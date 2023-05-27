@@ -6,7 +6,7 @@ dndsh is an interactive shell purpose-built for the Dungeons and Dragons© table
 
 When initially launching the program, you will be met with the dndsh shell, which looks similar to the following:
 
-![prompt](https://imgur.com/a/D06Rtim)
+![prompt](https://imgur.com/YY66YSC.png)
 
 The prompt displays the currently loaded character name, along with their heath (**current/max** *(temp)*).
 
