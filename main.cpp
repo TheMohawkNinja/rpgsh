@@ -3,7 +3,6 @@
 #include <spawn.h>
 #include <sys/wait.h>
 #include <string>
-#include <vector>
 #include "text.h"
 #include "classes.h"
 
