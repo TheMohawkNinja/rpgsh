@@ -1,5 +1,8 @@
 #include <string>
+#include <string.h>
 #include <vector>
+#include <cctype>
+#include "text.h"
 
 class DNDSH_DICE
 {
@@ -12,6 +15,36 @@ class DNDSH_DICE
 	{
 		Count = _count;
 		Face = _face;
+	}
+	DNDSH_DICE(char* dice)
+	{
+		for(int i = 0; i < sizeof(dice); i++)
+		{
+			if(dice[0] != 'd' && !std::isdigit(dice[0]))
+			{
+				fprintf(stderr,"%s%sERROR: First character is not \'d\' or an integer.%s\n",TEXT_BOLD,TEXT_RED,TEXT_NORMAL);
+				break;
+			}
+			else if(dice[0] == 'd')
+			{
+				Count = 1;
+			}
+			else
+			{
+				char Count_temp[strstr(dice,"d") - dice];
+				for(int i=0; i<sizeof(Count_temp); i++);
+				{
+					Count_temp[i]=dice[i];
+				}
+				Count = std::stoi(Count_temp);
+			}
+			fprintf(stdout,"Dice Count: %d\n",Count);
+		}
+	}
+
+	void roll()
+	{
+		
 	}
 };
 
