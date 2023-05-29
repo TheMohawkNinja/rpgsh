@@ -23,9 +23,9 @@ Run `./install.sh` as root
 When writing programs which may be called within the `dndsh` shell, the program *must* adhere to the following standard:
 - The name of the executable must start with "dndsh-"
 - The program will be given the following argv parameters:
-  - 0. The full path to the the called program (like any other program being called by a shell)
-  - 1. The name of the currently selected character
-  - 2-(n-1). All additional arguments given by the user for the program
-  - n. NULL (per posix_spawn() requirements).
+  - [0] The full path to the the called program (like any other program being called by a shell)
+  - [1] The name of the currently selected character
+  - [2] - [(n-1)]. All additional arguments given by the user for the program
+  - [n] NULL (per posix_spawn() requirements).
 
 Newlines are automatically placed before and after the output to reduce on-screen clutter, so this does not need to be added to the individual programs unless desired.
