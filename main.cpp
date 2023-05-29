@@ -2,41 +2,83 @@
 #include <string.h>
 #include <spawn.h>
 #include <sys/wait.h>
+#include <string>
+#include <vector>
 #include "text.h"
 #include "classes.h"
 
-void run_dndsh_prog(const char prog[],DNDSH_CHARACTER c,char args[])
+#define MAX_BUFFER_SIZE 256
+
+void run_dndsh_prog(DNDSH_CHARACTER c, std::string args)
 {
-	char* prog_name = (char*)prog;
 	extern char** environ;
 	pid_t pid;
 
-	//strcat() calls for setting up the correct parameter values for posix_spawn()
-	//Also defines naming convention for all sub-programs of dndsh to be prefixed with "dndsh-"
-	char prefix[] = "dndsh-";
-	char full_prog[(sizeof(prog_name)+sizeof(prefix))+2];
-	for(int i = 0; i<sizeof(full_prog); i++)
+	//Get number of args, and largest arg for efficient memory allocation.
+	int args_ctr = 1;
+	int arg_size = 0;
+	int largest_arg_size = 0;
+	std::string args_temp;
+	for(int i=0; i<args.length(); i++)
 	{
-		full_prog[i]='\0';
+		if(args.substr(i,1) == " ")
+		{
+			args_ctr++;
+		}
+		if(args.substr(i,1) == " " || args.substr(i,1) == "\0")
+		{
+			if(largest_arg_size < arg_size)
+			{
+				largest_arg_size = arg_size;
+			}
+			arg_size = 0;
+		}
+		else
+		{
+			arg_size++;
+		}
 	}
-	strcat(full_prog,prefix);
-	strcat(full_prog,prog);
 
-	char path[] = "/home/terminus/code/git/dndsh/";
-	char full_path[sizeof(full_prog)+sizeof(path)+2];
-	for(int i = 0; i<sizeof(full_path); i++)
+	//Set parse parameters and set char[][] for args.
+	int argv_length = (args_ctr+2);
+	char* argv[argv_length - 1];
+	std::string program;
+	std::string prefix = "dndsh-";
+	std::string path = "/home/terminus/code/git/dndsh/";
+	std::string full_path;
+	std::string full_prog_args[args_ctr];
+	int args_index = 0;
+	int arg_index = 0;
+	for(int i=0; i<=args.length(); i++)
 	{
-		full_path[i]='\0';
-	}
-	strcat(full_path,path);
-	strcat(full_path,full_prog);
+		if(args.substr(i,1) == " " || args.substr(i,1) == "\0")
+		{
+			full_prog_args[args_index] = (args.substr(arg_index,(i-arg_index)).data());
 
-	char* const argv[] = {full_prog,c.Name,args,NULL};
-	int status;
+			if(args_index == 0)
+			{		
+				//Defines naming convention for all sub-programs of dndsh to be prefixed with "dndsh-"
+				program = full_prog_args[args_index];
+				full_path = path + prefix + program;
+				argv[0] = const_cast<char*>(full_path.c_str());
+				argv[1] = c.Name;
+			}
+
+			args_index++;
+			arg_index = i+1;
+		}
+	}
+
+	argv[1] = c.Name;
+	for(int i=0; i<(args_ctr-1); i++)
+	{
+		argv[i+2] = const_cast<char*>(full_prog_args[i+1].c_str());
+	}
+	argv[argv_length - 1] = NULL;//NULL needs to be here, otherwise a 14: Bad address is thrown
 
 	fprintf(stdout,"\n");
 
-	status = posix_spawn(&pid, full_path, NULL, NULL, argv, environ);
+	int status = posix_spawn(&pid, argv[0], NULL, NULL, (char* const*)argv, environ);
 
 	if(status == 0)
 	{
@@ -52,7 +94,7 @@ void run_dndsh_prog(const char prog[],DNDSH_CHARACTER c,char args[])
 	{
 		if(status == 2)//File not found
 		{
-			fprintf(stderr,"%s%sERROR [%d]: \"%s\" is not a valid dndsh command.%s\n",TEXT_BOLD,TEXT_RED,status,prog,TEXT_NORMAL);
+			fprintf(stderr,"%s%sERROR [%d]: \"%s\" is not a valid dndsh command.%s\n",TEXT_BOLD,TEXT_RED,status,program.c_str(),TEXT_NORMAL);
 		}
 		else
 		{
@@ -68,30 +110,18 @@ int prompt(DNDSH_CHARACTER c)
 	fprintf(stdout,"%s┌─%s[%s%s%s%s%s%s%s]%s─%s(%s%hhu/%hhu%s %s(%hhu)%s%s%s)%s%s\n",TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_ITALIC,TEXT_RED,c.Name,TEXT_NOITALIC,TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_BOLD,TEXT_GREEN,c.HP,c.MaxHP,TEXT_NOBOLD,TEXT_ITALIC,c.TempHP,TEXT_NOITALIC,TEXT_BOLD,TEXT_WHITE,TEXT_NOBOLD,TEXT_NORMAL);
 	fprintf(stdout,"%s└─%sĐ₦Đ%s─%s$%s ",TEXT_WHITE,TEXT_CYAN,TEXT_WHITE,TEXT_CYAN,TEXT_NORMAL);
 
-	char input[256];
-	fgets(input,sizeof(input),stdin);
-	input[strcspn(input,"\n")] = 0; //Omits newline character from input buffer (https://stackoverflow.com/questions/2693776/removing-trailing-newline-character-from-fgets-input)
+	char buffer[MAX_BUFFER_SIZE];
+	fgets(buffer,sizeof(buffer),stdin);
+	buffer[strcspn(buffer,"\n")] = 0; //Omits newline character from input buffer (https://stackoverflow.com/questions/2693776/removing-trailing-newline-character-from-fgets-input)
 
-	if(!strcmp(input,"exit"))
+	if(!strcmp(buffer,"exit"))
 	{
 		fprintf(stdout,"Exiting...\n");
 		return -1;
 	}
 	else
 	{
-		std::string prog = "";
-
-		for(int i=0; i<sizeof(input); i++)
-		{
-			int num = input[i];
-			if(num == 0){break;} //null terminator
-			else if(num == 32){break;} //space
-			else{prog += input[i];}
-		}
-		if(strcmp(prog.c_str(),""))
-		{
-			run_dndsh_prog(prog.c_str(),c,input);
-		}
+		run_dndsh_prog(c,buffer);
 		return 0;
 	}
 
@@ -101,8 +131,8 @@ int main()
 {
 	DNDSH_CHARACTER character = DNDSH_CHARACTER();
 
-	run_dndsh_prog("banner",character,NULL);
-	run_dndsh_prog("version",character,NULL);
+	run_dndsh_prog(character,(char*)"banner");
+	run_dndsh_prog(character,(char*)"version");
 
 	while(prompt(character) >= 0){}
 
