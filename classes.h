@@ -2,43 +2,69 @@
 #include <string.h>
 #include <vector>
 #include <cctype>
+#include <climits>
 #include "text.h"
 
 class DNDSH_DICE
 {
+	private:
+		std::string Count_str = "";
+		std::string Faces_str = "";
+
+		void get_Faces(std::string d, int start)
+		{
+			for(int i = start; i <= d.length(); i++)
+			{
+				if(i == d.length())
+				{
+					Faces = std::stoi(Faces_str);
+					fprintf(stdout,"Dice faces = \"%d\"\n",Faces);
+					break;
+				}
+				Faces_str += d.substr(i,1);
+			}
+		}
 	public:
-		unsigned char	Count	=	0;
-		unsigned char	Face	=	0;
+		unsigned int	Count	=	0;
+		unsigned int	Faces	=	0;
 
 	DNDSH_DICE(){}
-	DNDSH_DICE(unsigned char _count,unsigned char _face)
+	DNDSH_DICE(unsigned int _count,unsigned int _faces)
 	{
 		Count = _count;
-		Face = _face;
+		Faces = _faces;
 	}
-	DNDSH_DICE(char* dice)
+	DNDSH_DICE(std::string dice)
 	{
-		for(int i = 0; i < sizeof(dice); i++)
+		if(dice.substr(0,1) != "d")
 		{
-			if(dice[0] != 'd' && !std::isdigit(dice[0]))
+			try //Get number of dice
 			{
-				fprintf(stderr,"%s%sERROR: First character is not \'d\' or an integer.%s\n",TEXT_BOLD,TEXT_RED,TEXT_NORMAL);
-				break;
-			}
-			else if(dice[0] == 'd')
-			{
-				Count = 1;
-			}
-			else
-			{
-				char Count_temp[strstr(dice,"d") - dice];
-				for(int i=0; i<sizeof(Count_temp); i++);
+				for(int i=0; dice.substr(i,1) != "d"; i++)
 				{
-					Count_temp[i]=dice[i];
+					Count_str += dice.substr(i,1);
 				}
-				Count = std::stoi(Count_temp);
+				Count = std::stoi(Count_str);
+				fprintf(stdout,"Dice count = \"%d\"\n",Count);
 			}
-			fprintf(stdout,"Dice Count: %d\n",Count);
+			catch(...)
+			{
+				if(Count > 0)
+				{
+					fprintf(stderr,"%s%sERROR: Unable to get number of dice. First character is not \'d\' or an integer.%s\n",TEXT_BOLD,TEXT_RED,TEXT_NORMAL);
+				}
+				else
+				{
+					fprintf(stderr,"%s%sERROR: Unable to get number of dice. You've tried rolling too many dice (%s > %d)!.%s\n",TEXT_BOLD,TEXT_RED,Count_str.c_str(),INT_MAX,TEXT_NORMAL);
+				}
+			}
+			get_Faces(dice,Count_str.length() + 1);
+		}
+		else if(dice.substr(0,1) == "d")
+		{
+			Count = 1;
+			fprintf(stdout,"Dice count = \"%d\"\n",Count);
+			get_Faces(dice,1);
 		}
 	}
 
