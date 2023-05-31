@@ -77,26 +77,54 @@ class DNDSH_DICE
 			}
 		}
 	public:
-		unsigned int	Count	=	0;
-		unsigned int	Faces	=	0;
+		unsigned int	Count		=	0;
+		unsigned int	Faces		=	0;
+			 int	Modifier	=	0;
 
 	DNDSH_DICE(){}
-	DNDSH_DICE(unsigned int _count,unsigned int _faces)
+	DNDSH_DICE(unsigned int _count, unsigned int _faces, int _modifier)
 	{
 		Count = _count;
 		Faces = _faces;
+		Modifier = _modifier;
 	}
 	DNDSH_DICE(std::string dice)
 	{
 		if(dice.substr(0,1) != "d")
 		{
 			Count = get_value(dice,"count",0,"d");
-			Faces = get_value(dice,"faces",dice.find("d",0) + 1,"");
+			if(dice.find("+",0) == std::string::npos && dice.find("-",0) == std::string::npos)// No modifier
+			{
+				Faces = get_value(dice,"faces",dice.find("d",0) + 1,"");
+			}
+			else if(dice.find("+",0) != std::string::npos)// + modifier
+			{
+				Faces = get_value(dice,"faces",dice.find("d",0) + 1,"+");
+				Modifier = get_value(dice,"modifier",dice.find("+",0) + 1,"");
+			}
+			else// - modifier
+			{
+				Faces = get_value(dice,"faces",dice.find("d",0) + 1,"-");
+				Modifier = -1 * get_value(dice,"modifier",dice.find("-",0) + 1,"");
+			}
 		}
 		else
 		{
 			Count = 1;
-			Faces = get_value(dice,"faces",1,"");
+			if(dice.find("+",0) == std::string::npos && dice.find("-",0) == std::string::npos)// No modifier
+			{
+				Faces = get_value(dice,"faces",dice.find("d",0) + 1,"");
+			}
+			else if(dice.find("+",0) != std::string::npos)// + modifier
+			{
+				Faces = get_value(dice,"faces",dice.find("d",0) + 1,"+");
+				Modifier = get_value(dice,"modifier",dice.find("+",0) + 1,"");
+			}
+			else// - modifier
+			{
+				Faces = get_value(dice,"faces",dice.find("d",0) + 1,"-");
+				Modifier = -1 * get_value(dice,"modifier",dice.find("-",0) + 1,"");
+			}
 		}
 	}
 
@@ -104,7 +132,7 @@ class DNDSH_DICE
 	{
 		if(Count > 0)
 		{
-			fprintf(stdout,"Rolling %d-sided dice %d time(s)...\n",Faces,Count);
+			fprintf(stdout,"Rolling %d-sided dice %d time(s) with a modifier of %d...\n",Faces,Count,Modifier);
 		}
 	}
 };
