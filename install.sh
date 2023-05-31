@@ -1,5 +1,5 @@
 echo "Compiling main.cpp..."
-g++ main.cpp text.h classes.h -o dndsh
+g++ main.cpp -o dndsh
 echo "Compiling version.cpp..."
 g++ version.cpp -o dndsh-version
 echo "Compiling banner.cpp..."
