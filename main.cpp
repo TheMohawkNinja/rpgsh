@@ -43,7 +43,7 @@ void run_dndsh_prog(DNDSH_CHARACTER c, std::string args)
 	char* argv[argv_length - 1];
 	std::string program;
 	std::string prefix = "dndsh-";
-	std::string path = "/home/terminus/code/git/dndsh/";
+	std::string path = "./";
 	std::string full_path;
 	std::string full_prog_args[args_ctr];
 	int args_index = 0;
