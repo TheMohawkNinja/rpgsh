@@ -15,11 +15,31 @@ class DNDSH_DICE
 		{
 			for(int i = start; i <= d.length(); i++)
 			{
-				if(i == d.length())
+				try
 				{
-					Faces = std::stoi(Faces_str);
-					fprintf(stdout,"Dice faces = \"%d\"\n",Faces);
-					break;
+					if(i > start)
+					{
+						Faces = std::stoi(Faces_str);
+					}
+					if(i == d.length())
+					{
+						Faces = std::stoi(Faces_str);
+						fprintf(stdout,"Dice faces = \"%d\"\n",Faces);
+						break;
+					}
+				}
+				catch(...)
+				{
+					if(Faces > 0)
+					{
+						fprintf(stderr,"%s%sERROR: Unable to get number of faces. You've tried rolling too large of a die (%s > %d)!.%s\n",TEXT_BOLD,TEXT_RED,Faces_str.c_str(),INT_MAX,TEXT_NORMAL);
+						break;
+					}
+					else
+					{
+						fprintf(stderr,"%s%sERROR: Unable to get number of faces. First character is not an integer.%s\n",TEXT_BOLD,TEXT_RED,TEXT_NORMAL);
+						break;
+					}
 				}
 				Faces_str += d.substr(i,1);
 			}
@@ -52,10 +72,12 @@ class DNDSH_DICE
 				if(Count > 0)
 				{
 					fprintf(stderr,"%s%sERROR: Unable to get number of dice. First character is not \'d\' or an integer.%s\n",TEXT_BOLD,TEXT_RED,TEXT_NORMAL);
+					break;
 				}
 				else
 				{
 					fprintf(stderr,"%s%sERROR: Unable to get number of dice. You've tried rolling too many dice (%s > %d)!.%s\n",TEXT_BOLD,TEXT_RED,Count_str.c_str(),INT_MAX,TEXT_NORMAL);
+					break;
 				}
 			}
 			get_Faces(dice,Count_str.length() + 1);
