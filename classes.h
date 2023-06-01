@@ -11,7 +11,7 @@ class DNDSH_DICE
 		std::string Count_str = "";
 		std::string Faces_str = "";
 
-		int get_value(std::string d, std::string value, int start, std::string terminator)
+		int get_value(std::string d, std::string value, int start, std::string terminator, bool allow_sign, bool required)
 		{
 			std::string value_str = "";
 			if(terminator != "")
@@ -20,8 +20,23 @@ class DNDSH_DICE
 				{
 					try
 					{
-						std::stoi(d.substr(i,1));
-						value_str += d.substr(i,1);
+						if(!allow_sign)
+						{
+							if(d.substr(i,1) == "+" || d.substr(i,1) == "-")
+							{
+								break;
+							}
+							std::stoi(d.substr(i,1));
+							value_str += d.substr(i,1);
+						}
+						else
+						{
+							if(d.substr(i,1) != "+" && d.substr(i,1) != "-")
+							{
+								std::stoi(d.substr(i,1));
+							}
+							value_str += d.substr(i,1);
+						}
 					}
 					catch(...)
 					{
@@ -33,7 +48,6 @@ class DNDSH_DICE
 				try
 				{
 					std::stoi(value_str);
-					//fprintf(stdout,"Dice %s = \"%s\"\n",value.c_str(),value_str.c_str());
 					return std::stoi(value_str);
 				}
 				catch(...)
@@ -46,15 +60,33 @@ class DNDSH_DICE
 			{
 				if(start == d.length())
 				{
-					fprintf(stderr,"%s%sERROR: Unable to get dice %s. No %s specified.%s\n",TEXT_BOLD,TEXT_RED,value.c_str(),value.c_str(),TEXT_NORMAL);
+					if(required)
+					{
+						fprintf(stderr,"%s%sERROR: Unable to get dice %s. No %s specified.%s\n",TEXT_BOLD,TEXT_RED,value.c_str(),value.c_str(),TEXT_NORMAL);
+					}
 					return 0;
 				}
 				for(int i=start; i<d.length(); i++)
 				{
 					try
 					{
-						std::stoi(d.substr(i,1));
-						value_str += d.substr(i,1);
+						if(!allow_sign)
+						{
+							if(d.substr(i,1) == "+" || d.substr(i,1) == "-")
+							{
+								break;
+							}
+							std::stoi(d.substr(i,1));
+							value_str += d.substr(i,1);
+						}
+						else
+						{
+							if(d.substr(i,1) != "+" && d.substr(i,1) != "-")
+							{
+								std::stoi(d.substr(i,1));
+							}
+							value_str += d.substr(i,1);
+						}
 					}
 					catch(...)
 					{
@@ -66,7 +98,6 @@ class DNDSH_DICE
 				try
 				{
 					std::stoi(value_str);
-					//fprintf(stdout,"Dice %s = \"%s\"\n",value.c_str(),value_str.c_str());
 					return std::stoi(value_str);
 				}
 				catch(...)
@@ -92,45 +123,21 @@ class DNDSH_DICE
 	{
 		if(dice.substr(0,1) != "d")
 		{
-			Count = get_value(dice,"count",0,"d");
-			if(dice.find("+",0) == std::string::npos && dice.find("-",0) == std::string::npos)// No modifier
-			{
-				Faces = get_value(dice,"faces",dice.find("d",0) + 1,"");
-			}
-			else if(dice.find("+",0) != std::string::npos)// + modifier
-			{
-				Faces = get_value(dice,"faces",dice.find("d",0) + 1,"+");
-				Modifier = get_value(dice,"modifier",dice.find("+",0) + 1,"");
-			}
-			else// - modifier
-			{
-				Faces = get_value(dice,"faces",dice.find("d",0) + 1,"-");
-				Modifier = -1 * get_value(dice,"modifier",dice.find("-",0) + 1,"");
-			}
+			Count = get_value(dice,"count",0,"d",false,true);
+			Faces = get_value(dice,"faces",dice.find("d",0) + 1,"",false,true);
+			Modifier = get_value(dice,"modifier",dice.find(std::to_string(Faces),dice.find("d",0)) + std::to_string(Faces).length(),"",true,false);
 		}
 		else
 		{
 			Count = 1;
-			if(dice.find("+",0) == std::string::npos && dice.find("-",0) == std::string::npos)// No modifier
-			{
-				Faces = get_value(dice,"faces",dice.find("d",0) + 1,"");
-			}
-			else if(dice.find("+",0) != std::string::npos)// + modifier
-			{
-				Faces = get_value(dice,"faces",dice.find("d",0) + 1,"+");
-				Modifier = get_value(dice,"modifier",dice.find("+",0) + 1,"");
-			}
-			else// - modifier
-			{
-				Faces = get_value(dice,"faces",dice.find("d",0) + 1,"-");
-				Modifier = -1 * get_value(dice,"modifier",dice.find("-",0) + 1,"");
-			}
+			Faces = get_value(dice,"faces",dice.find("d",0) + 1,"",false,true);
+			Modifier = get_value(dice,"modifier",dice.find(std::to_string(Faces),dice.find("d",0)) + std::to_string(Faces).length(),"",true,false);
 		}
 	}
 
 	void roll()
 	{
-		if(Count > 0)
+		if(Count > 0 && Faces > 0)
 		{
 			fprintf(stdout,"Rolling %d-sided dice %d time(s) with a modifier of %d...\n",Faces,Count,Modifier);
 		}
