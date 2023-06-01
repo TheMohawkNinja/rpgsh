@@ -3,6 +3,7 @@
 #include <vector>
 #include <cctype>
 #include <climits>
+#include <fstream>
 #include "text.h"
 
 class DNDSH_DICE
@@ -10,6 +11,7 @@ class DNDSH_DICE
 	private:
 		std::string Count_str = "";
 		std::string Faces_str = "";
+		std::vector<int> result_count;
 
 		int get_value(std::string d, std::string value, int start, std::string terminator, bool allow_sign, bool required)
 		{
@@ -139,7 +141,54 @@ class DNDSH_DICE
 	{
 		if(Count > 0 && Faces > 0)
 		{
+			for(int i=0; i<Faces; i++)
+			{
+				result_count.push_back(0);
+			}
+
 			fprintf(stdout,"Rolling %d-sided dice %d time(s) with a modifier of %d...\n",Faces,Count,Modifier);
+
+			std::ifstream fs("/dev/random");
+			std::string data, seed;
+			int result;
+
+			while(seed.length() < Count)
+			{
+				std::getline(fs,data);
+				seed += data;
+			}
+
+			for(int i=0; i<Count; i++)
+			{
+				std::srand((int)seed[i] * (int)seed[i] - i);
+				std::srand(std::rand());
+				result = std::rand() % Faces + 1;
+				result_count[result-1]++;
+				if(result == 1)
+				{
+					fprintf(stdout,"Roll %d: %s%d%s\n",i,TEXT_RED,result,TEXT_NORMAL);
+				}
+				else if(result == Faces)
+				{
+					fprintf(stdout,"Roll %d: %s%d%s\n",i,TEXT_GREEN,result,TEXT_NORMAL);
+				}
+				else
+				{
+					fprintf(stdout,"Roll %d: %s%d%s\n",i,TEXT_WHITE,result,TEXT_NORMAL);
+				}
+			}
+		}
+	}
+	void test()
+	{
+		Count = 100000;
+		Faces = 20;
+		roll();
+		fprintf(stdout,"\n");
+		for(int i=0; i<Faces; i++)
+		{
+			float percent = 100-(((float)result_count[i]/((float)Count/(float)Faces))*100);
+			fprintf(stdout,"# of %d's: %d (%.2f%% from perfect)\n",(i+1),result_count[i],percent);
 		}
 	}
 };
