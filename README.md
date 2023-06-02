@@ -14,7 +14,7 @@ When initially launching the program, you will be met with the `dndsh` shell, wh
 
 The prompt displays the currently loaded character name, along with their heath (**current/max** *(temp)*).
 
-Just like any other shell (sh, bash, cmd, etc.), you interact with it by typing a command along with any associated parameters and then executing the desired command by pressing the Enter key. You may exit the shell at any time by running the "exit" command, or by pressing ctrl+C.
+Just like any other shell (sh, bash, cmd, etc.), you interact with it by typing a command along with any associated parameters and then executing the desired command by pressing the Enter key. You may exit the shell at any time by running the "exit" command, or by pressing ctrl+c.
 
 ## Installation instructions
 
