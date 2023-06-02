@@ -45,23 +45,23 @@ int main(int argc, char** argv)
 					}
 				}
 			}
-			else if(current_arg == "-h")
+			else if(current_arg == "-?")
 			{
 				fprintf(stdout,"USAGE:\n");
 				fprintf(stdout,"\troll [%sc%s]d%sf%s[+%sm%s|-%sm%s]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
-				fprintf(stdout,"\troll [-t|--test]\n");
-				fprintf(stdout,"\troll [-h|--help]\n");
+				fprintf(stdout,"\troll -t\n");
+				fprintf(stdout,"\troll -?\n");
 				fprintf(stdout,"\n");
 				fprintf(stdout,"%sc%s		Optional. The number of dice being rolled. Dice count set to 1 if omitted.\n",TEXT_ITALIC,TEXT_NORMAL);
 				fprintf(stdout,"%sf%s		The number of faces on each die being rolled.\n",TEXT_ITALIC,TEXT_NORMAL);
 				fprintf(stdout,"%sm%s		Optional. The modifier for the total roll.\n",TEXT_ITALIC,TEXT_NORMAL);
-				fprintf(stdout,"-t|--test	Rolls 100000d20 and displays results showing rolls per face, along with the percent deviation from perfect distribution.\n");
-				fprintf(stdout,"-h|--help	Displays help text.\n");
+				fprintf(stdout,"-t		Rolls 100000d20 and displays results showing rolls per face, along with the percent deviation from perfect distribution.\n");
+				fprintf(stdout,"-h		Displays help text.\n");
 				fprintf(stdout,"\n");
 				fprintf(stdout,"EXAMPLES:\n");
 				fprintf(stdout,"\troll 4d8+3	Rolls an 8-sided die 4 times, then adds 3 to the result.\n");
 				fprintf(stdout,"\troll -t		Initiates a roll test.\n");
-				fprintf(stdout,"\troll --help	Displays this help text.\n");
+				fprintf(stdout,"\troll -?		Displays this help text.\n");
 				return 0;
 			}
 			else
