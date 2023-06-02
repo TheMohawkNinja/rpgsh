@@ -1,38 +1,26 @@
 #include "classes.h"
-#include <getopt.h>
-//#include "text.h"
 
 int main(int argc, char** argv)
 {
 	unsigned int repeat = 1;
-	std::string dice_str;
+	std::string dice_str, current_arg;
 	DNDSH_CHARACTER c = DNDSH_CHARACTER();//TODO This will eventually load the character defined in argv[1]
 
-	const option long_opts[] = {
-		{"test",	no_argument,		nullptr,	't'},
-		{"repeat",	required_argument,	nullptr,	'r'},
-		{"help",	no_argument,		nullptr,	'h'},
-		{0,		0,			0,		0}};
-
-	const auto opt = getopt_long(argc, argv, "trh", long_opts, nullptr);
-
-	while(true)
+	for(int arg=2; arg<argc; arg++)
 	{
-		fprintf(stdout,"opt = %d\n",opt);
-		if(opt == -1){break;}
-
-		switch(opt)
+		current_arg = std::string(argv[arg]);
+		if(current_arg.substr(0,1) == "-")//Assume anything starting with a "-" is a non-dice parameter
 		{
-			case 't':
+			if(current_arg == "-t")
 			{
 				fprintf(stdout,"Initiating roll test...\n\n");
 				DNDSH_DICE dice = DNDSH_DICE();
 				dice.test();
 				return 0;
 			}
-			case 'r':
+			else if(current_arg == "-r")
 			{
-				if(optind == argc)
+				if(!argv[arg+1])
 				{
 					fprintf(stderr,"%s%sERROR: No repeat value specified.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
 					return -1;
@@ -41,10 +29,9 @@ int main(int argc, char** argv)
 				{
 					try
 					{
-						fprintf(stdout,"argv[%d] = \"%d\"\n",(optind+1),std::strtol(argv[optind+1],NULL,10));
-						repeat = std::strtol(argv[optind+1],NULL,10);
-						break;
-
+						repeat = std::strtol(argv[arg+1],NULL,10);
+						arg++;
+	
 						if(repeat < 1)
 						{
 							fprintf(stderr,"%s%sERROR: Repeat value must be greater than 0.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
@@ -53,12 +40,12 @@ int main(int argc, char** argv)
 					}
 					catch(...)
 					{
-						fprintf(stderr,"%s%sERROR: Can't parse repeat value. \"%s\" is not a number.%s\n",TEXT_RED,TEXT_BOLD,argv[optind],TEXT_NORMAL);
+						fprintf(stderr,"%s%sERROR: Can't parse repeat value. \"%s\" is not a number.%s\n",TEXT_RED,TEXT_BOLD,argv[arg+1],TEXT_NORMAL);
 						return -1;
 					}
 				}
 			}
-			case 'h':
+			else if(current_arg == "-h")
 			{
 				fprintf(stdout,"USAGE:\n");
 				fprintf(stdout,"\troll [%sc%s]d%sf%s[+%sm%s|-%sm%s]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
@@ -77,10 +64,16 @@ int main(int argc, char** argv)
 				fprintf(stdout,"\troll --help	Displays this help text.\n");
 				return 0;
 			}
-			default:
-				dice_str = argv[optind];
-				break;
+			else
+			{
+				fprintf(stderr,"%s%sWARNING: Unknown option \"%s\".%s\n",TEXT_YELLOW,TEXT_BOLD,current_arg.c_str(),TEXT_NORMAL);
+			}
 		}
+		else
+		{
+			dice_str = current_arg;
+		}
+	
 	}
 
 	DNDSH_DICE dice = DNDSH_DICE(dice_str);
