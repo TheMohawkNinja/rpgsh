@@ -11,6 +11,8 @@ class DNDSH_DICE
 	private:
 		bool just_show_rolls = false;
 		bool just_show_total = false;
+		bool is_list = false;
+		std::string dice = "";
 		std::string Count_str = "";
 		std::string Faces_str = "";
 		std::vector<int> result_count;
@@ -125,22 +127,27 @@ class DNDSH_DICE
 		just_show_rolls = false;
 		just_show_total = true;
 	}
-	DNDSH_DICE(std::string dice, bool _just_show_rolls, bool _just_show_total)
+	DNDSH_DICE(std::string _dice, bool _just_show_rolls, bool _just_show_total, bool _is_list)
 	{
+		dice = _dice;
 		just_show_rolls = _just_show_rolls;
 		just_show_total = _just_show_total;
+		is_list = _is_list;
 
-		if(dice.substr(0,1) != "d")
+		if(!is_list)
 		{
-			Count = get_value(dice,"count",0,"d",false,true);
-			Faces = get_value(dice,"faces",dice.find("d",0) + 1,"",false,true);
-			Modifier = get_value(dice,"modifier",dice.find(std::to_string(Faces),dice.find("d",0)) + std::to_string(Faces).length(),"",true,false);
-		}
-		else
-		{
-			Count = 1;
-			Faces = get_value(dice,"faces",dice.find("d",0) + 1,"",false,true);
-			Modifier = get_value(dice,"modifier",dice.find(std::to_string(Faces),dice.find("d",0)) + std::to_string(Faces).length(),"",true,false);
+			if(dice.substr(0,1) != "d")
+			{
+				Count = get_value(dice,"count",0,"d",false,true);
+				Faces = get_value(dice,"faces",dice.find("d",0) + 1,"",false,true);
+				Modifier = get_value(dice,"modifier",dice.find(std::to_string(Faces),dice.find("d",0)) + std::to_string(Faces).length(),"",true,false);
+			}
+			else
+			{
+				Count = 1;
+				Faces = get_value(dice,"faces",dice.find("d",0) + 1,"",false,true);
+				Modifier = get_value(dice,"modifier",dice.find(std::to_string(Faces),dice.find("d",0)) + std::to_string(Faces).length(),"",true,false);
+			}
 		}
 	}
 
@@ -155,7 +162,7 @@ class DNDSH_DICE
 
 			if(!just_show_rolls && !just_show_total)
 			{
-				fprintf(stdout,"Rolling %d-sided dice %d time(s) with a modifier of %d...\n",Faces,Count,Modifier);
+				fprintf(stdout,"Rolling an %s%d%s-sided die %s%d%s time(s) with a modifier of %s%d%s...\n",TEXT_WHITE,Faces,TEXT_NORMAL,TEXT_WHITE,Count,TEXT_NORMAL,TEXT_WHITE,Modifier,TEXT_NORMAL);
 			}
 
 			std::ifstream fs("/dev/random");//Probably safe to assume this file exists?
@@ -191,24 +198,65 @@ class DNDSH_DICE
 				{
 					color = TEXT_WHITE;
 				}
-					fprintf(stdout,"%s%s%d%s\n",(just_show_rolls || just_show_total) ? "" : ("Roll "+std::to_string(i)+": ").c_str(),color,result,TEXT_NORMAL);
+
+				if(just_show_rolls)
+				{
+					fprintf(stdout,"%s%d%s\n",color.c_str(),result,TEXT_NORMAL);
+				}
+				else if(!just_show_total)
+				{
+					fprintf(stdout,"Roll %d: %s%d%s\n",i,color.c_str(),result,TEXT_NORMAL);
+				}
 			}
 			if(!just_show_rolls && !just_show_total)
 			{
 				fprintf(stdout,"\n");
-				fprintf(stdout,"Natural total: %d\n",total);
+				fprintf(stdout,"Natural total:\t%s%d%s\n",TEXT_WHITE,total,TEXT_NORMAL);
 			
 				if(Modifier != 0)
 				{
-					fprintf(stdout,"Modifier: %d\n",Modifier);
+					fprintf(stdout,"Modifier:\t%s%d%s\n",TEXT_WHITE,Modifier,TEXT_NORMAL);
 					total += Modifier;
 				}
-				fprintf(stdout,"Total: %d\n",total);
+				fprintf(stdout,"Total:\t\t%s%d%s\n",TEXT_WHITE,total,TEXT_NORMAL);
 			}
 			else if(just_show_total)
 			{
 				total += Modifier;
 				fprintf(stdout,"%d\n",total);
+			}
+			fs.close();
+		}
+		else if(is_list)
+		{
+			try
+			{
+				std::string tmp = "";
+				std::vector<std::string> values;
+				std::ifstream fs(dice);
+
+				while(std::getline(fs,tmp))
+				{
+					values.push_back(tmp);
+					tmp = "";
+				}
+				fs.close();
+
+				fs.open("/dev/random");//Probably safe to assume this file exists?
+				std::string data, seed;
+				int result;
+				std::getline(fs,data);
+				fs.close();
+
+				seed += data;
+				std::srand((int)seed[0] * (int)seed[seed.length()-1]);
+				std::srand(std::rand());//Mitigates apparent roll biasing when Faces%result=0
+				fprintf(stdout,"%s\n",values[std::rand() % values.size()].c_str());
+			}
+			catch(...)
+			{
+				fprintf(stderr,"%s%sERROR: Unable to open file \"%s\"\n",TEXT_RED,TEXT_ITALIC,dice.c_str(),TEXT_NORMAL);
+				exit(-1);
 			}
 		}
 	}
