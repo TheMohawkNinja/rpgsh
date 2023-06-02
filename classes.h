@@ -9,6 +9,8 @@
 class DNDSH_DICE
 {
 	private:
+		bool just_show_rolls = false;
+		bool just_show_total = false;
 		std::string Count_str = "";
 		std::string Faces_str = "";
 		std::vector<int> result_count;
@@ -120,9 +122,14 @@ class DNDSH_DICE
 		Count = _count;
 		Faces = _faces;
 		Modifier = _modifier;
+		just_show_rolls = false;
+		just_show_total = true;
 	}
-	DNDSH_DICE(std::string dice)
+	DNDSH_DICE(std::string dice, bool _just_show_rolls, bool _just_show_total)
 	{
+		just_show_rolls = _just_show_rolls;
+		just_show_total = _just_show_total;
+
 		if(dice.substr(0,1) != "d")
 		{
 			Count = get_value(dice,"count",0,"d",false,true);
@@ -146,9 +153,12 @@ class DNDSH_DICE
 				result_count.push_back(0);
 			}
 
-			fprintf(stdout,"Rolling %d-sided dice %d time(s) with a modifier of %d...\n",Faces,Count,Modifier);
+			if(!just_show_rolls && !just_show_total)
+			{
+				fprintf(stdout,"Rolling %d-sided dice %d time(s) with a modifier of %d...\n",Faces,Count,Modifier);
+			}
 
-			std::ifstream fs("/dev/random");
+			std::ifstream fs("/dev/random");//Probably safe to assume this file exists?
 			std::string data, seed;
 			int result;
 
@@ -158,24 +168,47 @@ class DNDSH_DICE
 				seed += data;
 			}
 
+			int total = 0;
+			std::string color;
+
 			for(int i=0; i<Count; i++)
 			{
 				std::srand((int)seed[i] * (int)seed[i] - i);
-				std::srand(std::rand());
+				std::srand(std::rand());//Mitigates apparent roll biasing when Faces%result=0
 				result = std::rand() % Faces + 1;
 				result_count[result-1]++;
+				total += result;
+
 				if(result == 1)
 				{
-					fprintf(stdout,"Roll %d: %s%d%s\n",i,TEXT_RED,result,TEXT_NORMAL);
+					color = TEXT_RED;
 				}
 				else if(result == Faces)
 				{
-					fprintf(stdout,"Roll %d: %s%d%s\n",i,TEXT_GREEN,result,TEXT_NORMAL);
+					color = TEXT_GREEN;
 				}
 				else
 				{
-					fprintf(stdout,"Roll %d: %s%d%s\n",i,TEXT_WHITE,result,TEXT_NORMAL);
+					color = TEXT_WHITE;
 				}
+					fprintf(stdout,"%s%s%d%s\n",(just_show_rolls || just_show_total) ? "" : ("Roll "+std::to_string(i)+": ").c_str(),color,result,TEXT_NORMAL);
+			}
+			if(!just_show_rolls && !just_show_total)
+			{
+				fprintf(stdout,"\n");
+				fprintf(stdout,"Natural total: %d\n",total);
+			
+				if(Modifier != 0)
+				{
+					fprintf(stdout,"Modifier: %d\n",Modifier);
+					total += Modifier;
+				}
+				fprintf(stdout,"Total: %d\n",total);
+			}
+			else if(just_show_total)
+			{
+				total += Modifier;
+				fprintf(stdout,"%d\n",total);
 			}
 		}
 	}
