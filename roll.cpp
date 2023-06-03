@@ -6,8 +6,10 @@ int main(int argc, char** argv)
 	bool only_total = false;
 	bool only_rolls = false;
 	bool is_list = false;
+	unsigned int count = 0;
 	unsigned int repeat = 1;
 	std::string dice_str, current_arg;
+	std::string count_expr = "";
 
 	for(int arg=2; arg<argc; arg++)
 	{
@@ -32,8 +34,7 @@ int main(int argc, char** argv)
 				{
 					try
 					{
-						repeat = std::strtol(argv[arg+1],NULL,10);
-						arg++;
+						repeat = std::stoi(argv[arg+1],NULL,10);
 	
 						if(repeat < 1)
 						{
@@ -47,6 +48,7 @@ int main(int argc, char** argv)
 						return -1;
 					}
 				}
+				arg++;
 			}
 			else if(current_arg == "-l" || current_arg == "--list")
 			{
@@ -66,13 +68,74 @@ int main(int argc, char** argv)
 					return -1;
 				}
 			}
-			else if(current_arg == "--only-total")
+			else if(current_arg == "-c" || current_arg == "--count")
 			{
-				only_total = true;
+				if(!argv[arg+1])
+				{
+					fprintf(stderr,"%s%sERROR: No count expression specified.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+					return -1;
+				}
+
+				count_expr = "";
+				std::string count_str = "";
+
+				try
+				{
+					count_str = argv[arg+1];
+					count = std::stoi(count_str);
+					count_expr = "=";
+				}
+				catch(...)
+				{
+					count_str = "";
+					std::string valid_expr[6] = {"<=", ">=", "!=", "=", "<", ">"};
+
+					for(int i=0; valid_expr[i] != ""; i++)
+					{
+						if(std::string(argv[arg+1]).substr(0,valid_expr[i].length()) == valid_expr[i])
+						{
+							count_expr = valid_expr[i];
+							break;
+						}
+					}
+
+					if(count_expr == "")
+					{
+						fprintf(stderr,"%s%sERROR: Invalid count expression in argument \"%s\".%s\n",TEXT_RED,TEXT_BOLD,argv[arg+1],TEXT_NORMAL);
+						return -1;
+					}
+				}
+
+				if(count == 0)
+				{
+					try
+					{
+						for(int i=count_expr.length(); i<std::string(argv[arg+1]).length(); i++)
+						{
+							count_str += std::string(argv[arg+1]).substr(i,1);
+							if(!std::isdigit(count_str[count_str.length()-1]))
+							{
+								fprintf(stderr,"%s%sERROR: Invalid count amount \"%s\".%s\n",TEXT_RED,TEXT_BOLD,count_str.c_str(),TEXT_NORMAL);
+								return -1;
+							}
+						}
+						count = std::stoi(count_str);
+					}
+					catch(...)
+					{
+						fprintf(stderr,"%s%sERROR: Invalid count amount \"%s\".%s\n",TEXT_RED,TEXT_BOLD,count_str.c_str(),TEXT_NORMAL);
+						return -1;
+					}
+				}
+				arg++;
 			}
 			else if(current_arg == "--only-rolls")
 			{
 				only_rolls = true;
+			}
+			else if(current_arg == "--only-total")
+			{
+				only_total = true;
 			}
 			else if(current_arg == "-?" || current_arg == "--help")
 			{
@@ -82,11 +145,12 @@ int main(int argc, char** argv)
 				fprintf(stdout,"\troll [-t|--test]\n");
 				fprintf(stdout,"\troll [-?|--help]\n");
 				fprintf(stdout,"\n");
-				fprintf(stdout,"\t%sc%s			The number of dice being rolled. Set to 1 if omitted.\n",TEXT_ITALIC,TEXT_NORMAL);
+				fprintf(stdout,"\t%sc%s			The number of dice being rolled.\n\t\t\t\tSet to 1 if omitted.\n",TEXT_ITALIC,TEXT_NORMAL);
 				fprintf(stdout,"\t%sf%s			The number of faces on each die being rolled.\n",TEXT_ITALIC,TEXT_NORMAL);
 				fprintf(stdout,"\t%sm%s			The modifier for the total roll.\n",TEXT_ITALIC,TEXT_NORMAL);
-				fprintf(stdout,"\t-r %sn%s|--repeat %sn%s		Repeat the roll %sn%s times. Set to 1 if omitted.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+				fprintf(stdout,"\t-r %sn%s|--repeat %sn%s		Repeat the roll %sn%s times.\n\t\t\t\tSet to 1 if omitted.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 				fprintf(stdout,"\t-l %spath%s|--list %spath%s	Rolls a die with custom faces sourced from %spath%s (newline delimited).\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+				fprintf(stdout,"\t-c %sexpr%s|--count %sexpr%s	Count how many dice rolls meet a criteria defined by a boolean expression (=,<,>,<=,>=,!=) and a numerical value.\n\t\t\t\tIf the boolean expression is omitted, it is assumed to be \"=\".\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 				fprintf(stdout,"\t--only-rolls		Only display dice rolls.\n");
 				fprintf(stdout,"\t--only-total		Only display total of the roll.\n");
 				fprintf(stdout,"\t-t|--test		Rolls 100000d20 and displays results with percent deviation from perfect distribution.\n");
@@ -96,6 +160,7 @@ int main(int argc, char** argv)
 				fprintf(stdout,"\troll 4d8+3			Rolls an 8-sided die 4 times, then adds 3 to the result.\n");
 				fprintf(stdout,"\troll 3d6+2 -r 5			Rolls a 6-sided die 3 times, then adds 2 to the result. Repeat this 5 times.\n");
 				fprintf(stdout,"\troll -l ./mylist		Rolls a dice with faces derived from the lines in the file \"./mylist\".\n");
+				fprintf(stdout,"\troll 10d20 -c >=15		Rolls a 20-sided die 10 times and counts the number of rolls greater than or equal to 15.\n");
 				fprintf(stdout,"\troll 2d10-5 --only-total	Rolls a 10-sided die twice, then subtracts 5 to the result. Only displays the total of the result.\n");
 				fprintf(stdout,"\troll --test			Initiates a roll test.\n");
 				fprintf(stdout,"\troll -?				Displays this help text.\n");
@@ -113,7 +178,7 @@ int main(int argc, char** argv)
 	
 	}
 
-	DNDSH_DICE dice = DNDSH_DICE(dice_str,only_rolls,only_total,is_list);
+	DNDSH_DICE dice = DNDSH_DICE(dice_str,only_rolls,only_total,is_list,count_expr,count);
 
 	for(int i=0; i<repeat; i++)
 	{

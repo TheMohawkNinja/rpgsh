@@ -12,10 +12,13 @@ class DNDSH_DICE
 		bool just_show_rolls = false;
 		bool just_show_total = false;
 		bool is_list = false;
+		unsigned int count = 0;
+		unsigned int total_count = 0;
 		std::string dice = "";
-		std::string Count_str = "";
+		std::string Quantity_str = "";
 		std::string Faces_str = "";
-		std::vector<int> result_count;
+		std::string count_expr = "";
+		std::vector<int> result_quantity;
 
 		int get_value(std::string d, std::string value, int start, std::string terminator, bool allow_sign, bool required)
 		{
@@ -114,37 +117,38 @@ class DNDSH_DICE
 			}
 		}
 	public:
-		unsigned int	Count		=	0;
+		unsigned int	Quantity		=	0;
 		unsigned int	Faces		=	0;
 			 int	Modifier	=	0;
 
 	DNDSH_DICE(){}
-	DNDSH_DICE(unsigned int _count, unsigned int _faces, int _modifier)
+	DNDSH_DICE(unsigned int _quantity, unsigned int _faces, int _modifier)
 	{
-		Count = _count;
+		Quantity = _quantity;
 		Faces = _faces;
 		Modifier = _modifier;
-		just_show_rolls = false;
 		just_show_total = true;
 	}
-	DNDSH_DICE(std::string _dice, bool _just_show_rolls, bool _just_show_total, bool _is_list)
+	DNDSH_DICE(std::string _dice, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count)
 	{
 		dice = _dice;
 		just_show_rolls = _just_show_rolls;
 		just_show_total = _just_show_total;
 		is_list = _is_list;
+		count_expr = _count_expr;
+		count = _count;
 
 		if(!is_list)
 		{
 			if(dice.substr(0,1) != "d")
 			{
-				Count = get_value(dice,"count",0,"d",false,true);
+				Quantity = get_value(dice,"quantity",0,"d",false,true);
 				Faces = get_value(dice,"faces",dice.find("d",0) + 1,"",false,true);
 				Modifier = get_value(dice,"modifier",dice.find(std::to_string(Faces),dice.find("d",0)) + std::to_string(Faces).length(),"",true,false);
 			}
 			else
 			{
-				Count = 1;
+				Quantity = 1;
 				Faces = get_value(dice,"faces",dice.find("d",0) + 1,"",false,true);
 				Modifier = get_value(dice,"modifier",dice.find(std::to_string(Faces),dice.find("d",0)) + std::to_string(Faces).length(),"",true,false);
 			}
@@ -153,23 +157,23 @@ class DNDSH_DICE
 
 	void roll()
 	{
-		if(Count > 0 && Faces > 0)
+		if(Quantity > 0 && Faces > 0)
 		{
 			for(int i=0; i<Faces; i++)
 			{
-				result_count.push_back(0);
+				result_quantity.push_back(0);
 			}
 
 			if(!just_show_rolls && !just_show_total)
 			{
-				fprintf(stdout,"Rolling an %s%d%s-sided die %s%d%s time(s) with a modifier of %s%d%s...\n",TEXT_WHITE,Faces,TEXT_NORMAL,TEXT_WHITE,Count,TEXT_NORMAL,TEXT_WHITE,Modifier,TEXT_NORMAL);
+				fprintf(stdout,"Rolling an %s%d%s-sided die %s%d%s time(s) with a modifier of %s%d%s...\n",TEXT_WHITE,Faces,TEXT_NORMAL,TEXT_WHITE,Quantity,TEXT_NORMAL,TEXT_WHITE,Modifier,TEXT_NORMAL);
 			}
 
 			std::ifstream fs("/dev/random");//Probably safe to assume this file exists?
 			std::string data, seed;
 			int result;
 
-			while(seed.length() < Count)
+			while(seed.length() < Quantity)
 			{
 				std::getline(fs,data);
 				seed += data;
@@ -178,13 +182,23 @@ class DNDSH_DICE
 			int total = 0;
 			std::string color;
 
-			for(int i=0; i<Count; i++)
+			for(int i=0; i<Quantity; i++)
 			{
 				std::srand((int)seed[i] * (int)seed[i] - i);
 				std::srand(std::rand());//Mitigates apparent roll biasing when Faces%result=0
 				result = std::rand() % Faces + 1;
-				result_count[result-1]++;
+				result_quantity[result-1]++;
 				total += result;
+
+				if(count_expr != "")
+				{
+					if(count_expr == "=" && result == count){total_count++;}
+					if(count_expr == "<" && result < count){total_count++;}
+					if(count_expr == ">" && result > count){total_count++;}
+					if(count_expr == "<=" && result <= count){total_count++;}
+					if(count_expr == ">=" && result >= count){total_count++;}
+					if(count_expr == "!=" && result != count){total_count++;}
+				}
 
 				if(result == 1)
 				{
@@ -205,7 +219,17 @@ class DNDSH_DICE
 				}
 				else if(!just_show_total)
 				{
-					fprintf(stdout,"Roll %d: %s%d%s\n",i,color.c_str(),result,TEXT_NORMAL);
+					fprintf(stdout,"Roll");
+					for(int space=std::to_string(Quantity).length(); space>=std::to_string(i+1).length(); space--)
+					{
+						fprintf(stdout," ");
+					}
+					fprintf(stdout,"%d:",(i+1));
+					for(int space=std::to_string(Faces).length(); space>=std::to_string(result).length(); space--)
+					{
+						fprintf(stdout," ");
+					}
+					fprintf(stdout,"%s%d%s\n",color.c_str(),result,TEXT_NORMAL);
 				}
 			}
 			if(!just_show_rolls && !just_show_total)
@@ -219,6 +243,11 @@ class DNDSH_DICE
 					total += Modifier;
 				}
 				fprintf(stdout,"Total:\t\t%s%d%s\n",TEXT_WHITE,total,TEXT_NORMAL);
+
+				if(count_expr != "")
+				{
+					fprintf(stdout,"Rolls %s%d:\t%s%d%s\n",count_expr.c_str(),count,TEXT_WHITE,total_count,TEXT_NORMAL);
+				}
 			}
 			else if(just_show_total)
 			{
@@ -262,14 +291,14 @@ class DNDSH_DICE
 	}
 	void test()
 	{
-		Count = 100000;
+		Quantity = 100000;
 		Faces = 20;
 		roll();
 		fprintf(stdout,"\n");
 		for(int i=0; i<Faces; i++)
 		{
-			float percent = 100-(((float)result_count[i]/((float)Count/(float)Faces))*100);
-			fprintf(stdout,"# of %d's: %d (%.2f%% from perfect)\n",(i+1),result_count[i],percent);
+			float percent = 100-(((float)result_quantity[i]/((float)Quantity/(float)Faces))*100);
+			fprintf(stdout,"# of %d's: %d (%.2f%% from perfect)\n",(i+1),result_quantity[i],percent);
 		}
 	}
 };
