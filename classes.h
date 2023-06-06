@@ -377,38 +377,94 @@ class DNDSH_CHAR_ATTR
 	public:
 		std::string Value = "";
 
+		//TODO
+		//Operator overloading definitions
+		//Planned overloads:
+		//	DNDSH_CHAR_ATTR + DNDSH_CHAR_ATTR
+		//	DNDSH_CHAR_ATTR + std::string		TODO
+		//	std::string + DNDSH_CHAR_ATTR		TODO
+		//	DNDSH_CHAR_ATTR + int
+		//	int + DNDSH_CHAR_ATTR			TODO
+		//	DNDSH_CHAR_ATTR - DNDSH_CHAR_ATTR
+		//	DNDSH_CHAR_ATTR - int			TODO
+		//	int - DNDSH_CHAR_ATTR			TODO
+		//	DNDSH_CHAR_ATTR = DNDSH_CHAR_ATTR
+		//	DNDSH_CHAR_ATTR = std::string
+		//	DNDSH_CHAR_ATTR = int			TODO
 		DNDSH_CHAR_ATTR operator + (const DNDSH_CHAR_ATTR &Other)
 		{
-			bool Value_is_int = true;
-			bool Other_is_int = true;
-			try
-			{
-				std::stoi(Value);
-			}
-			catch(...)
-			{
-				Value_is_int = false;
-			}
-			try
-			{
-				std::stoi(Other);
-			}
-			catch(...)
-			{
-				Other_is_int = false;
-			}
+			bool Value_is_num = true;
+			bool Other_is_num = true;
 
-			if(Value_is_int && Other_is_int)
+			try{std::stoi(Value);}
+			catch(...){Value_is_num = false;}
+			try{std::stoi(Other.Value);}
+			catch(...){Other_is_num = false;}
+
+			if(Value_is_num && Other_is_num)
 			{
-				Value = std::to_string((std::stoi(Value) + std::stoi(Other)));
+				return std::to_string((std::stoi(Value) + std::stoi(Other.Value)));
 			}
-			else if(!Value_is_int && !Other_is_int)
+			else if(!Value_is_num && !Other_is_num)
 			{
-				Value = Value + Other;
+				return Value + Other.Value;
 			}
 			else
 			{
-				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical value.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				return DNDSH_CHAR_ATTR("");
+			}
+		}
+		DNDSH_CHAR_ATTR operator + (const int &Other)
+		{
+			bool Value_is_num = true;
+
+			try{std::stoi(Value);}
+			catch(...){Value_is_num = false;}
+
+			if(Value_is_num)
+			{
+				return std::to_string((std::stoi(Value) + Other));
+			}
+			else
+			{
+				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				return DNDSH_CHAR_ATTR("");
+			}
+		}
+		DNDSH_CHAR_ATTR operator = (const DNDSH_CHAR_ATTR &Other)
+		{
+			Value = Other.Value;
+			return Value;
+		}
+		DNDSH_CHAR_ATTR operator = (const std::string &Other)
+		{
+			Value = Other;
+			return Other;
+		}
+		DNDSH_CHAR_ATTR operator - (const DNDSH_CHAR_ATTR &Other)
+		{
+			bool Value_is_num = true;
+			bool Other_is_num = true;
+
+			try{std::stoi(Value);}
+			catch(...){Value_is_num = false;}
+			try{std::stoi(Other.Value);}
+			catch(...){Other_is_num = false;}
+
+			if(Value_is_num && Other_is_num)
+			{
+				return std::to_string((std::stoi(Value) - std::stoi(Other.Value)));
+			}
+			else if(!Value_is_num && !Other_is_num)
+			{
+				fprintf(stderr,"%s%sERROR: Cannot subtract two non-numerical values from each other.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				return DNDSH_CHAR_ATTR("");
+			}
+			else
+			{
+				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				return DNDSH_CHAR_ATTR("");
 			}
 		}
 
