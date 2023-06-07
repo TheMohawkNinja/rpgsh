@@ -8,7 +8,7 @@
 
 #define MAX_BUFFER_SIZE 256
 
-void run_dndsh_prog(DNDSH_CHARACTER c, std::string args)
+void run_dndsh_prog(DNDSH_CHAR c, std::string args)
 {
 	extern char** environ;
 	pid_t pid;
@@ -55,7 +55,7 @@ void run_dndsh_prog(DNDSH_CHARACTER c, std::string args)
 			full_prog_args[args_index] = (args.substr(arg_index,(i-arg_index)).data());
 
 			if(args_index == 0)
-			{		
+			{
 				//Defines naming convention for all sub-programs of dndsh to be prefixed with "dndsh-"
 				program = full_prog_args[args_index];
 				full_path = path + prefix + program;
@@ -104,7 +104,7 @@ void run_dndsh_prog(DNDSH_CHARACTER c, std::string args)
 	fprintf(stdout,"\n");
 }
 
-int prompt(DNDSH_CHARACTER c)
+int prompt(DNDSH_CHAR c)
 {
 	fprintf(stdout,"%s┌─%s[%s%s%s%s%s%s%s]%s─%s(%s%hhu/%hhu%s %s(%hhu)%s%s%s)%s%s\n",TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_ITALIC,TEXT_RED,c.Name,TEXT_NOITALIC,TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_BOLD,TEXT_GREEN,c.HP,c.MaxHP,TEXT_NOBOLD,TEXT_ITALIC,c.TempHP,TEXT_NOITALIC,TEXT_BOLD,TEXT_WHITE,TEXT_NOBOLD,TEXT_NORMAL);
 	fprintf(stdout,"%s└─%sĐ₦Đ%s─%s$%s ",TEXT_WHITE,TEXT_CYAN,TEXT_WHITE,TEXT_CYAN,TEXT_NORMAL);
@@ -128,7 +128,7 @@ int prompt(DNDSH_CHARACTER c)
 }
 int main()
 {
-	DNDSH_CHARACTER character = DNDSH_CHARACTER();
+	DNDSH_CHAR character = DNDSH_CHAR();
 
 	run_dndsh_prog(character,(char*)"banner");
 	run_dndsh_prog(character,(char*)"version");
