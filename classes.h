@@ -1,5 +1,6 @@
 #include <string>
 #include <string.h>
+#include <map>
 #include <vector>
 #include <cctype>
 #include <climits>
@@ -236,7 +237,7 @@ class DNDSH_DICE
 			{
 				fprintf(stdout,"\n");
 				fprintf(stdout,"Natural total:\t%s%d%s\n",TEXT_WHITE,total,TEXT_NORMAL);
-			
+
 				if(Modifier != 0)
 				{
 					fprintf(stdout,"Modifier:\t%s%d%s\n",TEXT_WHITE,Modifier,TEXT_NORMAL);
@@ -396,12 +397,12 @@ class DNDSH_CHAR_ATTR
 		{
 			bool a_is_num = true;
 			bool b_is_num = true;
-		
+
 			try{std::stoi(Value);}
 			catch(...){a_is_num = false;}
 			try{std::stoi(b.Value);}
 			catch(...){b_is_num = false;}
-		
+
 			if(a_is_num && b_is_num)
 			{
 				Value = std::to_string((std::stoi(Value) + std::stoi(b.Value)));
@@ -439,10 +440,10 @@ class DNDSH_CHAR_ATTR
 		DNDSH_CHAR_ATTR operator += (const int b)
 		{
 			bool a_is_num = true;
-		
+
 			try{std::stoi(Value);}
 			catch(...){a_is_num = false;}
-		
+
 			if(a_is_num)
 			{
 				Value = std::to_string((std::stoi(Value) + b));
@@ -458,12 +459,12 @@ class DNDSH_CHAR_ATTR
 		{
 			bool a_is_num = true;
 			bool b_is_num = true;
-		
+
 			try{std::stoi(Value);}
 			catch(...){a_is_num = false;}
 			try{std::stoi(b.Value);}
 			catch(...){b_is_num = false;}
-		
+
 			if(a_is_num && b_is_num)
 			{
 				Value = std::to_string((std::stoi(Value) - std::stoi(b.Value)));
@@ -483,10 +484,10 @@ class DNDSH_CHAR_ATTR
 		DNDSH_CHAR_ATTR operator -= (const int b)
 		{
 			bool a_is_num = true;
-		
+
 			try{std::stoi(Value);}
 			catch(...){a_is_num = false;}
-		
+
 			if(a_is_num)
 			{
 				Value = std::to_string((std::stoi(Value) - b));
@@ -502,12 +503,12 @@ class DNDSH_CHAR_ATTR
 		{
 			bool a_is_num = true;
 			bool b_is_num = true;
-		
+
 			try{std::stoi(Value);}
 			catch(...){a_is_num = false;}
 			try{std::stoi(b.Value);}
 			catch(...){b_is_num = false;}
-		
+
 			if(a_is_num && b_is_num)
 			{
 				Value = std::to_string((std::stoi(Value) * std::stoi(b.Value)));
@@ -527,10 +528,10 @@ class DNDSH_CHAR_ATTR
 		DNDSH_CHAR_ATTR operator *= (const int b)
 		{
 			bool a_is_num = true;
-		
+
 			try{std::stoi(Value);}
 			catch(...){a_is_num = false;}
-		
+
 			if(a_is_num)
 			{
 				Value = std::to_string((std::stoi(Value) * b));
@@ -546,12 +547,12 @@ class DNDSH_CHAR_ATTR
 		{
 			bool a_is_num = true;
 			bool b_is_num = true;
-		
+
 			try{std::stoi(Value);}
 			catch(...){a_is_num = false;}
 			try{std::stoi(b.Value);}
 			catch(...){b_is_num = false;}
-		
+
 			if(a_is_num && b_is_num)
 			{
 				Value = std::to_string((std::stoi(Value) / std::stoi(b.Value)));
@@ -571,10 +572,10 @@ class DNDSH_CHAR_ATTR
 		DNDSH_CHAR_ATTR operator /= (const int b)
 		{
 			bool a_is_num = true;
-		
+
 			try{std::stoi(Value);}
 			catch(...){a_is_num = false;}
-		
+
 			if(a_is_num)
 			{
 				Value = std::to_string((std::stoi(Value) / b));
@@ -593,6 +594,10 @@ class DNDSH_CHAR_ATTR
 		Value = _value;
 	}
 };
+std::string std::string::operator = (const DNDSH_CHAR_ATTR b)
+{
+	return b.Value;
+}
 DNDSH_CHAR_ATTR operator + (const DNDSH_CHAR_ATTR a, const DNDSH_CHAR_ATTR b)
 {
 	DNDSH_CHAR_ATTR result = a;
@@ -678,60 +683,61 @@ DNDSH_CHAR_ATTR operator / (const int a, const DNDSH_CHAR_ATTR b)
 	return result;
 }
 
-class DNDSH_CHARACTER
+class DNDSH_CHAR
 {
 	public:
-		//std::vector<
-		char				Name[32]		=	"<NO_NAME>";
-		std::string			Class			=	"<NO_CLASS>";
-		unsigned char			Level			=	1;
-		std::string			Background		=	"<NO_BACKGROUND>";
-		std::string			Player			=	"<NO_PLAYER>";
-		std::string			Race			=	"<NO_RACE>";
-		std::string			Alignment		=	"<NO_ALIGNMENT>";
-		unsigned int			XP			=	0;
-		bool				Inspiration		=	false;
-		unsigned char			Proficiency		=	0;
-		unsigned char			AC			=	0;
-		unsigned char			Inititiative		=	0;
-		unsigned char			Speed			=	0;
+		std::map<std::string, DNDSH_CHAR_ATTR> Attr;
+		DNDSH_DICE		CurrentHitDice	=	DNDSH_DICE();
+		DNDSH_DICE		TotalHitDice	=	DNDSH_DICE();
+		DNDSH_CURRENCY		Currency	=	DNDSH_CURRENCY();
+		std::vector<DNDSH_SPELL>Spellbook	=	{};
 
-		unsigned char			HP			=	0;
-		unsigned char			MaxHP			=	0;
-		unsigned char			TempHP			=	0;
-		DNDSH_DICE			CurrentHitDice		=	DNDSH_DICE();
-		DNDSH_DICE			TotalHitDice		=	DNDSH_DICE();
-		unsigned char			FailedDeathSaves	=	0;
-		unsigned char			SucceededDeathSaves	=	0;
-
-		unsigned char			Str			=	0;
-		unsigned char			Dex			=	0;
-		unsigned char			Con			=	0;
-		unsigned char			Int			=	0;
-		unsigned char			Wis			=	0;
-		unsigned char			Cha			=	0;
-
-		std::string			PersonalityTraits	=	"<NO_PERSONALITY_TRAITS>";
-		std::string			Ideals			=	"<NO_IDEALS>";
-		std::string			Bonds			=	"<NO_BONDS>";
-		std::string			Flaws			=	"<NO_FLAWS>";
-		std::string			FeaturesAndTraits	=	"<NO_FEATURES_AND_TRAITS>";
-		DNDSH_CURRENCY			Currency		=	DNDSH_CURRENCY();
-
-		unsigned int			Age			=	0;
-		unsigned int			Height			=	0;
-		unsigned int			Weight			=	0;
-		std::string			EyeColor		=	"<NO_EYE_COLOR>";
-		std::string			SkinColor		=	"<NO_SKIN_COLOR>";
-		std::string			Hair			=	"<NO_HAIR>";
-
-		std::string			Appearance		=	"<NO_APPEARANCE>";
-		std::string			Allies			=	"<NO_ALLIES_OR_ORGANIZATIONS>";
-		std::string			Backstory		=	"<NO_BACKSTORY>";
-		std::string			Treasure		=	"<NO_TREASURE>";
-
-		std::string			SpellcastingAbility	=	"<NO_SPELLCASTING_ABILITY>";
-		unsigned char			SpellSaveDC		=	0;
-		unsigned char			SpellAttackBonus	=	0;
-		std::vector<DNDSH_SPELL>	Spellbook		=	{};
+	DNDSH_CHAR()
+	{
+		Attr["Name"]			=	"<NO_NAME>";
+		Attr["Class"]			=	"<NO_CLASS>";
+		Attr["Level"]			=	1;
+		Attr["Name"]			=	"<NO_NAME>";
+		Attr["Class"]			=	"<NO_CLASS>";
+		Attr["Level"]			=	1;
+		Attr["Background"]		=	"<NO_BACKGROUND>";
+		Attr["Player"]			=	"<NO_PLAYER>";
+		Attr["Race"]			=	"<NO_RACE>";
+		Attr["Alignment"]		=	"<NO_ALIGNMENT>";
+		Attr["XP"]			=	0;
+		Attr["Inspiration"]		=	"false";
+		Attr["Proficiency"]		=	0;
+		Attr["AC"]			=	0;
+		Attr["Initiative"]		=	0;
+		Attr["Speed"]			=	0;
+		Attr["HP"]			=	0;
+		Attr["MaxHP"]			=	0;
+		Attr["TempHP"]			=	0;
+		Attr["FailedDeathSaves"]	=	0;
+		Attr["SucceededDeathSaves"]	=	0;
+		Attr["Str"]			=	0;
+		Attr["Dex"]			=	0;
+		Attr["Con"]			=	0;
+		Attr["Int"]			=	0;
+		Attr["Wis"]			=	0;
+		Attr["Cha"]			=	0;
+		Attr["PersonalityTraits"]	=	"<NO_PERSONALITY_TRAITS>";
+		Attr["Ideals"]			=	"<NO_IDEALS>";
+		Attr["Bonds"]			=	"<NO_BONDS>";
+		Attr["Flaws"]			=	"<NO_FLAWS>";
+		Attr["FeaturesAndTraits"]	=	"<NO_FEATURES_AND_TRAITS>";
+		Attr["Age"]			=	0;
+		Attr["Height"]			=	0;
+		Attr["Weight"]			=	0;
+		Attr["EyeColor"]		=	"<NO_EYE_COLOR>";
+		Attr["SkinColor"]		=	"<NO_SKIN_COLOR>";
+		Attr["Hair"]			=	"<NO_HAIR>";
+		Attr["Appearance"]		=	"<NO_APPEARANCE>";
+		Attr["Allies"]			=	"<NO_ALLIES_OR_ORGANIZATIONS>";
+		Attr["Backstory"]		=	"<NO_BACKSTORY>";
+		Attr["Treasure"]		=	"<NO_TREASURE>";
+		Attr["SpellcastingAbility"]	=	"<NO_SPELLCASTING_ABILITY>";
+		Attr["SpellSaveDC"]		=	0;
+		Attr["SpellAttackBonus"]	=	0;
+	}
 };
