@@ -133,25 +133,6 @@ int main()
 	run_dndsh_prog(character,(char*)"banner");
 	run_dndsh_prog(character,(char*)"version");
 
-	DNDSH_CHAR_ATTR test1("5");
-	DNDSH_CHAR_ATTR test2("2");
-	DNDSH_CHAR_ATTR test3("7");
-	fprintf(stdout,"test1=%s\n",test1.Value.c_str());
-	fprintf(stdout,"test2=%s\n",test2.Value.c_str());
-	fprintf(stdout,"test3=%s\n",test3.Value.c_str());
-	fprintf(stdout,"test1+test2=%s\n",(test1 + test2).Value.c_str());
-	fprintf(stdout,"test2-test3=%s\n",(test2-test3).Value.c_str());
-	fprintf(stdout,"test2+2=%s\n",(test2+2).Value.c_str());
-	fprintf(stdout,"Making test2=test1\n");
-	test2=test1;
-	fprintf(stdout,"test2=%s\n",test1.Value.c_str());
-	fprintf(stdout,"Making test2=\"Hello\"\n");
-	test2="Hello";
-	fprintf(stdout,"test2=%s\n",test2.Value.c_str());
-	fprintf(stdout,"Making test2=4\n");
-	test2="4";
-	fprintf(stdout,"test2=%s\n",test2.Value.c_str());
-
 	while(prompt(character) >= 0){}
 
 	return 0;

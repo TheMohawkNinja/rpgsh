@@ -377,94 +377,213 @@ class DNDSH_CHAR_ATTR
 	public:
 		std::string Value = "";
 
-		//TODO
-		//Operator overloading definitions
-		//Planned overloads:
-		//	DNDSH_CHAR_ATTR + DNDSH_CHAR_ATTR
-		//	DNDSH_CHAR_ATTR + std::string		TODO
-		//	std::string + DNDSH_CHAR_ATTR		TODO
-		//	DNDSH_CHAR_ATTR + int
-		//	int + DNDSH_CHAR_ATTR			TODO
-		//	DNDSH_CHAR_ATTR - DNDSH_CHAR_ATTR
-		//	DNDSH_CHAR_ATTR - int			TODO
-		//	int - DNDSH_CHAR_ATTR			TODO
-		//	DNDSH_CHAR_ATTR = DNDSH_CHAR_ATTR
-		//	DNDSH_CHAR_ATTR = std::string
-		//	DNDSH_CHAR_ATTR = int			TODO
-		DNDSH_CHAR_ATTR operator + (const DNDSH_CHAR_ATTR &Other)
+		DNDSH_CHAR_ATTR operator = (const DNDSH_CHAR_ATTR b)
 		{
-			bool Value_is_num = true;
-			bool Other_is_num = true;
-
-			try{std::stoi(Value);}
-			catch(...){Value_is_num = false;}
-			try{std::stoi(Other.Value);}
-			catch(...){Other_is_num = false;}
-
-			if(Value_is_num && Other_is_num)
-			{
-				return std::to_string((std::stoi(Value) + std::stoi(Other.Value)));
-			}
-			else if(!Value_is_num && !Other_is_num)
-			{
-				return Value + Other.Value;
-			}
-			else
-			{
-				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
-				return DNDSH_CHAR_ATTR("");
-			}
-		}
-		DNDSH_CHAR_ATTR operator + (const int &Other)
-		{
-			bool Value_is_num = true;
-
-			try{std::stoi(Value);}
-			catch(...){Value_is_num = false;}
-
-			if(Value_is_num)
-			{
-				return std::to_string((std::stoi(Value) + Other));
-			}
-			else
-			{
-				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
-				return DNDSH_CHAR_ATTR("");
-			}
-		}
-		DNDSH_CHAR_ATTR operator = (const DNDSH_CHAR_ATTR &Other)
-		{
-			Value = Other.Value;
+			Value = b.Value;
 			return Value;
 		}
-		DNDSH_CHAR_ATTR operator = (const std::string &Other)
+		DNDSH_CHAR_ATTR operator = (const std::string b)
 		{
-			Value = Other;
-			return Other;
+			Value = b;
+			return b;
 		}
-		DNDSH_CHAR_ATTR operator - (const DNDSH_CHAR_ATTR &Other)
+		DNDSH_CHAR_ATTR operator = (const int b)
 		{
-			bool Value_is_num = true;
-			bool Other_is_num = true;
+			Value = std::to_string(b);
+			return Value;
+		}
+		DNDSH_CHAR_ATTR operator += (const DNDSH_CHAR_ATTR b)
+		{
+			bool a_is_num = true;
+			bool b_is_num = true;
+		
+			try{std::stoi(Value);}
+			catch(...){a_is_num = false;}
+			try{std::stoi(b.Value);}
+			catch(...){b_is_num = false;}
+		
+			if(a_is_num && b_is_num)
+			{
+				Value = std::to_string((std::stoi(Value) + std::stoi(b.Value)));
+				return Value;
+			}
+			else if(!a_is_num && !b_is_num)
+			{
+				Value = Value + b.Value;
+				return Value;
+			}
+			else
+			{
+				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				return Value;
+			}
+		}
+		DNDSH_CHAR_ATTR operator += (const std::string b)
+		{
+			bool a_is_num = true;
 
 			try{std::stoi(Value);}
-			catch(...){Value_is_num = false;}
-			try{std::stoi(Other.Value);}
-			catch(...){Other_is_num = false;}
+			catch(...){a_is_num = false;}
 
-			if(Value_is_num && Other_is_num)
+			if(!a_is_num)
 			{
-				return std::to_string((std::stoi(Value) - std::stoi(Other.Value)));
+				Value = Value + b;
+				return Value;
 			}
-			else if(!Value_is_num && !Other_is_num)
+			else
 			{
-				fprintf(stderr,"%s%sERROR: Cannot subtract two non-numerical values from each other.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
-				return DNDSH_CHAR_ATTR("");
+				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				return Value;
+			}
+		}
+		DNDSH_CHAR_ATTR operator += (const int b)
+		{
+			bool a_is_num = true;
+		
+			try{std::stoi(Value);}
+			catch(...){a_is_num = false;}
+		
+			if(a_is_num)
+			{
+				Value = std::to_string((std::stoi(Value) + b));
+				return Value;
 			}
 			else
 			{
 				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
 				return DNDSH_CHAR_ATTR("");
+			}
+		}
+		DNDSH_CHAR_ATTR operator -= (const DNDSH_CHAR_ATTR b)
+		{
+			bool a_is_num = true;
+			bool b_is_num = true;
+		
+			try{std::stoi(Value);}
+			catch(...){a_is_num = false;}
+			try{std::stoi(b.Value);}
+			catch(...){b_is_num = false;}
+		
+			if(a_is_num && b_is_num)
+			{
+				Value = std::to_string((std::stoi(Value) - std::stoi(b.Value)));
+				return Value;
+			}
+			else if(!a_is_num && !b_is_num)
+			{
+				fprintf(stderr,"%s%sERROR: Cannot subtract two non-numerical values from each other.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				return Value;
+			}
+			else
+			{
+				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				return Value;
+			}
+		}
+		DNDSH_CHAR_ATTR operator -= (const int b)
+		{
+			bool a_is_num = true;
+		
+			try{std::stoi(Value);}
+			catch(...){a_is_num = false;}
+		
+			if(a_is_num)
+			{
+				Value = std::to_string((std::stoi(Value) - b));
+				return Value;
+			}
+			else
+			{
+				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				return DNDSH_CHAR_ATTR("");
+			}
+		}
+		DNDSH_CHAR_ATTR operator *= (const DNDSH_CHAR_ATTR b)
+		{
+			bool a_is_num = true;
+			bool b_is_num = true;
+		
+			try{std::stoi(Value);}
+			catch(...){a_is_num = false;}
+			try{std::stoi(b.Value);}
+			catch(...){b_is_num = false;}
+		
+			if(a_is_num && b_is_num)
+			{
+				Value = std::to_string((std::stoi(Value) * std::stoi(b.Value)));
+				return Value;
+			}
+			else if(!a_is_num && !b_is_num)
+			{
+				fprintf(stderr,"%s%sERROR: Cannot multiply two non-numerical values from each other.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				return Value;
+			}
+			else
+			{
+				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				return Value;
+			}
+		}
+		DNDSH_CHAR_ATTR operator *= (const int b)
+		{
+			bool a_is_num = true;
+		
+			try{std::stoi(Value);}
+			catch(...){a_is_num = false;}
+		
+			if(a_is_num)
+			{
+				Value = std::to_string((std::stoi(Value) * b));
+				return Value;
+			}
+			else
+			{
+				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				return Value;
+			}
+		}
+		DNDSH_CHAR_ATTR operator /= (const DNDSH_CHAR_ATTR b)
+		{
+			bool a_is_num = true;
+			bool b_is_num = true;
+		
+			try{std::stoi(Value);}
+			catch(...){a_is_num = false;}
+			try{std::stoi(b.Value);}
+			catch(...){b_is_num = false;}
+		
+			if(a_is_num && b_is_num)
+			{
+				Value = std::to_string((std::stoi(Value) / std::stoi(b.Value)));
+				return Value;
+			}
+			else if(!a_is_num && !b_is_num)
+			{
+				fprintf(stderr,"%s%sERROR: Cannot divide two non-numerical values from each other.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				return Value;
+			}
+			else
+			{
+				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				return Value;
+			}
+		}
+		DNDSH_CHAR_ATTR operator /= (const int b)
+		{
+			bool a_is_num = true;
+		
+			try{std::stoi(Value);}
+			catch(...){a_is_num = false;}
+		
+			if(a_is_num)
+			{
+				Value = std::to_string((std::stoi(Value) / b));
+				return Value;
+			}
+			else
+			{
+				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				return Value;
 			}
 		}
 
@@ -474,6 +593,90 @@ class DNDSH_CHAR_ATTR
 		Value = _value;
 	}
 };
+DNDSH_CHAR_ATTR operator + (const DNDSH_CHAR_ATTR a, const DNDSH_CHAR_ATTR b)
+{
+	DNDSH_CHAR_ATTR result = a;
+	result += b;
+	return result;
+}
+DNDSH_CHAR_ATTR operator + (const DNDSH_CHAR_ATTR a, const std::string b)
+{
+	DNDSH_CHAR_ATTR result = a;
+	result += b;
+	return result;
+}
+DNDSH_CHAR_ATTR operator + (const std::string a, const DNDSH_CHAR_ATTR b)
+{
+	DNDSH_CHAR_ATTR result = DNDSH_CHAR_ATTR(a);
+	result += b;
+	return result;
+}
+DNDSH_CHAR_ATTR operator + (const DNDSH_CHAR_ATTR a, const int b)
+{
+	DNDSH_CHAR_ATTR result = a;
+	result += b;
+	return result;
+}
+DNDSH_CHAR_ATTR operator + (const int a, const DNDSH_CHAR_ATTR b)
+{
+	DNDSH_CHAR_ATTR result = std::to_string(a);
+	result += b;
+	return result;
+}
+DNDSH_CHAR_ATTR operator - (const DNDSH_CHAR_ATTR a, const DNDSH_CHAR_ATTR b)
+{
+	DNDSH_CHAR_ATTR result = a;
+	result -= b;
+	return result;
+}
+DNDSH_CHAR_ATTR operator - (const DNDSH_CHAR_ATTR a, const int b)
+{
+	DNDSH_CHAR_ATTR result = a;
+	result -= b;
+	return result;
+}
+DNDSH_CHAR_ATTR operator - (const int a, const DNDSH_CHAR_ATTR b)
+{
+	DNDSH_CHAR_ATTR result = std::to_string(a);
+	result -= b;
+	return result;
+}
+DNDSH_CHAR_ATTR operator * (const DNDSH_CHAR_ATTR a, const DNDSH_CHAR_ATTR b)
+{
+	DNDSH_CHAR_ATTR result = a;
+	result *= b;
+	return result;
+}
+DNDSH_CHAR_ATTR operator * (const DNDSH_CHAR_ATTR a, const int b)
+{
+	DNDSH_CHAR_ATTR result = a;
+	result *= b;
+	return result;
+}
+DNDSH_CHAR_ATTR operator * (const int a, const DNDSH_CHAR_ATTR b)
+{
+	DNDSH_CHAR_ATTR result = std::to_string(a);
+	result *= b;
+	return result;
+}
+DNDSH_CHAR_ATTR operator / (const DNDSH_CHAR_ATTR a, const DNDSH_CHAR_ATTR b)
+{
+	DNDSH_CHAR_ATTR result = a;
+	result /= b;
+	return result;
+}
+DNDSH_CHAR_ATTR operator / (const DNDSH_CHAR_ATTR a, const int b)
+{
+	DNDSH_CHAR_ATTR result = a;
+	result /= b;
+	return result;
+}
+DNDSH_CHAR_ATTR operator / (const int a, const DNDSH_CHAR_ATTR b)
+{
+	DNDSH_CHAR_ATTR result = std::to_string(a);
+	result /= b;
+	return result;
+}
 
 class DNDSH_CHARACTER
 {
