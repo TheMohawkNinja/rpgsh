@@ -5,7 +5,45 @@
 #include <cctype>
 #include <climits>
 #include <fstream>
+#include <cstdarg>
 #include "text.h"
+
+enum DNDSH_OUTPUT_TYPE
+{
+	Info,
+	Warning,
+	Error
+};
+void DNDSH_OUTPUT(DNDSH_OUTPUT_TYPE type, const char* format, ...)
+{
+	FILE* stream;
+	std::string prefix = "";
+	std::string color;
+	va_list args;
+	va_start(args, format);
+
+	switch(type)
+	{
+		case Info:
+			stream = stdout;
+			prefix = "%s%s[%sINFO%s]%s    ";
+			color = TEXT_CYAN;
+			break;
+		case Warning:
+			stream = stderr;
+			prefix = "%s%s[%sWARNING%s]%s ";
+			color = TEXT_YELLOW;
+			break;
+		case Error:
+			stream = stderr;
+			prefix = "%s%s[%sERROR%s]%s   ";
+			color = TEXT_RED;
+			break;
+	}
+	fprintf(stream,prefix.c_str(),TEXT_BOLD,TEXT_WHITE,color.c_str(),TEXT_WHITE,color.c_str());
+	vfprintf(stream,format,args);
+	fprintf(stream,"%s\n",TEXT_NORMAL);
+}
 
 class DNDSH_DICE
 {
@@ -50,8 +88,8 @@ class DNDSH_DICE
 					}
 					catch(...)
 					{
-						fprintf(stderr,"%s%sERROR: Unable to get dice %s. \"%s\" is not a number.%s\n",TEXT_BOLD,TEXT_RED,value.c_str(),d.substr(i,1).c_str(),TEXT_NORMAL);
-						return 0;
+						DNDSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" is not a number.",value.c_str(),d.substr(i,1).c_str());
+						exit(-1);
 					}
 				}
 
@@ -62,8 +100,8 @@ class DNDSH_DICE
 				}
 				catch(...)
 				{
-					fprintf(stderr,"%s%sERROR: Unable to get dice %s. \"%s\" exceeds the maximum size of %d.%s\n",TEXT_BOLD,TEXT_RED,value.c_str(),value_str.c_str(),INT_MAX,TEXT_NORMAL);
-					return 0;
+					DNDSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" exceeds the maximum size of %d.",value.c_str(),value_str.c_str(),INT_MAX);
+					exit(-1);
 				}
 			}
 			else
@@ -72,9 +110,9 @@ class DNDSH_DICE
 				{
 					if(required)
 					{
-						fprintf(stderr,"%s%sERROR: Unable to get dice %s. No %s specified.%s\n",TEXT_BOLD,TEXT_RED,value.c_str(),value.c_str(),TEXT_NORMAL);
+						DNDSH_OUTPUT(Error,"Unable to get dice %s. No %s specified.",value.c_str(),value.c_str());
 					}
-					return 0;
+					exit(-1);
 				}
 				for(int i=start; i<d.length(); i++)
 				{
@@ -100,8 +138,8 @@ class DNDSH_DICE
 					}
 					catch(...)
 					{
-						fprintf(stderr,"%s%sERROR: Unable to get dice %s. \"%s\" is not a number.%s\n",TEXT_BOLD,TEXT_RED,value.c_str(),d.substr(i,1).c_str(),TEXT_NORMAL);
-						return 0;
+						DNDSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" is not a number.",value.c_str(),d.substr(i,1).c_str());
+						exit(-1);
 					}
 				}
 
@@ -112,8 +150,8 @@ class DNDSH_DICE
 				}
 				catch(...)
 				{
-					fprintf(stderr,"%s%sERROR: Unable to get dice %s. \"%s\" exceeds the maximum size of %d.%s\n",TEXT_BOLD,TEXT_RED,value.c_str(),value_str.c_str(),INT_MAX,TEXT_NORMAL);
-					return 0;
+					DNDSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" exceeds the maximum size of %d.",value.c_str(),value_str.c_str(),INT_MAX);
+					exit(-1);
 				}
 			}
 		}
@@ -285,7 +323,7 @@ class DNDSH_DICE
 			}
 			catch(...)
 			{
-				fprintf(stderr,"%s%sERROR: Unable to open file \"%s\"\n",TEXT_RED,TEXT_ITALIC,dice.c_str(),TEXT_NORMAL);
+				DNDSH_OUTPUT(Error,"Unable to open file \"%s\"",dice.c_str());
 				exit(-1);
 			}
 		}
@@ -423,7 +461,7 @@ class DNDSH_CHAR_ATTR
 			}
 			else
 			{
-				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
 				return Value;
 			}
 		}
@@ -441,7 +479,7 @@ class DNDSH_CHAR_ATTR
 			}
 			else
 			{
-				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
 				return Value;
 			}
 		}
@@ -459,7 +497,7 @@ class DNDSH_CHAR_ATTR
 			}
 			else
 			{
-				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
 				return DNDSH_CHAR_ATTR("");
 			}
 		}
@@ -480,12 +518,12 @@ class DNDSH_CHAR_ATTR
 			}
 			else if(!a_is_num && !b_is_num)
 			{
-				fprintf(stderr,"%s%sERROR: Cannot subtract two non-numerical values from each other.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				DNDSH_OUTPUT(Error,"Cannot subtract two non-numerical values from each other.");
 				return Value;
 			}
 			else
 			{
-				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
 				return Value;
 			}
 		}
@@ -503,7 +541,7 @@ class DNDSH_CHAR_ATTR
 			}
 			else
 			{
-				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
 				return DNDSH_CHAR_ATTR("");
 			}
 		}
@@ -524,12 +562,12 @@ class DNDSH_CHAR_ATTR
 			}
 			else if(!a_is_num && !b_is_num)
 			{
-				fprintf(stderr,"%s%sERROR: Cannot multiply two non-numerical values from each other.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				DNDSH_OUTPUT(Error,"Cannot multiply two non-numerical values from each other.");
 				return Value;
 			}
 			else
 			{
-				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
 				return Value;
 			}
 		}
@@ -547,7 +585,7 @@ class DNDSH_CHAR_ATTR
 			}
 			else
 			{
-				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
 				return Value;
 			}
 		}
@@ -568,12 +606,12 @@ class DNDSH_CHAR_ATTR
 			}
 			else if(!a_is_num && !b_is_num)
 			{
-				fprintf(stderr,"%s%sERROR: Cannot divide two non-numerical values from each other.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				DNDSH_OUTPUT(Error,"Cannot divide two non-numerical values from each other.");
 				return Value;
 			}
 			else
 			{
-				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
 				return Value;
 			}
 		}
@@ -591,7 +629,7 @@ class DNDSH_CHAR_ATTR
 			}
 			else
 			{
-				fprintf(stderr,"%s%sERROR: Ambiguous operation between numerical and non-numerical values.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
 				return Value;
 			}
 		}
