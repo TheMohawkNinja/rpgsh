@@ -111,8 +111,9 @@ class DNDSH_DICE
 					if(required)
 					{
 						DNDSH_OUTPUT(Error,"Unable to get dice %s. No %s specified.",value.c_str(),value.c_str());
+						exit(-1);
 					}
-					exit(-1);
+					return 0;
 				}
 				for(int i=start; i<d.length(); i++)
 				{
