@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 			{
 				if(!argv[arg+1])
 				{
-					fprintf(stderr,"%s%sERROR: No repeat value specified.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+					DNDSH_OUTPUT(Error,"No repeat value specified.");
 					return -1;
 				}
 				else
@@ -35,16 +35,16 @@ int main(int argc, char** argv)
 					try
 					{
 						repeat = std::stoi(argv[arg+1],NULL,10);
-	
+
 						if(repeat < 1)
 						{
-							fprintf(stderr,"%s%sERROR: Repeat value must be greater than 0.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+							DNDSH_OUTPUT(Error,"Repeat value must be greater than 0.");
 							return -1;
 						}
 					}
 					catch(...)
 					{
-						fprintf(stderr,"%s%sERROR: Can't parse repeat value. \"%s\" is not a number.%s\n",TEXT_RED,TEXT_BOLD,argv[arg+1],TEXT_NORMAL);
+						DNDSH_OUTPUT(Error,"Can't parse repeat value. \"%s\" is not a number.",argv[arg+1]);
 						return -1;
 					}
 				}
@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 			{
 				if(!argv[arg+1])
 				{
-					fprintf(stderr,"%s%sERROR: No path specified.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+					DNDSH_OUTPUT(Error,"No path specified.");
 					return -1;
 				}
 				else if(std::filesystem::exists(argv[arg+1]))
@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 				}
 				else
 				{
-					fprintf(stderr,"%s%sERROR: File \"%s\" not found.%s\n",TEXT_RED,TEXT_BOLD,argv[arg+1],TEXT_NORMAL);
+					DNDSH_OUTPUT(Error,"File \"%s\" not found.",argv[arg+1]);
 					return -1;
 				}
 			}
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
 			{
 				if(!argv[arg+1])
 				{
-					fprintf(stderr,"%s%sERROR: No count expression specified.%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+					DNDSH_OUTPUT(Error,"No count expression specified.");
 					return -1;
 				}
 
@@ -101,7 +101,7 @@ int main(int argc, char** argv)
 
 					if(count_expr == "")
 					{
-						fprintf(stderr,"%s%sERROR: Invalid count expression in argument \"%s\".%s\n",TEXT_RED,TEXT_BOLD,argv[arg+1],TEXT_NORMAL);
+						DNDSH_OUTPUT(Error,"Invalid count expression in argument \"%s\".",argv[arg+1]);
 						return -1;
 					}
 				}
@@ -115,7 +115,7 @@ int main(int argc, char** argv)
 							count_str += std::string(argv[arg+1]).substr(i,1);
 							if(!std::isdigit(count_str[count_str.length()-1]))
 							{
-								fprintf(stderr,"%s%sERROR: Invalid count amount \"%s\".%s\n",TEXT_RED,TEXT_BOLD,count_str.c_str(),TEXT_NORMAL);
+								DNDSH_OUTPUT(Error,"Invalid count amount \"%s\".",count_str.c_str());
 								return -1;
 							}
 						}
@@ -123,7 +123,7 @@ int main(int argc, char** argv)
 					}
 					catch(...)
 					{
-						fprintf(stderr,"%s%sERROR: Invalid count amount \"%s\".%s\n",TEXT_RED,TEXT_BOLD,count_str.c_str(),TEXT_NORMAL);
+						DNDSH_OUTPUT(Error,"Invalid count amount \"%s\".",count_str.c_str());
 						return -1;
 					}
 				}
@@ -168,14 +168,13 @@ int main(int argc, char** argv)
 			}
 			else
 			{
-				fprintf(stderr,"%s%sWARNING: Unknown option \"%s\".%s\n",TEXT_YELLOW,TEXT_BOLD,current_arg.c_str(),TEXT_NORMAL);
+				DNDSH_OUTPUT(Warning,"Unknown option \"%s\".%s\n",current_arg.c_str());
 			}
 		}
 		else
 		{
 			dice_str = current_arg;
 		}
-	
 	}
 
 	DNDSH_DICE dice = DNDSH_DICE(dice_str,only_rolls,only_total,is_list,count_expr,count);
