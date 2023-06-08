@@ -411,7 +411,7 @@ class DNDSH_SPELL
 
 };
 
-class DNDSH_CHAR_ATTR
+class DNDSH_VAR
 {
 	public:
 		std::string Value = "";
@@ -424,22 +424,22 @@ class DNDSH_CHAR_ATTR
 		{
 			return std::stoi(Value);
 		}
-		DNDSH_CHAR_ATTR operator = (const DNDSH_CHAR_ATTR b)
+		DNDSH_VAR operator = (const DNDSH_VAR b)
 		{
 			Value = b.Value;
 			return Value;
 		}
-		DNDSH_CHAR_ATTR operator = (const std::string b)
+		DNDSH_VAR operator = (const std::string b)
 		{
 			Value = b;
 			return b;
 		}
-		DNDSH_CHAR_ATTR operator = (const int b)
+		DNDSH_VAR operator = (const int b)
 		{
 			Value = std::to_string(b);
 			return Value;
 		}
-		DNDSH_CHAR_ATTR operator += (const DNDSH_CHAR_ATTR b)
+		DNDSH_VAR operator += (const DNDSH_VAR b)
 		{
 			bool a_is_num = true;
 			bool b_is_num = true;
@@ -465,7 +465,7 @@ class DNDSH_CHAR_ATTR
 				return Value;
 			}
 		}
-		DNDSH_CHAR_ATTR operator += (const std::string b)
+		DNDSH_VAR operator += (const std::string b)
 		{
 			bool a_is_num = true;
 
@@ -483,7 +483,7 @@ class DNDSH_CHAR_ATTR
 				return Value;
 			}
 		}
-		DNDSH_CHAR_ATTR operator += (const int b)
+		DNDSH_VAR operator += (const int b)
 		{
 			bool a_is_num = true;
 
@@ -498,10 +498,10 @@ class DNDSH_CHAR_ATTR
 			else
 			{
 				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
-				return DNDSH_CHAR_ATTR("");
+				return DNDSH_VAR("");
 			}
 		}
-		DNDSH_CHAR_ATTR operator -= (const DNDSH_CHAR_ATTR b)
+		DNDSH_VAR operator -= (const DNDSH_VAR b)
 		{
 			bool a_is_num = true;
 			bool b_is_num = true;
@@ -527,7 +527,7 @@ class DNDSH_CHAR_ATTR
 				return Value;
 			}
 		}
-		DNDSH_CHAR_ATTR operator -= (const int b)
+		DNDSH_VAR operator -= (const int b)
 		{
 			bool a_is_num = true;
 
@@ -542,10 +542,10 @@ class DNDSH_CHAR_ATTR
 			else
 			{
 				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
-				return DNDSH_CHAR_ATTR("");
+				return DNDSH_VAR("");
 			}
 		}
-		DNDSH_CHAR_ATTR operator *= (const DNDSH_CHAR_ATTR b)
+		DNDSH_VAR operator *= (const DNDSH_VAR b)
 		{
 			bool a_is_num = true;
 			bool b_is_num = true;
@@ -571,7 +571,7 @@ class DNDSH_CHAR_ATTR
 				return Value;
 			}
 		}
-		DNDSH_CHAR_ATTR operator *= (const int b)
+		DNDSH_VAR operator *= (const int b)
 		{
 			bool a_is_num = true;
 
@@ -589,7 +589,7 @@ class DNDSH_CHAR_ATTR
 				return Value;
 			}
 		}
-		DNDSH_CHAR_ATTR operator /= (const DNDSH_CHAR_ATTR b)
+		DNDSH_VAR operator /= (const DNDSH_VAR b)
 		{
 			bool a_is_num = true;
 			bool b_is_num = true;
@@ -615,7 +615,7 @@ class DNDSH_CHAR_ATTR
 				return Value;
 			}
 		}
-		DNDSH_CHAR_ATTR operator /= (const int b)
+		DNDSH_VAR operator /= (const int b)
 		{
 			bool a_is_num = true;
 
@@ -634,93 +634,93 @@ class DNDSH_CHAR_ATTR
 			}
 		}
 
-	DNDSH_CHAR_ATTR(){}
-	DNDSH_CHAR_ATTR(std::string _value)
+	DNDSH_VAR(){}
+	DNDSH_VAR(std::string _value)
 	{
 		Value = _value;
 	}
 };
-DNDSH_CHAR_ATTR operator + (const DNDSH_CHAR_ATTR a, const DNDSH_CHAR_ATTR b)
+DNDSH_VAR operator + (const DNDSH_VAR a, const DNDSH_VAR b)
 {
-	DNDSH_CHAR_ATTR result = a;
+	DNDSH_VAR result = a;
 	result += b;
 	return result;
 }
-DNDSH_CHAR_ATTR operator + (const DNDSH_CHAR_ATTR a, const std::string b)
+DNDSH_VAR operator + (const DNDSH_VAR a, const std::string b)
 {
-	DNDSH_CHAR_ATTR result = a;
+	DNDSH_VAR result = a;
 	result += b;
 	return result;
 }
-DNDSH_CHAR_ATTR operator + (const std::string a, const DNDSH_CHAR_ATTR b)
+DNDSH_VAR operator + (const std::string a, const DNDSH_VAR b)
 {
-	DNDSH_CHAR_ATTR result = DNDSH_CHAR_ATTR(a);
+	DNDSH_VAR result = DNDSH_VAR(a);
 	result += b;
 	return result;
 }
-DNDSH_CHAR_ATTR operator + (const DNDSH_CHAR_ATTR a, const int b)
+DNDSH_VAR operator + (const DNDSH_VAR a, const int b)
 {
-	DNDSH_CHAR_ATTR result = a;
+	DNDSH_VAR result = a;
 	result += b;
 	return result;
 }
-DNDSH_CHAR_ATTR operator + (const int a, const DNDSH_CHAR_ATTR b)
+DNDSH_VAR operator + (const int a, const DNDSH_VAR b)
 {
-	DNDSH_CHAR_ATTR result = std::to_string(a);
+	DNDSH_VAR result = std::to_string(a);
 	result += b;
 	return result;
 }
-DNDSH_CHAR_ATTR operator - (const DNDSH_CHAR_ATTR a, const DNDSH_CHAR_ATTR b)
+DNDSH_VAR operator - (const DNDSH_VAR a, const DNDSH_VAR b)
 {
-	DNDSH_CHAR_ATTR result = a;
+	DNDSH_VAR result = a;
 	result -= b;
 	return result;
 }
-DNDSH_CHAR_ATTR operator - (const DNDSH_CHAR_ATTR a, const int b)
+DNDSH_VAR operator - (const DNDSH_VAR a, const int b)
 {
-	DNDSH_CHAR_ATTR result = a;
+	DNDSH_VAR result = a;
 	result -= b;
 	return result;
 }
-DNDSH_CHAR_ATTR operator - (const int a, const DNDSH_CHAR_ATTR b)
+DNDSH_VAR operator - (const int a, const DNDSH_VAR b)
 {
-	DNDSH_CHAR_ATTR result = std::to_string(a);
+	DNDSH_VAR result = std::to_string(a);
 	result -= b;
 	return result;
 }
-DNDSH_CHAR_ATTR operator * (const DNDSH_CHAR_ATTR a, const DNDSH_CHAR_ATTR b)
+DNDSH_VAR operator * (const DNDSH_VAR a, const DNDSH_VAR b)
 {
-	DNDSH_CHAR_ATTR result = a;
+	DNDSH_VAR result = a;
 	result *= b;
 	return result;
 }
-DNDSH_CHAR_ATTR operator * (const DNDSH_CHAR_ATTR a, const int b)
+DNDSH_VAR operator * (const DNDSH_VAR a, const int b)
 {
-	DNDSH_CHAR_ATTR result = a;
+	DNDSH_VAR result = a;
 	result *= b;
 	return result;
 }
-DNDSH_CHAR_ATTR operator * (const int a, const DNDSH_CHAR_ATTR b)
+DNDSH_VAR operator * (const int a, const DNDSH_VAR b)
 {
-	DNDSH_CHAR_ATTR result = std::to_string(a);
+	DNDSH_VAR result = std::to_string(a);
 	result *= b;
 	return result;
 }
-DNDSH_CHAR_ATTR operator / (const DNDSH_CHAR_ATTR a, const DNDSH_CHAR_ATTR b)
+DNDSH_VAR operator / (const DNDSH_VAR a, const DNDSH_VAR b)
 {
-	DNDSH_CHAR_ATTR result = a;
+	DNDSH_VAR result = a;
 	result /= b;
 	return result;
 }
-DNDSH_CHAR_ATTR operator / (const DNDSH_CHAR_ATTR a, const int b)
+DNDSH_VAR operator / (const DNDSH_VAR a, const int b)
 {
-	DNDSH_CHAR_ATTR result = a;
+	DNDSH_VAR result = a;
 	result /= b;
 	return result;
 }
-DNDSH_CHAR_ATTR operator / (const int a, const DNDSH_CHAR_ATTR b)
+DNDSH_VAR operator / (const int a, const DNDSH_VAR b)
 {
-	DNDSH_CHAR_ATTR result = std::to_string(a);
+	DNDSH_VAR result = std::to_string(a);
 	result /= b;
 	return result;
 }
@@ -728,7 +728,7 @@ DNDSH_CHAR_ATTR operator / (const int a, const DNDSH_CHAR_ATTR b)
 class DNDSH_CHAR
 {
 	public:
-		std::map<std::string, DNDSH_CHAR_ATTR> Attr;
+		std::map<std::string, DNDSH_VAR> Attr;
 		DNDSH_DICE		CurrentHitDice	=	DNDSH_DICE();
 		DNDSH_DICE		TotalHitDice	=	DNDSH_DICE();
 		DNDSH_CURRENCY		Currency	=	DNDSH_CURRENCY();
