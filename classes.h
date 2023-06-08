@@ -378,6 +378,14 @@ class DNDSH_CHAR_ATTR
 	public:
 		std::string Value = "";
 
+		explicit operator std::string() const
+		{
+			return Value;
+		}
+		explicit operator int() const
+		{
+			return std::stoi(Value);
+		}
 		DNDSH_CHAR_ATTR operator = (const DNDSH_CHAR_ATTR b)
 		{
 			Value = b.Value;
@@ -594,10 +602,6 @@ class DNDSH_CHAR_ATTR
 		Value = _value;
 	}
 };
-std::string std::string::operator = (const DNDSH_CHAR_ATTR b)
-{
-	return b.Value;
-}
 DNDSH_CHAR_ATTR operator + (const DNDSH_CHAR_ATTR a, const DNDSH_CHAR_ATTR b)
 {
 	DNDSH_CHAR_ATTR result = a;
