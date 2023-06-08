@@ -168,7 +168,7 @@ int main(int argc, char** argv)
 			}
 			else
 			{
-				DNDSH_OUTPUT(Warning,"Unknown option \"%s\".%s\n",current_arg.c_str());
+				DNDSH_OUTPUT(Warning,"Unknown option \"%s\".",current_arg.c_str());
 			}
 		}
 		else
