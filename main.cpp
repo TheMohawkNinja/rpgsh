@@ -120,7 +120,7 @@ int prompt(DNDSH_CHAR c)
 	}
 	else
 	{
-		if(buffer[0] == '%')//Check if user is operating on a variable
+		if(buffer[0] == '$'|| buffer[0] == '%')//Check if user is operating on a variable
 		{
 			std::string prefix = "variables ";
 			prefix += buffer;
