@@ -33,8 +33,11 @@ The program *must* adhere to the following standards in order to function correc
   - [n] NULL (per `posix_spawn()` requirements).
 
 The program *should* adhere to the following standards in order to maintain continuity of appearances during runtime:
- - Error messages should be programmed as: `fprintf(stderr,%s%sERROR: ...%s.\n,TEXT_RED,TEXT_BOLD,...,TEXT_NORMAL);`
- - Warning messages should be programmed as: `fprintf(stderr,%s%sWARNING: ...%s.\n,TEXT_YELLOW,TEXT_BOLD,...,TEXT_NORMAL);`
+ - Error, Warning, and Info text should use the standarized `DNDSH_OUTPUT()` call
+ - Error text should be follwed by `exit()`
+ - Warning text should allow for program continuation
+ - Info text should only be used when character attributes, character currency, or character spells change
+   - Info text should also state both the old and new values to keep the user well-informed
 
 Newlines are automatically placed before and after the output to reduce on-screen clutter, so this does not need to be added to the individual programs unless desired.
 
