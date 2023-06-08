@@ -120,6 +120,13 @@ int prompt(DNDSH_CHAR c)
 	}
 	else
 	{
+		if(buffer[0] == '%')//Check if user is operating on a variable
+		{
+			std::string prefix = "variables ";
+			prefix += buffer;
+			strcpy(buffer,prefix.c_str());
+			fprintf(stdout,"buffer = \"%s\"\n",buffer);
+		}
 		run_dndsh_prog(c,buffer);
 		return 0;
 	}
@@ -132,6 +139,10 @@ int main()
 
 	run_dndsh_prog(character,(char*)"banner");
 	run_dndsh_prog(character,(char*)"version");
+
+	DNDSH_OUTPUT(Info,"This is info text");
+	DNDSH_OUTPUT(Warning,"This is warning text");
+	DNDSH_OUTPUT(Error,"This is error text");
 
 	while(prompt(character) >= 0){}
 
