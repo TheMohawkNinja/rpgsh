@@ -93,11 +93,11 @@ void run_dndsh_prog(DNDSH_CHAR c, std::string args)
 	{
 		if(status == 2)//File not found
 		{
-			fprintf(stderr,"%s%sERROR [%d]: \"%s\" is not a valid dndsh command.%s\n",TEXT_BOLD,TEXT_RED,status,program.c_str(),TEXT_NORMAL);
+			DNDSH_OUTPUT(Error,"(%d): \"%s\" is not a valid dndsh command.",status,program.c_str());
 		}
 		else
 		{
-			fprintf(stderr,"%s%sERROR [%d]: %s%s\n",TEXT_BOLD,TEXT_RED,status,strerror(status),TEXT_NORMAL);
+			DNDSH_OUTPUT(Error,"(%d): %s",status,strerror(status));
 		}
 	}
 
