@@ -5,7 +5,9 @@
 #include <cctype>
 #include <climits>
 #include <fstream>
+#include <filesystem>
 #include <cstdarg>
+#include <unistd.h>
 #include "text.h"
 
 enum DNDSH_OUTPUT_TYPE
@@ -729,12 +731,24 @@ DNDSH_VAR operator / (const int a, const DNDSH_VAR b)
 class DNDSH_CHAR
 {
 	public:
+		std::string AttributeDesignator		=	"Attr";
+		std::string SpellDesignator		=	"Spell";
+		std::string DiceDesignator		=	"Dice";
+		std::string CurrencyDesignator		=	"Currency";
+		std::string FileSeparator		=	"::";
+
 		std::map<std::string, DNDSH_VAR> Attr;
 		DNDSH_DICE		CurrentHitDice	=	DNDSH_DICE();
 		DNDSH_DICE		TotalHitDice	=	DNDSH_DICE();
 		DNDSH_CURRENCY		Currency	=	DNDSH_CURRENCY();
 		std::vector<DNDSH_SPELL>Spellbook	=	{};
 
+	private:
+		std::string user = getlogin();
+		std::string base_path = "/home/"+user+"/.dndsh/";
+		std::string char_path = base_path+std::string(Attr["Name"])+".dndsh";
+
+	public:
 	DNDSH_CHAR()
 	{
 		Attr["Name"]			=	"<NO_NAME>";
@@ -782,5 +796,51 @@ class DNDSH_CHAR
 		Attr["SpellcastingAbility"]	=	"<NO_SPELLCASTING_ABILITY>";
 		Attr["SpellSaveDC"]		=	0;
 		Attr["SpellAttackBonus"]	=	0;
+	}
+
+	void save()
+	{
+		if(!std::filesystem::exists(base_path.c_str()))
+		{
+			DNDSH_OUTPUT(Info,"Main dndsh user directory not found at \"%s\", creating directory...",base_path.c_str());
+			std::filesystem::create_directory(base_path);
+		}
+		if(std::filesystem::exists(char_path.c_str()))
+		{
+			std::filesystem::rename(char_path.c_str(),(char_path+".bak").c_str());
+		}
+
+		std::ofstream fs((char_path).c_str());
+		for(const auto& [key,value] : Attr)
+		{
+			//Character file format definition
+			std::string data =	AttributeDesignator+
+						FileSeparator+
+						key+
+						FileSeparator+
+						std::string(value)+
+						"\n";
+			fs<<data;
+		}
+		fs.close();
+	}
+	void load()
+	{
+		std::ifstream fs((char_path).c_str());
+		while(!fs.eof())
+		{
+			std::string data = "";
+			std::getline(fs,data);
+
+			fprintf(stdout,"data=%s\n",data.c_str());
+			if(data.substr(0,data.find(FileSeparator)) == AttributeDesignator)//TODO Complete loading code
+			{
+				data = data.substr(data.find(FileSeparator)+FileSeparator.length(),
+							(data.length()-
+							(data.find(FileSeparator))));
+				fprintf(stdout,"\tdata=%s\n",data.c_str());
+			}
+		}
+		fs.close();
 	}
 };
