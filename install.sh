@@ -1,5 +1,7 @@
 echo "Compiling main.cpp..."
 g++ main.cpp -o dndsh
+echo "Compiling variables.cpp..."
+g++ variables.cpp -o dndsh-variables
 echo "Compiling version.cpp..."
 g++ version.cpp -o dndsh-version
 echo "Compiling banner.cpp..."
