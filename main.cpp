@@ -8,6 +8,8 @@
 
 #define MAX_BUFFER_SIZE 256
 
+DNDSH_CHAR c = DNDSH_CHAR();
+
 void run_dndsh_prog(DNDSH_CHAR c, std::string args)
 {
 	extern char** environ;
@@ -104,8 +106,10 @@ void run_dndsh_prog(DNDSH_CHAR c, std::string args)
 	fprintf(stdout,"\n");
 }
 
-int prompt(DNDSH_CHAR c)
+int prompt()
 {
+	c.load();
+
 	fprintf(stdout,"%s┌─%s[%s%s%s%s%s%s%s]%s─%s(%s%hhu/%hhu%s %s(%hhu)%s%s%s)%s%s\n",TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_ITALIC,TEXT_RED,std::string(c.Attr["Name"]).c_str(),TEXT_NOITALIC,TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_BOLD,TEXT_GREEN,int(c.Attr["HP"]),int(c.Attr["MaxHP"]),TEXT_NOBOLD,TEXT_ITALIC,int(c.Attr["TempHP"]),TEXT_NOITALIC,TEXT_BOLD,TEXT_WHITE,TEXT_NOBOLD,TEXT_NORMAL);
 	fprintf(stdout,"%s└─%sĐ₦Đ%s─%s$%s ",TEXT_WHITE,TEXT_CYAN,TEXT_WHITE,TEXT_CYAN,TEXT_NORMAL);
 
@@ -128,23 +132,16 @@ int prompt(DNDSH_CHAR c)
 			fprintf(stdout,"buffer = \"%s\"\n",buffer);
 		}
 		run_dndsh_prog(c,buffer);
+		c.save();
 		return 0;
 	}
-
-	return 0;
 }
 int main()
 {
-	DNDSH_CHAR character = DNDSH_CHAR();
+	run_dndsh_prog(DNDSH_CHAR(),(char*)"banner");
+	run_dndsh_prog(DNDSH_CHAR(),(char*)"version");
 
-	run_dndsh_prog(character,(char*)"banner");
-	run_dndsh_prog(character,(char*)"version");
-
-	DNDSH_OUTPUT(Info,"This is info text");
-	DNDSH_OUTPUT(Warning,"This is warning text");
-	DNDSH_OUTPUT(Error,"This is error text");
-
-	while(prompt(character) >= 0){}
+	while(prompt() >= 0);
 
 	return 0;
 }
