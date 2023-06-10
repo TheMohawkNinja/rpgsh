@@ -1,8 +1,8 @@
 #include <stdio.h>
+#include <string>
 #include <string.h>
 #include <spawn.h>
 #include <sys/wait.h>
-#include <string>
 #include "text.h"
 #include "classes.h"
 
@@ -117,29 +117,40 @@ int prompt()
 	fgets(buffer,sizeof(buffer),stdin);
 	buffer[strcspn(buffer,"\n")] = 0; //Omits newline character from input buffer (https://stackoverflow.com/questions/2693776/removing-trailing-newline-character-from-fgets-input)
 
-	if(!strcmp(buffer,"exit"))
+	if(strcmp(buffer,""))
 	{
-		fprintf(stdout,"Exiting...\n");
-		return -1;
-	}
-	else
-	{
-		if(buffer[0] == '$'|| buffer[0] == '%')//Check if user is operating on a variable
+		if(!strcmp(buffer,"exit"))
 		{
-			std::string prefix = "variables ";
-			prefix += buffer;
-			strcpy(buffer,prefix.c_str());
-			fprintf(stdout,"buffer = \"%s\"\n",buffer);
+			fprintf(stdout,"Exiting...\n");
+			return -1;
 		}
-		run_dndsh_prog(c,buffer);
-		c.save();
-		return 0;
+		else
+		{
+			if(buffer[0] == '$'|| buffer[0] == '%')//Check if user is operating on a variable
+			{
+				std::string prefix = "variables ";
+				prefix += buffer;
+				strcpy(buffer,prefix.c_str());
+				fprintf(stdout,"buffer = \"%s\"\n",buffer);
+			}
+			run_dndsh_prog(c,buffer);
+			return 0;
+		}
 	}
+	return 0;
 }
 int main()
 {
-	run_dndsh_prog(DNDSH_CHAR(),(char*)"banner");
-	run_dndsh_prog(DNDSH_CHAR(),(char*)"version");
+	//Forces default character to be created so first load() works correctly
+	DNDSH_CHAR *dummy = new DNDSH_CHAR();
+	if(!std::filesystem::exists(dummy->current_char_path.c_str()))
+	{
+		dummy->set_current();
+		dummy->save();
+	}
+	run_dndsh_prog(*dummy,(char*)"banner");
+	run_dndsh_prog(*dummy,(char*)"version");
+	delete dummy;
 
 	while(prompt() >= 0);
 
