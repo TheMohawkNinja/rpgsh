@@ -730,6 +730,9 @@ DNDSH_VAR operator / (const int a, const DNDSH_VAR b)
 
 class DNDSH_CHAR
 {
+	private:
+		std::string user = getlogin();
+
 	public:
 		std::string AttributeDesignator		=	"Attr";
 		std::string SpellDesignator		=	"Spell";
@@ -743,17 +746,11 @@ class DNDSH_CHAR
 		DNDSH_CURRENCY		Currency	=	DNDSH_CURRENCY();
 		std::vector<DNDSH_SPELL>Spellbook	=	{};
 
-	private:
-		std::string user = getlogin();
 		std::string base_path = "/home/"+user+"/.dndsh/";
-		std::string char_path = base_path+std::string(Attr["Name"])+".dndsh";
+		std::string current_char_path = base_path+".current";
 
-	public:
 	DNDSH_CHAR()
 	{
-		Attr["Name"]			=	"<NO_NAME>";
-		Attr["Class"]			=	"<NO_CLASS>";
-		Attr["Level"]			=	1;
 		Attr["Name"]			=	"<NO_NAME>";
 		Attr["Class"]			=	"<NO_CLASS>";
 		Attr["Level"]			=	1;
@@ -798,8 +795,20 @@ class DNDSH_CHAR
 		Attr["SpellAttackBonus"]	=	0;
 	}
 
+	void set_current()
+	{
+		if(std::filesystem::exists(current_char_path.c_str()))
+		{
+			std::filesystem::remove(current_char_path.c_str());
+		}
+		std::ofstream fs(current_char_path.c_str());
+		fs<<std::string(Attr["Name"]);
+		fs.close();
+	}
 	void save()
 	{
+		std::string char_path = base_path+std::string(Attr["Name"])+".dndsh";
+
 		if(!std::filesystem::exists(base_path.c_str()))
 		{
 			DNDSH_OUTPUT(Info,"Main dndsh user directory not found at \"%s\", creating directory...",base_path.c_str());
@@ -826,19 +835,29 @@ class DNDSH_CHAR
 	}
 	void load()
 	{
-		std::ifstream fs((char_path).c_str());
+		std::ifstream fs((current_char_path).c_str());
+		std::string current_char;
+		std::getline(fs,current_char);
+		fs.close();
+
+		std::string char_path = base_path+current_char+".dndsh";
+
+		fs.open(char_path.c_str());
 		while(!fs.eof())
 		{
 			std::string data = "";
 			std::getline(fs,data);
 
-			fprintf(stdout,"data=%s\n",data.c_str());
+			//fprintf(stdout,"data=%s\n",data.c_str());
 			if(data.substr(0,data.find(FileSeparator)) == AttributeDesignator)//TODO Complete loading code
 			{
 				data = data.substr(data.find(FileSeparator)+FileSeparator.length(),
 							(data.length()-
 							(data.find(FileSeparator))));
-				fprintf(stdout,"\tdata=%s\n",data.c_str());
+				//fprintf(stdout,"\tdata=%s\n",data.c_str());
+				Attr[data.substr(0,data.find(FileSeparator))] = data.substr(data.find(FileSeparator)+FileSeparator.length(),
+												(data.length()-
+												(data.find(FileSeparator))));
 			}
 		}
 		fs.close();
