@@ -46,6 +46,45 @@ void DNDSH_OUTPUT(DNDSH_OUTPUT_TYPE type, const char* format, ...)
 	vfprintf(stream,format,args);
 	fprintf(stream,"%s\n",TEXT_NORMAL);
 }
+std::vector<std::string> argv_handler(int argc, char** argv)
+{
+	std::vector<std::string> v;
+	std::string current_arg = "";
+
+	for(int i=0; i<argc; i++)
+	{
+		if(std::string(argv[i]).find("\"") != std::string::npos)//Combine args wrapped in quotes
+		{
+			current_arg+=std::string(argv[i]).substr(1,std::string(argv[i]).length()-1);
+			for(int j=(i+1); j<argc; j++)
+			{
+				if(std::string(argv[j]).find("\"") != std::string::npos)
+				{
+					current_arg+=" "+std::string(argv[j]).substr(0,std::string(argv[j]).find("\""));
+					v.push_back(current_arg);
+					i++;
+					break;
+				}
+				else
+				{
+					current_arg+=" "+std::string(argv[j]);
+					i++;
+				}
+
+				if((j+1) == argc)
+				{
+					DNDSH_OUTPUT(Error,"Unmatched quote in argument list.");
+					exit(-1);
+				}
+			}
+		}
+		else if(strcmp(argv[i],""))//Ignore empty args (typically because somebody put in an extra space by accident)
+		{
+			v.push_back(std::string(argv[i]));
+		}
+	}
+	return v;
+}
 
 class DNDSH_DICE
 {
