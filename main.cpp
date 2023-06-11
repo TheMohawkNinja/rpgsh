@@ -131,7 +131,6 @@ int prompt()
 				std::string prefix = "variables ";
 				prefix += buffer;
 				strcpy(buffer,prefix.c_str());
-				fprintf(stdout,"buffer = \"%s\"\n",buffer);
 			}
 			run_dndsh_prog(c,buffer);
 			return 0;
