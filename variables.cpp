@@ -1,19 +1,48 @@
 #include <vector>
 #include "classes.h"
 
-int set_var(std::string var, std::string value)
+DNDSH_CHAR c = DNDSH_CHAR();
+
+void set_var(std::string var, std::string value)
 {
+	std::string old = std::string(c.Attr[var]);
 	bool old_is_digit, new_is_digit;
 
 	try
 	{
-		std::stoi(std::string(
+		std::stoi(old);
+		old_is_digit = true;
 	}
+	catch(...)
+	{
+		old_is_digit = false;
+	}
+
+	try
+	{
+		std::stoi(value);
+		new_is_digit = true;
+	}
+	catch(...)
+	{
+		new_is_digit = false;
+	}
+
+	if(old_is_digit && !new_is_digit)
+	{
+		DNDSH_OUTPUT(Warning,"\"%s\" is changing from an integer to a string.",var.c_str());
+	}
+	else if(!old_is_digit && new_is_digit)
+	{
+		DNDSH_OUTPUT(Warning,"\"%s\" is changing from a string to an integer.",var.c_str());
+	}
+
+	c.Attr[var] = value;
+	DNDSH_OUTPUT(Info,"\"%s\" has been changed from \"%s\" to \"%s\".",var.c_str(),old.c_str(),value.c_str());
 }
 
 int main(int argc, char** argv)
 {
-	DNDSH_CHAR c = DNDSH_CHAR();
 	c.load();
 
 	std::vector<std::string> v_argv = argv_handler(argc, argv);
@@ -35,9 +64,7 @@ int main(int argc, char** argv)
 	{
 		if(v_argv[3] == "=")
 		{
-			std::string old = std::string(c.Attr[vars[0]]);
-			c.Attr[vars[0]] = v_argv[4];
-			DNDSH_OUTPUT(Info,"\"%s\" has been changed from \"%s\" to \"%s\".",vars[0].c_str(),old.c_str(),std::string(c.Attr[vars[0]]).c_str());
+			set_var(vars[0],v_argv[4]);
 		}
 	}
 
