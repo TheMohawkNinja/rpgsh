@@ -43,7 +43,7 @@ void set_var(std::string var, std::string value)
 
 int main(int argc, char** argv)
 {
-	c.load();
+	c.load(false);
 
 	std::vector<std::string> v_argv = argv_handler(argc, argv);
 	std::vector<std::string> vars;
