@@ -50,24 +50,34 @@ std::vector<std::string> argv_handler(int argc, char** argv)
 {
 	std::vector<std::string> v;
 	std::string current_arg = "";
+	std::string current_var = "";
 
 	for(int i=0; i<argc; i++)
 	{
-		if(std::string(argv[i]).find("\"") != std::string::npos)//Combine args wrapped in quotes
+		current_arg = std::string(argv[i]);
+		if(current_arg.find("\"") != std::string::npos)//Combine args wrapped in quotes
 		{
-			current_arg+=std::string(argv[i]).substr(1,std::string(argv[i]).length()-1);
+			current_var += current_arg.substr(1,current_arg.length()-1);
+
+			if(current_var.find("\"") != std::string::npos)//When user wraps single arg in quotes
+			{
+				current_var = current_var.substr(0,current_var.find("\""));
+				v.push_back(current_var);
+				continue;
+			}
+
 			for(int j=(i+1); j<argc; j++)
 			{
 				if(std::string(argv[j]).find("\"") != std::string::npos)
 				{
-					current_arg+=" "+std::string(argv[j]).substr(0,std::string(argv[j]).find("\""));
-					v.push_back(current_arg);
+					current_var += " "+std::string(argv[j]).substr(0,std::string(argv[j]).find("\""));
+					v.push_back(current_var);
 					i++;
 					break;
 				}
 				else
 				{
-					current_arg+=" "+std::string(argv[j]);
+					current_var += " "+std::string(argv[j]);
 					i++;
 				}
 
@@ -80,7 +90,7 @@ std::vector<std::string> argv_handler(int argc, char** argv)
 		}
 		else if(strcmp(argv[i],""))//Ignore empty args (typically because somebody put in an extra space by accident)
 		{
-			v.push_back(std::string(argv[i]));
+			v.push_back(current_arg);
 		}
 	}
 	return v;
