@@ -108,10 +108,36 @@ void run_dndsh_prog(DNDSH_CHAR c, std::string args)
 
 int prompt()
 {
-	c.load();
+	bool backup = false;
 
-	fprintf(stdout,"%s┌─%s[%s%s%s%s%s%s%s]%s─%s(%s%hhu/%hhu%s %s(%hhu)%s%s%s)%s%s\n",TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_ITALIC,TEXT_RED,std::string(c.Attr["Name"]).c_str(),TEXT_NOITALIC,TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_BOLD,TEXT_GREEN,int(c.Attr["HP"]),int(c.Attr["MaxHP"]),TEXT_NOBOLD,TEXT_ITALIC,int(c.Attr["TempHP"]),TEXT_NOITALIC,TEXT_BOLD,TEXT_WHITE,TEXT_NOBOLD,TEXT_NORMAL);
-	fprintf(stdout,"%s└─%sĐ₦Đ%s─%s$%s ",TEXT_WHITE,TEXT_CYAN,TEXT_WHITE,TEXT_CYAN,TEXT_NORMAL);
+	prompt:
+	c.load(backup);
+
+	try
+	{
+		fprintf(stdout,"%s┌─%s[%s%s%s%s%s%s%s]%s─%s(%s%hhu/%hhu%s %s(%hhu)%s%s%s)%s%s\n",TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_ITALIC,TEXT_RED,std::string(c.Attr["Name"]).c_str(),TEXT_NOITALIC,TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_BOLD,TEXT_GREEN,int(c.Attr["HP"]),int(c.Attr["MaxHP"]),TEXT_NOBOLD,TEXT_ITALIC,int(c.Attr["TempHP"]),TEXT_NOITALIC,TEXT_BOLD,TEXT_WHITE,TEXT_NOBOLD,TEXT_NORMAL);
+		fprintf(stdout,"%s└─%sĐ₦Đ%s─%s$%s ",TEXT_WHITE,TEXT_CYAN,TEXT_WHITE,TEXT_CYAN,TEXT_NORMAL);
+
+		if(backup)
+		{
+			c.save();
+			backup = false;
+		}
+	}
+	catch(...)
+	{
+		if(!backup)
+		{
+			DNDSH_OUTPUT(Warning,"Error while displaying prompt. One or more character attributes is not a valid integer. Attempting to load backup.");
+			backup = true;
+			goto prompt;
+		}
+		else
+		{
+			DNDSH_OUTPUT(Error,"Loading from backup was unsuccessful. Manual intervention required to restore file.\n\nGood luck.\n");
+			exit(-1);
+		}
+	}
 
 	char buffer[MAX_BUFFER_SIZE];
 	fgets(buffer,sizeof(buffer),stdin);
