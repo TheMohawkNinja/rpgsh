@@ -882,14 +882,14 @@ class DNDSH_CHAR
 		}
 		fs.close();
 	}
-	void load()
+	void load(bool load_bak)
 	{
 		std::ifstream fs((current_char_path).c_str());
 		std::string current_char;
 		std::getline(fs,current_char);
 		fs.close();
 
-		std::string char_path = base_path+current_char+".dndsh";
+		std::string char_path = base_path+current_char+".dndsh"+((load_bak)?".bak":"");
 
 		fs.open(char_path.c_str());
 		while(!fs.eof())
@@ -897,13 +897,11 @@ class DNDSH_CHAR
 			std::string data = "";
 			std::getline(fs,data);
 
-			//fprintf(stdout,"data=%s\n",data.c_str());
 			if(data.substr(0,data.find(FileSeparator)) == AttributeDesignator)//TODO Complete loading code
 			{
 				data = data.substr(data.find(FileSeparator)+FileSeparator.length(),
 							(data.length()-
 							(data.find(FileSeparator))));
-				//fprintf(stdout,"\tdata=%s\n",data.c_str());
 				Attr[data.substr(0,data.find(FileSeparator))] = data.substr(data.find(FileSeparator)+FileSeparator.length(),
 												(data.length()-
 												(data.find(FileSeparator))));
