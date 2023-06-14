@@ -10,13 +10,13 @@
 #include <unistd.h>
 #include "text.h"
 
-enum DNDSH_OUTPUT_TYPE
+enum RPGSH_OUTPUT_TYPE
 {
 	Info,
 	Warning,
 	Error
 };
-void DNDSH_OUTPUT(DNDSH_OUTPUT_TYPE type, const char* format, ...)
+void RPGSH_OUTPUT(RPGSH_OUTPUT_TYPE type, const char* format, ...)
 {
 	FILE* stream;
 	std::string prefix = "";
@@ -83,7 +83,7 @@ std::vector<std::string> argv_handler(int argc, char** argv)
 
 				if((j+1) == argc)
 				{
-					DNDSH_OUTPUT(Error,"Unmatched quote in argument list.");
+					RPGSH_OUTPUT(Error,"Unmatched quote in argument list.");
 					exit(-1);
 				}
 			}
@@ -96,7 +96,7 @@ std::vector<std::string> argv_handler(int argc, char** argv)
 	return v;
 }
 
-class DNDSH_DICE
+class RPGSH_DICE
 {
 	private:
 		bool just_show_rolls = false;
@@ -139,7 +139,7 @@ class DNDSH_DICE
 					}
 					catch(...)
 					{
-						DNDSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" is not a number.",value.c_str(),d.substr(i,1).c_str());
+						RPGSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" is not a number.",value.c_str(),d.substr(i,1).c_str());
 						exit(-1);
 					}
 				}
@@ -151,7 +151,7 @@ class DNDSH_DICE
 				}
 				catch(...)
 				{
-					DNDSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" exceeds the maximum size of %d.",value.c_str(),value_str.c_str(),INT_MAX);
+					RPGSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" exceeds the maximum size of %d.",value.c_str(),value_str.c_str(),INT_MAX);
 					exit(-1);
 				}
 			}
@@ -161,7 +161,7 @@ class DNDSH_DICE
 				{
 					if(required)
 					{
-						DNDSH_OUTPUT(Error,"Unable to get dice %s. No %s specified.",value.c_str(),value.c_str());
+						RPGSH_OUTPUT(Error,"Unable to get dice %s. No %s specified.",value.c_str(),value.c_str());
 						exit(-1);
 					}
 					return 0;
@@ -190,7 +190,7 @@ class DNDSH_DICE
 					}
 					catch(...)
 					{
-						DNDSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" is not a number.",value.c_str(),d.substr(i,1).c_str());
+						RPGSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" is not a number.",value.c_str(),d.substr(i,1).c_str());
 						exit(-1);
 					}
 				}
@@ -202,7 +202,7 @@ class DNDSH_DICE
 				}
 				catch(...)
 				{
-					DNDSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" exceeds the maximum size of %d.",value.c_str(),value_str.c_str(),INT_MAX);
+					RPGSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" exceeds the maximum size of %d.",value.c_str(),value_str.c_str(),INT_MAX);
 					exit(-1);
 				}
 			}
@@ -212,15 +212,15 @@ class DNDSH_DICE
 		unsigned int	Faces		=	0;
 			 int	Modifier	=	0;
 
-	DNDSH_DICE(){}
-	DNDSH_DICE(unsigned int _quantity, unsigned int _faces, int _modifier)
+	RPGSH_DICE(){}
+	RPGSH_DICE(unsigned int _quantity, unsigned int _faces, int _modifier)
 	{
 		Quantity = _quantity;
 		Faces = _faces;
 		Modifier = _modifier;
 		just_show_total = true;
 	}
-	DNDSH_DICE(std::string _dice, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count)
+	RPGSH_DICE(std::string _dice, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count)
 	{
 		dice = _dice;
 		just_show_rolls = _just_show_rolls;
@@ -375,7 +375,7 @@ class DNDSH_DICE
 			}
 			catch(...)
 			{
-				DNDSH_OUTPUT(Error,"Unable to open file \"%s\"",dice.c_str());
+				RPGSH_OUTPUT(Error,"Unable to open file \"%s\"",dice.c_str());
 				exit(-1);
 			}
 		}
@@ -394,7 +394,7 @@ class DNDSH_DICE
 	}
 };
 
-class DNDSH_CURRENCY
+class RPGSH_CURRENCY
 {
 	public:
 		unsigned int 	Copper		=	0;
@@ -402,8 +402,8 @@ class DNDSH_CURRENCY
 		unsigned int	Electrum	=	0;
 		unsigned int	Gold		=	0;
 		unsigned int	Platinum	=	0;
-	DNDSH_CURRENCY(){}
-	DNDSH_CURRENCY( unsigned int _Copper,
+	RPGSH_CURRENCY(){}
+	RPGSH_CURRENCY( unsigned int _Copper,
 			unsigned int _Silver,
 			unsigned int _Electrum,
 			unsigned int _Gold,
@@ -417,25 +417,25 @@ class DNDSH_CURRENCY
 			}
 };
 
-class DNDSH_ITEM
+class RPGSH_ITEM
 {
 	public:
 		std::string	Name		=	"<NO_NAME>";
 		std::string	Rarity		=	"<NO_RARITY>";
-		DNDSH_CURRENCY	Value		=	DNDSH_CURRENCY();
+		RPGSH_CURRENCY	Value		=	RPGSH_CURRENCY();
 		std::string	Type		=	"<NO_TYPE>";
 		unsigned int	Weight		=	0;
 		std::string	Description	=	"<NO_DESCRIPTION>";
-		DNDSH_DICE	Damage		=	DNDSH_DICE();
+		RPGSH_DICE	Damage		=	RPGSH_DICE();
 		bool		Equipped	=	false;
-	DNDSH_ITEM(){}
-	DNDSH_ITEM(	std::string	_Name,
+	RPGSH_ITEM(){}
+	RPGSH_ITEM(	std::string	_Name,
 			std::string	_Rarity,
-			DNDSH_CURRENCY	_Value,
+			RPGSH_CURRENCY	_Value,
 			std::string	_Type,
 			unsigned int	_Weight,
 			std::string	_Description,
-			DNDSH_DICE	_Damage,
+			RPGSH_DICE	_Damage,
 			bool		_Equipped)
 			{
 				Name = _Name;
@@ -450,7 +450,7 @@ class DNDSH_ITEM
 
 };
 
-class DNDSH_SPELL
+class RPGSH_SPELL
 {
 	public:
 		std::string	Name		=	"<NO_NAME>";
@@ -463,7 +463,7 @@ class DNDSH_SPELL
 
 };
 
-class DNDSH_VAR
+class RPGSH_VAR
 {
 	public:
 		std::string Value = "";
@@ -476,22 +476,22 @@ class DNDSH_VAR
 		{
 			return std::stoi(Value);
 		}
-		DNDSH_VAR operator = (const DNDSH_VAR b)
+		RPGSH_VAR operator = (const RPGSH_VAR b)
 		{
 			Value = b.Value;
 			return Value;
 		}
-		DNDSH_VAR operator = (const std::string b)
+		RPGSH_VAR operator = (const std::string b)
 		{
 			Value = b;
 			return b;
 		}
-		DNDSH_VAR operator = (const int b)
+		RPGSH_VAR operator = (const int b)
 		{
 			Value = std::to_string(b);
 			return Value;
 		}
-		DNDSH_VAR operator += (const DNDSH_VAR b)
+		RPGSH_VAR operator += (const RPGSH_VAR b)
 		{
 			bool a_is_num = true;
 			bool b_is_num = true;
@@ -513,11 +513,11 @@ class DNDSH_VAR
 			}
 			else
 			{
-				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
 				return Value;
 			}
 		}
-		DNDSH_VAR operator += (const std::string b)
+		RPGSH_VAR operator += (const std::string b)
 		{
 			bool a_is_num = true;
 
@@ -531,11 +531,11 @@ class DNDSH_VAR
 			}
 			else
 			{
-				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
 				return Value;
 			}
 		}
-		DNDSH_VAR operator += (const int b)
+		RPGSH_VAR operator += (const int b)
 		{
 			bool a_is_num = true;
 
@@ -549,11 +549,11 @@ class DNDSH_VAR
 			}
 			else
 			{
-				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
-				return DNDSH_VAR("");
+				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				return RPGSH_VAR("");
 			}
 		}
-		DNDSH_VAR operator -= (const DNDSH_VAR b)
+		RPGSH_VAR operator -= (const RPGSH_VAR b)
 		{
 			bool a_is_num = true;
 			bool b_is_num = true;
@@ -570,16 +570,16 @@ class DNDSH_VAR
 			}
 			else if(!a_is_num && !b_is_num)
 			{
-				DNDSH_OUTPUT(Error,"Cannot subtract two non-numerical values from each other.");
+				RPGSH_OUTPUT(Error,"Cannot subtract two non-numerical values from each other.");
 				return Value;
 			}
 			else
 			{
-				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
 				return Value;
 			}
 		}
-		DNDSH_VAR operator -= (const int b)
+		RPGSH_VAR operator -= (const int b)
 		{
 			bool a_is_num = true;
 
@@ -593,11 +593,11 @@ class DNDSH_VAR
 			}
 			else
 			{
-				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
-				return DNDSH_VAR("");
+				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				return RPGSH_VAR("");
 			}
 		}
-		DNDSH_VAR operator *= (const DNDSH_VAR b)
+		RPGSH_VAR operator *= (const RPGSH_VAR b)
 		{
 			bool a_is_num = true;
 			bool b_is_num = true;
@@ -614,16 +614,16 @@ class DNDSH_VAR
 			}
 			else if(!a_is_num && !b_is_num)
 			{
-				DNDSH_OUTPUT(Error,"Cannot multiply two non-numerical values from each other.");
+				RPGSH_OUTPUT(Error,"Cannot multiply two non-numerical values from each other.");
 				return Value;
 			}
 			else
 			{
-				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
 				return Value;
 			}
 		}
-		DNDSH_VAR operator *= (const int b)
+		RPGSH_VAR operator *= (const int b)
 		{
 			bool a_is_num = true;
 
@@ -637,11 +637,11 @@ class DNDSH_VAR
 			}
 			else
 			{
-				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
 				return Value;
 			}
 		}
-		DNDSH_VAR operator /= (const DNDSH_VAR b)
+		RPGSH_VAR operator /= (const RPGSH_VAR b)
 		{
 			bool a_is_num = true;
 			bool b_is_num = true;
@@ -658,16 +658,16 @@ class DNDSH_VAR
 			}
 			else if(!a_is_num && !b_is_num)
 			{
-				DNDSH_OUTPUT(Error,"Cannot divide two non-numerical values from each other.");
+				RPGSH_OUTPUT(Error,"Cannot divide two non-numerical values from each other.");
 				return Value;
 			}
 			else
 			{
-				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
 				return Value;
 			}
 		}
-		DNDSH_VAR operator /= (const int b)
+		RPGSH_VAR operator /= (const int b)
 		{
 			bool a_is_num = true;
 
@@ -681,13 +681,13 @@ class DNDSH_VAR
 			}
 			else
 			{
-				DNDSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
 				return Value;
 			}
 		}
 
-	DNDSH_VAR(){}
-	DNDSH_VAR(std::string _value)
+	RPGSH_VAR(){}
+	RPGSH_VAR(std::string _value)
 	{
 		Value = _value;
 	}
@@ -697,92 +697,92 @@ class DNDSH_VAR
 		return Value.c_str();
 	}
 };
-DNDSH_VAR operator + (const DNDSH_VAR a, const DNDSH_VAR b)
+RPGSH_VAR operator + (const RPGSH_VAR a, const RPGSH_VAR b)
 {
-	DNDSH_VAR result = a;
+	RPGSH_VAR result = a;
 	result += b;
 	return result;
 }
-DNDSH_VAR operator + (const DNDSH_VAR a, const std::string b)
+RPGSH_VAR operator + (const RPGSH_VAR a, const std::string b)
 {
-	DNDSH_VAR result = a;
+	RPGSH_VAR result = a;
 	result += b;
 	return result;
 }
-DNDSH_VAR operator + (const std::string a, const DNDSH_VAR b)
+RPGSH_VAR operator + (const std::string a, const RPGSH_VAR b)
 {
-	DNDSH_VAR result = DNDSH_VAR(a);
+	RPGSH_VAR result = RPGSH_VAR(a);
 	result += b;
 	return result;
 }
-DNDSH_VAR operator + (const DNDSH_VAR a, const int b)
+RPGSH_VAR operator + (const RPGSH_VAR a, const int b)
 {
-	DNDSH_VAR result = a;
+	RPGSH_VAR result = a;
 	result += b;
 	return result;
 }
-DNDSH_VAR operator + (const int a, const DNDSH_VAR b)
+RPGSH_VAR operator + (const int a, const RPGSH_VAR b)
 {
-	DNDSH_VAR result = std::to_string(a);
+	RPGSH_VAR result = std::to_string(a);
 	result += b;
 	return result;
 }
-DNDSH_VAR operator - (const DNDSH_VAR a, const DNDSH_VAR b)
+RPGSH_VAR operator - (const RPGSH_VAR a, const RPGSH_VAR b)
 {
-	DNDSH_VAR result = a;
+	RPGSH_VAR result = a;
 	result -= b;
 	return result;
 }
-DNDSH_VAR operator - (const DNDSH_VAR a, const int b)
+RPGSH_VAR operator - (const RPGSH_VAR a, const int b)
 {
-	DNDSH_VAR result = a;
+	RPGSH_VAR result = a;
 	result -= b;
 	return result;
 }
-DNDSH_VAR operator - (const int a, const DNDSH_VAR b)
+RPGSH_VAR operator - (const int a, const RPGSH_VAR b)
 {
-	DNDSH_VAR result = std::to_string(a);
+	RPGSH_VAR result = std::to_string(a);
 	result -= b;
 	return result;
 }
-DNDSH_VAR operator * (const DNDSH_VAR a, const DNDSH_VAR b)
+RPGSH_VAR operator * (const RPGSH_VAR a, const RPGSH_VAR b)
 {
-	DNDSH_VAR result = a;
+	RPGSH_VAR result = a;
 	result *= b;
 	return result;
 }
-DNDSH_VAR operator * (const DNDSH_VAR a, const int b)
+RPGSH_VAR operator * (const RPGSH_VAR a, const int b)
 {
-	DNDSH_VAR result = a;
+	RPGSH_VAR result = a;
 	result *= b;
 	return result;
 }
-DNDSH_VAR operator * (const int a, const DNDSH_VAR b)
+RPGSH_VAR operator * (const int a, const RPGSH_VAR b)
 {
-	DNDSH_VAR result = std::to_string(a);
+	RPGSH_VAR result = std::to_string(a);
 	result *= b;
 	return result;
 }
-DNDSH_VAR operator / (const DNDSH_VAR a, const DNDSH_VAR b)
+RPGSH_VAR operator / (const RPGSH_VAR a, const RPGSH_VAR b)
 {
-	DNDSH_VAR result = a;
+	RPGSH_VAR result = a;
 	result /= b;
 	return result;
 }
-DNDSH_VAR operator / (const DNDSH_VAR a, const int b)
+RPGSH_VAR operator / (const RPGSH_VAR a, const int b)
 {
-	DNDSH_VAR result = a;
+	RPGSH_VAR result = a;
 	result /= b;
 	return result;
 }
-DNDSH_VAR operator / (const int a, const DNDSH_VAR b)
+RPGSH_VAR operator / (const int a, const RPGSH_VAR b)
 {
-	DNDSH_VAR result = std::to_string(a);
+	RPGSH_VAR result = std::to_string(a);
 	result /= b;
 	return result;
 }
 
-class DNDSH_CHAR
+class RPGSH_CHAR
 {
 	private:
 		std::string user = getlogin();
@@ -794,16 +794,16 @@ class DNDSH_CHAR
 		std::string CurrencyDesignator		=	"Currency";
 		std::string FileSeparator		=	"::";
 
-		std::map<std::string, DNDSH_VAR> Attr;
-		DNDSH_DICE		CurrentHitDice	=	DNDSH_DICE();
-		DNDSH_DICE		TotalHitDice	=	DNDSH_DICE();
-		DNDSH_CURRENCY		Currency	=	DNDSH_CURRENCY();
-		std::vector<DNDSH_SPELL>Spellbook	=	{};
+		std::map<std::string, RPGSH_VAR> Attr;
+		RPGSH_DICE		CurrentHitDice	=	RPGSH_DICE();
+		RPGSH_DICE		TotalHitDice	=	RPGSH_DICE();
+		RPGSH_CURRENCY		Currency	=	RPGSH_CURRENCY();
+		std::vector<RPGSH_SPELL>Spellbook	=	{};
 
-		std::string base_path = "/home/"+user+"/.dndsh/";
+		std::string base_path = "/home/"+user+"/.rpgsh/";
 		std::string current_char_path = base_path+".current";
 
-	DNDSH_CHAR()
+	RPGSH_CHAR()
 	{
 		Attr["Name"]			=	"<NO_NAME>";
 		Attr["Class"]			=	"<NO_CLASS>";
@@ -861,11 +861,11 @@ class DNDSH_CHAR
 	}
 	void save()
 	{
-		std::string char_path = base_path+std::string(Attr["Name"])+".dndsh";
+		std::string char_path = base_path+std::string(Attr["Name"])+".char";
 
 		if(!std::filesystem::exists(base_path.c_str()))
 		{
-			DNDSH_OUTPUT(Info,"Main dndsh user directory not found at \"%s\", creating directory...",base_path.c_str());
+			RPGSH_OUTPUT(Info,"Main rpgsh user directory not found at \"%s\", creating directory...",base_path.c_str());
 			std::filesystem::create_directory(base_path);
 		}
 		if(std::filesystem::exists(char_path.c_str()))
@@ -894,7 +894,7 @@ class DNDSH_CHAR
 		std::getline(fs,current_char);
 		fs.close();
 
-		std::string char_path = base_path+current_char+".dndsh"+((load_bak)?".bak":"");
+		std::string char_path = base_path+current_char+".char"+((load_bak)?".bak":"");
 
 		fs.open(char_path.c_str());
 		while(!fs.eof())

@@ -1,10 +1,10 @@
 echo "Compiling main.cpp..."
-g++ main.cpp -lstdc++fs -std=c++17 -o dndsh
+g++ main.cpp -lstdc++fs -std=c++17 -o rpgsh
 echo "Compiling variables.cpp..."
-g++ variables.cpp -lstdc++fs -std=c++17 -o dndsh-variables
+g++ variables.cpp -lstdc++fs -std=c++17 -o rpgsh-variables
 echo "Compiling version.cpp..."
-g++ version.cpp -o dndsh-version
+g++ version.cpp -o rpgsh-version
 echo "Compiling banner.cpp..."
-g++ banner.cpp -o dndsh-banner
+g++ banner.cpp -o rpgsh-banner
 echo "Compiling roll.cpp..."
-g++ roll.cpp -lstdc++fs -std=c++17 -o dndsh-roll
+g++ roll.cpp -lstdc++fs -std=c++17 -o rpgsh-roll

@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 			if(current_arg == "-t" || current_arg == "--test")
 			{
 				fprintf(stdout,"Initiating roll test...\n\n");
-				DNDSH_DICE dice = DNDSH_DICE();
+				RPGSH_DICE dice = RPGSH_DICE();
 				dice.test();
 				return 0;
 			}
@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 			{
 				if(!argv[arg+1])
 				{
-					DNDSH_OUTPUT(Error,"No repeat value specified.");
+					RPGSH_OUTPUT(Error,"No repeat value specified.");
 					return -1;
 				}
 				else
@@ -38,13 +38,13 @@ int main(int argc, char** argv)
 
 						if(repeat < 1)
 						{
-							DNDSH_OUTPUT(Error,"Repeat value must be greater than 0.");
+							RPGSH_OUTPUT(Error,"Repeat value must be greater than 0.");
 							return -1;
 						}
 					}
 					catch(...)
 					{
-						DNDSH_OUTPUT(Error,"Can't parse repeat value. \"%s\" is not a number.",argv[arg+1]);
+						RPGSH_OUTPUT(Error,"Can't parse repeat value. \"%s\" is not a number.",argv[arg+1]);
 						return -1;
 					}
 				}
@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 			{
 				if(!argv[arg+1])
 				{
-					DNDSH_OUTPUT(Error,"No path specified.");
+					RPGSH_OUTPUT(Error,"No path specified.");
 					return -1;
 				}
 				else if(std::filesystem::exists(argv[arg+1]))
@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 				}
 				else
 				{
-					DNDSH_OUTPUT(Error,"File \"%s\" not found.",argv[arg+1]);
+					RPGSH_OUTPUT(Error,"File \"%s\" not found.",argv[arg+1]);
 					return -1;
 				}
 			}
@@ -72,7 +72,7 @@ int main(int argc, char** argv)
 			{
 				if(!argv[arg+1])
 				{
-					DNDSH_OUTPUT(Error,"No count expression specified.");
+					RPGSH_OUTPUT(Error,"No count expression specified.");
 					return -1;
 				}
 
@@ -101,7 +101,7 @@ int main(int argc, char** argv)
 
 					if(count_expr == "")
 					{
-						DNDSH_OUTPUT(Error,"Invalid count expression in argument \"%s\".",argv[arg+1]);
+						RPGSH_OUTPUT(Error,"Invalid count expression in argument \"%s\".",argv[arg+1]);
 						return -1;
 					}
 				}
@@ -115,7 +115,7 @@ int main(int argc, char** argv)
 							count_str += std::string(argv[arg+1]).substr(i,1);
 							if(!std::isdigit(count_str[count_str.length()-1]))
 							{
-								DNDSH_OUTPUT(Error,"Invalid count amount \"%s\".",count_str.c_str());
+								RPGSH_OUTPUT(Error,"Invalid count amount \"%s\".",count_str.c_str());
 								return -1;
 							}
 						}
@@ -123,7 +123,7 @@ int main(int argc, char** argv)
 					}
 					catch(...)
 					{
-						DNDSH_OUTPUT(Error,"Invalid count amount \"%s\".",count_str.c_str());
+						RPGSH_OUTPUT(Error,"Invalid count amount \"%s\".",count_str.c_str());
 						return -1;
 					}
 				}
@@ -168,7 +168,7 @@ int main(int argc, char** argv)
 			}
 			else
 			{
-				DNDSH_OUTPUT(Warning,"Unknown option \"%s\".",current_arg.c_str());
+				RPGSH_OUTPUT(Warning,"Unknown option \"%s\".",current_arg.c_str());
 			}
 		}
 		else
@@ -177,7 +177,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-	DNDSH_DICE dice = DNDSH_DICE(dice_str,only_rolls,only_total,is_list,count_expr,count);
+	RPGSH_DICE dice = RPGSH_DICE(dice_str,only_rolls,only_total,is_list,count_expr,count);
 
 	for(int i=0; i<repeat; i++)
 	{

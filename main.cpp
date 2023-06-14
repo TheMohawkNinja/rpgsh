@@ -8,9 +8,9 @@
 
 #define MAX_BUFFER_SIZE 256
 
-DNDSH_CHAR c = DNDSH_CHAR();
+RPGSH_CHAR c = RPGSH_CHAR();
 
-void run_dndsh_prog(DNDSH_CHAR c, std::string args)
+void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 {
 	extern char** environ;
 	pid_t pid;
@@ -44,7 +44,7 @@ void run_dndsh_prog(DNDSH_CHAR c, std::string args)
 	int argv_length = (args_ctr+2);
 	char* argv[argv_length - 1];
 	std::string program;
-	std::string prefix = "dndsh-";
+	std::string prefix = "rpgsh-";
 	std::string path = "./";
 	std::string full_path;
 	std::string full_prog_args[args_ctr];
@@ -58,7 +58,7 @@ void run_dndsh_prog(DNDSH_CHAR c, std::string args)
 
 			if(args_index == 0)
 			{
-				//Defines naming convention for all sub-programs of dndsh to be prefixed with "dndsh-"
+				//Defines naming convention for all sub-programs of rpgsh to be prefixed with "rpgsh-"
 				program = full_prog_args[args_index];
 				full_path = path + prefix + program;
 				argv[0] = (char*)full_path.c_str();
@@ -95,11 +95,11 @@ void run_dndsh_prog(DNDSH_CHAR c, std::string args)
 	{
 		if(status == 2)//File not found
 		{
-			DNDSH_OUTPUT(Error,"(%d): \"%s\" is not a valid dndsh command.",status,program.c_str());
+			RPGSH_OUTPUT(Error,"(%d): \"%s\" is not a valid rpgsh command.",status,program.c_str());
 		}
 		else
 		{
-			DNDSH_OUTPUT(Error,"(%d): %s",status,strerror(status));
+			RPGSH_OUTPUT(Error,"(%d): %s",status,strerror(status));
 		}
 	}
 
@@ -128,13 +128,13 @@ int prompt()
 	{
 		if(!backup)
 		{
-			DNDSH_OUTPUT(Warning,"Error while displaying prompt. One or more character attributes is not a valid integer. Attempting to load backup.");
+			RPGSH_OUTPUT(Warning,"Error while displaying prompt. One or more character attributes is not a valid integer. Attempting to load backup.");
 			backup = true;
 			goto prompt;
 		}
 		else
 		{
-			DNDSH_OUTPUT(Error,"Loading from backup was unsuccessful. Manual intervention required to restore file.\n\nGood luck.\n");
+			RPGSH_OUTPUT(Error,"Loading from backup was unsuccessful. Manual intervention required to restore file.\n\nGood luck.\n");
 			exit(-1);
 		}
 	}
@@ -158,7 +158,7 @@ int prompt()
 				prefix += buffer;
 				strcpy(buffer,prefix.c_str());
 			}
-			run_dndsh_prog(c,buffer);
+			run_rpgsh_prog(c,buffer);
 			return 0;
 		}
 	}
@@ -167,14 +167,14 @@ int prompt()
 int main()
 {
 	//Forces default character to be created so first load() works correctly
-	DNDSH_CHAR *dummy = new DNDSH_CHAR();
+	RPGSH_CHAR *dummy = new RPGSH_CHAR();
 	if(!std::filesystem::exists(dummy->current_char_path.c_str()))
 	{
 		dummy->set_current();
 		dummy->save();
 	}
-	run_dndsh_prog(*dummy,(char*)"banner");
-	run_dndsh_prog(*dummy,(char*)"version");
+	run_rpgsh_prog(*dummy,(char*)"banner");
+	run_rpgsh_prog(*dummy,(char*)"version");
 	delete dummy;
 
 	while(prompt() >= 0);

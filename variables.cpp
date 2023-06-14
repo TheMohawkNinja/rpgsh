@@ -1,7 +1,7 @@
 #include <vector>
 #include "classes.h"
 
-DNDSH_CHAR c = DNDSH_CHAR();
+RPGSH_CHAR c = RPGSH_CHAR();
 
 void set_var(std::string var, std::string value)
 {
@@ -30,15 +30,15 @@ void set_var(std::string var, std::string value)
 
 	if(old_is_digit && !new_is_digit)
 	{
-		DNDSH_OUTPUT(Warning,"\"%s\" is changing from an integer to a string.",var.c_str());
+		RPGSH_OUTPUT(Warning,"\"%s\" is changing from an integer to a string.",var.c_str());
 	}
 	else if(!old_is_digit && new_is_digit)
 	{
-		DNDSH_OUTPUT(Warning,"\"%s\" is changing from a string to an integer.",var.c_str());
+		RPGSH_OUTPUT(Warning,"\"%s\" is changing from a string to an integer.",var.c_str());
 	}
 
 	c.Attr[var] = value;
-	DNDSH_OUTPUT(Info,"\"%s\" has been changed from \"%s\" to \"%s\".",var.c_str(),old.c_str(),value.c_str());
+	RPGSH_OUTPUT(Info,"\"%s\" has been changed from \"%s\" to \"%s\".",var.c_str(),old.c_str(),value.c_str());
 }
 
 int main(int argc, char** argv)
