@@ -691,6 +691,11 @@ class DNDSH_VAR
 	{
 		Value = _value;
 	}
+
+	const char* c_str()
+	{
+		return Value.c_str();
+	}
 };
 DNDSH_VAR operator + (const DNDSH_VAR a, const DNDSH_VAR b)
 {
