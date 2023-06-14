@@ -45,26 +45,26 @@ int main(int argc, char** argv)
 {
 	c.load(false);
 
+	std::string var;
 	std::vector<std::string> v_argv = argv_handler(argc, argv);
-	std::vector<std::string> vars;
 
 	for(int i=0; i<v_argv.size(); i++)
 	{
 		if(std::string(v_argv[i]).substr(0,1) == "%")
 		{
-			vars.push_back(std::string(v_argv[i]).substr(1,sizeof(v_argv[i])-1));
+			var = std::string(v_argv[i]).substr(1,sizeof(v_argv[i])-1);
 		}
 	}
 
 	if(argc == 3)
 	{
-		fprintf(stdout,"%s\n",std::string(c.Attr[vars[0]]).c_str());
+		fprintf(stdout,"%s\n",c.Attr[var].c_str());
 	}
 	else
 	{
 		if(v_argv[3] == "=")
 		{
-			set_var(vars[0],v_argv[4]);
+			set_var(var,v_argv[4]);
 		}
 	}
 
