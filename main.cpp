@@ -62,7 +62,7 @@ void run_dndsh_prog(DNDSH_CHAR c, std::string args)
 				program = full_prog_args[args_index];
 				full_path = path + prefix + program;
 				argv[0] = (char*)full_path.c_str();
-				argv[1] = (char*)std::string(c.Attr["Name"]).c_str();
+				argv[1] = (char*)c.Attr["Name"].c_str();
 			}
 
 			args_index++;
@@ -70,7 +70,7 @@ void run_dndsh_prog(DNDSH_CHAR c, std::string args)
 		}
 	}
 
-	argv[1] = (char*)std::string(c.Attr["Name"]).c_str();
+	argv[1] = (char*)c.Attr["Name"].c_str();
 	for(int i=0; i<(args_ctr-1); i++)
 	{
 		argv[i+2] = const_cast<char*>(full_prog_args[i+1].c_str());
@@ -115,7 +115,7 @@ int prompt()
 
 	try
 	{
-		fprintf(stdout,"%s┌─%s[%s%s%s%s%s%s%s]%s─%s(%s%hhu/%hhu%s %s(%hhu)%s%s%s)%s%s\n",TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_ITALIC,TEXT_RED,std::string(c.Attr["Name"]).c_str(),TEXT_NOITALIC,TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_BOLD,TEXT_GREEN,int(c.Attr["HP"]),int(c.Attr["MaxHP"]),TEXT_NOBOLD,TEXT_ITALIC,int(c.Attr["TempHP"]),TEXT_NOITALIC,TEXT_BOLD,TEXT_WHITE,TEXT_NOBOLD,TEXT_NORMAL);
+		fprintf(stdout,"%s┌─%s[%s%s%s%s%s%s%s]%s─%s(%s%hhu/%hhu%s %s(%hhu)%s%s%s)%s%s\n",TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_ITALIC,TEXT_RED,c.Attr["Name"].c_str(),TEXT_NOITALIC,TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_BOLD,TEXT_GREEN,int(c.Attr["HP"]),int(c.Attr["MaxHP"]),TEXT_NOBOLD,TEXT_ITALIC,int(c.Attr["TempHP"]),TEXT_NOITALIC,TEXT_BOLD,TEXT_WHITE,TEXT_NOBOLD,TEXT_NORMAL);
 		fprintf(stdout,"%s└─%sĐ₦Đ%s─%s$%s ",TEXT_WHITE,TEXT_CYAN,TEXT_WHITE,TEXT_CYAN,TEXT_NORMAL);
 
 		if(backup)
