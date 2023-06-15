@@ -116,7 +116,7 @@ int prompt()
 	try
 	{
 		fprintf(stdout,"%s┌─%s[%s%s%s%s%s%s%s]%s─%s(%s%hhu/%hhu%s %s(%hhu)%s%s%s)%s%s\n",TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_ITALIC,TEXT_RED,c.Attr["Name"].c_str(),TEXT_NOITALIC,TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_BOLD,TEXT_GREEN,int(c.Attr["HP"]),int(c.Attr["MaxHP"]),TEXT_NOBOLD,TEXT_ITALIC,int(c.Attr["TempHP"]),TEXT_NOITALIC,TEXT_BOLD,TEXT_WHITE,TEXT_NOBOLD,TEXT_NORMAL);
-		fprintf(stdout,"%s└─%sĐ₦Đ%s─%s$%s ",TEXT_WHITE,TEXT_CYAN,TEXT_WHITE,TEXT_CYAN,TEXT_NORMAL);
+		fprintf(stdout,"%s└─%s$%s ",TEXT_WHITE,TEXT_CYAN,TEXT_NORMAL);
 
 		if(backup)
 		{
