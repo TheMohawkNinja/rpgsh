@@ -170,8 +170,8 @@ int main()
 	RPGSH_CHAR *dummy = new RPGSH_CHAR();
 	if(!std::filesystem::exists(dummy->current_char_path.c_str()))
 	{
-		dummy->set_current();
 		dummy->save();
+		dummy->set_current();
 	}
 	run_rpgsh_prog(*dummy,(char*)"banner");
 	run_rpgsh_prog(*dummy,(char*)"version");
