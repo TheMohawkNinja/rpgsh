@@ -42,8 +42,5 @@ The program *should* adhere to the following standards in order to maintain cont
 Newlines are automatically placed before and after the output to reduce on-screen clutter, so this does not need to be added to the individual programs unless desired.
 
 ## Known Issues
-`rpgsh`
- - Prompt fails to appear on first launch
-
 `roll`
  - High values for `-r|--repeat` when using a custom list may result in program crashing. During limited testing, this behavior was observed when the value was >90
