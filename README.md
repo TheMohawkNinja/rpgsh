@@ -10,11 +10,13 @@ This project is entirely developed independantly. I am not associated in anyway 
 
 When initially launching the program, you will be met with the `rpgsh` shell, which looks similar to the following:
 
-![prompt](https://imgur.com/YY66YSC.png)
+![prompt](https://i.imgur.com/XTBgRw9.png)
 
 The prompt displays the currently loaded character name, along with their heath (**current/max** *(temp)*).
 
 Just like any other shell (sh, bash, cmd, etc.), you interact with 'rpgsh' by typing a command follwed by any associated parameters. You then execute the desired command by pressing the Enter key. You may exit the shell at any time by running the "exit" command, or by pressing ctrl+c.
+
+When first launching `rpgsh`, you will see `[INFO]` text appear stating that the root directory for the program has been created at `~/.rpgsh/`. In addition, a placeholder character `<NO_NAME>.char` is created to give the prompt something to work with until you create a character of your own. This file can be safely deleted if the placeholder character is no longer being used. Whenever the currently loaded character is modifed by the shell or a program called by the shell, it will create a `.char.bak` file which contains the character information prior to the last save of the character (which *should* be the last command run). This is mainly for instances whereby the player accidentally sets a prompt value to something non-sensical (e.g. setting their current HP to "FULL" instead of "20"), as this would cause the prompt to crash. In the event this happens, the prompt will attempt to load the backup. If loading the backup fails, the player will need to open up their character file and attempt to manually edit the file to resolve the issue.
 
 ## Installation instructions
 
@@ -27,10 +29,10 @@ Run `./install.sh` as root
 The program *must* adhere to the following standards in order to function correctly when being called by the `rpgsh` shell:
 - The name of the executable must start with "rpgsh-"
 - The program will be given the following argv parameters when called by `rpgsh`:
-  - [0] The full path to the the called program
-  - [1] The name of the currently selected character (for programs which will need to be aware of the currently selected character)
-  - [2] - [(n-1)]. All additional arguments given by the user for the program
-  - [n] NULL (per `posix_spawn()` requirements).
+  - **[0]** The full path to the the called program
+  - **[1]** The name of the currently selected character (for programs which will need to be aware of the currently selected character)
+  - **[2]** - **[(n-1)]**. All additional arguments given by the user for the program
+  - **[n]** NULL (per `posix_spawn()` requirements).
 
 The program *should* adhere to the following standards in order to maintain continuity of appearances during runtime:
  - Error, Warning, and Info text should use the standarized `RPGSH_OUTPUT()` call
