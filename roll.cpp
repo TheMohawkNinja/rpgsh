@@ -1,11 +1,111 @@
 #include <filesystem>
 #include "classes.h"
 
+int get_value(std::string d, std::string value, int start, std::string terminator, bool allow_sign, bool required)
+{
+	std::string value_str = "";
+	if(terminator != "")
+	{
+		for(int i=start; d.substr(i,1)!=terminator; i++)
+		{
+			try
+			{
+				if(!allow_sign)
+				{
+					if(d.substr(i,1) == "+" || d.substr(i,1) == "-")
+					{
+						break;
+					}
+					std::stoi(d.substr(i,1));
+					value_str += d.substr(i,1);
+				}
+				else
+				{
+					if(d.substr(i,1) != "+" && d.substr(i,1) != "-")
+					{
+						std::stoi(d.substr(i,1));
+					}
+					value_str += d.substr(i,1);
+				}
+			}
+			catch(...)
+			{
+				RPGSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" is not a number.",value.c_str(),d.substr(i,1).c_str());
+				exit(-1);
+			}
+		}
+
+		try
+		{
+			std::stoi(value_str);
+			return std::stoi(value_str);
+		}
+		catch(...)
+		{
+			RPGSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" exceeds the maximum size of %d.",value.c_str(),value_str.c_str(),INT_MAX);
+			exit(-1);
+		}
+	}
+	else
+	{
+		if(start == d.length())
+		{
+			if(required)
+			{
+				RPGSH_OUTPUT(Error,"Unable to get dice %s. No %s specified.",value.c_str(),value.c_str());
+				exit(-1);
+			}
+			return 0;
+		}
+		for(int i=start; i<d.length(); i++)
+		{
+			try
+			{
+				if(!allow_sign)
+				{
+					if(d.substr(i,1) == "+" || d.substr(i,1) == "-")
+					{
+						break;
+					}
+					std::stoi(d.substr(i,1));
+					value_str += d.substr(i,1);
+				}
+				else
+				{
+					if(d.substr(i,1) != "+" && d.substr(i,1) != "-")
+					{
+						std::stoi(d.substr(i,1));
+					}
+					value_str += d.substr(i,1);
+				}
+			}
+			catch(...)
+			{
+				RPGSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" is not a number.",value.c_str(),d.substr(i,1).c_str());
+				exit(-1);
+			}
+		}
+
+		try
+		{
+			std::stoi(value_str);
+			return std::stoi(value_str);
+		}
+		catch(...)
+		{
+			RPGSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" exceeds the maximum size of %d.",value.c_str(),value_str.c_str(),INT_MAX);
+			exit(-1);
+		}
+	}
+}
 int main(int argc, char** argv)
 {
 	bool only_total = false;
 	bool only_rolls = false;
 	bool is_list = false;
+	int Modifier = 0;
+	unsigned int Quantity = 0;
+	unsigned int Faces = 0;
 	unsigned int count = 0;
 	unsigned int repeat = 1;
 	std::string dice_str, current_arg;
@@ -173,11 +273,26 @@ int main(int argc, char** argv)
 		}
 		else
 		{
-			dice_str = current_arg;
+			//dice_str = current_arg;
+			if(!is_list)
+			{
+				if(current_arg.substr(0,1) != "d")
+				{
+					Quantity = get_value(current_arg,"quantity",0,"d",false,true);
+					Faces = get_value(current_arg,"faces",current_arg.find("d",0) + 1,"",false,true);
+					Modifier = get_value(current_arg,"modifier",current_arg.find(std::to_string(Faces),current_arg.find("d",0)) + std::to_string(Faces).length(),"",true,false);
+				}
+				else
+				{
+					Quantity = 1;
+					Faces = get_value(current_arg,"faces",current_arg.find("d",0) + 1,"",false,true);
+					Modifier = get_value(current_arg,"modifier",current_arg.find(std::to_string(Faces),current_arg.find("d",0)) + std::to_string(Faces).length(),"",true,false);
+				}
+			}
 		}
 	}
 
-	RPGSH_DICE dice = RPGSH_DICE(dice_str,only_rolls,only_total,is_list,count_expr,count);
+	RPGSH_DICE dice = RPGSH_DICE(Quantity,Faces,Modifier,only_rolls,only_total,is_list,count_expr,count);
 
 	for(int i=0; i<repeat; i++)
 	{
