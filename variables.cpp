@@ -45,16 +45,12 @@ int main(int argc, char** argv)
 {
 	c.load(false);
 
-	std::string var;
-	std::vector<std::string> v_argv = argv_handler(argc, argv);
-
-	for(int i=0; i<v_argv.size(); i++)
+	for(int i=0; i<argc; i++)
 	{
-		if(std::string(v_argv[i]).substr(0,1) == "%")
-		{
-			var = std::string(v_argv[i]).substr(1,sizeof(v_argv[i])-1);
-		}
+		fprintf(stdout,"argv[%d]: \'%s\'\n",i,argv[i]);
 	}
+
+	std::string var = std::string(argv[2]).substr(1,std::string(argv[2]).length()-1);
 
 	if(argc == 3)
 	{
@@ -62,9 +58,9 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		if(v_argv[3] == "=")
+		if(!strcmp(argv[3],"="))
 		{
-			set_var(var,v_argv[4]);
+			set_var(var,std::string(argv[4]));
 		}
 	}
 
