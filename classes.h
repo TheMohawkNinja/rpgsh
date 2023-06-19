@@ -46,56 +46,6 @@ void RPGSH_OUTPUT(RPGSH_OUTPUT_TYPE type, const char* format, ...)
 	vfprintf(stream,format,args);
 	fprintf(stream,"%s\n",TEXT_NORMAL);
 }
-std::vector<std::string> argv_handler(int argc, char** argv)
-{
-	std::vector<std::string> v;
-	std::string current_arg = "";
-	std::string current_var = "";
-
-	for(int i=0; i<argc; i++)
-	{
-		current_arg = std::string(argv[i]);
-		if(current_arg.find("\"") != std::string::npos)//Combine args wrapped in quotes
-		{
-			current_var += current_arg.substr(1,current_arg.length()-1);
-
-			if(current_var.find("\"") != std::string::npos)//When user wraps single arg in quotes
-			{
-				current_var = current_var.substr(0,current_var.find("\""));
-				v.push_back(current_var);
-				continue;
-			}
-
-			for(int j=(i+1); j<argc; j++)
-			{
-				if(std::string(argv[j]).find("\"") != std::string::npos)
-				{
-					current_var += " "+std::string(argv[j]).substr(0,std::string(argv[j]).find("\""));
-					v.push_back(current_var);
-					i++;
-					break;
-				}
-				else
-				{
-					current_var += " "+std::string(argv[j]);
-					i++;
-				}
-
-				if((j+1) == argc)
-				{
-					RPGSH_OUTPUT(Error,"Unmatched quote in argument list.");
-					exit(-1);
-				}
-			}
-		}
-		else if(strcmp(argv[i],""))//Ignore empty args (typically because somebody put in an extra space by accident)
-		{
-			v.push_back(current_arg);
-		}
-	}
-	return v;
-}
-
 class RPGSH_DICE
 {
 	private:
