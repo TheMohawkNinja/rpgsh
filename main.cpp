@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <vector>
 #include <string>
 #include <string.h>
 #include <spawn.h>
@@ -12,70 +13,98 @@ RPGSH_CHAR c = RPGSH_CHAR();
 
 void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 {
+	std::vector<std::string> v;
 	extern char** environ;
 	pid_t pid;
 
-	//Get number of args, and largest arg for efficient memory allocation.
-	int args_ctr = 1;
-	int arg_size = 0;
-	int largest_arg_size = 0;
-	std::string args_temp;
-	for(int i=0; i<args.length(); i++)
-	{
-		if(args.substr(i,1) == " ")
-		{
-			args_ctr++;
-		}
-		if(args.substr(i,1) == " " || args.substr(i,1) == "\0")
-		{
-			if(largest_arg_size < arg_size)
-			{
-				largest_arg_size = arg_size;
-			}
-			arg_size = 0;
-		}
-		else
-		{
-			arg_size++;
-		}
-	}
-
-	//Set parse parameters and set char[][] for args.
-	int argv_length = (args_ctr+2);
-	char* argv[argv_length - 1];
-	std::string program;
+	//Set char*[] for args.
 	std::string prefix = "rpgsh-";
 	std::string path = "./";
-	std::string full_path;
-	std::string full_prog_args[args_ctr];
-	int args_index = 0;
-	int arg_index = 0;
-	for(int i=0; i<=args.length(); i++)
+
+	fprintf(stdout,"args = \'%s\'\n",args.c_str());
+
+	for(int i=2; i<args.length(); i++)//TODO Replace all instances of variables except for if the first arg is a variable
 	{
-		if(args.substr(i,1) == " " || args.substr(i,1) == "\0")
+		std::string var = "";
+		if(args.substr(i,1) == "%")
 		{
-			full_prog_args[args_index] = (args.substr(arg_index,(i-arg_index)).data());
-
-			if(args_index == 0)
+			fprintf(stdout,"args.substr(%d,1) = %s\n",i,args.substr(i,1).c_str());
+			for(int j=i+1; j<args.length() && args.substr(j,1) != " "; j++)
 			{
-				//Defines naming convention for all sub-programs of rpgsh to be prefixed with "rpgsh-"
-				program = full_prog_args[args_index];
-				full_path = path + prefix + program;
-				argv[0] = (char*)full_path.c_str();
-				argv[1] = (char*)c.Attr["Name"].c_str();
+				var+=args.substr(j,1);
 			}
-
-			args_index++;
-			arg_index = i+1;
+			fprintf(stdout,"var = \'%s\'\n",var.c_str());
 		}
 	}
 
-	argv[1] = (char*)c.Attr["Name"].c_str();
-	for(int i=0; i<(args_ctr-1); i++)
+	if(args.find(" ") != std::string::npos)
 	{
-		argv[i+2] = const_cast<char*>(full_prog_args[i+1].c_str());
+		v.push_back(path+prefix+args.substr(0,args.find(" ")));
+		args = args.substr(args.find(" ")+1,(args.length() - args.find(" ")+1));
+
+		v.push_back(std::string(c.Attr["Name"]));
+
+		for(int i=0; args != "" && v[v.size()-1] != args; i++)
+		{
+			if(args.substr(0,1) == "\"")//Combine args wrapped in quotes
+			{
+				if(args.find("\"",1) == std::string::npos)
+				{
+					RPGSH_OUTPUT(Error,"Unmatched quote in argument list.");
+					return;
+				}
+				v.push_back(args.substr(1,args.find("\"",1)-1));
+				fprintf(stdout,"Quote-wrapped string = \'%s\'\n",v[v.size()-1].c_str());
+				args = args.substr(1,(args.length() - args.find("\"",1)-1));
+				fprintf(stdout,"args = \'%s\'\n",args.c_str());
+			}
+			else if(args.substr(0,1) == "%")
+			{
+				if(v.size() > 3)
+				{
+					if(args.find(" ") != std::string::npos)
+					{
+						v.push_back(std::string(c.Attr[args.substr(1,args.find(" "))]));
+						args = args.substr(args.find(" ")+1,args.length() - args.find(" ")+1);
+					}
+					else
+					{
+						v.push_back(std::string(c.Attr[args.substr(1,args.length()-1)]));
+						args = args.substr(1,args.length()-1);
+					}
+				}
+				else
+				{
+					if(args.find(" ") != std::string::npos)
+					{
+						v.push_back(args.substr(0,args.find(" ")));
+						args = args.substr(args.find(" ")+1,args.length() - args.find(" ")+1);
+					}
+					else
+					{
+						v.push_back(args);
+					}
+				}
+			}
+			else
+			{
+				v.push_back(args.substr(0,args.find(" ")));
+				args = args.substr(args.find(" ")+1,args.length() - args.find(" ")+1);
+			}
+		}
 	}
-	argv[argv_length - 1] = NULL;//NULL needs to be here, otherwise a 14: Bad address is thrown
+	else//If only one arg is called
+	{
+		v.push_back(path+prefix+args);
+		v.push_back(std::string(c.Attr["Name"]));
+	}
+
+	char* argv[v.size()+1];
+	for(int i=0; i<v.size(); i++)
+	{
+		argv[i] = (char*)v[i].c_str();
+	}
+	argv[v.size()] = NULL;
 
 	fprintf(stdout,"\n");
 
@@ -95,11 +124,11 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 	{
 		if(status == 2)//File not found
 		{
-			RPGSH_OUTPUT(Error,"(%d): \"%s\" is not a valid rpgsh command.",status,program.c_str());
+			RPGSH_OUTPUT(Error,"\"%s\" is not a valid rpgsh command. (%d)",argv[0],status);
 		}
 		else
 		{
-			RPGSH_OUTPUT(Error,"(%d): %s",status,strerror(status));
+			RPGSH_OUTPUT(Error,"%s (%d)",strerror(status),status);
 		}
 	}
 
