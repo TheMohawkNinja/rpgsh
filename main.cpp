@@ -18,15 +18,19 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 	pid_t pid;
 
 	//Set char*[] for args.
+	int params_start = args.find(" ", args.find(" ")+1);
 	std::string prefix = "rpgsh-";
 	std::string path = "./";
 
-	fprintf(stdout,"args = \'%s\'\n",args.c_str());
-
-	if(args.find(" ", args.find(" ")+1) != std::string::npos)
+	if(params_start != std::string::npos)
 	{
-		for(int i=args.find(" ", args.find(" ")+1)+1; i<args.length(); i++)//TODO Replace all instances of variables after space
+		//Replaces all instances of variables with their respective value
+		//Except for the first arg if it is a variable
+		//TODO if the regex lib is ever properly fully-implemented, replace this shit with regex like God intended
+		for(int i=params_start+1; i<args.length(); i++)
 		{
+			params_start = args.find(" ", args.find(" ")+1);
+			int find_percent = args.find("%",params_start);
 			std::string var = "";
 			if(args.substr(i,1) == "%")
 			{
@@ -35,19 +39,16 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 					var+=args.substr(j,1);
 				}
 				fprintf(stdout,"var = \'%s\'\n",var.c_str());
-				args = args.substr(0,
-						args.find("%"))+
-						c.Attr[var].c_str()+
-						args.substr(args.find("%")+var.length()+1,
-							args.length()-
-							(args.substr(0,
-								args.find("%")+var.length()+1).length()));//TODO This is ugly
-				fprintf(stdout,"args = \'%s\'\n",args.c_str());
+				int new_args_start = find_percent + var.length() + 1;
+				args = args.substr(0,find_percent)+c.Attr[var].c_str()+
+					args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
 			}
 		}
+	}
+	if(args.find(" ") != std::string::npos)
+	{
 		v.push_back(path+prefix+args.substr(0,args.find(" ")));
 		args = args.substr(args.find(" ")+1,(args.length() - args.find(" ")+1));
-
 		v.push_back(std::string(c.Attr["Name"]));
 
 		for(int i=0; args != "" && v[v.size()-1] != args; i++)
@@ -60,37 +61,22 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 					return;
 				}
 				v.push_back(args.substr(1,args.find("\"",1)-1));
-				fprintf(stdout,"Quote-wrapped string = \'%s\'\n",v[v.size()-1].c_str());
 				args = args.substr(1,(args.length() - args.find("\"",1)-1));
-				fprintf(stdout,"args = \'%s\'\n",args.c_str());
 			}
 			else if(args.substr(0,1) == "%")
 			{
-				if(v.size() > 3)
+				fprintf(stdout,"\'%%\' found, args = \'%s\'\n",args.c_str());
+				if(args.find(" ") != std::string::npos)
 				{
-					if(args.find(" ") != std::string::npos)
-					{
-						v.push_back(std::string(c.Attr[args.substr(1,args.find(" "))]));
-						args = args.substr(args.find(" ")+1,args.length() - args.find(" ")+1);
-					}
-					else
-					{
-						v.push_back(std::string(c.Attr[args.substr(1,args.length()-1)]));
-						args = args.substr(1,args.length()-1);
-					}
+					v.push_back(args.substr(args.find(" ")));
+					args = args.substr(args.find(" ")+1,args.length() - args.find(" ")+1);
 				}
 				else
 				{
-					if(args.find(" ") != std::string::npos)
-					{
-						v.push_back(args.substr(0,args.find(" ")));
-						args = args.substr(args.find(" ")+1,args.length() - args.find(" ")+1);
-					}
-					else
-					{
-						v.push_back(args);
-					}
+					v.push_back(args);
+					args = "";
 				}
+				fprintf(stdout,"args = \'%s\'\n",args.c_str());
 			}
 			else
 			{
@@ -109,6 +95,7 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 	for(int i=0; i<v.size(); i++)
 	{
 		argv[i] = (char*)v[i].c_str();
+		fprintf(stdout,"argv[%d] = %s\n",i,argv[i]);
 	}
 	argv[v.size()] = NULL;
 
