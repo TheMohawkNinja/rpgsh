@@ -45,11 +45,6 @@ int main(int argc, char** argv)
 {
 	c.load(false);
 
-	for(int i=0; i<argc; i++)
-	{
-		fprintf(stdout,"argv[%d]: \'%s\'\n",i,argv[i]);
-	}
-
 	std::string var = std::string(argv[2]).substr(1,std::string(argv[2]).length()-1);
 
 	if(argc == 3)
