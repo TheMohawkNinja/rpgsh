@@ -23,22 +23,28 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 
 	fprintf(stdout,"args = \'%s\'\n",args.c_str());
 
-	for(int i=2; i<args.length(); i++)//TODO Replace all instances of variables except for if the first arg is a variable
+	if(args.find(" ", args.find(" ")+1) != std::string::npos)
 	{
-		std::string var = "";
-		if(args.substr(i,1) == "%")
+		for(int i=args.find(" ", args.find(" ")+1)+1; i<args.length(); i++)//TODO Replace all instances of variables after space
 		{
-			fprintf(stdout,"args.substr(%d,1) = %s\n",i,args.substr(i,1).c_str());
-			for(int j=i+1; j<args.length() && args.substr(j,1) != " "; j++)
+			std::string var = "";
+			if(args.substr(i,1) == "%")
 			{
-				var+=args.substr(j,1);
+				for(int j=i+1; j<args.length() && args.substr(j,1) != " "; j++)
+				{
+					var+=args.substr(j,1);
+				}
+				fprintf(stdout,"var = \'%s\'\n",var.c_str());
+				args = args.substr(0,
+						args.find("%"))+
+						c.Attr[var].c_str()+
+						args.substr(args.find("%")+var.length()+1,
+							args.length()-
+							(args.substr(0,
+								args.find("%")+var.length()+1).length()));//TODO This is ugly
+				fprintf(stdout,"args = \'%s\'\n",args.c_str());
 			}
-			fprintf(stdout,"var = \'%s\'\n",var.c_str());
 		}
-	}
-
-	if(args.find(" ") != std::string::npos)
-	{
 		v.push_back(path+prefix+args.substr(0,args.find(" ")));
 		args = args.substr(args.find(" ")+1,(args.length() - args.find(" ")+1));
 
