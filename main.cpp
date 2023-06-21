@@ -51,37 +51,44 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 		args = args.substr(args.find(" ")+1,(args.length() - args.find(" ")+1));
 		v.push_back(std::string(c.Attr["Name"]));
 
-		for(int i=0; args != "" && v[v.size()-1] != args; i++)
+		for(int i=0; i<args.length(); i++)
 		{
-			if(args.substr(0,1) == "\"")//Combine args wrapped in quotes
+			if(args.substr(i,1) == "\"")//Combine args wrapped in quotes
 			{
+				fprintf(stdout,"Found quote-wrapped string\n");
 				if(args.find("\"",1) == std::string::npos)
 				{
 					RPGSH_OUTPUT(Error,"Unmatched quote in argument list.");
 					return;
 				}
-				v.push_back(args.substr(1,args.find("\"",1)-1));
-				args = args.substr(1,(args.length() - args.find("\"",1)-1));
-			}
-			else if(args.substr(0,1) == "%")
-			{
-				fprintf(stdout,"\'%%\' found, args = \'%s\'\n",args.c_str());
-				if(args.find(" ") != std::string::npos)
-				{
-					v.push_back(args.substr(args.find(" ")));
-					args = args.substr(args.find(" ")+1,args.length() - args.find(" ")+1);
-				}
-				else
-				{
-					v.push_back(args);
-					args = "";
-				}
-				fprintf(stdout,"args = \'%s\'\n",args.c_str());
+				v.push_back(args.substr(i+1,args.find("\"",i+1)-1));
+				fprintf(stdout,"i = %d\n",i);
+				i+=v[v.size()-1].length();
+				fprintf(stdout,"i = %d\n",i);
 			}
 			else
 			{
-				v.push_back(args.substr(0,args.find(" ")));
-				args = args.substr(args.find(" ")+1,args.length() - args.find(" ")+1);
+				if(args.find(" ") != std::string::npos)
+				{
+					if(args.find(" ",args.find(" ")+1) != std::string::npos)
+					{
+						v.push_back(args.substr(i,
+									args.find(" ",
+										(args.find(" ")+i+1)) - (args.find(" ",i))));
+					}
+					else
+					{
+						v.push_back(args.substr(i,args.length()-args.find(" ",i)));
+					}
+					fprintf(stdout,"i = %d\n",i);
+					i+=v[v.size()-1].length();
+					fprintf(stdout,"i = %d\n",i);
+				}
+				else
+				{
+					v.push_back(args.substr(i,args.length()-i));
+					break;
+				}
 			}
 		}
 	}
@@ -95,7 +102,7 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 	for(int i=0; i<v.size(); i++)
 	{
 		argv[i] = (char*)v[i].c_str();
-		fprintf(stdout,"argv[%d] = %s\n",i,argv[i]);
+		fprintf(stdout,"argv[%d] = \'%s\'\n",i,argv[i]);
 	}
 	argv[v.size()] = NULL;
 
