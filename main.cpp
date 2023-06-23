@@ -54,7 +54,6 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 		{
 			if(args.substr(i,1) == "\"")//Combine args wrapped in quotes
 			{
-				fprintf(stdout,"Found quote-wrapped string\n");
 				if(args.find("\"",1) == std::string::npos)
 				{
 					RPGSH_OUTPUT(Error,"Unmatched quote in argument list.");
