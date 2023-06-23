@@ -224,8 +224,8 @@ int main(int argc, char** argv)
 					exit(-1);
 				}
 			}
-			set_var(var,std::string(value));
 		}
+		set_var(var,std::string(value));
 	}
 
 	c.set_current();
