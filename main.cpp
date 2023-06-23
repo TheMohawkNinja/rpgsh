@@ -38,7 +38,6 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 				{
 					var+=args.substr(j,1);
 				}
-				fprintf(stdout,"var = \'%s\'\n",var.c_str());
 				int new_args_start = find_percent + var.length() + 1;
 				args = args.substr(0,find_percent)+c.Attr[var].c_str()+
 					args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
@@ -62,19 +61,28 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 					return;
 				}
 				v.push_back(args.substr(i+1,(args.find("\"",i+1)-i-1)));
-				fprintf(stdout,"i = %d\n",i);
 				i+=v[v.size()-1].length()+1;
-				fprintf(stdout,"i = %d\n",i);
 			}
 			else
 			{
 				if(args.find(" ",i) != std::string::npos)
 				{
-					v.push_back(args.substr(i,args.find(" ",i)-i));
-					fprintf(stdout,"args.find(\" \",i) = %d\n",args.find(" ",i));
-					fprintf(stdout,"i = %d\n",i);
-					i+=v[v.size()-1].length();
-					fprintf(stdout,"i = %d\n",i);
+					std::string var = args.substr(i,args.find(" ",i)-i);
+					bool var_is_valid = false;
+					for(int c_i=0; c_i<var.length(); c_i++)//Make sure we're not just grabbing extraneous whitespace
+					{
+						std::string c = var.substr(c_i,1);
+						if(c != " " && c != "")
+						{
+							var_is_valid = true;
+						}
+					}
+
+					if(var_is_valid)
+					{
+						v.push_back(args.substr(i,args.find(" ",i)-i));
+						i+=v[v.size()-1].length();
+					}
 				}
 				else
 				{
@@ -94,7 +102,6 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 	for(int i=0; i<v.size(); i++)
 	{
 		argv[i] = (char*)v[i].c_str();
-		fprintf(stdout,"argv[%d] = \'%s\'\n",i,argv[i]);
 	}
 	argv[v.size()] = NULL;
 
