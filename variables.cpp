@@ -4,13 +4,25 @@
 RPGSH_CHAR c = RPGSH_CHAR();
 bool is_operator(std::string s)
 {
-	if(s == "=" ||
-	s == "+=" || s == "-=" || s== "*=" || s == "/=" ||
-	s == "+" || s == "-" || s == "*" || s == "/")
+	if(s == "="  ||
+	   s == "+=" || s == "-=" || s== "*=" || s == "/=" ||
+	   s == "+"  || s == "-"  || s == "*" || s == "/")
 	{
 		return true;
 	}
 	else{return false;}
+}
+bool is_int(char* s)
+{
+	try
+	{
+		std::stoi(std::string(s));
+		return true;
+	}
+	catch(...)
+	{
+		return false;
+	}
 }
 void set_var(std::string var, std::string value)
 {
@@ -47,6 +59,7 @@ void set_var(std::string var, std::string value)
 	}
 
 	c.Attr[var] = value;
+	c.save();
 	RPGSH_OUTPUT(Info,"\"%s\" has been changed from \"%s\" to \"%s\".",var.c_str(),old.c_str(),value.c_str());
 }
 
@@ -62,7 +75,7 @@ int main(int argc, char** argv)
 	}
 	else if(argc == 4)
 	{
-		if(is_operator(std::string(argv[argc-1])))
+		if(is_operator(std::string(argv[3])))
 		{
 			RPGSH_OUTPUT(Error,"Expected value after \'%s\'.",argv[argc-1]);
 			exit(-1);
@@ -72,6 +85,74 @@ int main(int argc, char** argv)
 			RPGSH_OUTPUT(Error,"Expected operator before \'%s\'.",argv[argc-1]);
 			exit(-1);
 		}
+	}
+	else if(argc == 5)
+	{
+		if(!is_operator(argv[3]))
+		{
+			RPGSH_OUTPUT(Error,"Expected operator at \'%s\'.",argv[3]);
+			exit(-1);
+		}
+
+		RPGSH_VAR value = c.Attr[var];
+		if(!strcmp(argv[3],"="))
+		{
+			set_var(var,argv[4]);
+			return 0;
+		}
+		else if(!strcmp(argv[3],"+="))
+		{
+			if(is_int(argv[4]))
+			{
+				value += std::stoi(argv[4]);
+			}
+			else
+			{
+				value += std::string(argv[4]);
+			}
+		}
+		else if(!strcmp(argv[3],"-="))
+		{
+			if(is_int(argv[4]))
+			{
+				value -= std::stoi(argv[4]);
+			}
+			else
+			{
+				RPGSH_OUTPUT(Error,"Cannot subtract \'%s\' from left-hand operand.",argv[4]);
+				exit(-1);
+			}
+		}
+		else if(!strcmp(argv[3],"*="))
+		{
+			if(is_int(argv[4]))
+			{
+				value *= std::stoi(argv[4]);
+			}
+			else
+			{
+				RPGSH_OUTPUT(Error,"Cannot multiply left-hand operand by \'%s\'.",argv[4]);
+				exit(-1);
+			}
+		}
+		else if(!strcmp(argv[3],"/="))
+		{
+			if(is_int(argv[4]))
+			{
+				value /= std::stoi(argv[4]);
+			}
+			else
+			{
+				RPGSH_OUTPUT(Error,"Cannot divide left-hand operand by \'%s\'.",argv[4]);
+				exit(-1);
+			}
+		}
+		else
+		{
+			RPGSH_OUTPUT(Error,"Invalid operator \'%s\'.",argv[3]);
+			exit(-1);
+		}
+		set_var(var,std::string(value));
 	}
 	else
 	{
@@ -92,23 +173,50 @@ int main(int argc, char** argv)
 			{
 				if(!strcmp(argv[i],"+"))
 				{
-					try{value += std::stoi(argv[i+1]);}
-					catch(...){value += std::string(argv[i+1]);}
+					if(is_int(argv[i+1]))
+					{
+						value += std::stoi(argv[i+1]);
+					}
+					else
+					{
+						value += std::string(argv[i+1]);
+					}
 				}
 				else if(!strcmp(argv[i],"-"))
 				{
-					try{value -= std::stoi(argv[i+1]);}
-					catch(...){RPGSH_OUTPUT(Error,"Cannot subtract \'%s\' from left-hand operand.",argv[i+1]);exit(-1);}
+					if(is_int(argv[i+1]))
+					{
+						value -= std::stoi(argv[i+1]);
+					}
+					else
+					{
+						RPGSH_OUTPUT(Error,"Cannot subtract \'%s\' from left-hand operand.",argv[i+1]);
+						exit(-1);
+					}
 				}
 				else if(!strcmp(argv[i],"*"))
 				{
-					try{value *= std::stoi(argv[i+1]);}
-					catch(...){RPGSH_OUTPUT(Error,"Cannot multiply left-hand operand by \'%s\'.",argv[i+1]);exit(-1);}
+					if(is_int(argv[i+1]))
+					{
+						value *= std::stoi(argv[i+1]);
+					}
+					else
+					{
+						RPGSH_OUTPUT(Error,"Cannot multiply left-hand operand by \'%s\'.",argv[i+1]);
+						exit(-1);
+					}
 				}
 				else if(!strcmp(argv[i],"/"))
 				{
-					try{value /= std::stoi(argv[i+1]);}
-					catch(...){RPGSH_OUTPUT(Error,"Cannot divide left-hand operand by \'%s\'.",argv[i+1]);exit(-1);}
+					if(is_int(argv[i+1]))
+					{
+						value /= std::stoi(argv[i+1]);
+					}
+					else
+					{
+						RPGSH_OUTPUT(Error,"Cannot divide left-hand operand by \'%s\'.",argv[i+1]);
+						exit(-1);
+					}
 				}
 				else
 				{
@@ -116,16 +224,7 @@ int main(int argc, char** argv)
 					exit(-1);
 				}
 			}
-		}
-		if(!strcmp(argv[3],"="))
-		{
-			if(argc == 5)
-			{
-				set_var(var,std::string(argv[4]));
-			}
-			else
-			{
-			}
+			set_var(var,std::string(value));
 		}
 	}
 
