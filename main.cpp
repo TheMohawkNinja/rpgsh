@@ -179,7 +179,7 @@ int prompt()
 		}
 		else
 		{
-			if(buffer[0] == '$'|| buffer[0] == '%')//Check if user is operating on a variable
+			if(buffer[0] == SHELL_VAR || buffer[0] == CHAR_VAR)//Check if user is operating on a variable
 			{
 				std::string prefix = "variables ";
 				prefix += buffer;
