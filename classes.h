@@ -10,6 +10,12 @@
 #include <unistd.h>
 #include "text.h"
 
+#define SHELL_VAR '$'
+#define CHAR_VAR  '%'
+
+std::string user = getlogin();
+std::string base_path = "/home/"+user+"/.rpgsh/";
+
 enum RPGSH_OUTPUT_TYPE
 {
 	Info,
@@ -307,6 +313,7 @@ class RPGSH_VAR
 {
 	public:
 		std::string Value = "";
+		std::string DataSeparator = "::";
 
 		explicit operator std::string() const
 		{
@@ -625,14 +632,12 @@ RPGSH_VAR operator / (const int a, const RPGSH_VAR b)
 class RPGSH_CHAR
 {
 	private:
-		std::string user = getlogin();
-
+		RPGSH_VAR var = RPGSH_VAR();
 	public:
 		std::string AttributeDesignator		=	"Attr";
 		std::string SpellDesignator		=	"Spell";
 		std::string DiceDesignator		=	"Dice";
 		std::string CurrencyDesignator		=	"Currency";
-		std::string FileSeparator		=	"::";
 
 		std::map<std::string, RPGSH_VAR> Attr;
 		RPGSH_DICE		CurrentHitDice	=	RPGSH_DICE();
@@ -640,7 +645,6 @@ class RPGSH_CHAR
 		RPGSH_CURRENCY		Currency	=	RPGSH_CURRENCY();
 		std::vector<RPGSH_SPELL>Spellbook	=	{};
 
-		std::string base_path = "/home/"+user+"/.rpgsh/";
 		std::string current_char_path = base_path+".current";
 
 	RPGSH_CHAR()
@@ -718,9 +722,9 @@ class RPGSH_CHAR
 		{
 			//Character file format definition
 			std::string data =	AttributeDesignator+
-						FileSeparator+
+						var.DataSeparator+
 						key+
-						FileSeparator+
+						var.DataSeparator+
 						std::string(value)+
 						"\n";
 			fs<<data;
@@ -742,14 +746,12 @@ class RPGSH_CHAR
 			std::string data = "";
 			std::getline(fs,data);
 
-			if(data.substr(0,data.find(FileSeparator)) == AttributeDesignator)//TODO Complete loading code
+			if(data.substr(0,data.find(var.DataSeparator)) == AttributeDesignator)//TODO Complete loading code
 			{
-				data = data.substr(data.find(FileSeparator)+FileSeparator.length(),
-							(data.length()-
-							(data.find(FileSeparator))));
-				Attr[data.substr(0,data.find(FileSeparator))] = data.substr(data.find(FileSeparator)+FileSeparator.length(),
-												(data.length()-
-												(data.find(FileSeparator))));
+				data = data.substr(data.find(var.DataSeparator)+var.DataSeparator.length(),
+							(data.length() - (data.find(var.DataSeparator))));
+				Attr[data.substr(0,data.find(var.DataSeparator))] = data.substr(data.find(var.DataSeparator)+var.DataSeparator.length(),
+												(data.length() - (data.find(var.DataSeparator))));
 			}
 		}
 		fs.close();
