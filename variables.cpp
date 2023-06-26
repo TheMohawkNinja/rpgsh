@@ -1,7 +1,10 @@
 #include <vector>
+#include <filesystem>
 #include "classes.h"
 
 RPGSH_CHAR c = RPGSH_CHAR();
+RPGSH_VAR v = RPGSH_VAR();
+
 bool is_operator(std::string s)
 {
 	if(s == "="  ||
@@ -24,9 +27,37 @@ bool is_int(char* s)
 		return false;
 	}
 }
-void set_var(std::string var, std::string value)
+void set_var(std::string var, std::string value, bool is_char_var)
 {
-	std::string old = std::string(c.Attr[var]);
+	std::string shell_var_path = base_path + ".shell";
+	std::string old, var_type;
+	std::vector<std::string> shell_vars;
+
+	if(!is_char_var)
+	{
+		var_type = "Shell variable";
+		std::ifstream ifs(shell_var_path.c_str());
+		for(int i=0; !ifs.eof(); i++)
+		{
+			std::string data = "";
+			std::getline(ifs,data);
+
+			if(data.substr(0,data.find(v.DataSeparator)) == var)
+			{
+				old = data.substr(data.find(v.DataSeparator)+2,data.length()-(data.find(v.DataSeparator)+2));
+			}
+			else
+			{
+				shell_vars.push_back(data);
+			}
+		}
+	}
+	else
+	{
+		var_type = "Character attribute";
+		old = std::string(c.Attr[var]);
+	}
+
 	bool old_is_digit, new_is_digit;
 
 	try
@@ -51,22 +82,37 @@ void set_var(std::string var, std::string value)
 
 	if(old_is_digit && !new_is_digit)
 	{
-		RPGSH_OUTPUT(Warning,"\"%s\" is changing from an integer to a string.",var.c_str());
+		RPGSH_OUTPUT(Warning,"%s \"%s\" is changing from an integer to a string.",var_type.c_str(),var.c_str());
 	}
 	else if(!old_is_digit && new_is_digit)
 	{
-		RPGSH_OUTPUT(Warning,"\"%s\" is changing from a string to an integer.",var.c_str());
+		RPGSH_OUTPUT(Warning,"%s \"%s\" is changing from a string to an integer.",var_type.c_str(),var.c_str());
 	}
 
-	c.Attr[var] = value;
-	c.save();
-	RPGSH_OUTPUT(Info,"\"%s\" has been changed from \"%s\" to \"%s\".",var.c_str(),old.c_str(),value.c_str());
+	if(!is_char_var)
+	{
+		std::filesystem::remove(shell_var_path.c_str());
+		std::ofstream ofs(shell_var_path.c_str());
+		for(int i=0; i<shell_vars.size(); i++)
+		{
+			ofs<<shell_vars[i];
+		}
+		ofs<<var+v.DataSeparator+value;
+		ofs.close();
+	}
+	else
+	{
+		c.Attr[var] = value;
+		c.save();
+	}
+	RPGSH_OUTPUT(Info,"%s \"%s\" has been changed from \"%s\" to \"%s\".",var_type.c_str(),var.c_str(),old.c_str(),value.c_str());
 }
 
 int main(int argc, char** argv)
 {
 	c.load(false);
 
+	bool is_char_var = (argv[2][0] == CHAR_VAR);
 	std::string var = std::string(argv[2]).substr(1,std::string(argv[2]).length()-1);
 
 	if(argc == 3)
@@ -97,7 +143,7 @@ int main(int argc, char** argv)
 		RPGSH_VAR value = c.Attr[var];
 		if(!strcmp(argv[3],"="))
 		{
-			set_var(var,argv[4]);
+			set_var(var,argv[4],is_char_var);
 			return 0;
 		}
 		else if(!strcmp(argv[3],"+="))
@@ -152,7 +198,7 @@ int main(int argc, char** argv)
 			RPGSH_OUTPUT(Error,"Invalid operator \'%s\'.",argv[3]);
 			exit(-1);
 		}
-		set_var(var,std::string(value));
+		set_var(var,std::string(value),is_char_var);
 	}
 	else
 	{
@@ -225,7 +271,7 @@ int main(int argc, char** argv)
 				}
 			}
 		}
-		set_var(var,std::string(value));
+		set_var(var,std::string(value),is_char_var);
 	}
 
 	c.set_current();
