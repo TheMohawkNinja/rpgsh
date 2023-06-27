@@ -14,7 +14,7 @@ int main()
 	fprintf(stdout,"%s  │#┌─────┐#││#┌─────┐#││#┌─────┐#│%s┌┘######││#│              %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
 	fprintf(stdout,"%s  │#└─────┘#││#└─────┘#││#│     └─┘%s│#┌─────┘│#│              %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
 	fprintf(stdout,"%s  │########┌┘│########┌┘│#│   ┌───┐%s│#└────┐ │#└────┐         %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
-	fprintf(stdout,"%s  │#┌──┐#─┬┘ │#┌──────┘ │#│   │###│%s└┐#####└┐│######└┐        %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
+	fprintf(stdout,"%s  │#┌──┐##┌┘ │#┌──────┘ │#│   │###│%s└┐#####└┐│######└┐        %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
 	fprintf(stdout,"%s  │#│  └┐#└┐ │#│        │#│   └─┐#│%s └────┐#││#┌───┐#│        %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
 	fprintf(stdout,"%s  │#│   └┐#└┐│#│        │#└─────┘#│%s┌─────┘#││#│   │#│        %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
 	fprintf(stdout,"%s  │#│    └┐#││#│        └┐########│%s│######┌┘│#│   │#│        %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
