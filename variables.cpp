@@ -77,7 +77,7 @@ void set_var(std::string var, std::string old, std::string value, bool is_char_v
 		std::ofstream ofs(shell_vars_path.c_str());
 		for(int i=0; i<shell_vars.size(); i++)
 		{
-			ofs<<shell_vars[i];
+			ofs<<shell_vars[i]+"\n";
 		}
 		ofs<<var+v.DataSeparator+value;
 		ofs.close();
