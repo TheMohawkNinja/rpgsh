@@ -193,6 +193,13 @@ int prompt()
 }
 int main()
 {
+	//Create shell vars file if it doesn't exist
+	if(!std::filesystem::exists(shell_vars_path.c_str()))
+	{
+		std::ofstream ofs(shell_vars_path.c_str());
+		ofs.close();
+	}
+
 	//Forces default character to be created so first load() works correctly
 	RPGSH_CHAR *dummy = new RPGSH_CHAR();
 	if(!std::filesystem::exists(dummy->current_char_path.c_str()))
