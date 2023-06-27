@@ -27,35 +27,17 @@ bool is_int(char* s)
 		return false;
 	}
 }
-void set_var(std::string var, std::string value, bool is_char_var)
+void set_var(std::string var, std::string old, std::string value, bool is_char_var, std::vector<std::string> shell_vars)
 {
-	std::string shell_var_path = base_path + ".shell";
-	std::string old, var_type;
-	std::vector<std::string> shell_vars;
+	std::string var_type;
 
 	if(!is_char_var)
 	{
 		var_type = "Shell variable";
-		std::ifstream ifs(shell_var_path.c_str());
-		for(int i=0; !ifs.eof(); i++)
-		{
-			std::string data = "";
-			std::getline(ifs,data);
-
-			if(data.substr(0,data.find(v.DataSeparator)) == var)
-			{
-				old = data.substr(data.find(v.DataSeparator)+2,data.length()-(data.find(v.DataSeparator)+2));
-			}
-			else
-			{
-				shell_vars.push_back(data);
-			}
-		}
 	}
 	else
 	{
 		var_type = "Character attribute";
-		old = std::string(c.Attr[var]);
 	}
 
 	bool old_is_digit, new_is_digit;
@@ -91,8 +73,8 @@ void set_var(std::string var, std::string value, bool is_char_var)
 
 	if(!is_char_var)
 	{
-		std::filesystem::remove(shell_var_path.c_str());
-		std::ofstream ofs(shell_var_path.c_str());
+		std::filesystem::remove(shell_vars_path.c_str());
+		std::ofstream ofs(shell_vars_path.c_str());
 		for(int i=0; i<shell_vars.size(); i++)
 		{
 			ofs<<shell_vars[i];
@@ -110,14 +92,39 @@ void set_var(std::string var, std::string value, bool is_char_var)
 
 int main(int argc, char** argv)
 {
-	c.load(false);
-
 	bool is_char_var = (argv[2][0] == CHAR_VAR);
+	std::vector<std::string> shell_vars;
 	std::string var = std::string(argv[2]).substr(1,std::string(argv[2]).length()-1);
+	std::string old;
+
+	if(!is_char_var)
+	{
+		std::ifstream ifs(shell_vars_path.c_str());
+		for(int i=0; !ifs.eof(); i++)
+		{
+			std::string data = "";
+			std::getline(ifs,data);
+
+			if(data.substr(0,data.find(v.DataSeparator)) == var)
+			{
+				old = data.substr(data.find(v.DataSeparator)+2,data.length()-(data.find(v.DataSeparator)+2));
+			}
+			else
+			{
+				shell_vars.push_back(data);
+			}
+		}
+		ifs.close();
+	}
+	else
+	{
+		c.load(false);
+		old = std::string(c.Attr[var]);
+	}
 
 	if(argc == 3)
 	{
-		fprintf(stdout,"%s\n",c.Attr[var].c_str());
+		fprintf(stdout,"%s\n",old.c_str());
 	}
 	else if(argc == 4)
 	{
@@ -140,10 +147,10 @@ int main(int argc, char** argv)
 			exit(-1);
 		}
 
-		RPGSH_VAR value = c.Attr[var];
+		RPGSH_VAR value = RPGSH_VAR(old);
 		if(!strcmp(argv[3],"="))
 		{
-			set_var(var,argv[4],is_char_var);
+			set_var(var,old,argv[4],is_char_var,shell_vars);
 			return 0;
 		}
 		else if(!strcmp(argv[3],"+="))
@@ -198,7 +205,7 @@ int main(int argc, char** argv)
 			RPGSH_OUTPUT(Error,"Invalid operator \'%s\'.",argv[3]);
 			exit(-1);
 		}
-		set_var(var,std::string(value),is_char_var);
+		set_var(var,old,std::string(value),is_char_var,shell_vars);
 	}
 	else
 	{
@@ -271,10 +278,13 @@ int main(int argc, char** argv)
 				}
 			}
 		}
-		set_var(var,std::string(value),is_char_var);
+		set_var(var,old,std::string(value),is_char_var,shell_vars);
 	}
 
-	c.set_current();
-	c.save();
+	if(is_char_var)
+	{
+		c.set_current();
+		c.save();
+	}
 	return 0;
 }
