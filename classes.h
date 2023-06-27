@@ -15,6 +15,7 @@
 
 std::string user = getlogin();
 std::string base_path = "/home/"+user+"/.rpgsh/";
+std::string shell_vars_path = base_path+".shell";
 
 enum RPGSH_OUTPUT_TYPE
 {
