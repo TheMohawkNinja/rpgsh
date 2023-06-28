@@ -18,6 +18,16 @@ Just like any other shell (sh, bash, cmd, etc.), you interact with 'rpgsh' by ty
 
 When first launching `rpgsh`, you will see `[INFO]` text appear stating that the root directory for the program has been created at `~/.rpgsh/`. In addition, a placeholder character file `<NO_NAME>.char` is created to give the prompt something to work with until you create a character of your own. This file can be safely deleted if the placeholder character is no longer being used. Whenever the currently loaded character is modifed by the shell or a program called by the shell, it will create a `.char.bak` file which contains the character information prior to the last save of the character (which *should* be the last command run). This is mainly for instances whereby the player accidentally sets a prompt value to something non-sensical (e.g. setting their current HP to "FULL" instead of "20"), as this would cause the prompt to crash. In the event this happens, the prompt will attempt to load the backup. If loading the backup fails, the player will need to open up their character file and attempt to manually edit the file to resolve the issue.
 
+## Variables
+
+`rpgsh` contains two types of variables:
+ - Shell variables, prefixed by a `$`
+   - General-use variables for things not meant for your character sheet, but that you would still want to keep track of. These are global in scope and are stored in `~/.rpgsh/.shell`
+ - Character attributes, prefixed by a `%`
+   - Values which will appear on your character sheet (excluding things like hit dice and currency, which have additional mechanics). The scope of these variables are thus limited to the currently loaded character. If you are playing a game which is known to `rpgsh`, many of these attributes will have been generated for you as part of the character creation process. The default `<NO_NAME>` character contains such pre-generated attributes as a placeholder for the prompt.
+
+All variables are lazily evaluated, meaning that they can either store numerical values or strings of characters, with operations handling them accordingly. Currently supported operators are `=`, `+`, `-`, `*`, `/`, `+=`,`-=`, `*=`, `/=`. The `+` and `+=` operators will assume addition if both sides are numbers, or concatenation if both sides are strings. An error will be thrown if both sides are not of the same apparent data type. Variables can be used in the shell with any program, as any variable arguments passed to a program will be replaced with the variable's value prior to the program's execution. The only exception to this is when one is modifying the value of a variable, in which case the variable in question is not swapped out for its' value.
+
 ## Installation instructions
 
 Run `./install.sh` as root
