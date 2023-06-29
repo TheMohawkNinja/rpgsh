@@ -10,10 +10,11 @@
 #define MAX_BUFFER_SIZE 256
 
 RPGSH_CHAR c = RPGSH_CHAR();
+RPGSH_VAR v = RPGSH_VAR();
 
 void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 {
-	std::vector<std::string> v;
+	std::vector<std::string> vars;
 	extern char** environ;
 	pid_t pid;
 
@@ -30,10 +31,10 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 		for(int i=params_start+1; i<args.length(); i++)
 		{
 			params_start = args.find(" ", args.find(" ")+1);
-			int find_percent = args.find("%",params_start);
 			std::string var = "";
-			if(args.substr(i,1) == "%")
+			if(args[i] == CHAR_VAR)
 			{
+				int find_percent = args.find(CHAR_VAR,params_start);
 				for(int j=i+1; j<args.length() && args.substr(j,1) != " "; j++)
 				{
 					var+=args.substr(j,1);
@@ -42,25 +43,53 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 				args = args.substr(0,find_percent)+c.Attr[var].c_str()+
 					args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
 			}
+			else if(args[i] == SHELL_VAR)
+			{
+				int find_dollar = args.find(SHELL_VAR,params_start);
+				for(int j=i+1; j<args.length() && args.substr(j,1) != " "; j++)
+				{
+					var+=args.substr(j,1);
+				}
+
+				std::ifstream ifs(shell_vars_path.c_str());
+				while(!ifs.eof())
+				{
+					std::string old;
+					std::string data = "";
+					std::getline(ifs,data);
+
+					if(data.substr(0,data.find(v.DataSeparator)) == var)
+					{
+						old = data.substr(data.find(v.DataSeparator)+v.DataSeparator.length(),
+								data.length()-(data.find(v.DataSeparator)+v.DataSeparator.length()));
+						int new_args_start = find_dollar + var.length() + 1;
+
+						args = args.substr(0,find_dollar)+old+
+							args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
+						break;
+					}
+				}
+				ifs.close();
+			}
 		}
 	}
 	if(args.find(" ") != std::string::npos)
 	{
-		v.push_back(path+prefix+args.substr(0,args.find(" ")));
+		vars.push_back(path+prefix+args.substr(0,args.find(" ")));
 		args = args.substr(args.find(" ")+1,(args.length() - args.find(" ")+1));
-		v.push_back(std::string(c.Attr["Name"]));
+		vars.push_back(std::string(c.Attr["Name"]));
 
 		for(int i=0; i<args.length(); i++)
 		{
 			if(args.substr(i,1) == "\"")//Combine args wrapped in quotes
 			{
-				if(args.find("\"",1) == std::string::npos)
+				if(args.find("\"",i+1) == std::string::npos)
 				{
 					RPGSH_OUTPUT(Error,"Unmatched quote in argument list.");
 					return;
 				}
-				v.push_back(args.substr(i+1,(args.find("\"",i+1)-i-1)));
-				i+=v[v.size()-1].length()+1;
+				vars.push_back(args.substr(i,(args.find("\"",i+1)-i+1)));
+				i+=vars[vars.size()-1].length()+1;
 			}
 			else
 			{
@@ -79,13 +108,13 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 
 					if(var_is_valid)
 					{
-						v.push_back(args.substr(i,args.find(" ",i)-i));
-						i+=v[v.size()-1].length();
+						vars.push_back(args.substr(i,args.find(" ",i)-i));
+						i+=vars[vars.size()-1].length();
 					}
 				}
 				else
 				{
-					v.push_back(args.substr(i,args.length()-i));
+					vars.push_back(args.substr(i,args.length()-i));
 					break;
 				}
 			}
@@ -93,16 +122,16 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 	}
 	else//If only one arg is called
 	{
-		v.push_back(path+prefix+args);
-		v.push_back(std::string(c.Attr["Name"]));
+		vars.push_back(path+prefix+args);
+		vars.push_back(std::string(c.Attr["Name"]));
 	}
 
-	char* argv[v.size()+1];
-	for(int i=0; i<v.size(); i++)
+	char* argv[vars.size()+1];
+	for(int i=0; i<vars.size(); i++)
 	{
-		argv[i] = (char*)v[i].c_str();
+		argv[i] = (char*)vars[i].c_str();
 	}
-	argv[v.size()] = NULL;
+	argv[vars.size()] = NULL;
 
 	fprintf(stdout,"\n");
 
