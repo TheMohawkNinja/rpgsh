@@ -100,14 +100,15 @@ int main(int argc, char** argv)
 	if(!is_char_var)
 	{
 		std::ifstream ifs(shell_vars_path.c_str());
-		for(int i=0; !ifs.eof(); i++)
+		while(!ifs.eof())
 		{
 			std::string data = "";
 			std::getline(ifs,data);
 
 			if(data.substr(0,data.find(v.DataSeparator)) == var)
 			{
-				old = data.substr(data.find(v.DataSeparator)+2,data.length()-(data.find(v.DataSeparator)+2));
+				old = data.substr(data.find(v.DataSeparator)+v.DataSeparator.length(),
+						data.length()-(data.find(v.DataSeparator)+v.DataSeparator.length()));
 			}
 			else
 			{
