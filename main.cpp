@@ -60,9 +60,14 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 
 					if(data.substr(0,data.find(v.DataSeparator)) == var)
 					{
+						int new_args_start = find_dollar + var.length() + 1;
 						old = data.substr(data.find(v.DataSeparator)+v.DataSeparator.length(),
 								data.length()-(data.find(v.DataSeparator)+v.DataSeparator.length()));
-						int new_args_start = find_dollar + var.length() + 1;
+
+						if(old.find(" ") != std::string::npos)
+						{
+							old = "\"" + old + "\"";
+						}
 
 						args = args.substr(0,find_dollar)+old+
 							args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
@@ -88,7 +93,7 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 					RPGSH_OUTPUT(Error,"Unmatched quote in argument list.");
 					return;
 				}
-				vars.push_back(args.substr(i,(args.find("\"",i+1)-i+1)));
+				vars.push_back(args.substr(i+1,(args.find("\"",i+1)-i-1)));
 				i+=vars[vars.size()-1].length()+1;
 			}
 			else
