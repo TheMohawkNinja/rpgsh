@@ -25,6 +25,6 @@ int main()
 	fprintf(stdout,"%s             ▀               ▀▀         ▀█ ██%s██████%s██    %s\n",TEXT_RED,TEXT_YELLOW,TEXT_RED,TEXT_NORMAL);
 	fprintf(stdout,"%s                                            ▀▀▀▀▀▀▀▀         %s\n",TEXT_RED,TEXT_NORMAL);
 	fprintf(stdout,"\n");
-	fprintf(stdout,"The interactive Linux shell for table-top RPGs.\n\nBy %s%s%s%s%s.\n",TEXT_BG_RED,TEXT_ITALIC,TEXT_GREEN,"TheMohawkNinja",TEXT_NORMAL);
+	fprintf(stdout,"The interactive Linux shell for table-top RPGs.\n\nBy %s%s%s%s.\n",TEXT_ITALIC,TEXT_LIGHTBLUE,"TheMohawkNinja",TEXT_NORMAL);
 	return 0;
 }
