@@ -34,7 +34,7 @@ Operators and associated values must be entered in a space-delimited format. (e.
 
 ## Dependancies
 
-`gcc` should be all that is needed, as nothing outside of the C++ standard library is used.
+`g++` should be all that is needed, as nothing outside of the C++ standard library is used.
 
 ## Installation instructions
 
