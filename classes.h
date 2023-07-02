@@ -53,6 +53,7 @@ void RPGSH_OUTPUT(RPGSH_OUTPUT_TYPE type, const char* format, ...)
 	vfprintf(stream,format,args);
 	fprintf(stream,"%s\n",TEXT_NORMAL);
 }
+
 class RPGSH_DICE
 {
 	private:
