@@ -325,22 +325,22 @@ class RPGSH_VAR
 		{
 			return std::stoi(Value);
 		}
-		RPGSH_VAR operator = (const RPGSH_VAR b)
+		RPGSH_VAR& operator = (const RPGSH_VAR b)
 		{
 			Value = b.Value;
-			return Value;
+			return *this;
 		}
-		RPGSH_VAR operator = (const std::string b)
+		RPGSH_VAR& operator = (const std::string b)
 		{
 			Value = b;
-			return b;
+			return *this;
 		}
-		RPGSH_VAR operator = (const int b)
+		RPGSH_VAR& operator = (const int b)
 		{
 			Value = std::to_string(b);
-			return Value;
+			return *this;
 		}
-		RPGSH_VAR operator += (const RPGSH_VAR b)
+		RPGSH_VAR& operator += (const RPGSH_VAR b)
 		{
 			bool a_is_num = true;
 			bool b_is_num = true;
@@ -353,20 +353,18 @@ class RPGSH_VAR
 			if(a_is_num && b_is_num)
 			{
 				Value = std::to_string((std::stoi(Value) + std::stoi(b.Value)));
-				return Value;
 			}
 			else if(!a_is_num && !b_is_num)
 			{
 				Value = Value + b.Value;
-				return Value;
 			}
 			else
 			{
 				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
-				return Value;
 			}
+			return *this;
 		}
-		RPGSH_VAR operator += (const std::string b)
+		RPGSH_VAR& operator += (const std::string b)
 		{
 			bool a_is_num = true;
 
@@ -376,15 +374,14 @@ class RPGSH_VAR
 			if(!a_is_num)
 			{
 				Value = Value + b;
-				return Value;
 			}
 			else
 			{
 				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
-				return Value;
 			}
+			return *this;
 		}
-		RPGSH_VAR operator += (const int b)
+		RPGSH_VAR& operator += (const int b)
 		{
 			bool a_is_num = true;
 
@@ -394,15 +391,14 @@ class RPGSH_VAR
 			if(a_is_num)
 			{
 				Value = std::to_string((std::stoi(Value) + b));
-				return Value;
 			}
 			else
 			{
 				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
-				return RPGSH_VAR("");
 			}
+			return *this;
 		}
-		RPGSH_VAR operator -= (const RPGSH_VAR b)
+		RPGSH_VAR& operator -= (const RPGSH_VAR b)
 		{
 			bool a_is_num = true;
 			bool b_is_num = true;
@@ -415,20 +411,18 @@ class RPGSH_VAR
 			if(a_is_num && b_is_num)
 			{
 				Value = std::to_string((std::stoi(Value) - std::stoi(b.Value)));
-				return Value;
 			}
 			else if(!a_is_num && !b_is_num)
 			{
 				RPGSH_OUTPUT(Error,"Cannot subtract two non-numerical values from each other.");
-				return Value;
 			}
 			else
 			{
 				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
-				return Value;
 			}
+			return *this;
 		}
-		RPGSH_VAR operator -= (const int b)
+		RPGSH_VAR& operator -= (const int b)
 		{
 			bool a_is_num = true;
 
@@ -438,15 +432,14 @@ class RPGSH_VAR
 			if(a_is_num)
 			{
 				Value = std::to_string((std::stoi(Value) - b));
-				return Value;
 			}
 			else
 			{
 				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
-				return RPGSH_VAR("");
 			}
+			return *this;
 		}
-		RPGSH_VAR operator *= (const RPGSH_VAR b)
+		RPGSH_VAR& operator *= (const RPGSH_VAR b)
 		{
 			bool a_is_num = true;
 			bool b_is_num = true;
@@ -459,20 +452,18 @@ class RPGSH_VAR
 			if(a_is_num && b_is_num)
 			{
 				Value = std::to_string((std::stoi(Value) * std::stoi(b.Value)));
-				return Value;
 			}
 			else if(!a_is_num && !b_is_num)
 			{
 				RPGSH_OUTPUT(Error,"Cannot multiply two non-numerical values from each other.");
-				return Value;
 			}
 			else
 			{
 				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
-				return Value;
 			}
+			return *this;
 		}
-		RPGSH_VAR operator *= (const int b)
+		RPGSH_VAR& operator *= (const int b)
 		{
 			bool a_is_num = true;
 
@@ -482,15 +473,14 @@ class RPGSH_VAR
 			if(a_is_num)
 			{
 				Value = std::to_string((std::stoi(Value) * b));
-				return Value;
 			}
 			else
 			{
 				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
-				return Value;
 			}
+			return *this;
 		}
-		RPGSH_VAR operator /= (const RPGSH_VAR b)
+		RPGSH_VAR& operator /= (const RPGSH_VAR b)
 		{
 			bool a_is_num = true;
 			bool b_is_num = true;
@@ -503,20 +493,18 @@ class RPGSH_VAR
 			if(a_is_num && b_is_num)
 			{
 				Value = std::to_string((std::stoi(Value) / std::stoi(b.Value)));
-				return Value;
 			}
 			else if(!a_is_num && !b_is_num)
 			{
 				RPGSH_OUTPUT(Error,"Cannot divide two non-numerical values from each other.");
-				return Value;
 			}
 			else
 			{
 				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
-				return Value;
 			}
+			return *this;
 		}
-		RPGSH_VAR operator /= (const int b)
+		RPGSH_VAR& operator /= (const int b)
 		{
 			bool a_is_num = true;
 
@@ -526,13 +514,46 @@ class RPGSH_VAR
 			if(a_is_num)
 			{
 				Value = std::to_string((std::stoi(Value) / b));
-				return Value;
 			}
 			else
 			{
 				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
-				return Value;
 			}
+			return *this;
+		}
+		RPGSH_VAR& operator ++ ()
+		{
+			bool a_is_num = true;
+
+			try{std::stoi(Value);}
+			catch(...){a_is_num = false;}
+
+			if(a_is_num)
+			{
+				Value = std::to_string((std::stoi(Value) + 1));
+			}
+			else
+			{
+				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+			}
+			return *this;
+		}
+		RPGSH_VAR& operator -- ()
+		{
+			bool a_is_num = true;
+
+			try{std::stoi(Value);}
+			catch(...){a_is_num = false;}
+
+			if(a_is_num)
+			{
+				Value = std::to_string((std::stoi(Value) - 1));
+			}
+			else
+			{
+				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+			}
+			return *this;
 		}
 
 	RPGSH_VAR(){}
