@@ -521,7 +521,7 @@ class RPGSH_VAR
 			}
 			return *this;
 		}
-		RPGSH_VAR& operator ++ ()
+		RPGSH_VAR& operator ++ (const int b)
 		{
 			bool a_is_num = true;
 
@@ -538,7 +538,7 @@ class RPGSH_VAR
 			}
 			return *this;
 		}
-		RPGSH_VAR& operator -- ()
+		RPGSH_VAR& operator -- (const int b)
 		{
 			bool a_is_num = true;
 
