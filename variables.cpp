@@ -8,8 +8,9 @@ RPGSH_VAR v = RPGSH_VAR();
 bool is_operator(std::string s)
 {
 	if(s == "="  ||
-	   s == "+=" || s == "-=" || s== "*=" || s == "/=" ||
-	   s == "+"  || s == "-"  || s == "*" || s == "/")
+	   s == "+"  || s == "-"  || s == "*"  || s == "/"  ||
+	   s == "+=" || s == "-=" || s == "*=" || s == "/=" ||
+	   s == "++" || s == "--")
 	{
 		return true;
 	}
@@ -27,7 +28,7 @@ bool is_int(char* s)
 		return false;
 	}
 }
-void set_var(std::string var, std::string old_value, std::string new_value, bool is_char_var, std::vector<std::string> shell_vars)
+void set_var(std::string var, RPGSH_VAR old_value, RPGSH_VAR new_value, bool is_char_var, std::vector<std::string> shell_vars)
 {
 	std::string var_type;
 
@@ -44,7 +45,7 @@ void set_var(std::string var, std::string old_value, std::string new_value, bool
 
 	try
 	{
-		std::stoi(old_value);
+		int(old_value);
 		old_value_is_digit = true;
 	}
 	catch(...)
@@ -54,7 +55,7 @@ void set_var(std::string var, std::string old_value, std::string new_value, bool
 
 	try
 	{
-		std::stoi(new_value);
+		int(new_value);
 		new_is_digit = true;
 	}
 	catch(...)
@@ -79,7 +80,7 @@ void set_var(std::string var, std::string old_value, std::string new_value, bool
 		{
 			ofs<<shell_vars[i]+"\n";
 		}
-		ofs<<var+v.DataSeparator+new_value;
+		ofs<<var+v.DataSeparator+std::string(new_value);
 		ofs.close();
 	}
 	else
@@ -132,8 +133,21 @@ int main(int argc, char** argv)
 	{
 		if(is_operator(std::string(argv[3])))
 		{
-			RPGSH_OUTPUT(Error,"Expected new_value after \'%s\'.",argv[argc-1]);
-			exit(-1);
+			if(std::string(argv[3]) == "++")
+			{
+				set_var(var,old_value,old_value+1,is_char_var,shell_vars);
+				return 0;
+			}
+			else if(std::string(argv[3]) == "--")
+			{
+				set_var(var,old_value,old_value-1,is_char_var,shell_vars);
+				return 0;
+			}
+			else
+			{
+				RPGSH_OUTPUT(Error,"Expected new_value after \'%s\'.",argv[argc-1]);
+				exit(-1);
+			}
 		}
 		else
 		{
@@ -185,27 +199,27 @@ int main(int argc, char** argv)
 
 		if(!strcmp(argv[3],"="))
 		{
-			set_var(var,std::string(old_value),std::string(new_value),is_char_var,shell_vars);
+			set_var(var,old_value,new_value,is_char_var,shell_vars);
 			return 0;
 		}
 		else if(!strcmp(argv[3],"+="))
 		{
-			set_var(var,std::string(old_value),std::string(old_value+new_value),is_char_var,shell_vars);
+			set_var(var,old_value,std::string(old_value+new_value),is_char_var,shell_vars);
 			return 0;
 		}
 		else if(!strcmp(argv[3],"-="))
 		{
-			set_var(var,std::string(old_value),std::string(old_value-new_value),is_char_var,shell_vars);
+			set_var(var,old_value,std::string(old_value-new_value),is_char_var,shell_vars);
 			return 0;
 		}
 		else if(!strcmp(argv[3],"*="))
 		{
-			set_var(var,std::string(old_value),std::string(old_value*new_value),is_char_var,shell_vars);
+			set_var(var,old_value,std::string(old_value*new_value),is_char_var,shell_vars);
 			return 0;
 		}
 		else if(!strcmp(argv[3],"/="))
 		{
-			set_var(var,std::string(old_value),std::string(old_value/new_value),is_char_var,shell_vars);
+			set_var(var,old_value,std::string(old_value/new_value),is_char_var,shell_vars);
 			return 0;
 		}
 		else
