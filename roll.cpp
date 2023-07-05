@@ -111,7 +111,7 @@ int main(int argc, char** argv)
 	std::string dice_str, current_arg;
 	std::string count_expr = "";
 
-	for(int arg=2; arg<argc; arg++)
+	for(int arg=1; arg<argc; arg++)
 	{
 		current_arg = std::string(argv[arg]);
 		if(current_arg.substr(0,1) == "-")//Assume anything starting with a "-" is a non-dice parameter
