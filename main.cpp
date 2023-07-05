@@ -82,7 +82,6 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 	{
 		vars.push_back(path+prefix+args.substr(0,args.find(" ")));
 		args = args.substr(args.find(" ")+1,(args.length() - args.find(" ")+1));
-		vars.push_back(std::string(c.Attr["Name"]));
 
 		for(int i=0; i<args.length(); i++)
 		{
