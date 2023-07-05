@@ -561,6 +561,10 @@ class RPGSH_VAR
 	{
 		Value = _value;
 	}
+	RPGSH_VAR(int _value)
+	{
+		Value = std::to_string(_value);
+	}
 
 	const char* c_str()
 	{
