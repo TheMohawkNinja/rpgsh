@@ -94,9 +94,9 @@ void set_var(std::string var, RPGSH_VAR old_value, RPGSH_VAR new_value, bool is_
 
 int main(int argc, char** argv)
 {
-	bool is_char_var = (argv[2][0] == CHAR_VAR);
+	bool is_char_var = (argv[1][0] == CHAR_VAR);
 	std::vector<std::string> shell_vars;
-	std::string var = std::string(argv[2]).substr(1,std::string(argv[2]).length()-1);
+	std::string var = std::string(argv[1]).substr(1,std::string(argv[1]).length()-1);
 	RPGSH_VAR old_value;
 
 	if(!is_char_var)
@@ -125,27 +125,27 @@ int main(int argc, char** argv)
 		old_value = std::string(c.Attr[var]);
 	}
 
-	if(argc == 3)
+	if(argc == 2)
 	{
 		fprintf(stdout,"%s\n",old_value.c_str());
 	}
-	else if(argc == 4)
+	else if(argc == 3)
 	{
-		if(is_operator(std::string(argv[3])))
+		if(is_operator(std::string(argv[2])))
 		{
-			if(std::string(argv[3]) == "++")
+			if(std::string(argv[2]) == "++")
 			{
 				set_var(var,old_value,old_value+1,is_char_var,shell_vars);
 				return 0;
 			}
-			else if(std::string(argv[3]) == "--")
+			else if(std::string(argv[2]) == "--")
 			{
 				set_var(var,old_value,old_value-1,is_char_var,shell_vars);
 				return 0;
 			}
 			else
 			{
-				RPGSH_OUTPUT(Error,"Expected new_value after \'%s\'.",argv[argc-1]);
+				RPGSH_OUTPUT(Error,"Expected new value after \'%s\'.",argv[argc-1]);
 				exit(-1);
 			}
 		}
@@ -157,24 +157,25 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		RPGSH_VAR new_value = std::string(argv[4]);
+		RPGSH_VAR new_value = std::string(argv[3]);
 		for(int i=4; i<argc; i++)
 		{
-			if(!i%2 && is_operator(argv[i]))
+			if(i%2 == 1 && is_operator(argv[i]))
 			{
-				RPGSH_OUTPUT(Error,"Expected non-operator new_value at \'%s\'.",argv[i]);
+				RPGSH_OUTPUT(Error,"Expected non-operator new value at \'%s\'.",argv[i]);
 				exit(-1);
 			}
-			else if(i%2 && !is_operator(argv[i]))
+			else if(i%2 == 0 && !is_operator(argv[i]))
 			{
 				RPGSH_OUTPUT(Error,"Expected operator at \'%s\'.",argv[i]);
 				exit(-1);
 			}
-			else if(i%2)
+			else if(i%2 == 0)
 			{
 				RPGSH_VAR current_operand = std::string(argv[i+1]);
 				if(!strcmp(argv[i],"+"))
 				{
+					fprintf(stdout,"Addition\n");
 					new_value += current_operand;
 				}
 				else if(!strcmp(argv[i],"-"))
@@ -197,34 +198,34 @@ int main(int argc, char** argv)
 			}
 		}
 
-		if(!strcmp(argv[3],"="))
+		if(!strcmp(argv[2],"="))
 		{
 			set_var(var,old_value,new_value,is_char_var,shell_vars);
 			return 0;
 		}
-		else if(!strcmp(argv[3],"+="))
+		else if(!strcmp(argv[2],"+="))
 		{
 			set_var(var,old_value,std::string(old_value+new_value),is_char_var,shell_vars);
 			return 0;
 		}
-		else if(!strcmp(argv[3],"-="))
+		else if(!strcmp(argv[2],"-="))
 		{
 			set_var(var,old_value,std::string(old_value-new_value),is_char_var,shell_vars);
 			return 0;
 		}
-		else if(!strcmp(argv[3],"*="))
+		else if(!strcmp(argv[2],"*="))
 		{
 			set_var(var,old_value,std::string(old_value*new_value),is_char_var,shell_vars);
 			return 0;
 		}
-		else if(!strcmp(argv[3],"/="))
+		else if(!strcmp(argv[2],"/="))
 		{
 			set_var(var,old_value,std::string(old_value/new_value),is_char_var,shell_vars);
 			return 0;
 		}
 		else
 		{
-			RPGSH_OUTPUT(Error,"Invalid operator \'%s\'.",argv[3]);
+			RPGSH_OUTPUT(Error,"Invalid operator \'%s\'.",argv[2]);
 			exit(-1);
 		}
 	}
