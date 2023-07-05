@@ -48,8 +48,7 @@ The program *must* adhere to the following standards in order to function correc
 - The name of the executable must start with "rpgsh-"
 - The program will be given the following argv parameters when called by `rpgsh`:
   - **[0]** The full path to the the called program
-  - **[1]** The name of the currently selected character (for programs which will need to be aware of the currently selected character)
-  - **[2]** - **[n-1]**. All additional arguments given by the user for the program
+  - **[1]** - **[n-1]**. All additional arguments given by the user for the program
   - **[n]** NULL (per `posix_spawn()` requirements).
 
 The program *should* adhere to the following standards in order to maintain continuity of appearances during runtime:
