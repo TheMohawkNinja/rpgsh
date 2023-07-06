@@ -784,3 +784,55 @@ class RPGSH_CHAR
 		fs.close();
 	}
 };
+
+std::string get_shell_var(std::string var)
+{
+	RPGSH_VAR v = RPGSH_VAR();
+	std::ifstream ifs(shell_vars_path.c_str());
+	while(!ifs.eof())
+	{
+		std::string data = "";
+		std::getline(ifs,data);
+
+		if(data.substr(0,data.find(v.DataSeparator)) == var)
+		{
+			return data.substr(data.find(v.DataSeparator)+v.DataSeparator.length(),
+				data.length()-(data.find(v.DataSeparator)+v.DataSeparator.length()));
+		}
+	}
+	ifs.close();
+	return "";
+}
+void set_shell_var(std::string var,std::string value)
+{
+	RPGSH_VAR v = RPGSH_VAR();
+	std::ifstream ifs(shell_vars_path.c_str());
+	std::filesystem::remove((shell_vars_path+".bak").c_str());
+	std::ofstream ofs((shell_vars_path+".bak").c_str());
+	bool ReplacedValue = false;
+
+	while(!ifs.eof())
+	{
+		std::string data = "";
+		std::getline(ifs,data);
+
+		if(data.substr(0,data.find(v.DataSeparator)) == var)
+		{
+			ofs<<var + v.DataSeparator + value + "\n";
+			ReplacedValue = true;
+		}
+		else
+		{
+			ofs<<data + "\n";
+		}
+	}
+
+	if(!ReplacedValue)
+	{
+		ofs<<var + v.DataSeparator + value + "\n";
+	}
+	ifs.close();
+	ofs.close();
+	std::filesystem::remove(shell_vars_path.c_str());
+	std::filesystem::rename((shell_vars_path+".bak").c_str(),shell_vars_path.c_str());
+}
