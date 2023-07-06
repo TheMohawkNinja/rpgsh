@@ -74,14 +74,7 @@ void set_var(std::string var, RPGSH_VAR old_value, RPGSH_VAR new_value, bool is_
 
 	if(!is_char_var)
 	{
-		std::filesystem::remove(shell_vars_path.c_str());
-		std::ofstream ofs(shell_vars_path.c_str());
-		for(int i=0; i<shell_vars.size(); i++)
-		{
-			ofs<<shell_vars[i]+"\n";
-		}
-		ofs<<var+v.DataSeparator+std::string(new_value);
-		ofs.close();
+		set_shell_var(var,std::string(new_value));
 	}
 	else
 	{
@@ -101,23 +94,7 @@ int main(int argc, char** argv)
 
 	if(!is_char_var)
 	{
-		std::ifstream ifs(shell_vars_path.c_str());
-		while(!ifs.eof())
-		{
-			std::string data = "";
-			std::getline(ifs,data);
-
-			if(data.substr(0,data.find(v.DataSeparator)) == var)
-			{
-				old_value = data.substr(data.find(v.DataSeparator)+v.DataSeparator.length(),
-						data.length()-(data.find(v.DataSeparator)+v.DataSeparator.length()));
-			}
-			else
-			{
-				shell_vars.push_back(data);
-			}
-		}
-		ifs.close();
+		old_value = get_shell_var(var);
 	}
 	else
 	{
@@ -175,7 +152,6 @@ int main(int argc, char** argv)
 				RPGSH_VAR current_operand = std::string(argv[i+1]);
 				if(!strcmp(argv[i],"+"))
 				{
-					fprintf(stdout,"Addition\n");
 					new_value += current_operand;
 				}
 				else if(!strcmp(argv[i],"-"))
