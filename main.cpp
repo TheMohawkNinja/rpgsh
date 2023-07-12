@@ -12,7 +12,7 @@
 RPGSH_CHAR c = RPGSH_CHAR();
 RPGSH_VAR v = RPGSH_VAR();
 
-void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
+void run_rpgsh_prog(std::string args)
 {
 	std::vector<std::string> vars;
 	extern char** environ;
@@ -168,6 +168,8 @@ void run_rpgsh_prog(RPGSH_CHAR c, std::string args)
 
 int prompt()
 {
+	RPGSH_CHAR c = RPGSH_CHAR();
+
 	bool backup = false;
 
 	prompt:
@@ -218,7 +220,7 @@ int prompt()
 				prefix += buffer;
 				strcpy(buffer,prefix.c_str());
 			}
-			run_rpgsh_prog(c,buffer);
+			run_rpgsh_prog(buffer);
 			return 0;
 		}
 	}
@@ -234,15 +236,8 @@ int main()
 	}
 
 	//Forces default character to be created so first load() works correctly
-	RPGSH_CHAR *dummy = new RPGSH_CHAR();
-	if(!std::filesystem::exists(dummy->current_char_path.c_str()))
-	{
-		dummy->save();
-		dummy->set_current();
-	}
-	run_rpgsh_prog(*dummy,(char*)"banner");
-	run_rpgsh_prog(*dummy,(char*)"version");
-	delete dummy;
+	run_rpgsh_prog((char*)"banner");
+	run_rpgsh_prog((char*)"version");
 
 	while(prompt() >= 0);
 
