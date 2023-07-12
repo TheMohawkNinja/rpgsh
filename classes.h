@@ -10,8 +10,9 @@
 #include <unistd.h>
 #include "text.h"
 
-#define SHELL_VAR '$'
-#define CHAR_VAR  '%'
+#define SHELL_VAR		'$'
+#define CHAR_VAR		'%'
+#define CURRENT_CHAR_SHELL_VAR	"current_char"
 
 std::string user = getlogin();
 std::string base_path = "/home/"+user+"/.rpgsh/";
@@ -656,135 +657,6 @@ RPGSH_VAR operator / (const int a, const RPGSH_VAR b)
 	return result;
 }
 
-class RPGSH_CHAR
-{
-	private:
-		RPGSH_VAR var = RPGSH_VAR();
-	public:
-		std::string AttributeDesignator		=	"Attr";
-		std::string SpellDesignator		=	"Spell";
-		std::string DiceDesignator		=	"Dice";
-		std::string CurrencyDesignator		=	"Currency";
-
-		std::map<std::string, RPGSH_VAR> Attr;
-		RPGSH_DICE		CurrentHitDice	=	RPGSH_DICE();
-		RPGSH_DICE		TotalHitDice	=	RPGSH_DICE();
-		RPGSH_CURRENCY		Currency	=	RPGSH_CURRENCY();
-		std::vector<RPGSH_SPELL>Spellbook	=	{};
-
-		std::string current_char_path = base_path+".current";
-
-	RPGSH_CHAR()
-	{
-		Attr["Name"]			=	"<NO_NAME>";
-		Attr["Class"]			=	"<NO_CLASS>";
-		Attr["Level"]			=	1;
-		Attr["Background"]		=	"<NO_BACKGROUND>";
-		Attr["Player"]			=	"<NO_PLAYER>";
-		Attr["Race"]			=	"<NO_RACE>";
-		Attr["Alignment"]		=	"<NO_ALIGNMENT>";
-		Attr["XP"]			=	0;
-		Attr["Inspiration"]		=	"false";
-		Attr["Proficiency"]		=	0;
-		Attr["AC"]			=	0;
-		Attr["Initiative"]		=	0;
-		Attr["Speed"]			=	0;
-		Attr["HP"]			=	0;
-		Attr["MaxHP"]			=	0;
-		Attr["TempHP"]			=	0;
-		Attr["FailedDeathSaves"]	=	0;
-		Attr["SucceededDeathSaves"]	=	0;
-		Attr["Str"]			=	0;
-		Attr["Dex"]			=	0;
-		Attr["Con"]			=	0;
-		Attr["Int"]			=	0;
-		Attr["Wis"]			=	0;
-		Attr["Cha"]			=	0;
-		Attr["PersonalityTraits"]	=	"<NO_PERSONALITY_TRAITS>";
-		Attr["Ideals"]			=	"<NO_IDEALS>";
-		Attr["Bonds"]			=	"<NO_BONDS>";
-		Attr["Flaws"]			=	"<NO_FLAWS>";
-		Attr["FeaturesAndTraits"]	=	"<NO_FEATURES_AND_TRAITS>";
-		Attr["Age"]			=	0;
-		Attr["Height"]			=	0;
-		Attr["Weight"]			=	0;
-		Attr["EyeColor"]		=	"<NO_EYE_COLOR>";
-		Attr["SkinColor"]		=	"<NO_SKIN_COLOR>";
-		Attr["Hair"]			=	"<NO_HAIR>";
-		Attr["Appearance"]		=	"<NO_APPEARANCE>";
-		Attr["Allies"]			=	"<NO_ALLIES_OR_ORGANIZATIONS>";
-		Attr["Backstory"]		=	"<NO_BACKSTORY>";
-		Attr["Treasure"]		=	"<NO_TREASURE>";
-		Attr["SpellcastingAbility"]	=	"<NO_SPELLCASTING_ABILITY>";
-		Attr["SpellSaveDC"]		=	0;
-		Attr["SpellAttackBonus"]	=	0;
-	}
-
-	void set_current()
-	{
-		if(std::filesystem::exists(current_char_path.c_str()))
-		{
-			std::filesystem::remove(current_char_path.c_str());
-		}
-		std::ofstream fs(current_char_path.c_str());
-		fs<<std::string(Attr["Name"]);
-		fs.close();
-	}
-	void save()
-	{
-		std::string char_path = base_path+std::string(Attr["Name"])+".char";
-
-		if(!std::filesystem::exists(base_path.c_str()))
-		{
-			RPGSH_OUTPUT(Info,"Main rpgsh user directory not found at \"%s\", creating directory...",base_path.c_str());
-			std::filesystem::create_directory(base_path);
-		}
-		if(std::filesystem::exists(char_path.c_str()))
-		{
-			std::filesystem::rename(char_path.c_str(),(char_path+".bak").c_str());
-		}
-
-		std::ofstream fs((char_path).c_str());
-		for(const auto& [key,value] : Attr)
-		{
-			//Character file format definition
-			std::string data =	AttributeDesignator+
-						var.DataSeparator+
-						key+
-						var.DataSeparator+
-						std::string(value)+
-						"\n";
-			fs<<data;
-		}
-		fs.close();
-	}
-	void load(bool load_bak)
-	{
-		std::ifstream fs((current_char_path).c_str());
-		std::string current_char;
-		std::getline(fs,current_char);
-		fs.close();
-
-		std::string char_path = base_path+current_char+".char"+((load_bak)?".bak":"");
-
-		fs.open(char_path.c_str());
-		while(!fs.eof())
-		{
-			std::string data = "";
-			std::getline(fs,data);
-
-			if(data.substr(0,data.find(var.DataSeparator)) == AttributeDesignator)//TODO Complete loading code
-			{
-				data = data.substr(data.find(var.DataSeparator)+var.DataSeparator.length(),
-							(data.length() - (data.find(var.DataSeparator))));
-				Attr[data.substr(0,data.find(var.DataSeparator))] = data.substr(data.find(var.DataSeparator)+var.DataSeparator.length(),
-												(data.length() - (data.find(var.DataSeparator))));
-			}
-		}
-		fs.close();
-	}
-};
-
 std::string get_shell_var(std::string var)
 {
 	RPGSH_VAR v = RPGSH_VAR();
@@ -836,3 +708,133 @@ void set_shell_var(std::string var,std::string value)
 	std::filesystem::remove(shell_vars_path.c_str());
 	std::filesystem::rename((shell_vars_path+".bak").c_str(),shell_vars_path.c_str());
 }
+
+class RPGSH_CHAR
+{
+	private:
+		RPGSH_VAR var = RPGSH_VAR();
+	public:
+		std::string AttributeDesignator		=	"Attr";
+		std::string SpellDesignator		=	"Spell";
+		std::string DiceDesignator		=	"Dice";
+		std::string CurrencyDesignator		=	"Currency";
+
+		std::map<std::string, RPGSH_VAR> Attr;
+		RPGSH_DICE		CurrentHitDice	=	RPGSH_DICE();
+		RPGSH_DICE		TotalHitDice	=	RPGSH_DICE();
+		RPGSH_CURRENCY		Currency	=	RPGSH_CURRENCY();
+		std::vector<RPGSH_SPELL>Spellbook	=	{};
+
+	RPGSH_CHAR()
+	{
+		Attr["Name"]			=	"<NO_NAME>";
+		Attr["Class"]			=	"<NO_CLASS>";
+		Attr["Level"]			=	1;
+		Attr["Background"]		=	"<NO_BACKGROUND>";
+		Attr["Player"]			=	"<NO_PLAYER>";
+		Attr["Race"]			=	"<NO_RACE>";
+		Attr["Alignment"]		=	"<NO_ALIGNMENT>";
+		Attr["XP"]			=	0;
+		Attr["Inspiration"]		=	"false";
+		Attr["Proficiency"]		=	0;
+		Attr["AC"]			=	0;
+		Attr["Initiative"]		=	0;
+		Attr["Speed"]			=	0;
+		Attr["HP"]			=	0;
+		Attr["MaxHP"]			=	0;
+		Attr["TempHP"]			=	0;
+		Attr["FailedDeathSaves"]	=	0;
+		Attr["SucceededDeathSaves"]	=	0;
+		Attr["Str"]			=	0;
+		Attr["Dex"]			=	0;
+		Attr["Con"]			=	0;
+		Attr["Int"]			=	0;
+		Attr["Wis"]			=	0;
+		Attr["Cha"]			=	0;
+		Attr["PersonalityTraits"]	=	"<NO_PERSONALITY_TRAITS>";
+		Attr["Ideals"]			=	"<NO_IDEALS>";
+		Attr["Bonds"]			=	"<NO_BONDS>";
+		Attr["Flaws"]			=	"<NO_FLAWS>";
+		Attr["FeaturesAndTraits"]	=	"<NO_FEATURES_AND_TRAITS>";
+		Attr["Age"]			=	0;
+		Attr["Height"]			=	0;
+		Attr["Weight"]			=	0;
+		Attr["EyeColor"]		=	"<NO_EYE_COLOR>";
+		Attr["SkinColor"]		=	"<NO_SKIN_COLOR>";
+		Attr["Hair"]			=	"<NO_HAIR>";
+		Attr["Appearance"]		=	"<NO_APPEARANCE>";
+		Attr["Allies"]			=	"<NO_ALLIES_OR_ORGANIZATIONS>";
+		Attr["Backstory"]		=	"<NO_BACKSTORY>";
+		Attr["Treasure"]		=	"<NO_TREASURE>";
+		Attr["SpellcastingAbility"]	=	"<NO_SPELLCASTING_ABILITY>";
+		Attr["SpellSaveDC"]		=	0;
+		Attr["SpellAttackBonus"]	=	0;
+	}
+
+	void set_current()
+	{
+		set_shell_var(CURRENT_CHAR_SHELL_VAR,std::string(Attr["Name"]));
+	}
+	void save()
+	{
+		std::string char_path = base_path+std::string(Attr["Name"])+".char";
+
+		if(!std::filesystem::exists(base_path.c_str()))
+		{
+			RPGSH_OUTPUT(Info,"Main rpgsh user directory not found at \"%s\", creating directory...",base_path.c_str());
+			std::filesystem::create_directory(base_path);
+		}
+		if(std::filesystem::exists(char_path.c_str()))
+		{
+			std::filesystem::rename(char_path.c_str(),(char_path+".bak").c_str());
+		}
+
+		std::ofstream fs((char_path).c_str());
+		for(const auto& [key,value] : Attr)
+		{
+			//Character file format definition
+			std::string data =	AttributeDesignator+
+						var.DataSeparator+
+						key+
+						var.DataSeparator+
+						std::string(value)+
+						"\n";
+			fs<<data;
+		}
+		fs.close();
+	}
+	void load(bool load_bak)
+	{
+		std::string char_path = base_path+get_shell_var(CURRENT_CHAR_SHELL_VAR)+".char"+((load_bak)?".bak":"");
+
+		std::ifstream fs;
+
+		fs.open(char_path.c_str());
+		if(!fs.good())
+		{
+			//This should only apply if CURRENT_CHAR_SHELL_VAR gets set to something that isn't a valid character
+			//Generate default character and set that as the current character
+			RPGSH_CHAR *dummy = new RPGSH_CHAR();
+			dummy->save();
+			set_shell_var(CURRENT_CHAR_SHELL_VAR,std::string(dummy->Attr["Name"]));
+			delete dummy;
+
+			char_path = base_path+get_shell_var(CURRENT_CHAR_SHELL_VAR)+".char"+((load_bak)?".bak":"");
+			fs.open(char_path.c_str());
+		}
+		while(!fs.eof())
+		{
+			std::string data = "";
+			std::getline(fs,data);
+
+			if(data.substr(0,data.find(var.DataSeparator)) == AttributeDesignator)//TODO Complete loading code
+			{
+				data = data.substr(data.find(var.DataSeparator)+var.DataSeparator.length(),
+							(data.length() - (data.find(var.DataSeparator))));
+				Attr[data.substr(0,data.find(var.DataSeparator))] = data.substr(data.find(var.DataSeparator)+var.DataSeparator.length(),
+												(data.length() - (data.find(var.DataSeparator))));
+			}
+		}
+		fs.close();
+	}
+};
