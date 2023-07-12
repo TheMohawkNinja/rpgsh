@@ -32,6 +32,10 @@ All variables are lazily evaluated, meaning that they can either store numerical
 
 Operators and associated values must be entered in a space-delimited format. (e.g. `$four = 2 + 2`, **NOT** `$four=2+2`)
 
+The following shell variables are built-in and should not be modified:
+ - `current_user`
+   - This is used to load the currently loaded user, including the last loaded user from the previous session. If modified to a value that isn't the name of a `.char` file, it will reset to the default `rpgsh` character name.
+
 ## Dependancies
 
 `g++` should be all that is needed, as nothing outside of the C++ standard library is used.
