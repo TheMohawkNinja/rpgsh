@@ -79,8 +79,8 @@ void set_var(std::string var, RPGSH_VAR old_value, RPGSH_VAR new_value, bool is_
 	else
 	{
 		c.Attr[var] = new_value;
-		c.set_current();
 		c.save();
+		c.set_as_current();
 	}
 	RPGSH_OUTPUT(Info,"%s \"%s\" has been changed from \"%s\" to \"%s\".",var_type.c_str(),var.c_str(),old_value.c_str(),new_value.c_str());
 }
@@ -98,7 +98,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		c.load(false);
+		c.load(get_shell_var(CURRENT_CHAR_SHELL_VAR),false);
 		old_value = std::string(c.Attr[var]);
 	}
 
