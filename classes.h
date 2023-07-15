@@ -12,7 +12,8 @@
 
 #define SHELL_VAR		'$'
 #define CHAR_VAR		'%'
-#define CURRENT_CHAR_SHELL_VAR	"current_char"
+#define CURRENT_CHAR_SHELL_VAR	".CURRENT_CHAR"
+#define CHAR_NAME_ATTR		".NAME"
 
 std::string user = getlogin();
 std::string base_path = "/home/"+user+"/.rpgsh/";
@@ -728,6 +729,7 @@ class RPGSH_CHAR
 	RPGSH_CHAR()
 	{
 		Attr["Name"]			=	"<NO_NAME>";
+		Attr[CHAR_NAME_ATTR]		=	"Name";
 		Attr["Class"]			=	"<NO_CLASS>";
 		Attr["Level"]			=	1;
 		Attr["Background"]		=	"<NO_BACKGROUND>";
@@ -771,13 +773,13 @@ class RPGSH_CHAR
 		Attr["SpellAttackBonus"]	=	0;
 	}
 
-	void set_current()
+	std::string Name()
 	{
-		set_shell_var(CURRENT_CHAR_SHELL_VAR,std::string(Attr["Name"]));
+		return std::string(Attr[std::string(Attr[CHAR_NAME_ATTR])]);
 	}
 	void save()
 	{
-		std::string char_path = base_path+std::string(Attr["Name"])+".char";
+		std::string char_path = base_path+get_shell_var(CURRENT_CHAR_SHELL_VAR)+".char";
 
 		if(!std::filesystem::exists(base_path.c_str()))
 		{
@@ -803,23 +805,19 @@ class RPGSH_CHAR
 		}
 		fs.close();
 	}
-	void load(bool load_bak)
+	void load(std::string character, bool load_bak)
 	{
-		std::string char_path = base_path+get_shell_var(CURRENT_CHAR_SHELL_VAR)+".char"+((load_bak)?".bak":"");
+		std::string char_path = base_path+character+".char"+((load_bak)?".bak":"");
 
-		std::ifstream fs;
-
-		fs.open(char_path.c_str());
+		std::ifstream fs(char_path.c_str());
 		if(!fs.good())
 		{
-			//This should only apply if CURRENT_CHAR_SHELL_VAR gets set to something that isn't a valid character
+			//This should only apply if 'character' gets set to something that isn't a valid character
 			//Generate default character and set that as the current character
 			RPGSH_CHAR *dummy = new RPGSH_CHAR();
 			dummy->save();
-			set_shell_var(CURRENT_CHAR_SHELL_VAR,std::string(dummy->Attr["Name"]));
+			char_path = base_path+Name()+".char"+((load_bak)?".bak":"");
 			delete dummy;
-
-			char_path = base_path+get_shell_var(CURRENT_CHAR_SHELL_VAR)+".char"+((load_bak)?".bak":"");
 			fs.open(char_path.c_str());
 		}
 		while(!fs.eof())
@@ -836,5 +834,14 @@ class RPGSH_CHAR
 			}
 		}
 		fs.close();
+	}
+	void set_as_current()
+	{
+		set_shell_var(CURRENT_CHAR_SHELL_VAR,Name());
+	}
+	void update_Name(std::string new_name_attr)
+	{
+		Attr[CHAR_NAME_ATTR] = new_name_attr;
+		save();
 	}
 };
