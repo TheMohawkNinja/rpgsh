@@ -33,7 +33,7 @@ All variables are lazily evaluated, meaning that they can either store numerical
 Operators and associated values must be entered in a space-delimited format. (e.g. `$four = 2 + 2`, **NOT** `$four=2+2`)
 
 The following shell variables are built-in and should not be modified:
- - `current_user`
+ - `.CURRENT_USER`
    - This is used to load the currently loaded user, including the last loaded user from the previous session. If modified to a value that isn't the name of a `.char` file, it will reset to the default `rpgsh` character name.
 
 ## Dependancies
@@ -43,6 +43,18 @@ The following shell variables are built-in and should not be modified:
 ## Installation instructions
 
 Run `./install.sh` as root.
+
+## Current programs
+
+`rpgsh` comes with a number of core programs built-in for use in its' environment. These are:
+
+ - `banner`	Displays pretty banner art
+ - `version`	Prints version info
+ - `roll`	A dice-rolling program
+ - `setname`	Sets which character attribute is used for displaying the character's name
+ - `variables`	Not to be explicitly called, but is used when the user enters a variable as the first parameter in the buffer
+
+All core programs that expect a parameter (excluding `variables`) has help text with examples which can be called with the `-?` or `--help` flags.
 
 ## Writing programs for rpgsh
 
