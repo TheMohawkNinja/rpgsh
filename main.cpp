@@ -18,7 +18,6 @@ void run_rpgsh_prog(std::string args)
 	extern char** environ;
 	pid_t pid;
 
-	//Set char*[] for args.
 	int params_start = args.find(" ", args.find(" ")+1);
 	std::string prefix = "rpgsh-";
 	std::string path = "./";
@@ -127,14 +126,16 @@ void run_rpgsh_prog(std::string args)
 	else//If only one arg is called
 	{
 		vars.push_back(path+prefix+args);
-		vars.push_back(std::string(c.Attr["Name"]));
 	}
 
+	//Convert vector to char*[]
 	char* argv[vars.size()+1];
 	for(int i=0; i<vars.size(); i++)
 	{
 		argv[i] = (char*)vars[i].c_str();
 	}
+
+	//Add a NULL because posix_spawn() needs that for some reason
 	argv[vars.size()] = NULL;
 
 	fprintf(stdout,"\n");
@@ -173,11 +174,11 @@ int prompt()
 	bool backup = false;
 
 	prompt:
-	c.load(backup);
+	c.load(get_shell_var(CURRENT_CHAR_SHELL_VAR),backup);
 
 	try
 	{
-		fprintf(stdout,"%s┌─%s[%s%s%s%s%s%s%s]%s─%s(%s%hhu/%hhu%s %s(%hhu)%s%s%s)%s%s\n",TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_ITALIC,TEXT_RED,c.Attr["Name"].c_str(),TEXT_NOITALIC,TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_BOLD,TEXT_GREEN,int(c.Attr["HP"]),int(c.Attr["MaxHP"]),TEXT_NOBOLD,TEXT_ITALIC,int(c.Attr["TempHP"]),TEXT_NOITALIC,TEXT_BOLD,TEXT_WHITE,TEXT_NOBOLD,TEXT_NORMAL);
+		fprintf(stdout,"%s┌─%s[%s%s%s%s%s%s%s]%s─%s(%s%hhu/%hhu%s %s(%hhu)%s%s%s)%s%s\n",TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_ITALIC,TEXT_RED,c.Name().c_str(),TEXT_NOITALIC,TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_BOLD,TEXT_GREEN,int(c.Attr["HP"]),int(c.Attr["MaxHP"]),TEXT_NOBOLD,TEXT_ITALIC,int(c.Attr["TempHP"]),TEXT_NOITALIC,TEXT_BOLD,TEXT_WHITE,TEXT_NOBOLD,TEXT_NORMAL);
 		fprintf(stdout,"%s└─%s$%s ",TEXT_WHITE,TEXT_CYAN,TEXT_NORMAL);
 
 		if(backup)
