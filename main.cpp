@@ -140,6 +140,7 @@ void run_rpgsh_prog(std::string args)
 	//Add a NULL because posix_spawn() needs that for some reason
 	argv[vars.size()] = NULL;
 
+	fprintf(stdout,"");
 	fprintf(stdout,"\n");
 
 	int status = posix_spawn(&pid, argv[0], NULL, NULL, (char* const*)argv, environ);
@@ -172,8 +173,6 @@ std::string input_handler()
 {
 	#define ESC_SEQ		'\033'
 	#define KB_ENTER	10
-	#define KB_HOME		55
-	#define KB_END		56
 	#define KB_BACKSPACE	127
 
 	struct termios t_old, t_new;
@@ -235,6 +234,20 @@ std::string input_handler()
 					{
 						fprintf(stdout,"\e[D");
 						cur_pos--;
+					}
+					break;
+				case 'H':	//Home
+					if(cur_pos > 0)
+					{
+						fprintf(stdout,"\e[%dD",cur_pos);
+						cur_pos = 0;
+					}
+					break;
+				case 'F':	//End
+					if(cur_pos < input.size())
+					{
+						fprintf(stdout,"\e[%dC",input.size()-cur_pos);
+						cur_pos = input.size();
 					}
 					break;
 				case '3':
