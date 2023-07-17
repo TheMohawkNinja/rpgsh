@@ -32,9 +32,11 @@ All variables are lazily evaluated, meaning that they can either store numerical
 
 Operators and associated values must be entered in a space-delimited format. (e.g. `$four = 2 + 2`, **NOT** `$four=2+2`)
 
-The following shell variables are built-in and should not be modified:
- - `.CURRENT_USER`
+Additionally, the following variables are built-in and should not be directly modified:
+ - `$.CURRENT_USER`
    - This is used to load the currently loaded user, including the last loaded user from the previous session. If modified to a value that isn't the name of a `.char` file, it will reset to the default `rpgsh` character name.
+ - `%.NAME`
+   - This holds the name of the variable to be referenced when displaying the character's name. It should be modified via the `setname` command.
 
 ## Dependancies
 
