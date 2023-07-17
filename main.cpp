@@ -3,6 +3,8 @@
 #include <string>
 #include <string.h>
 #include <spawn.h>
+#include <termios.h>
+#include <fcntl.h>
 #include <sys/wait.h>
 #include "text.h"
 #include "classes.h"
@@ -166,7 +168,100 @@ void run_rpgsh_prog(std::string args)
 
 	fprintf(stdout,"\n");
 }
+std::string input_handler()
+{
+	#define ESC_SEQ		'\033'
+	#define KB_ENTER	10
+	#define KB_HOME		55
+	#define KB_END		56
+	#define KB_BACKSPACE	127
 
+	struct termios t_old, t_new;
+	tcgetattr(fileno(stdin), &t_old);
+	t_new = t_old;
+	t_new.c_lflag &= ~(ICANON | ECHO);
+	tcsetattr(fileno(stdin), TCSANOW, &t_new);
+
+	std::vector<char> input;
+	char c = 0;
+	int cur_pos = 0;
+
+	while(c != KB_ENTER)
+	{
+		c = getchar();
+
+		if(isprint(c))
+		{
+			input.insert(input.begin()+cur_pos,c);
+			fprintf(stdout,"\e[K");
+			for(int i=cur_pos; i<input.size(); i++)
+			{
+				fprintf(stdout,"%c",input[i]);
+			}
+			if(cur_pos < input.size()-1)
+			{
+				fprintf(stdout,"\e[%dD",input.size()-1-cur_pos);
+			}
+			cur_pos++;
+		}
+		else if(c == KB_BACKSPACE && cur_pos > 0)
+		{
+			fprintf(stdout,"\b\e[K");// \b backs up one character and \e[K deletes everything to EOL
+			cur_pos--;
+			input.erase(input.begin()+cur_pos);
+			for(int i=cur_pos; i<input.size(); i++)
+			{
+				fprintf(stdout,"%c",input[i]);
+			}
+			if(cur_pos < input.size())
+			{
+				fprintf(stdout,"\e[%dD",input.size()-cur_pos);
+			}
+		}
+		else if(c == ESC_SEQ)//Escape sequences
+		{
+			getchar();//skip '['
+			switch(getchar())
+			{
+				case 'C':	//Right
+					if(cur_pos < input.size())
+					{
+						fprintf(stdout,"\e[C");
+						cur_pos++;
+					}
+					break;
+				case 'D':	//Left
+					if(cur_pos > 0)
+					{
+						fprintf(stdout,"\e[D");
+						cur_pos--;
+					}
+					break;
+				case '3':
+					if(getchar() == '~')	//Delete
+					{
+						if(cur_pos < input.size())
+						{
+							fprintf(stdout,"\e[K");// \b backs up one character and \e[K deletes everything to EOL
+							input.erase(input.begin()+cur_pos);
+							for(int i=cur_pos; i<input.size(); i++)
+							{
+								fprintf(stdout,"%c",input[i]);
+							}
+							if(cur_pos < input.size())
+							{
+								fprintf(stdout,"\e[%dD",input.size()-cur_pos);
+							}
+						}
+					}
+					break;
+			}
+		}
+	}
+	tcsetattr(fileno(stdin), TCSANOW, &t_old);
+	input.push_back('\0');
+	return input.data();
+}
 int prompt()
 {
 	RPGSH_CHAR c = RPGSH_CHAR();
@@ -203,8 +298,12 @@ int prompt()
 	}
 
 	char buffer[MAX_BUFFER_SIZE];
-	fgets(buffer,sizeof(buffer),stdin);
-	buffer[strcspn(buffer,"\n")] = 0; //Omits newline character from input buffer (https://stackoverflow.com/questions/2693776/removing-trailing-newline-character-from-fgets-input)
+	const char* in = input_handler().c_str();
+	if(sizeof(in))
+	{
+		strncpy(buffer,in,sizeof(in));
+		//buffer[strcspn(buffer,"\n")] = 0; //Omits newline character from input buffer (https://stackoverflow.com/questions/2693776/removing-trailing-newline-character-from-fgets-input)
+	}
 
 	if(strcmp(buffer,""))
 	{
@@ -224,6 +323,10 @@ int prompt()
 			run_rpgsh_prog(buffer);
 			return 0;
 		}
+	}
+	else
+	{
+		fprintf(stdout,"\n");
 	}
 	return 0;
 }
