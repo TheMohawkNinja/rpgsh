@@ -140,7 +140,6 @@ void run_rpgsh_prog(std::string args)
 	//Add a NULL because posix_spawn() needs that for some reason
 	argv[vars.size()] = NULL;
 
-	fprintf(stdout,"");
 	fprintf(stdout,"\n");
 
 	int status = posix_spawn(&pid, argv[0], NULL, NULL, (char* const*)argv, environ);
