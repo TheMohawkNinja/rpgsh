@@ -1,7 +1,7 @@
 echo "Compiling main.cpp..."
 g++ main.cpp -lstdc++fs -std=c++17 -o rpgsh
 echo "Compiling setname.cpp..."
-g++ setname.cpp -o rpgsh-setname
+g++ setname.cpp -lstdc++fs -std=c++17 -o rpgsh-setname 
 echo "Compiling variables.cpp..."
 g++ variables.cpp -lstdc++fs -std=c++17 -o rpgsh-variables
 echo "Compiling version.cpp..."
