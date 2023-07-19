@@ -314,7 +314,6 @@ int prompt()
 	if(sizeof(in))
 	{
 		strncpy(buffer,in,sizeof(in));
-		//buffer[strcspn(buffer,"\n")] = 0; //Omits newline character from input buffer (https://stackoverflow.com/questions/2693776/removing-trailing-newline-character-from-fgets-input)
 	}
 
 	if(strcmp(buffer,""))
@@ -332,6 +331,7 @@ int prompt()
 				prefix += buffer;
 				strcpy(buffer,prefix.c_str());
 			}
+			fprintf(stdout,"\n");
 			run_rpgsh_prog(buffer);
 			return 0;
 		}
