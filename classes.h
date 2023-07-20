@@ -19,13 +19,13 @@ std::string user = getlogin();
 std::string base_path = "/home/"+user+"/.rpgsh/";
 std::string shell_vars_path = base_path+".shell";
 
-enum RPGSH_OUTPUT_TYPE
+enum output_level
 {
 	Info,
 	Warning,
 	Error
 };
-void RPGSH_OUTPUT(RPGSH_OUTPUT_TYPE type, const char* format, ...)
+void output(output_level level, const char* format, ...)
 {
 	FILE* stream;
 	std::string prefix = "";
@@ -33,7 +33,7 @@ void RPGSH_OUTPUT(RPGSH_OUTPUT_TYPE type, const char* format, ...)
 	va_list args;
 	va_start(args, format);
 
-	switch(type)
+	switch(level)
 	{
 		case Info:
 			stream = stdout;
@@ -106,7 +106,7 @@ class RPGSH_DICE
 
 			if(!just_show_rolls && !just_show_total)
 			{
-				fprintf(stdout,"Rolling an %s%d%s-sided die %s%d%s time(s) with a modifier of %s%d%s...\n",TEXT_WHITE,Faces,TEXT_NORMAL,TEXT_WHITE,Quantity,TEXT_NORMAL,TEXT_WHITE,Modifier,TEXT_NORMAL);
+				fprintf(stdout,"Rolling an %s%d%s-sided die %s%d%s time(s) with a modifier of %s%d%s...\n\n",TEXT_WHITE,Faces,TEXT_NORMAL,TEXT_WHITE,Quantity,TEXT_NORMAL,TEXT_WHITE,Modifier,TEXT_NORMAL);
 			}
 
 			std::ifstream fs("/dev/random");//Probably safe to assume this file exists?
@@ -225,7 +225,7 @@ class RPGSH_DICE
 			}
 			catch(...)
 			{
-				RPGSH_OUTPUT(Error,"Unable to open file \"%s\"",dice.c_str());
+				output(Error,"Unable to open file \"%s\"",dice.c_str());
 				exit(-1);
 			}
 		}
@@ -362,7 +362,7 @@ class RPGSH_VAR
 			}
 			else
 			{
-				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				output(Error,"Ambiguous operation between numerical and non-numerical values.");
 			}
 			return *this;
 		}
@@ -379,7 +379,7 @@ class RPGSH_VAR
 			}
 			else
 			{
-				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				output(Error,"Ambiguous operation between numerical and non-numerical values.");
 			}
 			return *this;
 		}
@@ -396,7 +396,7 @@ class RPGSH_VAR
 			}
 			else
 			{
-				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				output(Error,"Ambiguous operation between numerical and non-numerical values.");
 			}
 			return *this;
 		}
@@ -416,11 +416,11 @@ class RPGSH_VAR
 			}
 			else if(!a_is_num && !b_is_num)
 			{
-				RPGSH_OUTPUT(Error,"Cannot subtract two non-numerical values from each other.");
+				output(Error,"Cannot subtract two non-numerical values from each other.");
 			}
 			else
 			{
-				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				output(Error,"Ambiguous operation between numerical and non-numerical values.");
 			}
 			return *this;
 		}
@@ -437,7 +437,7 @@ class RPGSH_VAR
 			}
 			else
 			{
-				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				output(Error,"Ambiguous operation between numerical and non-numerical values.");
 			}
 			return *this;
 		}
@@ -457,11 +457,11 @@ class RPGSH_VAR
 			}
 			else if(!a_is_num && !b_is_num)
 			{
-				RPGSH_OUTPUT(Error,"Cannot multiply two non-numerical values from each other.");
+				output(Error,"Cannot multiply two non-numerical values from each other.");
 			}
 			else
 			{
-				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				output(Error,"Ambiguous operation between numerical and non-numerical values.");
 			}
 			return *this;
 		}
@@ -478,7 +478,7 @@ class RPGSH_VAR
 			}
 			else
 			{
-				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				output(Error,"Ambiguous operation between numerical and non-numerical values.");
 			}
 			return *this;
 		}
@@ -498,11 +498,11 @@ class RPGSH_VAR
 			}
 			else if(!a_is_num && !b_is_num)
 			{
-				RPGSH_OUTPUT(Error,"Cannot divide two non-numerical values from each other.");
+				output(Error,"Cannot divide two non-numerical values from each other.");
 			}
 			else
 			{
-				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				output(Error,"Ambiguous operation between numerical and non-numerical values.");
 			}
 			return *this;
 		}
@@ -519,7 +519,7 @@ class RPGSH_VAR
 			}
 			else
 			{
-				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				output(Error,"Ambiguous operation between numerical and non-numerical values.");
 			}
 			return *this;
 		}
@@ -536,7 +536,7 @@ class RPGSH_VAR
 			}
 			else
 			{
-				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				output(Error,"Ambiguous operation between numerical and non-numerical values.");
 			}
 			return *this;
 		}
@@ -553,7 +553,7 @@ class RPGSH_VAR
 			}
 			else
 			{
-				RPGSH_OUTPUT(Error,"Ambiguous operation between numerical and non-numerical values.");
+				output(Error,"Ambiguous operation between numerical and non-numerical values.");
 			}
 			return *this;
 		}
@@ -783,7 +783,7 @@ class RPGSH_CHAR
 
 		if(!std::filesystem::exists(base_path.c_str()))
 		{
-			RPGSH_OUTPUT(Info,"Main rpgsh user directory not found at \"%s\", creating directory...",base_path.c_str());
+			output(Info,"Main rpgsh user directory not found at \"%s\", creating directory...",base_path.c_str());
 			std::filesystem::create_directory(base_path);
 		}
 		if(std::filesystem::exists(char_path.c_str()))

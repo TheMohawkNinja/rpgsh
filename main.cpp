@@ -90,7 +90,7 @@ void run_rpgsh_prog(std::string args)
 			{
 				if(args.find("\"",i+1) == std::string::npos)
 				{
-					RPGSH_OUTPUT(Error,"Unmatched quote in argument list.");
+					output(Error,"Unmatched quote in argument list.");
 					return;
 				}
 				vars.push_back(args.substr(i+1,(args.find("\"",i+1)-i-1)));
@@ -159,11 +159,11 @@ void run_rpgsh_prog(std::string args)
 		if(status == 2)//File not found
 		{
 			std::string displayed_command = std::string(argv[0]).substr(prefix.length()+2,std::string(argv[0]).length()-prefix.length()-2);
-			RPGSH_OUTPUT(Error,"\"%s\" is not a valid rpgsh command. (%d)",displayed_command.c_str(),status);
+			output(Error,"\"%s\" is not a valid rpgsh command. (%d)",displayed_command.c_str(),status);
 		}
 		else
 		{
-			RPGSH_OUTPUT(Error,"%s (%d)",strerror(status),status);
+			output(Error,"%s (%d)",strerror(status),status);
 		}
 	}
 
@@ -321,13 +321,13 @@ int prompt()
 	{
 		if(!backup)
 		{
-			RPGSH_OUTPUT(Warning,"Error while displaying prompt. One or more character attributes is not a valid integer. Attempting to load backup.");
+			output(Warning,"Error while displaying prompt. One or more character attributes is not a valid integer. Attempting to load backup.");
 			backup = true;
 			goto prompt;
 		}
 		else
 		{
-			RPGSH_OUTPUT(Error,"Loading from backup was unsuccessful. Manual intervention required to restore file.\n\nGood luck.\n");
+			output(Error,"Loading from backup was unsuccessful. Manual intervention required to restore file.\n\nGood luck.\n");
 			exit(-1);
 		}
 	}

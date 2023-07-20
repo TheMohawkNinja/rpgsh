@@ -30,7 +30,7 @@ int get_value(std::string d, std::string value, int start, std::string terminato
 			}
 			catch(...)
 			{
-				RPGSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" is not a number.",value.c_str(),d.substr(i,1).c_str());
+				output(Error,"Unable to get dice %s. \"%s\" is not a number.",value.c_str(),d.substr(i,1).c_str());
 				exit(-1);
 			}
 		}
@@ -42,7 +42,7 @@ int get_value(std::string d, std::string value, int start, std::string terminato
 		}
 		catch(...)
 		{
-			RPGSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" exceeds the maximum size of %d.",value.c_str(),value_str.c_str(),INT_MAX);
+			output(Error,"Unable to get dice %s. \"%s\" exceeds the maximum size of %d.",value.c_str(),value_str.c_str(),INT_MAX);
 			exit(-1);
 		}
 	}
@@ -52,7 +52,7 @@ int get_value(std::string d, std::string value, int start, std::string terminato
 		{
 			if(required)
 			{
-				RPGSH_OUTPUT(Error,"Unable to get dice %s. No %s specified.",value.c_str(),value.c_str());
+				output(Error,"Unable to get dice %s. No %s specified.",value.c_str(),value.c_str());
 				exit(-1);
 			}
 			return 0;
@@ -81,7 +81,7 @@ int get_value(std::string d, std::string value, int start, std::string terminato
 			}
 			catch(...)
 			{
-				RPGSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" is not a number.",value.c_str(),d.substr(i,1).c_str());
+				output(Error,"Unable to get dice %s. \"%s\" is not a number.",value.c_str(),d.substr(i,1).c_str());
 				exit(-1);
 			}
 		}
@@ -93,7 +93,7 @@ int get_value(std::string d, std::string value, int start, std::string terminato
 		}
 		catch(...)
 		{
-			RPGSH_OUTPUT(Error,"Unable to get dice %s. \"%s\" exceeds the maximum size of %d.",value.c_str(),value_str.c_str(),INT_MAX);
+			output(Error,"Unable to get dice %s. \"%s\" exceeds the maximum size of %d.",value.c_str(),value_str.c_str(),INT_MAX);
 			exit(-1);
 		}
 	}
@@ -127,7 +127,7 @@ int main(int argc, char** argv)
 			{
 				if(!argv[arg+1])
 				{
-					RPGSH_OUTPUT(Error,"No repeat value specified.");
+					output(Error,"No repeat value specified.");
 					return -1;
 				}
 				else
@@ -138,13 +138,13 @@ int main(int argc, char** argv)
 
 						if(repeat < 1)
 						{
-							RPGSH_OUTPUT(Error,"Repeat value must be greater than 0.");
+							output(Error,"Repeat value must be greater than 0.");
 							return -1;
 						}
 					}
 					catch(...)
 					{
-						RPGSH_OUTPUT(Error,"Can't parse repeat value. \"%s\" is not a number.",argv[arg+1]);
+						output(Error,"Can't parse repeat value. \"%s\" is not a number.",argv[arg+1]);
 						return -1;
 					}
 				}
@@ -154,7 +154,7 @@ int main(int argc, char** argv)
 			{
 				if(!argv[arg+1])
 				{
-					RPGSH_OUTPUT(Error,"No path specified.");
+					output(Error,"No path specified.");
 					return -1;
 				}
 				else if(std::filesystem::exists(argv[arg+1]))
@@ -164,7 +164,7 @@ int main(int argc, char** argv)
 				}
 				else
 				{
-					RPGSH_OUTPUT(Error,"File \"%s\" not found.",argv[arg+1]);
+					output(Error,"File \"%s\" not found.",argv[arg+1]);
 					return -1;
 				}
 			}
@@ -172,7 +172,7 @@ int main(int argc, char** argv)
 			{
 				if(!argv[arg+1])
 				{
-					RPGSH_OUTPUT(Error,"No count expression specified.");
+					output(Error,"No count expression specified.");
 					return -1;
 				}
 
@@ -201,7 +201,7 @@ int main(int argc, char** argv)
 
 					if(count_expr == "")
 					{
-						RPGSH_OUTPUT(Error,"Invalid count expression in argument \"%s\".",argv[arg+1]);
+						output(Error,"Invalid count expression in argument \"%s\".",argv[arg+1]);
 						return -1;
 					}
 				}
@@ -215,7 +215,7 @@ int main(int argc, char** argv)
 							count_str += std::string(argv[arg+1]).substr(i,1);
 							if(!std::isdigit(count_str[count_str.length()-1]))
 							{
-								RPGSH_OUTPUT(Error,"Invalid count amount \"%s\".",count_str.c_str());
+								output(Error,"Invalid count amount \"%s\".",count_str.c_str());
 								return -1;
 							}
 						}
@@ -223,7 +223,7 @@ int main(int argc, char** argv)
 					}
 					catch(...)
 					{
-						RPGSH_OUTPUT(Error,"Invalid count amount \"%s\".",count_str.c_str());
+						output(Error,"Invalid count amount \"%s\".",count_str.c_str());
 						return -1;
 					}
 				}
@@ -268,12 +268,11 @@ int main(int argc, char** argv)
 			}
 			else
 			{
-				RPGSH_OUTPUT(Warning,"Unknown option \"%s\".",current_arg.c_str());
+				output(Warning,"Unknown option \"%s\".",current_arg.c_str());
 			}
 		}
 		else
 		{
-			//dice_str = current_arg;
 			if(!is_list)
 			{
 				if(current_arg.substr(0,1) != "d")

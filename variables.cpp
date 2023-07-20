@@ -65,11 +65,11 @@ void set_var(std::string var, RPGSH_VAR old_value, RPGSH_VAR new_value, bool is_
 
 	if(old_value_is_digit && !new_is_digit)
 	{
-		RPGSH_OUTPUT(Warning,"%s \"%s\" is changing from an integer to a string.",var_type.c_str(),var.c_str());
+		output(Warning,"%s \"%s\" is changing from an integer to a string.",var_type.c_str(),var.c_str());
 	}
 	else if(!old_value_is_digit && new_is_digit)
 	{
-		RPGSH_OUTPUT(Warning,"%s \"%s\" is changing from a string to an integer.",var_type.c_str(),var.c_str());
+		output(Warning,"%s \"%s\" is changing from a string to an integer.",var_type.c_str(),var.c_str());
 	}
 
 	if(!is_char_var)
@@ -82,14 +82,14 @@ void set_var(std::string var, RPGSH_VAR old_value, RPGSH_VAR new_value, bool is_
 		c.save();
 		c.set_as_current();
 	}
-	RPGSH_OUTPUT(Info,"%s \"%s\" has been changed from \"%s\" to \"%s\".",var_type.c_str(),var.c_str(),old_value.c_str(),new_value.c_str());
+	output(Info,"%s \"%s\" has been changed from \"%s\" to \"%s\".",var_type.c_str(),var.c_str(),old_value.c_str(),new_value.c_str());
 }
 
 int main(int argc, char** argv)
 {
 	if(std::string(argv[1]).length() == 1)// If all the user enters is '$' or '%')
 	{
-		RPGSH_OUTPUT(Error,"Empty variable name.");
+		output(Error,"Empty variable name.");
 		exit(-1);
 	}
 
@@ -128,13 +128,13 @@ int main(int argc, char** argv)
 			}
 			else
 			{
-				RPGSH_OUTPUT(Error,"Expected new value after \'%s\'.",argv[argc-1]);
+				output(Error,"Expected new value after \'%s\'.",argv[argc-1]);
 				exit(-1);
 			}
 		}
 		else
 		{
-			RPGSH_OUTPUT(Error,"Expected operator before \'%s\'.",argv[argc-1]);
+			output(Error,"Expected operator before \'%s\'.",argv[argc-1]);
 			exit(-1);
 		}
 	}
@@ -145,12 +145,12 @@ int main(int argc, char** argv)
 		{
 			if(i%2 == 1 && is_operator(argv[i]))
 			{
-				RPGSH_OUTPUT(Error,"Expected non-operator new value at \'%s\'.",argv[i]);
+				output(Error,"Expected non-operator new value at \'%s\'.",argv[i]);
 				exit(-1);
 			}
 			else if(i%2 == 0 && !is_operator(argv[i]))
 			{
-				RPGSH_OUTPUT(Error,"Expected operator at \'%s\'.",argv[i]);
+				output(Error,"Expected operator at \'%s\'.",argv[i]);
 				exit(-1);
 			}
 			else if(i%2 == 0)
@@ -174,7 +174,7 @@ int main(int argc, char** argv)
 				}
 				else
 				{
-					RPGSH_OUTPUT(Error,"Invalid operator \'%s\'.",argv[i]);
+					output(Error,"Invalid operator \'%s\'.",argv[i]);
 					exit(-1);
 				}
 			}
@@ -207,7 +207,7 @@ int main(int argc, char** argv)
 		}
 		else
 		{
-			RPGSH_OUTPUT(Error,"Invalid operator \'%s\'.",argv[2]);
+			output(Error,"Invalid operator \'%s\'.",argv[2]);
 			exit(-1);
 		}
 	}

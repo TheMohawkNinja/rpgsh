@@ -4,12 +4,12 @@ int main(int argc, char** argv)
 {
 	if(argc < 2)
 	{
-		RPGSH_OUTPUT(Error,"setname requires at least one argument to function!");
+		output(Error,"setname requires at least one argument to function!");
 		exit(-1);
 	}
 	else if(argc > 2)
 	{
-		RPGSH_OUTPUT(Warning,"Expected only one argument. All args past \"%s\" will be ignored.",argv[1]);
+		output(Warning,"Expected only one argument. All args past \"%s\" will be ignored.",argv[1]);
 	}
 
 	if(!strcmp(argv[1],"-?") || !strcmp(argv[1],"--help"))
@@ -30,9 +30,9 @@ int main(int argc, char** argv)
 
 	if(std::string(c.Attr[argv[1]]) == "")
 	{
-		RPGSH_OUTPUT(Warning,"%s is empty.",argv[1]);
+		output(Warning,"%s is empty.",argv[1]);
 	}
 
 	c.update_Name(argv[1]);
-	RPGSH_OUTPUT(Info,"Character's display name is now set to the character attribute \"%s\" (Current value: \"%s\")",argv[1],c.Attr[argv[1]].c_str());
+	output(Info,"Character's display name is now set to the character attribute \"%s\" (Current value: \"%s\")",argv[1],c.Attr[argv[1]].c_str());
 }
