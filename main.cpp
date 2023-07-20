@@ -158,7 +158,8 @@ void run_rpgsh_prog(std::string args)
 	{
 		if(status == 2)//File not found
 		{
-			RPGSH_OUTPUT(Error,"\"%s\" is not a valid rpgsh command. (%d)",argv[0],status);
+			std::string displayed_command = std::string(argv[0]).substr(prefix.length()+2,std::string(argv[0]).length()-prefix.length()-2);
+			RPGSH_OUTPUT(Error,"\"%s\" is not a valid rpgsh command. (%d)",displayed_command.c_str(),status);
 		}
 		else
 		{
@@ -183,6 +184,7 @@ std::string input_handler()
 	std::vector<char> input;
 	char c = 0;
 	int cur_pos = 0;
+	bool insert_mode = false;
 
 	while(c != KB_ENTER)
 	{
@@ -190,7 +192,21 @@ std::string input_handler()
 
 		if(isprint(c))
 		{
-			input.insert(input.begin()+cur_pos,c);
+			if(insert_mode)
+			{
+				if(cur_pos < input.size())
+				{
+					input[cur_pos] = c;
+				}
+				else
+				{
+					input.push_back(c);
+				}
+			}
+			else
+			{
+				input.insert(input.begin()+cur_pos,c);
+			}
 			fprintf(stdout,"\e[K");
 			for(int i=cur_pos; i<input.size(); i++)
 			{
@@ -249,6 +265,12 @@ std::string input_handler()
 						cur_pos = input.size();
 					}
 					break;
+				case '2':
+					if(getchar() == '~')	//Insert
+					{
+						insert_mode = !insert_mode;
+					}
+					break;
 				case '3':
 					if(getchar() == '~')	//Delete
 					{
@@ -271,6 +293,7 @@ std::string input_handler()
 		}
 	}
 	tcsetattr(fileno(stdin), TCSANOW, &t_old);
+
 	input.push_back('\0');
 	return input.data();
 }
@@ -310,10 +333,10 @@ int prompt()
 	}
 
 	char buffer[MAX_BUFFER_SIZE];
-	const char* in = input_handler().c_str();
-	if(sizeof(in))
+	std::string in = input_handler();
+	if(in.length())
 	{
-		strncpy(buffer,in,sizeof(in));
+		strncpy(buffer,in.c_str(),in.length()+1);
 	}
 
 	if(strcmp(buffer,""))
