@@ -87,6 +87,12 @@ void set_var(std::string var, RPGSH_VAR old_value, RPGSH_VAR new_value, bool is_
 
 int main(int argc, char** argv)
 {
+	if(std::string(argv[1]).length() == 1)// If all the user enters is '$' or '%')
+	{
+		RPGSH_OUTPUT(Error,"Empty variable name.");
+		exit(-1);
+	}
+
 	bool is_char_var = (argv[1][0] == CHAR_VAR);
 	std::vector<std::string> shell_vars;
 	std::string var = std::string(argv[1]).substr(1,std::string(argv[1]).length()-1);
