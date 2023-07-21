@@ -11,6 +11,7 @@
 
 #define MAX_BUFFER_SIZE 256
 
+RPGSH_CONFIG config = RPGSH_CONFIG();
 RPGSH_CHAR c = RPGSH_CHAR();
 RPGSH_VAR v = RPGSH_VAR();
 
@@ -140,7 +141,19 @@ void run_rpgsh_prog(std::string args)
 	//Add a NULL because posix_spawn() needs that for some reason
 	argv[vars.size()] = NULL;
 
-	fprintf(stdout,"\n");
+	//Pad output if set
+	try
+	{
+		if(stob(config.setting[PADDING]))
+		{
+			fprintf(stdout,"\n");
+		}
+	}
+	catch(...)
+	{
+		output(Error,"Invalid value \'%s\' for \'%s\'.",config.setting[PADDING].c_str(),PADDING);
+		exit(-1);
+	}
 
 	int status = posix_spawn(&pid, argv[0], NULL, NULL, (char* const*)argv, environ);
 
@@ -167,7 +180,19 @@ void run_rpgsh_prog(std::string args)
 		}
 	}
 
-	fprintf(stdout,"\n");
+	//Pad output if set
+	try
+	{
+		if(stob(config.setting[PADDING]))
+		{
+			fprintf(stdout,"\n");
+		}
+	}
+	catch(...)
+	{
+		output(Error,"Invalid value \'%s\' for \'%s\'.",config.setting[PADDING].c_str(),PADDING);
+		exit(-1);
+	}
 }
 std::string input_handler()
 {
@@ -368,8 +393,10 @@ int prompt()
 int main()
 {
 	//Create shell vars file if it doesn't exist
+	check_root_path();
 	if(!std::filesystem::exists(shell_vars_path.c_str()))
 	{
+		output(Info,"Shell variable storage file not found, creating empty file at \'%s\'.",shell_vars_path.c_str());
 		std::ofstream ofs(shell_vars_path.c_str());
 		ofs.close();
 	}
