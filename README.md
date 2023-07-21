@@ -46,6 +46,10 @@ Additionally, the following variables are built-in and should not be directly mo
 
 Run `./install.sh` as root.
 
+## Configuration
+
+When `rpgsh` first runs, it will create a `.config` file at `~/.rpgsh/.config`. This will contain some settings that change how `rpgsh` acts during runtime. Comments are designated by a `#` which explain what a given setting does.
+
 ## Current programs
 
 `rpgsh` comes with a number of core programs built-in for use in its' environment. These are:
