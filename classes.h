@@ -8,16 +8,19 @@
 #include <filesystem>
 #include <cstdarg>
 #include <unistd.h>
+#include <stdexcept>
 #include "text.h"
 
 #define SHELL_VAR		'$'
 #define CHAR_VAR		'%'
 #define CURRENT_CHAR_SHELL_VAR	".CURRENT_CHAR"
 #define CHAR_NAME_ATTR		".NAME"
+#define PADDING			"padding"
 
 std::string user = getlogin();
-std::string base_path = "/home/"+user+"/.rpgsh/";
-std::string shell_vars_path = base_path+".shell";
+std::string root_path = "/home/"+user+"/.rpgsh/";
+std::string shell_vars_path = root_path+".shell";
+std::string config_path = root_path+".config";
 
 enum output_level
 {
@@ -55,6 +58,116 @@ void output(output_level level, const char* format, ...)
 	vfprintf(stream,format,args);
 	fprintf(stream,"%s\n",TEXT_NORMAL);
 }
+
+bool stob(std::string s)
+{
+	if(!strcasecmp(s.c_str(),"true"))
+	{
+		return true;
+	}
+	else if(!strcasecmp(s.c_str(),"false"))
+	{
+		return false;
+	}
+	else
+	{
+		throw std::invalid_argument("Parameter for stob() was not \'true\' or \'false\'.");
+		return false;
+	}
+}
+
+void check_root_path()
+{
+	if(!std::filesystem::exists(root_path.c_str()))
+	{
+		output(Info,"Root rpgsh directory not found, creating directory at \'%s\'.",root_path.c_str());
+		std::filesystem::create_directory(root_path);
+	}
+}
+
+class RPGSH_CONFIG
+{
+	#define COMMENT '#'
+
+	// Configuration file definition:
+	//
+	// Name=Value
+	// Ignore '#' for use as comments
+	public:
+		std::string default_value = "";
+		std::map<std::string,std::string> setting;
+
+	private:
+	std::string get_config_item(std::string s)
+	{
+		if(s.find("=")!=std::string::npos)
+		{
+			return s.substr(0,s.find("="));
+		}
+		else//No '='
+		{
+			output(Warning,"No \'=\' found for config item \'%s\', ignoring...",s.c_str());
+			return default_value;
+		}
+	}
+	std::string get_config_value(std::string s)
+	{
+		if(s.find("=")!=std::string::npos)
+		{
+			if(s.find("=") == s.length()-1)//Nothing after '='
+			{
+				//If the setting exists, return default value for setting, otherwise return default_value
+				if(auto search = setting.find(s); search != setting.end())
+				{
+					output(Warning,"Found blank config setting \'%s\'",setting[s].c_str());
+					return setting[s];
+				}
+				else
+				{
+					output(Warning,"Unknown config setting \'%s\', ignoring...",s.c_str());
+					return default_value;
+				}
+			}
+			else//Found value
+			{
+				return s.substr(s.find("=")+1,s.length()-(s.find("=")+1));
+			}
+		}
+		else//No '='
+		{
+			return default_value;
+		}
+	}
+
+	public:
+	RPGSH_CONFIG()
+	{
+		check_root_path();
+
+		setting[PADDING] = "true";
+
+		// Create default config file if one does not exist
+		if(!std::filesystem::exists(config_path.c_str()))
+		{
+			output(Info,"Config file not found, creating default at \'%s\'.",config_path.c_str());
+			std::ofstream fs(config_path.c_str());
+			fs<<"# Places a newline character before and after command output. Default: "<<setting[PADDING]<<"\n";
+			fs<<PADDING<<"="<<setting[PADDING]<<"\n";
+			fs.close();
+		}
+		std::ifstream fs(config_path.c_str());
+		while(!fs.eof())
+		{
+			std::string data;
+			std::getline(fs,data);
+			if(data.length() && data[0] != COMMENT)
+			{
+				setting[get_config_item(data)] = get_config_value(data);
+			}
+		}
+		fs.close();
+	}
+};
 
 class RPGSH_DICE
 {
@@ -779,13 +892,9 @@ class RPGSH_CHAR
 	}
 	void save()
 	{
-		std::string char_path = base_path+get_shell_var(CURRENT_CHAR_SHELL_VAR)+".char";
+		std::string char_path = root_path+Name()+".char";
 
-		if(!std::filesystem::exists(base_path.c_str()))
-		{
-			output(Info,"Main rpgsh user directory not found at \"%s\", creating directory...",base_path.c_str());
-			std::filesystem::create_directory(base_path);
-		}
+		check_root_path();
 		if(std::filesystem::exists(char_path.c_str()))
 		{
 			std::filesystem::rename(char_path.c_str(),(char_path+".bak").c_str());
@@ -807,8 +916,9 @@ class RPGSH_CHAR
 	}
 	void load(std::string character, bool load_bak)
 	{
-		std::string char_path = base_path+character+".char"+((load_bak)?".bak":"");
+		std::string char_path = root_path+character+".char"+((load_bak)?".bak":"");
 
+		check_root_path();
 		std::ifstream fs(char_path.c_str());
 		if(!fs.good())
 		{
@@ -816,7 +926,7 @@ class RPGSH_CHAR
 			//Generate default character and set that as the current character
 			RPGSH_CHAR *dummy = new RPGSH_CHAR();
 			dummy->save();
-			char_path = base_path+Name()+".char"+((load_bak)?".bak":"");
+			char_path = root_path+Name()+".char"+((load_bak)?".bak":"");
 			delete dummy;
 			fs.open(char_path.c_str());
 		}
