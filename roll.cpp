@@ -134,7 +134,7 @@ int main(int argc, char** argv)
 				{
 					try
 					{
-						repeat = std::stoi(argv[arg+1],NULL,10);
+						repeat = std::stoi(argv[arg+1]);
 
 						if(repeat < 1)
 						{
@@ -293,9 +293,11 @@ int main(int argc, char** argv)
 
 	RPGSH_DICE dice = RPGSH_DICE(Quantity,Faces,Modifier,only_rolls,only_total,is_list,count_expr,count);
 
-	for(int i=0; i<repeat; i++)
+	for(int i=0; i<repeat && Quantity>0; i++)
 	{
 		fprintf(stdout,"%s",(repeat > 1 && i > 0) ? "\n" : "");
 		dice.roll();
 	}
+
+	return 0;
 }
