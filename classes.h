@@ -17,6 +17,8 @@
 #define CHAR_NAME_ATTR		".NAME"
 #define PADDING			"padding"
 
+const char* random_seed_path = "/dev/random";
+const char* backup_random_seed_path = "/dev/urandom";
 std::string user = getlogin();
 std::string root_path = "/home/"+user+"/.rpgsh/";
 std::string shell_vars_path = root_path+".shell";
@@ -210,6 +212,17 @@ class RPGSH_DICE
 
 	void roll()
 	{
+		if(!std::filesystem::exists(random_seed_path))
+		{
+			if(std::filesystem::exists(backup_random_seed_path))
+			{
+				random_seed_path = backup_random_seed_path;
+			}
+			else
+			{
+				output(Error,"Random seed path file doesn't exist at either \"%s\" or \"%s\". If system corruption is not suspected, please report your system's RNG/pRNG file to the RPGSH Github issues page.",random_seed_path,backup_random_seed_path);
+			}
+		}
 		if(Quantity > 0 && Faces > 0)
 		{
 			for(int i=0; i<Faces; i++)
@@ -219,10 +232,10 @@ class RPGSH_DICE
 
 			if(!just_show_rolls && !just_show_total)
 			{
-				fprintf(stdout,"Rolling an %s%d%s-sided die %s%d%s time(s) with a modifier of %s%d%s...\n\n",TEXT_WHITE,Faces,TEXT_NORMAL,TEXT_WHITE,Quantity,TEXT_NORMAL,TEXT_WHITE,Modifier,TEXT_NORMAL);
+				fprintf(stdout,"Rolling a %s%d%s-sided die %s%d%s time(s) with a modifier of %s%d%s...\n\n",TEXT_WHITE,Faces,TEXT_NORMAL,TEXT_WHITE,Quantity,TEXT_NORMAL,TEXT_WHITE,Modifier,TEXT_NORMAL);
 			}
 
-			std::ifstream fs("/dev/random");//Probably safe to assume this file exists?
+			std::ifstream fs(random_seed_path);
 			std::string data, seed;
 			int result;
 
@@ -325,7 +338,7 @@ class RPGSH_DICE
 				}
 				fs.close();
 
-				fs.open("/dev/random");//Probably safe to assume this file exists?
+				fs.open(random_seed_path);
 				std::string data, seed;
 				int result;
 				std::getline(fs,data);
@@ -345,6 +358,8 @@ class RPGSH_DICE
 	}
 	void test()
 	{
+		std::string plus = TEXT_WHITE;
+		plus += "+";
 		Quantity = 100000;
 		Faces = 20;
 		roll();
@@ -352,7 +367,7 @@ class RPGSH_DICE
 		for(int i=0; i<Faces; i++)
 		{
 			float percent = 100-(((float)result_quantity[i]/((float)Quantity/(float)Faces))*100);
-			fprintf(stdout,"# of %d's: %d (%.2f%% from perfect)\n",(i+1),result_quantity[i],percent);
+			fprintf(stdout,"# of %d's: %s%d (%s%s%.2f%%%s from perfect)\n",(i+1),(i<9)?" ":"",result_quantity[i],(percent>=0)?plus.c_str():"",TEXT_WHITE,percent,TEXT_NORMAL);
 		}
 	}
 };
