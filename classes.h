@@ -11,11 +11,26 @@
 #include <stdexcept>
 #include "text.h"
 
+//Variable character definitions
 #define SHELL_VAR		'$'
 #define CHAR_VAR		'%'
+
+//Built-in variables
 #define CURRENT_CHAR_SHELL_VAR	".CURRENT_CHAR"
 #define CHAR_NAME_ATTR		".NAME"
+
+//Setting names
 #define PADDING			"padding"
+#define DEFAULT_GAME		"default_game"
+
+//Games
+#define GAME_DND1E		"dnd1e"		//Dungeons and Dragons, 1st Edition (AD&D)
+#define GAME_DND2E		"dnd2e"		//Dungeons and Dragons, 2nd Edition
+#define GAME_DND3E		"dnd3e"		//Dungeons and Dragons, 3rd Edition
+#define GAME_DND3_5E		"dnd3.5e"	//Dungeons and Dragons, 3.5 Edition
+#define GAME_DND4E		"dnd4e"		//Dungeons and Dragons, 4th Edition
+#define GAME_DND5E		"dnd5e"		//Dungeons and Dragons, 5th Edition
+#define GAME_PATHFINDER		"pathfinder"	//Pathfinder
 
 const char* random_seed_path = "/dev/random";
 const char* backup_random_seed_path = "/dev/urandom";
@@ -146,15 +161,23 @@ class RPGSH_CONFIG
 	{
 		check_root_path();
 
-		setting[PADDING] = "true";
+		// Set defaults
+		setting[PADDING]	=	"true";
+		setting[DEFAULT_GAME]	=	GAME_DND5E;
 
 		// Create default config file if one does not exist
 		if(!std::filesystem::exists(config_path.c_str()))
 		{
 			output(Info,"Config file not found, creating default at \'%s\'.",config_path.c_str());
 			std::ofstream fs(config_path.c_str());
-			fs<<"# Places a newline character before and after command output. Default: "<<setting[PADDING]<<"\n";
+			fs<<COMMENT<<" Places a newline character before and after command output.\n";
+			fs<<COMMENT<<" Default: "<<setting[PADDING]<<"\n";
 			fs<<PADDING<<"="<<setting[PADDING]<<"\n";
+			fs<<"\n";
+			fs<<COMMENT<<" Sets the default game for use by RPGSH.\n";
+			fs<<COMMENT<<" Will change things like the character sheet used for the \'print\' command, and what attributes will be created for new characters when using default settings.\n";
+			fs<<COMMENT<<" Default: "<<setting[DEFAULT_GAME]<<"\n";
+			fs<<DEFAULT_GAME<<"="<<setting[DEFAULT_GAME]<<"\n";
 			fs.close();
 		}
 		std::ifstream fs(config_path.c_str());
@@ -971,6 +994,7 @@ class RPGSH_CHAR
 	void update_Name(std::string new_name_attr)
 	{
 		Attr[CHAR_NAME_ATTR] = new_name_attr;
+		set_as_current();
 		save();
 	}
 };
