@@ -324,8 +324,6 @@ std::string input_handler()
 }
 int prompt()
 {
-	RPGSH_CHAR c = RPGSH_CHAR();
-
 	bool backup = false;
 
 	prompt:
@@ -358,6 +356,11 @@ int prompt()
 	}
 
 	char buffer[MAX_BUFFER_SIZE];
+	for(int i=0; i<MAX_BUFFER_SIZE; i++)
+	{
+		buffer[i] = '\0';
+	}
+
 	std::string in = input_handler();
 	if(in.length())
 	{
@@ -396,9 +399,11 @@ int main()
 	check_root_path();
 	if(!std::filesystem::exists(shell_vars_path.c_str()))
 	{
-		output(Info,"Shell variable storage file not found, creating empty file at \'%s\'.",shell_vars_path.c_str());
+		output(Info,"Shell variable storage file not found, creating file at \'%s\'.",shell_vars_path.c_str());
 		std::ofstream ofs(shell_vars_path.c_str());
 		ofs.close();
+
+		set_shell_var(CURRENT_CHAR_SHELL_VAR,c.Name());
 	}
 
 	//Forces default character to be created so first load() works correctly
