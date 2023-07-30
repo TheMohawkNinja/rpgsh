@@ -35,4 +35,6 @@ int main(int argc, char** argv)
 
 	c.update_Name(argv[1]);
 	output(Info,"Character's display name is now set to the character attribute \"%s\" (Current value: \"%s\")",argv[1],c.Attr[argv[1]].c_str());
+
+	return 0;
 }
