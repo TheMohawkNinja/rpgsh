@@ -869,6 +869,18 @@ class RPGSH_CHAR
 {
 	private:
 		RPGSH_VAR var = RPGSH_VAR();
+		std::string char_folder_path = root_path + "characters/";
+
+	void check_char_path()
+	{
+		check_root_path();
+		if(!std::filesystem::exists(char_folder_path.c_str()))
+		{
+			output(Info,"Character folder not found, creating directory at \'%s\'.",char_folder_path.c_str());
+			std::filesystem::create_directory(char_folder_path);
+		}
+	}
+
 	public:
 		std::string AttributeDesignator		=	"Attr";
 		std::string SpellDesignator		=	"Spell";
@@ -934,9 +946,10 @@ class RPGSH_CHAR
 	}
 	void save()
 	{
-		std::string char_path = root_path+Name()+".char";
+		check_char_path();
 
-		check_root_path();
+		std::string char_path = char_folder_path+Name()+".char";
+
 		if(std::filesystem::exists(char_path.c_str()))
 		{
 			std::filesystem::rename(char_path.c_str(),(char_path+".bak").c_str());
@@ -958,25 +971,27 @@ class RPGSH_CHAR
 	}
 	void load(std::string character, bool load_bak)
 	{
-		std::string char_path = root_path+character+".char"+((load_bak)?".bak":"");
+		check_char_path();
 
-		check_root_path();
+		std::string char_path = char_folder_path+character+".char"+((load_bak)?".bak":"");
+
 		std::ifstream fs(char_path.c_str());
 		if(!fs.good())
 		{
 			//This should only apply if 'character' gets set to something that isn't a valid character
 			//Generate default character and set that as the current character
-			RPGSH_CHAR *dummy = new RPGSH_CHAR();
-			dummy->save();
-			char_path = root_path+Name()+".char"+((load_bak)?".bak":"");
-			delete dummy;
+			output(Warning,"Unable to open character file for \'%s\', loading default character.",character.c_str());
+			RPGSH_CHAR dummy = RPGSH_CHAR();
+			dummy.save();
+			dummy.set_as_current();
+			char_path = char_folder_path+Name()+".char"+((load_bak)?".bak":"");
 			fs.open(char_path.c_str());
 		}
+
 		while(!fs.eof())
 		{
 			std::string data = "";
 			std::getline(fs,data);
-
 			if(data.substr(0,data.find(var.DataSeparator)) == AttributeDesignator)//TODO Complete loading code
 			{
 				data = data.substr(data.find(var.DataSeparator)+var.DataSeparator.length(),
