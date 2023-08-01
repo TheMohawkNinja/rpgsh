@@ -864,6 +864,61 @@ void set_shell_var(std::string var,std::string value)
 	std::filesystem::remove(shell_vars_path.c_str());
 	std::filesystem::rename((shell_vars_path+".bak").c_str(),shell_vars_path.c_str());
 }
+std::map<std::string, RPGSH_VAR> load_template_object(std::string game, std::string obj_id)
+{
+	std::map<std::string, RPGSH_VAR> map;
+	std::string template_path = root_path + "templates/";
+
+	if(!std::filesystem::exists(template_path))
+	{
+		output(Info,"Template directory not found, creating directory at \'%s\'.",template_path.c_str());
+		std::filesystem::create_directory(template_path);
+	}
+
+	if(!std::filesystem::exists(template_path+game))
+	{
+		output(Error,"Template file not found at \'%s\'",(template_path+game).c_str());
+		exit(-1);
+	}
+
+	std::ifstream fs(template_path+game);
+	if(!fs.good())
+	{
+		output(Error,"Unable to open template file at \'%s\'",(template_path+game).c_str());
+		exit(-1);
+	}
+
+	while(!fs.eof())
+	{
+		std::string data = "";
+		std::string obj = "";
+		std::string key = "";
+		RPGSH_VAR value = RPGSH_VAR();
+		std::string DS = value.DataSeparator; // Shorten some of these statements down a bit
+
+		std::getline(fs,data);
+		if(data != "")
+		{
+			//fprintf(stdout,"data=%s\n",data.c_str());
+			obj = data.substr(0,data.find(DS));
+			//fprintf(stdout,"obj=%s\n",obj.c_str());
+			key = data.substr(data.find(obj)+obj.length()+DS.length(),
+					 (data.rfind(DS)-(data.find(obj)+obj.length()+DS.length())));
+			//fprintf(stdout,"key=%s\n",key.c_str());
+			value = data.substr(data.rfind(DS)+DS.length(),
+					   (data.length()-data.rfind(DS)+DS.length()));
+			//fprintf(stdout,"value=%s\n\n",value.c_str());
+
+			if(obj == obj_id)
+			{
+				map[key] = value;
+			}
+		}
+	}
+	fs.close();
+
+	return map;
+}
 
 class RPGSH_CHAR
 {
@@ -895,49 +950,12 @@ class RPGSH_CHAR
 
 	RPGSH_CHAR()
 	{
-		Attr["Name"]			=	"<NO_NAME>";
-		Attr[CHAR_NAME_ATTR]		=	"Name";
-		Attr["Class"]			=	"<NO_CLASS>";
-		Attr["Level"]			=	1;
-		Attr["Background"]		=	"<NO_BACKGROUND>";
-		Attr["Player"]			=	"<NO_PLAYER>";
-		Attr["Race"]			=	"<NO_RACE>";
-		Attr["Alignment"]		=	"<NO_ALIGNMENT>";
-		Attr["XP"]			=	0;
-		Attr["Inspiration"]		=	"false";
-		Attr["Proficiency"]		=	0;
-		Attr["AC"]			=	0;
-		Attr["Initiative"]		=	0;
-		Attr["Speed"]			=	0;
-		Attr["HP"]			=	0;
-		Attr["MaxHP"]			=	0;
-		Attr["TempHP"]			=	0;
-		Attr["FailedDeathSaves"]	=	0;
-		Attr["SucceededDeathSaves"]	=	0;
-		Attr["Str"]			=	0;
-		Attr["Dex"]			=	0;
-		Attr["Con"]			=	0;
-		Attr["Int"]			=	0;
-		Attr["Wis"]			=	0;
-		Attr["Cha"]			=	0;
-		Attr["PersonalityTraits"]	=	"<NO_PERSONALITY_TRAITS>";
-		Attr["Ideals"]			=	"<NO_IDEALS>";
-		Attr["Bonds"]			=	"<NO_BONDS>";
-		Attr["Flaws"]			=	"<NO_FLAWS>";
-		Attr["FeaturesAndTraits"]	=	"<NO_FEATURES_AND_TRAITS>";
-		Attr["Age"]			=	0;
-		Attr["Height"]			=	0;
-		Attr["Weight"]			=	0;
-		Attr["EyeColor"]		=	"<NO_EYE_COLOR>";
-		Attr["SkinColor"]		=	"<NO_SKIN_COLOR>";
-		Attr["Hair"]			=	"<NO_HAIR>";
-		Attr["Appearance"]		=	"<NO_APPEARANCE>";
-		Attr["Allies"]			=	"<NO_ALLIES_OR_ORGANIZATIONS>";
-		Attr["Backstory"]		=	"<NO_BACKSTORY>";
-		Attr["Treasure"]		=	"<NO_TREASURE>";
-		Attr["SpellcastingAbility"]	=	"<NO_SPELLCASTING_ABILITY>";
-		Attr["SpellSaveDC"]		=	0;
-		Attr["SpellAttackBonus"]	=	0;
+		RPGSH_CONFIG config = RPGSH_CONFIG();
+		RPGSH_CHAR(config.setting[DEFAULT_GAME]);
+	}
+	RPGSH_CHAR(std::string game)
+	{
+		load_template_object(game,AttributeDesignator);
 	}
 
 	std::string Name()
@@ -995,9 +1013,9 @@ class RPGSH_CHAR
 			if(data.substr(0,data.find(var.DataSeparator)) == AttributeDesignator)//TODO Complete loading code
 			{
 				data = data.substr(data.find(var.DataSeparator)+var.DataSeparator.length(),
-							(data.length() - (data.find(var.DataSeparator))));
+						  (data.length() - (data.find(var.DataSeparator))));
 				Attr[data.substr(0,data.find(var.DataSeparator))] = data.substr(data.find(var.DataSeparator)+var.DataSeparator.length(),
-												(data.length() - (data.find(var.DataSeparator))));
+											       (data.length() - (data.find(var.DataSeparator))));
 			}
 		}
 		fs.close();
