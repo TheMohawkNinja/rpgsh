@@ -13,7 +13,6 @@
 
 RPGSH_CONFIG config = RPGSH_CONFIG();
 RPGSH_CHAR c = RPGSH_CHAR();
-RPGSH_VAR v = RPGSH_VAR();
 
 void run_rpgsh_prog(std::string args)
 {
@@ -60,11 +59,11 @@ void run_rpgsh_prog(std::string args)
 					std::string data = "";
 					std::getline(ifs,data);
 
-					if(data.substr(0,data.find(v.DataSeparator)) == var)
+					if(data.substr(0,data.find(DS)) == var)
 					{
 						int new_args_start = find_dollar + var.length() + 1;
-						old = data.substr(data.find(v.DataSeparator)+v.DataSeparator.length(),
-								data.length()-(data.find(v.DataSeparator)+v.DataSeparator.length()));
+						old = data.substr(data.find(DS)+DS.length(),
+								data.length()-(data.find(DS)+DS.length()));
 
 						if(old.find(" ") != std::string::npos)
 						{
@@ -403,10 +402,14 @@ int main()
 		std::ofstream ofs(shell_vars_path.c_str());
 		ofs.close();
 
-		set_shell_var(CURRENT_CHAR_SHELL_VAR,c.Name());
+		//Set default values for built-in shell variables
+		std::map<std::string, RPGSH_VAR> Attr = load_template_object<RPGSH_VAR>(config.setting[DEFAULT_GAME],c.AttributeDesignator);
+		set_shell_var(CURRENT_CHAR_SHELL_VAR,std::string(Attr["Name"]));
 	}
 
-	//Forces default character to be created so first load() works correctly
+	//(re)build default character on launch
+	c.save();
+
 	run_rpgsh_prog((char*)"banner");
 	run_rpgsh_prog((char*)"version");
 
