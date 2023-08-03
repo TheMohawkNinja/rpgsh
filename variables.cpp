@@ -3,7 +3,6 @@
 #include "classes.h"
 
 RPGSH_CHAR c = RPGSH_CHAR();
-RPGSH_VAR v = RPGSH_VAR();
 
 bool is_operator(std::string s)
 {
