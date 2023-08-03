@@ -1,12 +1,32 @@
-echo "Compiling main.cpp..."
+bold_white="\e[1m\e[97m"
+normal="\e[0m"
+
+root_dir="/home/$USER/.rpgsh/"
+characters_dir="$root_dir""characters/"
+templates_dir="$root_dir""templates/"
+
+echo -e "Compiling:\tmain.cpp\t->\t$bold_white""rpgsh"$normal
 g++ main.cpp -lstdc++fs -std=c++17 -o rpgsh
-echo "Compiling setname.cpp..."
-g++ setname.cpp -lstdc++fs -std=c++17 -o rpgsh-setname 
-echo "Compiling variables.cpp..."
+echo -e "Compiling:\tsetname.cpp\t->\t$bold_white""rpgsh-setname"$normal
+g++ setname.cpp -lstdc++fs -std=c++17 -o rpgsh-setname
+echo -e "Compiling:\tvariables.cpp\t->\t$bold_white""rpgsh-variables"$normal
 g++ variables.cpp -lstdc++fs -std=c++17 -o rpgsh-variables
-echo "Compiling version.cpp..."
+echo -e "Compiling:\tversion.cpp\t->\t$bold_white""rpgsh-version"$normal
 g++ version.cpp -o rpgsh-version
-echo "Compiling banner.cpp..."
+echo -e "Compiling:\tbanner.cpp\t->\t$bold_white""rpgsh-banner"$normal
 g++ banner.cpp -o rpgsh-banner
-echo "Compiling roll.cpp..."
+echo -e "Compiling:\troll.cpp\t->\t$bold_white""rpgsh-roll"$normal
 g++ roll.cpp -lstdc++fs -std=c++17 -o rpgsh-roll
+
+echo
+
+if [ ! -d "$root_dir" ]; then echo -e "Creating root directory at:\t\t$bold_white""$root_dir$normal"; mkdir "$root_dir"; fi
+if [ ! -d "$characters_dir" ]; then echo -e "Creating character directory at:\t$bold_white""$characters_dir$normal"; mkdir "$characters_dir"; fi
+if [ ! -d "$templates_dir" ]; then echo -e "Creating templates directory at:\t$bold_white""$templates_dir$normal"; mkdir "$templates_dir"; fi
+
+echo
+
+echo "Copying templates..."
+for i in $(ls templates); do echo -e "\t$bold_white""$i"$normal; cp "templates/$i" "$templates_dir$i"; done
+
+echo "Done!"
