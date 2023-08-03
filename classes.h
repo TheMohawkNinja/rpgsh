@@ -23,21 +23,13 @@
 #define PADDING			"padding"
 #define DEFAULT_GAME		"default_game"
 
-//Games
-#define GAME_DND1E		"dnd1e"		//Dungeons and Dragons, 1st Edition (AD&D)
-#define GAME_DND2E		"dnd2e"		//Dungeons and Dragons, 2nd Edition
-#define GAME_DND3E		"dnd3e"		//Dungeons and Dragons, 3rd Edition
-#define GAME_DND3_5E		"dnd3.5e"	//Dungeons and Dragons, 3.5 Edition
-#define GAME_DND4E		"dnd4e"		//Dungeons and Dragons, 4th Edition
-#define GAME_DND5E		"dnd5e"		//Dungeons and Dragons, 5th Edition
-#define GAME_PATHFINDER		"pathfinder"	//Pathfinder
-
 const char* random_seed_path = "/dev/random";
 const char* backup_random_seed_path = "/dev/urandom";
 std::string user = getlogin();
 std::string root_path = "/home/"+user+"/.rpgsh/";
 std::string shell_vars_path = root_path+".shell";
 std::string config_path = root_path+".config";
+std::string DS = "::"; //Data separator string. Name shortened for brevity in the code.
 
 enum output_level
 {
@@ -163,7 +155,7 @@ class RPGSH_CONFIG
 
 		// Set defaults
 		setting[PADDING]	=	"true";
-		setting[DEFAULT_GAME]	=	GAME_DND5E;
+		setting[DEFAULT_GAME]	=	"dnd5e";
 
 		// Create default config file if one does not exist
 		if(!std::filesystem::exists(config_path.c_str()))
@@ -208,12 +200,126 @@ class RPGSH_DICE
 		std::string count_expr = "";
 		std::vector<int> result_quantity;
 
+	int get_value(std::string d, std::string value, int start, std::string terminator, bool allow_sign, bool required)
+	{
+		std::string value_str = "";
+		if(terminator != "")
+		{
+			for(int i=start; d.substr(i,1)!=terminator; i++)
+			{
+				try
+				{
+					if(!allow_sign)
+					{
+						if(d.substr(i,1) == "+" || d.substr(i,1) == "-")
+						{
+							break;
+						}
+						std::stoi(d.substr(i,1));
+						value_str += d.substr(i,1);
+					}
+					else
+					{
+						if(d.substr(i,1) != "+" && d.substr(i,1) != "-")
+						{
+							std::stoi(d.substr(i,1));
+						}
+						value_str += d.substr(i,1);
+					}
+				}
+				catch(...)
+				{
+					output(Error,"Unable to get dice %s. \"%s\" is not a number.",value.c_str(),d.substr(i,1).c_str());
+					exit(-1);
+				}
+			}
+
+			try
+			{
+				std::stoi(value_str);
+				return std::stoi(value_str);
+			}
+			catch(...)
+			{
+				output(Error,"Unable to get dice %s. \"%s\" exceeds the maximum size of %d.",value.c_str(),value_str.c_str(),INT_MAX);
+				exit(-1);
+			}
+		}
+		else
+		{
+			if(start == d.length())
+			{
+				if(required)
+				{
+					output(Error,"Unable to get dice %s. No %s specified.",value.c_str(),value.c_str());
+					exit(-1);
+				}
+				return 0;
+			}
+			for(int i=start; i<d.length(); i++)
+			{
+				try
+				{
+					if(!allow_sign)
+					{
+						if(d.substr(i,1) == "+" || d.substr(i,1) == "-")
+						{
+							break;
+						}
+						std::stoi(d.substr(i,1));
+						value_str += d.substr(i,1);
+					}
+					else
+					{
+						if(d.substr(i,1) != "+" && d.substr(i,1) != "-")
+						{
+							std::stoi(d.substr(i,1));
+						}
+						value_str += d.substr(i,1);
+					}
+				}
+				catch(...)
+				{
+					output(Error,"Unable to get dice %s. \"%s\" is not a number.",value.c_str(),d.substr(i,1).c_str());
+					exit(-1);
+				}
+			}
+
+			try
+			{
+				std::stoi(value_str);
+				return std::stoi(value_str);
+			}
+			catch(...)
+			{
+				output(Error,"Unable to get dice %s. \"%s\" exceeds the maximum size of %d.",value.c_str(),value_str.c_str(),INT_MAX);
+				exit(-1);
+			}
+		}
+	}
+
+
 	public:
-		unsigned int	Quantity		=	0;
+		unsigned int	Quantity	=	0;
 		unsigned int	Faces		=	0;
 			 int	Modifier	=	0;
 
 	RPGSH_DICE(){}
+	RPGSH_DICE(std::string dice_str)
+	{
+		if(dice_str.substr(0,1) != "d")
+		{
+			Quantity = get_value(dice_str,"quantity",0,"d",false,true);
+			Faces = get_value(dice_str,"faces",dice_str.find("d",0) + 1,"",false,true);
+			Modifier = get_value(dice_str,"modifier",dice_str.find(std::to_string(Faces),dice_str.find("d",0)) + std::to_string(Faces).length(),"",true,false);
+		}
+		else
+		{
+			Quantity = 1;
+			Faces = get_value(dice_str,"faces",dice_str.find("d",0) + 1,"",false,true);
+			Modifier = get_value(dice_str,"modifier",dice_str.find(std::to_string(Faces),dice_str.find("d",0)) + std::to_string(Faces).length(),"",true,false);
+		}
+	}
 	RPGSH_DICE(unsigned int _quantity, unsigned int _faces, int _modifier)
 	{
 		Quantity = _quantity;
@@ -472,7 +578,6 @@ class RPGSH_VAR
 {
 	public:
 		std::string Value = "";
-		std::string DataSeparator = "::";
 
 		explicit operator std::string() const
 		{
@@ -815,17 +920,16 @@ RPGSH_VAR operator / (const int a, const RPGSH_VAR b)
 
 std::string get_shell_var(std::string var)
 {
-	RPGSH_VAR v = RPGSH_VAR();
 	std::ifstream ifs(shell_vars_path.c_str());
 	while(!ifs.eof())
 	{
 		std::string data = "";
 		std::getline(ifs,data);
 
-		if(data.substr(0,data.find(v.DataSeparator)) == var)
+		if(data.substr(0,data.find(DS)) == var)
 		{
-			return data.substr(data.find(v.DataSeparator)+v.DataSeparator.length(),
-				data.length()-(data.find(v.DataSeparator)+v.DataSeparator.length()));
+			return data.substr(data.find(DS)+DS.length(),
+				data.length()-(data.find(DS)+DS.length()));
 		}
 	}
 	ifs.close();
@@ -833,7 +937,6 @@ std::string get_shell_var(std::string var)
 }
 void set_shell_var(std::string var,std::string value)
 {
-	RPGSH_VAR v = RPGSH_VAR();
 	std::ifstream ifs(shell_vars_path.c_str());
 	std::filesystem::remove((shell_vars_path+".bak").c_str());
 	std::ofstream ofs((shell_vars_path+".bak").c_str());
@@ -844,9 +947,9 @@ void set_shell_var(std::string var,std::string value)
 		std::string data = "";
 		std::getline(ifs,data);
 
-		if(data.substr(0,data.find(v.DataSeparator)) == var)
+		if(data.substr(0,data.find(DS)) == var)
 		{
-			ofs<<var + v.DataSeparator + value + "\n";
+			ofs<<var + DS + value + "\n";
 			ReplacedValue = true;
 		}
 		else
@@ -857,16 +960,17 @@ void set_shell_var(std::string var,std::string value)
 
 	if(!ReplacedValue)
 	{
-		ofs<<var + v.DataSeparator + value + "\n";
+		ofs<<var + DS + value + "\n";
 	}
 	ifs.close();
 	ofs.close();
 	std::filesystem::remove(shell_vars_path.c_str());
 	std::filesystem::rename((shell_vars_path+".bak").c_str(),shell_vars_path.c_str());
 }
-std::map<std::string, RPGSH_VAR> load_template_object(std::string game, std::string obj_id)
+template <typename T>
+std::map<std::string, T>load_template_object(std::string game, std::string obj_id)
 {
-	std::map<std::string, RPGSH_VAR> map;
+	std::map<std::string, T> map;
 	std::string template_path = root_path + "templates/";
 
 	if(!std::filesystem::exists(template_path))
@@ -893,24 +997,18 @@ std::map<std::string, RPGSH_VAR> load_template_object(std::string game, std::str
 		std::string data = "";
 		std::string obj = "";
 		std::string key = "";
-		RPGSH_VAR value = RPGSH_VAR();
-		std::string DS = value.DataSeparator; // Shorten some of these statements down a bit
+		T value;
 
 		std::getline(fs,data);
 		if(data != "")
 		{
-			//fprintf(stdout,"data=%s\n",data.c_str());
-			obj = data.substr(0,data.find(DS));
-			//fprintf(stdout,"obj=%s\n",obj.c_str());
-			key = data.substr(data.find(obj)+obj.length()+DS.length(),
-					 (data.rfind(DS)-(data.find(obj)+obj.length()+DS.length())));
-			//fprintf(stdout,"key=%s\n",key.c_str());
-			value = data.substr(data.rfind(DS)+DS.length(),
-					   (data.length()-data.rfind(DS)+DS.length()));
-			//fprintf(stdout,"value=%s\n\n",value.c_str());
-
-			if(obj == obj_id)
+			if(data.substr(0,data.find(DS)) ==  obj_id)
 			{
+				obj = data.substr(0,data.find(DS));
+				key = data.substr(data.find(obj)+obj.length()+DS.length(),
+						 (data.rfind(DS)-(data.find(obj)+obj.length()+DS.length())));
+				value = T(data.substr(data.rfind(DS)+DS.length(),
+						     (data.length()-data.rfind(DS)+DS.length())));
 				map[key] = value;
 			}
 		}
@@ -923,7 +1021,6 @@ std::map<std::string, RPGSH_VAR> load_template_object(std::string game, std::str
 class RPGSH_CHAR
 {
 	private:
-		RPGSH_VAR var = RPGSH_VAR();
 		std::string char_folder_path = root_path + "characters/";
 
 	void check_char_path()
@@ -943,19 +1040,26 @@ class RPGSH_CHAR
 		std::string CurrencyDesignator		=	"Currency";
 
 		std::map<std::string, RPGSH_VAR> Attr;
-		RPGSH_DICE		CurrentHitDice	=	RPGSH_DICE();
-		RPGSH_DICE		TotalHitDice	=	RPGSH_DICE();
+		std::map<std::string, RPGSH_DICE> Dice;
 		RPGSH_CURRENCY		Currency	=	RPGSH_CURRENCY();
 		std::vector<RPGSH_SPELL>Spellbook	=	{};
 
-	RPGSH_CHAR()
+	RPGSH_CHAR()//Create character using default game
 	{
 		RPGSH_CONFIG config = RPGSH_CONFIG();
-		RPGSH_CHAR(config.setting[DEFAULT_GAME]);
+
+		Attr = load_template_object<RPGSH_VAR>(config.setting[DEFAULT_GAME],AttributeDesignator);
+		Attr[CHAR_NAME_ATTR] = "Name";
+
+		Dice = load_template_object<RPGSH_DICE>(config.setting[DEFAULT_GAME],DiceDesignator);
+
 	}
 	RPGSH_CHAR(std::string game)
 	{
-		load_template_object(game,AttributeDesignator);
+		Attr = load_template_object<RPGSH_VAR>(game,AttributeDesignator);
+		Attr[CHAR_NAME_ATTR] = "Name";
+
+		Dice = load_template_object<RPGSH_DICE>(game,DiceDesignator);
 	}
 
 	std::string Name()
@@ -978,9 +1082,9 @@ class RPGSH_CHAR
 		{
 			//Character file format definition
 			std::string data =	AttributeDesignator+
-						var.DataSeparator+
+						DS+
 						key+
-						var.DataSeparator+
+						DS+
 						std::string(value)+
 						"\n";
 			fs<<data;
@@ -1010,12 +1114,12 @@ class RPGSH_CHAR
 		{
 			std::string data = "";
 			std::getline(fs,data);
-			if(data.substr(0,data.find(var.DataSeparator)) == AttributeDesignator)//TODO Complete loading code
+			if(data.substr(0,data.find(DS)) == AttributeDesignator)//TODO Complete loading code
 			{
-				data = data.substr(data.find(var.DataSeparator)+var.DataSeparator.length(),
-						  (data.length() - (data.find(var.DataSeparator))));
-				Attr[data.substr(0,data.find(var.DataSeparator))] = data.substr(data.find(var.DataSeparator)+var.DataSeparator.length(),
-											       (data.length() - (data.find(var.DataSeparator))));
+				data = data.substr(data.find(DS)+DS.length(),
+						  (data.length() - (data.find(DS))));
+				Attr[data.substr(0,data.find(DS))] = data.substr(data.find(DS)+DS.length(),
+											       (data.length() - (data.find(DS))));
 			}
 		}
 		fs.close();
