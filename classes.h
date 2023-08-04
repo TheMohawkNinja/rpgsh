@@ -1130,7 +1130,10 @@ class RPGSH_CHAR
 
 		//Clear attributes in-case a character from a non-default game is being loaded
 		Attr.clear();
+		Dice.clear();
+
 		Attr = load_map_from_file<RPGSH_VAR>(char_path,AttributeDesignator);
+		Dice = load_map_from_file<RPGSH_DICE>(char_path,DiceDesignator);
 
 		fs.close();
 	}
