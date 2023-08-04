@@ -1,3 +1,5 @@
+#!/bin/bash
+
 bold_white="\e[1m\e[97m"
 normal="\e[0m"
 
@@ -12,7 +14,7 @@ g++ setname.cpp -lstdc++fs -std=c++17 -o rpgsh-setname
 echo -e "Compiling:\tvariables.cpp\t->\t$bold_white""rpgsh-variables"$normal
 g++ variables.cpp -lstdc++fs -std=c++17 -o rpgsh-variables
 echo -e "Compiling:\tversion.cpp\t->\t$bold_white""rpgsh-version"$normal
-g++ version.cpp -o rpgsh-version
+g++ version.cpp -lstdc++fs -std=c++17 -o rpgsh-version
 echo -e "Compiling:\tbanner.cpp\t->\t$bold_white""rpgsh-banner"$normal
 g++ banner.cpp -o rpgsh-banner
 echo -e "Compiling:\troll.cpp\t->\t$bold_white""rpgsh-roll"$normal
@@ -28,5 +30,7 @@ echo
 
 echo "Copying templates..."
 for i in $(ls templates); do echo -e "\t$bold_white""$i"$normal; cp "templates/$i" "$templates_dir$i"; done
+
+echo
 
 echo "Done!"
