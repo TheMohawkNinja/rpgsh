@@ -16,7 +16,7 @@ The prompt displays the currently loaded character name, along with their heath 
 
 Just like any other shell (sh, bash, cmd, etc.), you interact with `rpgsh` by typing a command follwed by any associated parameters. You then execute the desired command by pressing the Enter key. You may exit the shell at any time by running the "exit" command, or by pressing ctrl+c.
 
-When first launching `rpgsh`, you will see `[INFO]` text appear stating that the root directory for the program has been created at `~/.rpgsh/`. In addition, a placeholder character file `<NO_NAME>.char` is created to give the prompt something to work with until you create a character of your own. (NOTE: This file can be safely deleted if the placeholder character is no longer being used).
+When first launching `rpgsh`, a placeholder character file `<NO_NAME>.char` is created to give the prompt something to work with until you create a character of your own, or as a fallback when a given character cannot be loaded.
 
 Whenever the currently loaded character is modifed by the shell or a program called by the shell, it will create a `.char.bak` file which contains the character information prior to the last save of the character (which *should* be the last command run). This is mainly for instances whereby the player accidentally sets a prompt value to something which would crash the prompt due to a data type mis-match (e.g. setting their current HP to "FULL" instead of "20"). In the event this happens, the prompt will attempt to load the backup. If loading the backup fails, the player will need to open up their character file and attempt to manually edit the file to resolve the issue.
 
@@ -48,7 +48,15 @@ Run `./install.sh` as root.
 
 ## Configuration
 
-When `rpgsh` first runs, it will create a `.config` file at `~/.rpgsh/.config`. This will contain some settings that change how `rpgsh` acts during runtime. Comments are designated by a `#` which explain what a given setting does.
+When `rpgsh` first runs, it will create a `config` file at `~/.rpgsh/config`. This will contain some settings that change how `rpgsh` acts during runtime. Comments are designated by a `#` which explain what a given setting does.
+
+## Templates
+
+Since `rpgsh` is designed as a general-purpose platform for table-top RPGs, it uses template files to determine things like character attributes, the currency used by the game, and so forth. These can be found in `~/.rpgsh/templates/` and must obey the following rules:
+
+ - The name of the template file should be a shorthand for the name of the game it is acting as a template for (e.g. "dnd5e" as the name of the template file for "Dungeons and Dragons, 5th Edition"). This is because that name will need to be referenced by the user during actions like new character creation, or when specifying the `default_game` value in `/.rpgsh/config`.
+ - The file must follow the below format for each line (please see one of the templates that come default with `rpgsh` for a working example):
+   - [Object Type]::[Name]::[Value]
 
 ## Current programs
 
