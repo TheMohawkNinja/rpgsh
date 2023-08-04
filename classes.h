@@ -8,8 +8,12 @@
 #include <filesystem>
 #include <cstdarg>
 #include <unistd.h>
-#include <stdexcept>
 #include "text.h"
+
+//Version info
+#define MAJOR_VERSION		0
+#define MINOR_VERSION		5
+#define PATCH_VERSION		8
 
 //Variable character definitions
 #define SHELL_VAR		'$'
@@ -23,13 +27,20 @@
 #define PADDING			"padding"
 #define DEFAULT_GAME		"default_game"
 
+//Locations of files to get random data from for things like 'roll'
 const char* random_seed_path = "/dev/random";
 const char* backup_random_seed_path = "/dev/urandom";
+
+//Internal file/directory paths
 std::string user = getlogin();
-std::string root_path = "/home/"+user+"/.rpgsh/";
-std::string shell_vars_path = root_path+".shell";
-std::string config_path = root_path+".config";
-std::string DS = "::"; //Data separator string. Name shortened for brevity in the code.
+std::string root_dir = "/home/"+user+"/.rpgsh/";
+std::string shell_vars_file = root_dir+".shell";
+std::string config_file = root_dir+".config";
+std::string characters_dir = root_dir + "characters/";
+std::string templates_dir = root_dir + "templates/";
+
+//Data separator string. Name shortened for brevity in the code.
+std::string DS = "::";
 
 enum output_level
 {
@@ -82,15 +93,6 @@ bool stob(std::string s)
 	{
 		throw std::invalid_argument("Parameter for stob() was not \'true\' or \'false\'.");
 		return false;
-	}
-}
-
-void check_root_path()
-{
-	if(!std::filesystem::exists(root_path.c_str()))
-	{
-		output(Info,"Root rpgsh directory not found, creating directory at \'%s\'.",root_path.c_str());
-		std::filesystem::create_directory(root_path);
 	}
 }
 
@@ -151,17 +153,15 @@ class RPGSH_CONFIG
 	public:
 	RPGSH_CONFIG()
 	{
-		check_root_path();
-
 		// Set defaults
 		setting[PADDING]	=	"true";
 		setting[DEFAULT_GAME]	=	"dnd5e";
 
 		// Create default config file if one does not exist
-		if(!std::filesystem::exists(config_path.c_str()))
+		if(!std::filesystem::exists(config_file.c_str()))
 		{
-			output(Info,"Config file not found, creating default at \'%s\'.",config_path.c_str());
-			std::ofstream fs(config_path.c_str());
+			output(Info,"Config file not found, creating default at \'%s\'.",config_file.c_str());
+			std::ofstream fs(config_file.c_str());
 			fs<<COMMENT<<" Places a newline character before and after command output.\n";
 			fs<<COMMENT<<" Default: "<<setting[PADDING]<<"\n";
 			fs<<PADDING<<"="<<setting[PADDING]<<"\n";
@@ -172,7 +172,7 @@ class RPGSH_CONFIG
 			fs<<DEFAULT_GAME<<"="<<setting[DEFAULT_GAME]<<"\n";
 			fs.close();
 		}
-		std::ifstream fs(config_path.c_str());
+		std::ifstream fs(config_file.c_str());
 		while(!fs.eof())
 		{
 			std::string data;
@@ -304,6 +304,11 @@ class RPGSH_DICE
 		unsigned int	Faces		=	0;
 			 int	Modifier	=	0;
 
+		explicit operator std::string() const
+		{
+			return (std::to_string(Quantity)+"d"+std::to_string(Faces));
+		}
+
 	RPGSH_DICE(){}
 	RPGSH_DICE(std::string dice_str)
 	{
@@ -320,12 +325,33 @@ class RPGSH_DICE
 			Modifier = get_value(dice_str,"modifier",dice_str.find(std::to_string(Faces),dice_str.find("d",0)) + std::to_string(Faces).length(),"",true,false);
 		}
 	}
-	RPGSH_DICE(unsigned int _quantity, unsigned int _faces, int _modifier)
+	RPGSH_DICE(unsigned int _Quantity, unsigned int _Faces, int _Modifier)
 	{
-		Quantity = _quantity;
-		Faces = _faces;
-		Modifier = _modifier;
+		Quantity = _Quantity;
+		Faces = _Faces;
+		Modifier = _Modifier;
 		just_show_total = true;
+	}
+	RPGSH_DICE(std::string dice_str, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count)
+	{
+		if(dice_str.substr(0,1) != "d")
+		{
+			Quantity = get_value(dice_str,"quantity",0,"d",false,true);
+			Faces = get_value(dice_str,"faces",dice_str.find("d",0) + 1,"",false,true);
+			Modifier = get_value(dice_str,"modifier",dice_str.find(std::to_string(Faces),dice_str.find("d",0)) + std::to_string(Faces).length(),"",true,false);
+		}
+		else
+		{
+			Quantity = 1;
+			Faces = get_value(dice_str,"faces",dice_str.find("d",0) + 1,"",false,true);
+			Modifier = get_value(dice_str,"modifier",dice_str.find(std::to_string(Faces),dice_str.find("d",0)) + std::to_string(Faces).length(),"",true,false);
+		}
+
+		just_show_rolls = _just_show_rolls;
+		just_show_total = _just_show_total;
+		is_list = _is_list;
+		count_expr = _count_expr;
+		count = _count;
 	}
 	RPGSH_DICE(unsigned int _Quantity, unsigned int _Faces, int _Modifier, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count)
 	{
@@ -920,7 +946,7 @@ RPGSH_VAR operator / (const int a, const RPGSH_VAR b)
 
 std::string get_shell_var(std::string var)
 {
-	std::ifstream ifs(shell_vars_path.c_str());
+	std::ifstream ifs(shell_vars_file.c_str());
 	while(!ifs.eof())
 	{
 		std::string data = "";
@@ -937,9 +963,9 @@ std::string get_shell_var(std::string var)
 }
 void set_shell_var(std::string var,std::string value)
 {
-	std::ifstream ifs(shell_vars_path.c_str());
-	std::filesystem::remove((shell_vars_path+".bak").c_str());
-	std::ofstream ofs((shell_vars_path+".bak").c_str());
+	std::ifstream ifs(shell_vars_file.c_str());
+	std::filesystem::remove((shell_vars_file+".bak").c_str());
+	std::ofstream ofs((shell_vars_file+".bak").c_str());
 	bool ReplacedValue = false;
 
 	while(!ifs.eof())
@@ -964,31 +990,49 @@ void set_shell_var(std::string var,std::string value)
 	}
 	ifs.close();
 	ofs.close();
-	std::filesystem::remove(shell_vars_path.c_str());
-	std::filesystem::rename((shell_vars_path+".bak").c_str(),shell_vars_path.c_str());
+	std::filesystem::remove(shell_vars_file.c_str());
+	std::filesystem::rename((shell_vars_file+".bak").c_str(),shell_vars_file.c_str());
 }
+
 template <typename T>
-std::map<std::string, T>load_template_object(std::string game, std::string obj_id)
+void save_map_to_file(std::string path, std::map<std::string, T> map, std::string obj_id)
 {
-	std::map<std::string, T> map;
-	std::string template_path = root_path + "templates/";
-
-	if(!std::filesystem::exists(template_path))
+	std::ofstream fs(path, std::ios::app);
+	if(!fs.good())
 	{
-		output(Info,"Template directory not found, creating directory at \'%s\'.",template_path.c_str());
-		std::filesystem::create_directory(template_path);
-	}
-
-	if(!std::filesystem::exists(template_path+game))
-	{
-		output(Error,"Template file not found at \'%s\'",(template_path+game).c_str());
+		output(Error,"Unable to open \'%s\' for writing",path.c_str());
 		exit(-1);
 	}
 
-	std::ifstream fs(template_path+game);
+	for(const auto& [key,value] : map)
+	{
+		//Template/Character file format definition
+		std::string data =	obj_id+
+					DS+
+					key+
+					DS+
+					std::string(value)+
+					"\n";
+		fs<<data;
+	}
+	fs.close();
+}
+
+template <typename T>
+std::map<std::string, T>load_map_from_file(std::string path, std::string obj_id)
+{
+	std::map<std::string, T> map;
+
+	if(!std::filesystem::exists(path))
+	{
+		output(Error,"File not found at \'%s\'",path.c_str());
+		exit(-1);
+	}
+
+	std::ifstream fs(path);
 	if(!fs.good())
 	{
-		output(Error,"Unable to open template file at \'%s\'",(template_path+game).c_str());
+		output(Error,"Unable to open \'%s\' for reading",path.c_str());
 		exit(-1);
 	}
 
@@ -1007,6 +1051,8 @@ std::map<std::string, T>load_template_object(std::string game, std::string obj_i
 				obj = data.substr(0,data.find(DS));
 				key = data.substr(data.find(obj)+obj.length()+DS.length(),
 						 (data.rfind(DS)-(data.find(obj)+obj.length()+DS.length())));
+
+				// IMPORTANT: This requires that there exist a constructor T(std::string)
 				value = T(data.substr(data.rfind(DS)+DS.length(),
 						     (data.length()-data.rfind(DS)+DS.length())));
 				map[key] = value;
@@ -1020,19 +1066,6 @@ std::map<std::string, T>load_template_object(std::string game, std::string obj_i
 
 class RPGSH_CHAR
 {
-	private:
-		std::string char_folder_path = root_path + "characters/";
-
-	void check_char_path()
-	{
-		check_root_path();
-		if(!std::filesystem::exists(char_folder_path.c_str()))
-		{
-			output(Info,"Character folder not found, creating directory at \'%s\'.",char_folder_path.c_str());
-			std::filesystem::create_directory(char_folder_path);
-		}
-	}
-
 	public:
 		std::string AttributeDesignator		=	"Attr";
 		std::string SpellDesignator		=	"Spell";
@@ -1048,18 +1081,18 @@ class RPGSH_CHAR
 	{
 		RPGSH_CONFIG config = RPGSH_CONFIG();
 
-		Attr = load_template_object<RPGSH_VAR>(config.setting[DEFAULT_GAME],AttributeDesignator);
+		Attr = load_map_from_file<RPGSH_VAR>(templates_dir+config.setting[DEFAULT_GAME],AttributeDesignator);
 		Attr[CHAR_NAME_ATTR] = "Name";
 
-		Dice = load_template_object<RPGSH_DICE>(config.setting[DEFAULT_GAME],DiceDesignator);
+		Dice = load_map_from_file<RPGSH_DICE>(templates_dir+config.setting[DEFAULT_GAME],DiceDesignator);
 
 	}
 	RPGSH_CHAR(std::string game)
 	{
-		Attr = load_template_object<RPGSH_VAR>(game,AttributeDesignator);
+		Attr = load_map_from_file<RPGSH_VAR>(templates_dir+game,AttributeDesignator);
 		Attr[CHAR_NAME_ATTR] = "Name";
 
-		Dice = load_template_object<RPGSH_DICE>(game,DiceDesignator);
+		Dice = load_map_from_file<RPGSH_DICE>(templates_dir+game,DiceDesignator);
 	}
 
 	std::string Name()
@@ -1068,34 +1101,19 @@ class RPGSH_CHAR
 	}
 	void save()
 	{
-		check_char_path();
-
-		std::string char_path = char_folder_path+Name()+".char";
+		std::string char_path = characters_dir+Name()+".char";
 
 		if(std::filesystem::exists(char_path.c_str()))
 		{
 			std::filesystem::rename(char_path.c_str(),(char_path+".bak").c_str());
 		}
 
-		std::ofstream fs((char_path).c_str());
-		for(const auto& [key,value] : Attr)
-		{
-			//Character file format definition
-			std::string data =	AttributeDesignator+
-						DS+
-						key+
-						DS+
-						std::string(value)+
-						"\n";
-			fs<<data;
-		}
-		fs.close();
+		save_map_to_file<RPGSH_VAR>(char_path, Attr, AttributeDesignator);
+		save_map_to_file<RPGSH_DICE>(char_path, Dice, DiceDesignator);
 	}
 	void load(std::string character, bool load_bak)
 	{
-		check_char_path();
-
-		std::string char_path = char_folder_path+character+".char"+((load_bak)?".bak":"");
+		std::string char_path = characters_dir+character+".char"+((load_bak)?".bak":"");
 
 		std::ifstream fs(char_path.c_str());
 		if(!fs.good())
@@ -1106,22 +1124,14 @@ class RPGSH_CHAR
 			RPGSH_CHAR dummy = RPGSH_CHAR();
 			dummy.save();
 			dummy.set_as_current();
-			char_path = char_folder_path+Name()+".char"+((load_bak)?".bak":"");
+			char_path = characters_dir+Name()+".char"+((load_bak)?".bak":"");
 			fs.open(char_path.c_str());
 		}
 
-		while(!fs.eof())
-		{
-			std::string data = "";
-			std::getline(fs,data);
-			if(data.substr(0,data.find(DS)) == AttributeDesignator)//TODO Complete loading code
-			{
-				data = data.substr(data.find(DS)+DS.length(),
-						  (data.length() - (data.find(DS))));
-				Attr[data.substr(0,data.find(DS))] = data.substr(data.find(DS)+DS.length(),
-											       (data.length() - (data.find(DS))));
-			}
-		}
+		//Clear attributes in-case a character from a non-default game is being loaded
+		Attr.clear();
+		Attr = load_map_from_file<RPGSH_VAR>(char_path,AttributeDesignator);
+
 		fs.close();
 	}
 	void set_as_current()
