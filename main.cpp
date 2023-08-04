@@ -14,6 +14,22 @@
 RPGSH_CONFIG config = RPGSH_CONFIG();
 RPGSH_CHAR c = RPGSH_CHAR();
 
+void padding()
+{
+	//Pad output if set
+	try
+	{
+		if(stob(config.setting[PADDING]))
+		{
+			fprintf(stdout,"\n");
+		}
+	}
+	catch(...)
+	{
+		output(Error,"Invalid value \'%s\' for \'%s\'.",config.setting[PADDING].c_str(),PADDING);
+		exit(-1);
+	}
+}
 void run_rpgsh_prog(std::string args)
 {
 	std::vector<std::string> vars;
@@ -52,7 +68,7 @@ void run_rpgsh_prog(std::string args)
 					var+=args.substr(j,1);
 				}
 
-				std::ifstream ifs(shell_vars_path.c_str());
+				std::ifstream ifs(shell_vars_file.c_str());
 				while(!ifs.eof())
 				{
 					std::string old;
@@ -140,19 +156,7 @@ void run_rpgsh_prog(std::string args)
 	//Add a NULL because posix_spawn() needs that for some reason
 	argv[vars.size()] = NULL;
 
-	//Pad output if set
-	try
-	{
-		if(stob(config.setting[PADDING]))
-		{
-			fprintf(stdout,"\n");
-		}
-	}
-	catch(...)
-	{
-		output(Error,"Invalid value \'%s\' for \'%s\'.",config.setting[PADDING].c_str(),PADDING);
-		exit(-1);
-	}
+	padding();
 
 	int status = posix_spawn(&pid, argv[0], NULL, NULL, (char* const*)argv, environ);
 
@@ -178,20 +182,7 @@ void run_rpgsh_prog(std::string args)
 			output(Error,"%s (%d)",strerror(status),status);
 		}
 	}
-
-	//Pad output if set
-	try
-	{
-		if(stob(config.setting[PADDING]))
-		{
-			fprintf(stdout,"\n");
-		}
-	}
-	catch(...)
-	{
-		output(Error,"Invalid value \'%s\' for \'%s\'.",config.setting[PADDING].c_str(),PADDING);
-		exit(-1);
-	}
+	padding();
 }
 std::string input_handler()
 {
@@ -199,6 +190,7 @@ std::string input_handler()
 	#define KB_ENTER	10
 	#define KB_BACKSPACE	127
 
+	//Set terminal flags for non-buffered reading required for handling keyboard input
 	struct termios t_old, t_new;
 	tcgetattr(fileno(stdin), &t_old);
 	t_new = t_old;
@@ -216,7 +208,7 @@ std::string input_handler()
 
 		if(isprint(c))
 		{
-			if(insert_mode)
+			if(insert_mode)	//If the "Insert" key is toggled
 			{
 				if(cur_pos < input.size())
 				{
@@ -316,8 +308,11 @@ std::string input_handler()
 			}
 		}
 	}
+
+	//Reset terminal flags in-case of sudden program termination
 	tcsetattr(fileno(stdin), TCSANOW, &t_old);
 
+	//Strings need to be null-terminated
 	input.push_back('\0');
 	return input.data();
 }
@@ -355,6 +350,8 @@ int prompt()
 	}
 
 	char buffer[MAX_BUFFER_SIZE];
+
+	//Zero-out buffer so we have a known dataset
 	for(int i=0; i<MAX_BUFFER_SIZE; i++)
 	{
 		buffer[i] = '\0';
@@ -370,8 +367,8 @@ int prompt()
 	{
 		if(!strcmp(buffer,"exit"))
 		{
-			fprintf(stdout,"Exiting...\n");
-			return -1;
+			fprintf(stdout,"\nExiting...\n");
+			return 1; //Non-zero so we can exit, and positive so user can discriminate between good exits and bad exits
 		}
 		else
 		{
@@ -395,15 +392,14 @@ int prompt()
 int main()
 {
 	//Create shell vars file if it doesn't exist
-	check_root_path();
-	if(!std::filesystem::exists(shell_vars_path.c_str()))
+	if(!std::filesystem::exists(shell_vars_file.c_str()))
 	{
-		output(Info,"Shell variable storage file not found, creating file at \'%s\'.",shell_vars_path.c_str());
-		std::ofstream ofs(shell_vars_path.c_str());
+		output(Info,"Shell variable storage file not found, creating file at \'%s\'.",shell_vars_file.c_str());
+		std::ofstream ofs(shell_vars_file.c_str());
 		ofs.close();
 
 		//Set default values for built-in shell variables
-		std::map<std::string, RPGSH_VAR> Attr = load_template_object<RPGSH_VAR>(config.setting[DEFAULT_GAME],c.AttributeDesignator);
+		std::map<std::string, RPGSH_VAR> Attr = load_map_from_file<RPGSH_VAR>(templates_dir+config.setting[DEFAULT_GAME],c.AttributeDesignator);
 		set_shell_var(CURRENT_CHAR_SHELL_VAR,std::string(Attr["Name"]));
 	}
 
@@ -413,7 +409,7 @@ int main()
 	run_rpgsh_prog((char*)"banner");
 	run_rpgsh_prog((char*)"version");
 
-	while(prompt() >= 0);
+	while(prompt() == 0);
 
 	return 0;
 }
