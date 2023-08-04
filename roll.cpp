@@ -6,9 +6,6 @@ int main(int argc, char** argv)
 	bool only_total = false;
 	bool only_rolls = false;
 	bool is_list = false;
-	int Modifier = 0;
-	unsigned int Quantity = 0;
-	unsigned int Faces = 0;
 	unsigned int count = 0;
 	unsigned int repeat = 1;
 	std::string dice_str, current_arg;
@@ -178,14 +175,14 @@ int main(int argc, char** argv)
 		{
 			if(!is_list)
 			{
-				RPGSH_DICE(current_arg);
+				dice_str = current_arg;
 			}
 		}
 	}
 
-	RPGSH_DICE dice = RPGSH_DICE(Quantity,Faces,Modifier,only_rolls,only_total,is_list,count_expr,count);
+	RPGSH_DICE dice = RPGSH_DICE(dice_str,only_rolls,only_total,is_list,count_expr,count);
 
-	for(int i=0; i<repeat && Quantity>0; i++)
+	for(int i=0; i<repeat && dice.Quantity>0; i++)
 	{
 		fprintf(stdout,"%s",(repeat > 1 && i > 0) ? "\n" : "");
 		dice.roll();
