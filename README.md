@@ -54,7 +54,7 @@ When `rpgsh` first runs, it will create a `config` file at `~/.rpgsh/config`. Th
 
 Since `rpgsh` is designed as a general-purpose platform for table-top RPGs, it uses template files to determine things like character attributes, the currency used by the game, and so forth. These can be found in `~/.rpgsh/templates/` and must obey the following rules:
 
- - The name of the template file should be a shorthand for the name of the game it is acting as a template for (e.g. "dnd5e" as the name of the template file for "Dungeons and Dragons, 5th Edition"). This is because that name will need to be referenced by the user during actions like new character creation, or when specifying the `default_game` value in `/.rpgsh/config`.
+ - The name of the template file should be a shorthand for the name of the game it is acting as a template for (e.g. "dnd5e" as the name of the template file for "Dungeons and Dragons, 5th Edition"). This is because that name will need to be referenced by the user during actions like new character creation, or when specifying the `default_game` value in `~/.rpgsh/config`.
  - The file must follow the below format for each line (please see one of the templates that come default with `rpgsh` for a working example):
    - *Object Type*::*Name*::*Value*
 
