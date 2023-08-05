@@ -13,15 +13,26 @@ int main(int argc, char** argv)
 		output(Warning,"Expected only one argument. All args past \"%s\" will be ignored.",argv[1]);
 	}
 
+	if(!strcmp(argv[1],"-l") || !strcmp(argv[1],"--list"))
+	{
+		RPGSH_CHAR c = RPGSH_CHAR();
+		c.load(get_shell_var(CURRENT_CHAR_SHELL_VAR),false);
+
+		fprintf(stdout,"Display name character attribute:\t%s%s%s\n",TEXT_WHITE,c.Attr[CHAR_NAME_ATTR].c_str(),TEXT_NORMAL);
+		fprintf(stdout,"Current value of %s%%%s%s:\t\t\t%s%s%s\n",TEXT_WHITE,c.Attr[CHAR_NAME_ATTR].c_str(),TEXT_NORMAL,TEXT_WHITE,c.Name().c_str(),TEXT_NORMAL);
+		return 0;
+	}
 	if(!strcmp(argv[1],"-?") || !strcmp(argv[1],"--help"))
 	{
 		fprintf(stdout,"Sets the character attribute to be used when displaying the character's name.\n\n");
 		fprintf(stdout,"USAGE:\n");
 		fprintf(stdout,"\tsetname %sattr%s		Sets the character attribute for their display name to the character attribute %sattr%s. The \'%%\' must be omitted.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\tsetname [-l|--list]	Lists current display name character attribute and value.\n");
 		fprintf(stdout,"\tsetname [-?|--help]	Displays this help text.\n");
 		fprintf(stdout,"\n");
 		fprintf(stdout,"EXAMPLES:\n");
 		fprintf(stdout,"\tsetname FirstName	Sets the character attribute for their display name to \"FirstName\".\n");
+		fprintf(stdout,"\tsetname --list		Display the current display name attribute and value.\n");
 		fprintf(stdout,"\tsetname -?		Displays help text.\n");
 		return 0;
 	}
