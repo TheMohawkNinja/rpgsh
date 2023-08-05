@@ -1,15 +1,11 @@
 #pragma once
 
 #include <string>
-#include <string.h>
 #include <map>
 #include <vector>
-#include <cctype>
-#include <climits>
 #include <fstream>
 #include <filesystem>
 #include <cstdarg>
-#include <unistd.h>
 #include "define.h"
 #include "text.h"
 

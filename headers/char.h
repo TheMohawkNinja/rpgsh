@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string.h>
-#include <map>
 #include "config.h"
 #include "currency.h"
 #include "dice.h"

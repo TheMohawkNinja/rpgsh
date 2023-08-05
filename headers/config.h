@@ -1,6 +1,5 @@
 #pragma once
 
-#include <string.h>
 #include "functions.h"
 
 class RPGSH_CONFIG

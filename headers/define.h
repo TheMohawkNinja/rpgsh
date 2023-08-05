@@ -1,6 +1,7 @@
 #pragma once
 
-#include <string.h>
+#include <string>
+#include <unistd.h>//getlogin()
 
 //Version info
 #define MAJOR_VERSION		0
