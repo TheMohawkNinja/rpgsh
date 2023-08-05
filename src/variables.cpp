@@ -1,6 +1,6 @@
-#include <vector>
-#include <filesystem>
-#include "classes.h"
+#include "../headers/char.h"
+#include "../headers/functions.h"
+#include "../headers/var.h"
 
 RPGSH_CHAR c = RPGSH_CHAR();
 

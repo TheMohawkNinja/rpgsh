@@ -1,5 +1,5 @@
-#include <filesystem>
-#include "classes.h"
+#include "../headers/dice.h"
+#include "../headers/functions.h"
 
 int main(int argc, char** argv)
 {

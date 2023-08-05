@@ -1,13 +1,10 @@
-#include <stdio.h>
-#include <vector>
-#include <string>
-#include <string.h>
 #include <spawn.h>
 #include <termios.h>
 #include <fcntl.h>
 #include <sys/wait.h>
-#include "text.h"
-#include "classes.h"
+#include "../headers/char.h"
+#include "../headers/config.h"
+#include "../headers/functions.h"
 
 #define MAX_BUFFER_SIZE 256
 
