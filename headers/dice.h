@@ -342,7 +342,7 @@ class RPGSH_DICE
 		fprintf(stdout,"\t│                                       │\n");
 		for(int i=0; i<Faces; i++)
 		{
-			float percent = 100-(((float)result_quantity[i]/((float)Quantity/(float)Faces))*100);
+			float percent = ((float)result_quantity[i]/((float)Quantity/(float)Faces))*100-100;
 			fprintf(stdout,"\t│ # of %d's: %s%d (%s%s%.2f%%%s from perfect) │\n",(i+1),(i<9)?" ":"",result_quantity[i],(percent>=0)?plus.c_str():"",TEXT_WHITE,percent,TEXT_NORMAL);
 		}
 		fprintf(stdout,"\t└───────────────────────────────────────┘\n");
