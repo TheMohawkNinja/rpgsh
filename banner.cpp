@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <string>
-#include "../headers/text.h"
+#include "text.h"
 
 int main()
 {

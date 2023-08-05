@@ -1,5 +1,4 @@
-#include "../headers/char.h"
-#include "../headers/functions.h"
+#include "classes.h"
 
 int main(int argc, char** argv)
 {

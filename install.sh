@@ -7,18 +7,18 @@ root_dir="/home/$USER/.rpgsh/"
 characters_dir="$root_dir""characters/"
 templates_dir="$root_dir""templates/"
 
-echo -e "Compiling:\tsrc/main.cpp\t\t->\t$bold_white""rpgsh"$normal
-g++ src/main.cpp -o rpgsh
-echo -e "Compiling:\tsrc/setname.cpp\t\t->\t$bold_white""rpgsh-setname"$normal
-g++ src/setname.cpp -o rpgsh-setname
-echo -e "Compiling:\tsrc/variables.cpp\t->\t$bold_white""rpgsh-variables"$normal
-g++ src/variables.cpp -o rpgsh-variables
-echo -e "Compiling:\tsrc/version.cpp\t\t->\t$bold_white""rpgsh-version"$normal
-g++ src/version.cpp -o rpgsh-version
-echo -e "Compiling:\tsrc/banner.cpp\t\t->\t$bold_white""rpgsh-banner"$normal
-g++ src/banner.cpp -o rpgsh-banner
-echo -e "Compiling:\tsrc/roll.cpp\t\t->\t$bold_white""rpgsh-roll"$normal
-g++ src/roll.cpp -o rpgsh-roll
+echo -e "Compiling:\tmain.cpp\t->\t$bold_white""rpgsh"$normal
+g++ main.cpp -lstdc++fs -std=c++17 -o rpgsh
+echo -e "Compiling:\tsetname.cpp\t->\t$bold_white""rpgsh-setname"$normal
+g++ setname.cpp -lstdc++fs -std=c++17 -o rpgsh-setname
+echo -e "Compiling:\tvariables.cpp\t->\t$bold_white""rpgsh-variables"$normal
+g++ variables.cpp -lstdc++fs -std=c++17 -o rpgsh-variables
+echo -e "Compiling:\tversion.cpp\t->\t$bold_white""rpgsh-version"$normal
+g++ version.cpp -lstdc++fs -std=c++17 -o rpgsh-version
+echo -e "Compiling:\tbanner.cpp\t->\t$bold_white""rpgsh-banner"$normal
+g++ banner.cpp -o rpgsh-banner
+echo -e "Compiling:\troll.cpp\t->\t$bold_white""rpgsh-roll"$normal
+g++ roll.cpp -lstdc++fs -std=c++17 -o rpgsh-roll
 
 echo
 

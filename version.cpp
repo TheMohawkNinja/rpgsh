@@ -1,4 +1,5 @@
-#include "../headers/functions.h"
+#include <stdio.h>
+#include "classes.h"
 
 int main()
 {
