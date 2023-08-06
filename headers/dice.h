@@ -12,7 +12,7 @@ class RPGSH_DICE
 		bool is_list = false;
 		unsigned int count = 0;
 		unsigned int total_count = 0;
-		std::string dice = "";
+		std::string dice_list = "";
 		std::string Quantity_str = "";
 		std::string Faces_str = "";
 		std::string count_expr = "";
@@ -152,17 +152,24 @@ class RPGSH_DICE
 	}
 	RPGSH_DICE(std::string dice_str, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count)
 	{
-		if(dice_str.substr(0,1) != "d")
+		if(!_is_list)
 		{
-			Quantity = get_value(dice_str,"quantity",0,"d",false,true);
-			Faces = get_value(dice_str,"faces",dice_str.find("d",0) + 1,"",false,true);
-			Modifier = get_value(dice_str,"modifier",dice_str.find(std::to_string(Faces),dice_str.find("d",0)) + std::to_string(Faces).length(),"",true,false);
+			if(dice_str.substr(0,1) != "d")
+			{
+				Quantity = get_value(dice_str,"quantity",0,"d",false,true);
+				Faces = get_value(dice_str,"faces",dice_str.find("d",0) + 1,"",false,true);
+				Modifier = get_value(dice_str,"modifier",dice_str.find(std::to_string(Faces),dice_str.find("d",0)) + std::to_string(Faces).length(),"",true,false);
+			}
+			else
+			{
+				Quantity = 1;
+				Faces = get_value(dice_str,"faces",dice_str.find("d",0) + 1,"",false,true);
+				Modifier = get_value(dice_str,"modifier",dice_str.find(std::to_string(Faces),dice_str.find("d",0)) + std::to_string(Faces).length(),"",true,false);
+			}
 		}
 		else
 		{
-			Quantity = 1;
-			Faces = get_value(dice_str,"faces",dice_str.find("d",0) + 1,"",false,true);
-			Modifier = get_value(dice_str,"modifier",dice_str.find(std::to_string(Faces),dice_str.find("d",0)) + std::to_string(Faces).length(),"",true,false);
+			dice_list = dice_str;
 		}
 
 		just_show_rolls = _just_show_rolls;
@@ -298,35 +305,54 @@ class RPGSH_DICE
 		}
 		else if(is_list)
 		{
-			try
+			std::string list_line = "";
+			std::string list_path = "";
+			std::vector<std::string> values;
+			std::ifstream fs;
+
+			if(dice_list.substr(0,1) != "/" && dice_list.substr(0,2) != "./" && dice_list.substr(0,3) != "../")//If not specifying path, assume it's something in the dice-lists folder
 			{
-				std::string tmp = "";
-				std::vector<std::string> values;
-				std::ifstream fs(dice);
-
-				while(std::getline(fs,tmp))
-				{
-					values.push_back(tmp);
-					tmp = "";
-				}
-				fs.close();
-
-				fs.open(random_seed_path);
-				std::string data, seed;
-				int result;
-				std::getline(fs,data);
-				fs.close();
-
-				seed += data;
-				std::srand((int)seed[0] * (int)seed[seed.length()-1]);
-				std::srand(std::rand());//Mitigates apparent roll biasing when Faces%result=0
-				fprintf(stdout,"%s\n",values[std::rand() % values.size()].c_str());
+				list_path = dice_lists_dir+dice_list;
 			}
-			catch(...)
+			else//Otherwise, user is specifying a path outside of the dice-lists folder, so just go with what the user inputted
 			{
-				output(Error,"Unable to open file \"%s\"",dice.c_str());
+				list_path = dice_list;
+			}
+
+			if(std::filesystem::exists(list_path))
+			{
+				fs.open(list_path);
+				if(!fs.good())
+				{
+					output(Error,"Unable to open dice list \"%s\".",list_path.c_str());
+				}
+			}
+			else
+			{
+				output(Error,"Dice list \"%s\" does not exist.",list_path.c_str());
 				exit(-1);
 			}
+
+			while(std::getline(fs,list_line))//Get values from dice list, making sure to ignore blank space and comments
+			{
+				if(list_line != "" && list_line[0] != COMMENT)
+				{
+					values.push_back(list_line);
+					list_line = "";
+				}
+			}
+			fs.close();
+
+			fs.open(random_seed_path);
+			std::string data, seed;
+			int result;
+			std::getline(fs,data);
+			fs.close();
+
+			seed += data;
+			std::srand((int)seed[0] * (int)seed[seed.length()-1]);
+			std::srand(std::rand());//Mitigates apparent roll biasing when Faces%result=0
+			fprintf(stdout,"%s\n",values[std::rand() % values.size()].c_str());
 		}
 	}
 	void test()

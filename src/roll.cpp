@@ -57,16 +57,9 @@ int main(int argc, char** argv)
 					output(Error,"No path specified.");
 					return -1;
 				}
-				else if(std::filesystem::exists(argv[arg+1]))
-				{
-					dice_str = argv[arg+1];
-					is_list = true;
-				}
-				else
-				{
-					output(Error,"File \"%s\" not found.",argv[arg+1]);
-					return -1;
-				}
+				dice_str = argv[arg+1];
+				is_list = true;
+				arg++;
 			}
 			else if(current_arg == "-c" || current_arg == "--count")
 			{
@@ -141,7 +134,8 @@ int main(int argc, char** argv)
 			{
 				fprintf(stdout,"A simple dice rolling program.\n\n");
 				fprintf(stdout,"USAGE:\n");
-				fprintf(stdout,"\troll [%sc%s]d%sf%s[+%sm%s|-%sm%s] [-r %sn%s] [-l %spath%s] [--only-rolls|--only-total]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+				fprintf(stdout,"\troll [%sc%s]d%sf%s[+%sm%s|-%sm%s] [-r %sn%s] [--only-rolls|--only-total]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+				fprintf(stdout,"\troll [-l|--list] %slist%s [-r %sn%s]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 				fprintf(stdout,"\troll [-t|--test]\n");
 				fprintf(stdout,"\troll [-?|--help]\n");
 				fprintf(stdout,"\n");
@@ -149,7 +143,9 @@ int main(int argc, char** argv)
 				fprintf(stdout,"\t%sf%s			The number of faces on each die being rolled.\n",TEXT_ITALIC,TEXT_NORMAL);
 				fprintf(stdout,"\t%sm%s			The modifier for the total roll.\n",TEXT_ITALIC,TEXT_NORMAL);
 				fprintf(stdout,"\t-r %sn%s|--repeat %sn%s		Repeat the roll %sn%s times.\n\t\t\t\tSet to 1 if omitted.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
-				fprintf(stdout,"\t-l %spath%s|--list %spath%s	Rolls a die with custom faces sourced from %spath%s (newline delimited).\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+				fprintf(stdout,"\t-l %slist%s|--list %slist%s	Rolls a die with custom faces sourced from %slist%s (newline delimited).\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+				fprintf(stdout,"\t\t\t\tIf %slist%s does not start with a \'/\', \'./\', or \'../\' roll will check the \"%s\" directory.\n",TEXT_ITALIC,TEXT_NORMAL,dice_lists_dir.c_str());
+				fprintf(stdout,"\t\t\t\tOtherwise it will check the path specified by the user.\n");
 				fprintf(stdout,"\t-c %sexpr%s|--count %sexpr%s	Count how many dice rolls meet a criteria defined by a boolean expression (=,<,>,<=,>=,!=) and a numerical value.\n\t\t\t\tIf the boolean expression is omitted, it is assumed to be \"=\".\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 				fprintf(stdout,"\t--only-rolls		Only display dice rolls.\n");
 				fprintf(stdout,"\t--only-total		Only display total of the roll.\n");
@@ -158,8 +154,8 @@ int main(int argc, char** argv)
 				fprintf(stdout,"\n");
 				fprintf(stdout,"EXAMPLES:\n");
 				fprintf(stdout,"\troll 4d8+3			Rolls an 8-sided die 4 times, then adds 3 to the result.\n");
-				fprintf(stdout,"\troll 3d6+2 -r 5			Rolls a 6-sided die 3 times, then adds 2 to the result. Repeat this 5 times.\n");
-				fprintf(stdout,"\troll -l ./mylist		Rolls a dice with faces derived from the lines in the file \"./mylist\".\n");
+				fprintf(stdout,"\troll 3d6+2 -r 5			Rolls a 6-sided die 3 times, then adds 2 to the result. Repeats 5 times.\n");
+				fprintf(stdout,"\troll -l chaos-burst-2.0		Rolls a dice with faces derived from the lines in the file \".%s\".\n",(dice_lists_dir+"chaos-burts-2.0").c_str());
 				fprintf(stdout,"\troll 10d20 -c >=15		Rolls a 20-sided die 10 times and counts the number of rolls greater than or equal to 15.\n");
 				fprintf(stdout,"\troll 2d10-5 --only-total	Rolls a 10-sided die twice, then subtracts 5 to the result. Only displays the total of the result.\n");
 				fprintf(stdout,"\troll --test			Initiates a roll test.\n");
@@ -181,6 +177,15 @@ int main(int argc, char** argv)
 	}
 
 	RPGSH_DICE dice = RPGSH_DICE(dice_str,only_rolls,only_total,is_list,count_expr,count);
+
+	if(is_list)
+	{
+		for(int i=0; i<repeat; i++)
+		{
+			fprintf(stdout,"%s",(repeat > 1 && i > 0) ? "\n" : "");
+			dice.roll();
+		}
+	}
 
 	for(int i=0; i<repeat && dice.Quantity>0; i++)
 	{
