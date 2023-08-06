@@ -4,8 +4,6 @@
 
 class RPGSH_CONFIG
 {
-	#define COMMENT '#'
-
 	// Configuration file definition:
 	//
 	// Name=Value

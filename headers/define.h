@@ -8,6 +8,9 @@
 #define MINOR_VERSION		5
 #define PATCH_VERSION		8
 
+//Comment character definition
+#define COMMENT			'#'
+
 //Variable character definitions
 #define SHELL_VAR		'$'
 #define CHAR_VAR		'%'
@@ -31,6 +34,7 @@ std::string shell_vars_file = root_dir+".shell";
 std::string config_file = root_dir+"config";
 std::string characters_dir = root_dir + "characters/";
 std::string templates_dir = root_dir + "templates/";
+std::string dice_lists_dir = root_dir + "dice-lists/";
 
 //Data separator string. Name shortened for brevity in the code.
 std::string DS = "::";
