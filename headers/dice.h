@@ -116,7 +116,6 @@ class RPGSH_DICE
 		}
 	}
 
-
 	public:
 		unsigned int	Quantity	=	0;
 		unsigned int	Faces		=	0;
@@ -346,13 +345,29 @@ class RPGSH_DICE
 			fs.open(random_seed_path);
 			std::string data, seed;
 			int result;
-			std::getline(fs,data);
+			do
+			{
+				std::getline(fs,data);
+			}while((int)data[0] == 0); //Prevents crashing on first seed when (int)seed[0] == 0
 			fs.close();
 
 			seed += data;
 			std::srand((int)seed[0] * (int)seed[seed.length()-1]);
 			std::srand(std::rand());//Mitigates apparent roll biasing when Faces%result=0
-			fprintf(stdout,"%s\n",values[std::rand() % values.size()].c_str());
+			result = std::rand() % values.size();
+
+			if(!just_show_total && !just_show_rolls)
+			{
+				fprintf(stdout,"[Roll result: %s%d%s]\n",TEXT_WHITE,result,TEXT_NORMAL);
+			}
+			if(!just_show_rolls)
+			{
+				fprintf(stdout,"%s\n",values[result].c_str());
+			}
+			else
+			{
+				fprintf(stdout,"%d\n",result);
+			}
 		}
 	}
 	void test()

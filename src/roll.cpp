@@ -135,7 +135,7 @@ int main(int argc, char** argv)
 				fprintf(stdout,"A simple dice rolling program.\n\n");
 				fprintf(stdout,"USAGE:\n");
 				fprintf(stdout,"\troll [%sc%s]d%sf%s[+%sm%s|-%sm%s] [-r %sn%s] [--only-rolls|--only-total]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
-				fprintf(stdout,"\troll [-l|--list] %slist%s [-r %sn%s]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+				fprintf(stdout,"\troll [-l|--list] %slist%s [-r %sn%s] [--only-rolls|--only-total]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 				fprintf(stdout,"\troll [-t|--test]\n");
 				fprintf(stdout,"\troll [-?|--help]\n");
 				fprintf(stdout,"\n");
@@ -149,13 +149,15 @@ int main(int argc, char** argv)
 				fprintf(stdout,"\t-c %sexpr%s|--count %sexpr%s	Count how many dice rolls meet a criteria defined by a boolean expression (=,<,>,<=,>=,!=) and a numerical value.\n\t\t\t\tIf the boolean expression is omitted, it is assumed to be \"=\".\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 				fprintf(stdout,"\t--only-rolls		Only display dice rolls.\n");
 				fprintf(stdout,"\t--only-total		Only display total of the roll.\n");
+				fprintf(stdout,"\t\t\t\tWhen used with -l, the \"Roll result\" text is omitted.\n");
 				fprintf(stdout,"\t-t|--test		Rolls 100000d20 and displays results with percent deviation from perfect distribution.\n");
 				fprintf(stdout,"\t-h|--help		Displays help text.\n");
 				fprintf(stdout,"\n");
 				fprintf(stdout,"EXAMPLES:\n");
+				fprintf(stdout,"\troll d20			Rolls a single 20-sided die.\n");
 				fprintf(stdout,"\troll 4d8+3			Rolls an 8-sided die 4 times, then adds 3 to the result.\n");
 				fprintf(stdout,"\troll 3d6+2 -r 5			Rolls a 6-sided die 3 times, then adds 2 to the result. Repeats 5 times.\n");
-				fprintf(stdout,"\troll -l chaos-burst-2.0		Rolls a dice with faces derived from the lines in the file \".%s\".\n",(dice_lists_dir+"chaos-burts-2.0").c_str());
+				fprintf(stdout,"\troll -l chaos-burst-2.0		Rolls a dice with faces derived from the lines in the file \"%s\".\n",(dice_lists_dir+"chaos-burts-2.0").c_str());
 				fprintf(stdout,"\troll 10d20 -c >=15		Rolls a 20-sided die 10 times and counts the number of rolls greater than or equal to 15.\n");
 				fprintf(stdout,"\troll 2d10-5 --only-total	Rolls a 10-sided die twice, then subtracts 5 to the result. Only displays the total of the result.\n");
 				fprintf(stdout,"\troll --test			Initiates a roll test.\n");
