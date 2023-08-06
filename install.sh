@@ -6,6 +6,7 @@ normal="\e[0m"
 root_dir="/home/$USER/.rpgsh/"
 characters_dir="$root_dir""characters/"
 templates_dir="$root_dir""templates/"
+dice_lists_dir="$root_dir""dice-lists/"
 
 echo -e "Compiling:\tsrc/main.cpp\t\t->\t$bold_white""rpgsh"$normal
 g++ src/main.cpp -o rpgsh
@@ -23,13 +24,19 @@ g++ src/roll.cpp -o rpgsh-roll
 echo
 
 if [ ! -d "$root_dir" ]; then echo -e "Creating root directory at:\t\t$bold_white""$root_dir$normal"; mkdir "$root_dir"; fi
-if [ ! -d "$characters_dir" ]; then echo -e "Creating character directory at:\t$bold_white""$characters_dir$normal"; mkdir "$characters_dir"; fi
+if [ ! -d "$characters_dir" ]; then echo -e "Creating characters directory at:\t$bold_white""$characters_dir$normal"; mkdir "$characters_dir"; fi
 if [ ! -d "$templates_dir" ]; then echo -e "Creating templates directory at:\t$bold_white""$templates_dir$normal"; mkdir "$templates_dir"; fi
+if [ ! -d "$dice_lists_dir" ]; then echo -e "Creating dice lists directory at:\t$bold_white""$dice_lists_dir$normal"; mkdir "$dice_lists_dir"; fi
 
 echo
 
 echo "Copying templates..."
 for i in $(ls templates); do echo -e "\t$bold_white""$i"$normal; cp "templates/$i" "$templates_dir$i"; done
+
+echo
+
+echo "Copying dice lists..."
+for i in $(ls dice-lists); do echo -e "\t$bold_white""$i"$normal; cp "dice-lists/$i" "$dice_lists_dir$i"; done
 
 echo
 
