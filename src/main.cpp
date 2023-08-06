@@ -271,8 +271,22 @@ std::string input_handler()
 						cur_pos = 0;
 					}
 					break;
+				case '7':	//Home
+					if(getchar() == '~' && cur_pos > 0)
+					{
+						fprintf(stdout,"\e[%dD",cur_pos);
+						cur_pos = 0;
+					}
+					break;
 				case 'F':	//End
 					if(cur_pos < input.size())
+					{
+						fprintf(stdout,"\e[%dC",input.size()-cur_pos);
+						cur_pos = input.size();
+					}
+					break;
+				case '8':	//End
+					if(getchar() == '~' && cur_pos < input.size())
 					{
 						fprintf(stdout,"\e[%dC",input.size()-cur_pos);
 						cur_pos = input.size();
