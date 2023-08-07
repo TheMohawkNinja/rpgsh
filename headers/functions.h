@@ -163,19 +163,16 @@ std::map<std::string, T>load_map_from_file(std::string path, std::string obj_id)
 		T value;
 
 		std::getline(fs,data);
-		if(data != "")
+		if(data != "" && data[0] != COMMENT && data.substr(0,data.find(DS)) == obj_id)
 		{
-			if(data.substr(0,data.find(DS)) ==  obj_id)
-			{
-				obj = data.substr(0,data.find(DS));
-				key = data.substr(data.find(obj)+obj.length()+DS.length(),
-						 (data.rfind(DS)-(data.find(obj)+obj.length()+DS.length())));
+			obj = data.substr(0,data.find(DS));
+			key = data.substr(data.find(obj)+obj.length()+DS.length(),
+					 (data.rfind(DS)-(data.find(obj)+obj.length()+DS.length())));
 
-				// IMPORTANT: This requires that there exist a constructor T(std::string)
-				value = T(data.substr(data.rfind(DS)+DS.length(),
-						     (data.length()-data.rfind(DS)+DS.length())));
-				map[key] = value;
-			}
+			// IMPORTANT: This requires that there exist a constructor T(std::string)
+			value = T(data.substr(data.rfind(DS)+DS.length(),
+					     (data.length()-data.rfind(DS)+DS.length())));
+			map[key] = value;
 		}
 	}
 	fs.close();
