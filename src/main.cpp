@@ -1,6 +1,5 @@
 #include <spawn.h>
 #include <termios.h>
-#include <fcntl.h>
 #include <sys/wait.h>
 #include "../headers/char.h"
 #include "../headers/config.h"
@@ -55,7 +54,7 @@ void run_rpgsh_prog(std::string args)
 				}
 				int new_args_start = find_percent + var.length() + 1;
 				args = args.substr(0,find_percent)+c.Attr[var].c_str()+
-					args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
+				       args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
 			}
 			else if(args[i] == SHELL_VAR)
 			{
@@ -76,15 +75,16 @@ void run_rpgsh_prog(std::string args)
 					{
 						int new_args_start = find_dollar + var.length() + 1;
 						old = data.substr(data.find(DS)+DS.length(),
-								data.length()-(data.find(DS)+DS.length()));
+								  data.length()-(data.find(DS)+DS.length()));
 
 						if(old.find(" ") != std::string::npos)
 						{
 							old = "\"" + old + "\"";
 						}
 
-						args = args.substr(0,find_dollar)+old+
-							args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
+						args = args.substr(0,find_dollar)+
+						       old+
+						       args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
 						break;
 					}
 				}
