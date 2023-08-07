@@ -224,7 +224,7 @@ class RPGSH_VAR
 			}
 			else
 			{
-				output(Error,"Ambiguous operation between numerical and non-numerical values.");
+				output(Error,"Cannot increment non-numerical value.");
 			}
 			return *this;
 		}
@@ -241,7 +241,7 @@ class RPGSH_VAR
 			}
 			else
 			{
-				output(Error,"Ambiguous operation between numerical and non-numerical values.");
+				output(Error,"Cannot decrement non-numerical value.");
 			}
 			return *this;
 		}
