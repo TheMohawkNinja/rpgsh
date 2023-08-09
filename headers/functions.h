@@ -7,44 +7,8 @@
 #include <filesystem>
 #include <cstdarg>
 #include "define.h"
-#include "text.h"
-
-enum output_level
-{
-	Info,
-	Warning,
-	Error
-};
-void output(output_level level, const char* format, ...)
-{
-	FILE* stream;
-	std::string prefix = "";
-	std::string color;
-	va_list args;
-	va_start(args, format);
-
-	switch(level)
-	{
-		case Info:
-			stream = stdout;
-			prefix = "%s%s[%sINFO%s]%s    ";
-			color = TEXT_CYAN;
-			break;
-		case Warning:
-			stream = stderr;
-			prefix = "%s%s[%sWARNING%s]%s ";
-			color = TEXT_YELLOW;
-			break;
-		case Error:
-			stream = stderr;
-			prefix = "%s%s[%sERROR%s]%s   ";
-			color = TEXT_RED;
-			break;
-	}
-	fprintf(stream,prefix.c_str(),TEXT_BOLD,TEXT_WHITE,color.c_str(),TEXT_WHITE,color.c_str());
-	vfprintf(stream,format,args);
-	fprintf(stream,"%s\n",TEXT_NORMAL);
-}
+#include "output.h"
+#include "var.h"
 
 bool stob(std::string s)
 {
@@ -114,7 +78,7 @@ void set_shell_var(std::string var,std::string value)
 }
 
 template <typename T>
-void save_map_to_file(std::string path, std::map<std::string, T> map, std::string obj_id)
+void save_obj_to_file(std::string path, T obj, std::string obj_id)
 {
 	std::ofstream fs(path, std::ios::app);
 	if(!fs.good())
@@ -123,7 +87,7 @@ void save_map_to_file(std::string path, std::map<std::string, T> map, std::strin
 		exit(-1);
 	}
 
-	for(const auto& [key,value] : map)
+	for(const auto& [key,value] : obj)
 	{
 		//Template/Character file format definition
 		std::string data =	obj_id+
@@ -138,9 +102,9 @@ void save_map_to_file(std::string path, std::map<std::string, T> map, std::strin
 }
 
 template <typename T>
-std::map<std::string, T>load_map_from_file(std::string path, std::string obj_id)
+RPGSH_OBJ<T> load_obj_from_file(std::string path, std::string var_id)
 {
-	std::map<std::string, T> map;
+	RPGSH_OBJ<T> obj;
 
 	if(!std::filesystem::exists(path))
 	{
@@ -158,24 +122,24 @@ std::map<std::string, T>load_map_from_file(std::string path, std::string obj_id)
 	while(!fs.eof())
 	{
 		std::string data = "";
-		std::string obj = "";
+		std::string var = "";
 		std::string key = "";
 		T value;
 
 		std::getline(fs,data);
-		if(data != "" && data[0] != COMMENT && data.substr(0,data.find(DS)) == obj_id)
+		if(data != "" && data[0] != COMMENT && data.substr(0,data.find(DS)) == var_id)
 		{
-			obj = data.substr(0,data.find(DS));
-			key = data.substr(data.find(obj)+obj.length()+DS.length(),
-					 (data.rfind(DS)-(data.find(obj)+obj.length()+DS.length())));
+			var = data.substr(0,data.find(DS));
+			key = data.substr(data.find(var)+var.length()+DS.length(),
+					 (data.rfind(DS)-(data.find(var)+var.length()+DS.length())));
 
-			// IMPORTANT: This requires that there exist a constructor T(std::string)
+			//NOTE: This requires that the constructor T(std::string) exists!
 			value = T(data.substr(data.rfind(DS)+DS.length(),
-					     (data.length()-data.rfind(DS)+DS.length())));
-			map[key] = value;
+				 (data.length()-data.rfind(DS)+DS.length())));
+			obj[key] = value;
 		}
 	}
 	fs.close();
 
-	return map;
+	return obj;
 }

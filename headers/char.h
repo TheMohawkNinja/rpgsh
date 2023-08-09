@@ -6,7 +6,6 @@
 #include "dice.h"
 #include "functions.h"
 #include "spell.h"
-#include "var.h"
 
 class RPGSH_CHAR
 {
@@ -16,8 +15,8 @@ class RPGSH_CHAR
 		std::string DiceDesignator		=	"Dice";
 		std::string CurrencyDesignator		=	"Currency";
 
-		std::map<std::string, RPGSH_VAR> Attr;
-		std::map<std::string, RPGSH_DICE> Dice;
+		RPGSH_OBJ<RPGSH_VAR> Attr;
+		RPGSH_OBJ<RPGSH_DICE> Dice;
 		RPGSH_CURRENCY		Currency	=	RPGSH_CURRENCY();
 		std::vector<RPGSH_SPELL>Spellbook	=	{};
 
@@ -25,18 +24,18 @@ class RPGSH_CHAR
 	{
 		RPGSH_CONFIG config = RPGSH_CONFIG();
 
-		Attr = load_map_from_file<RPGSH_VAR>(templates_dir+config.setting[DEFAULT_GAME],AttributeDesignator);
+		Attr = load_obj_from_file<RPGSH_VAR>(templates_dir+config.setting[DEFAULT_GAME],AttributeDesignator);
 		Attr[CHAR_NAME_ATTR] = "Name";
 
-		Dice = load_map_from_file<RPGSH_DICE>(templates_dir+config.setting[DEFAULT_GAME],DiceDesignator);
+		Dice = load_obj_from_file<RPGSH_DICE>(templates_dir+config.setting[DEFAULT_GAME],DiceDesignator);
 
 	}
 	RPGSH_CHAR(std::string game)
 	{
-		Attr = load_map_from_file<RPGSH_VAR>(templates_dir+game,AttributeDesignator);
+		Attr = load_obj_from_file<RPGSH_VAR>(templates_dir+game,AttributeDesignator);
 		Attr[CHAR_NAME_ATTR] = "Name";
 
-		Dice = load_map_from_file<RPGSH_DICE>(templates_dir+game,DiceDesignator);
+		Dice = load_obj_from_file<RPGSH_DICE>(templates_dir+game,DiceDesignator);
 	}
 
 	std::string Name()
@@ -52,8 +51,8 @@ class RPGSH_CHAR
 			std::filesystem::rename(char_path.c_str(),(char_path+".bak").c_str());
 		}
 
-		save_map_to_file<RPGSH_VAR>(char_path, Attr, AttributeDesignator);
-		save_map_to_file<RPGSH_DICE>(char_path, Dice, DiceDesignator);
+		save_obj_to_file<RPGSH_OBJ<RPGSH_VAR>>(char_path, Attr, AttributeDesignator);
+		save_obj_to_file<RPGSH_OBJ<RPGSH_DICE>>(char_path, Dice, DiceDesignator);
 	}
 	void load(std::string character, bool load_bak)
 	{
@@ -76,8 +75,8 @@ class RPGSH_CHAR
 		Attr.clear();
 		Dice.clear();
 
-		Attr = load_map_from_file<RPGSH_VAR>(char_path,AttributeDesignator);
-		Dice = load_map_from_file<RPGSH_DICE>(char_path,DiceDesignator);
+		Attr = load_obj_from_file<RPGSH_VAR>(char_path,AttributeDesignator);
+		Dice = load_obj_from_file<RPGSH_DICE>(char_path,DiceDesignator);
 
 		fs.close();
 	}

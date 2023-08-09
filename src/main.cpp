@@ -410,7 +410,7 @@ int main()
 		ofs.close();
 
 		//Set default values for built-in shell variables
-		std::map<std::string, RPGSH_VAR> Attr = load_map_from_file<RPGSH_VAR>(templates_dir+config.setting[DEFAULT_GAME],c.AttributeDesignator);
+		RPGSH_OBJ Attr = load_obj_from_file<RPGSH_VAR>(templates_dir+config.setting[DEFAULT_GAME],c.AttributeDesignator);
 		set_shell_var(CURRENT_CHAR_SHELL_VAR,std::string(Attr["Name"]));
 	}
 

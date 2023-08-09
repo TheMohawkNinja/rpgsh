@@ -1,6 +1,6 @@
 #pragma once
 
-#include "functions.h"
+#include "output.h"
 
 class RPGSH_VAR
 {
@@ -345,3 +345,50 @@ RPGSH_VAR operator / (const int a, const RPGSH_VAR b)
 	result /= b;
 	return result;
 }
+
+template <typename T>
+class RPGSH_OBJ
+{
+	private:
+		std::map<std::string, T> Properties;
+
+	public:
+
+	//Allows an std::map<std::string,RPGSH_OBJ> to be called as: map_name["obj_str"]["var_str"]
+	//Basically, a map of RPGSH_OBJ acts as a 2D std::map which takes two string coordinates and returns an RPGSH_VAR
+	T& operator [] (const std::string s)
+	{
+		return Properties[s];
+	}
+
+	//Iterator type for the class
+	using iterator = typename std::map<std::string, T>::const_iterator;
+
+	//Beginning and end iterators. This is so I can use "for(const auto& [key,val] : RPGSH_OBJ){}"
+	iterator begin() const
+	{
+		return Properties.begin();
+	}
+	iterator end() const
+	{
+		return Properties.end();
+	}
+
+	RPGSH_OBJ(){}
+	RPGSH_OBJ(std::string s, T var)
+	{
+		Properties[s] = var;
+	}
+	RPGSH_OBJ(std::map<std::string, T> map)
+	{
+		for(auto const& [key, value] : map)
+		{
+			Properties[key] = value;
+		}
+	}
+
+	void clear()
+	{
+		Properties.clear();
+	}
+};
