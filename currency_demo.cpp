@@ -10,16 +10,18 @@ class RPGSH_CURRENCY
 		RPGSH_CURRENCYSYSTEM* ParentCurrencySystem = nullptr;
 		std::string Name = "";
 		int Quantity = 0;
-		std::string ConversionDown = "";
-		std::string ConversionUp = "";
+		int SmallerAmount = 0;
+		std::string Smaller = "";
+		std::string Larger = "";
 
 	RPGSH_CURRENCY(){}
-	RPGSH_CURRENCY(std::string _Name, int _Quantity, std::string _ConversionDown, std::string _ConversionUp)
+	RPGSH_CURRENCY(std::string _Name, int _Quantity, int _SmallerAmount, std::string _Smaller, std::string _Larger)
 	{
 		Name = _Name;
 		Quantity = _Quantity;
-		ConversionDown = _ConversionDown;
-		ConversionUp = _ConversionUp;
+		Smaller = _Smaller;
+		SmallerAmount = _SmallerAmount;
+		Larger = _Larger;
 	}
 
 	void AttachToCurrencySystem(RPGSH_CURRENCYSYSTEM* _CurrencySystem);
@@ -30,6 +32,7 @@ class RPGSH_CURRENCYSYSTEM
 {
 	public:
 		std::map<std::string, RPGSH_CURRENCY> Currency;
+		RPGSH_CURRENCY transaction = RPGSH_CURRENCY();
 
 	RPGSH_CURRENCY& operator [] (const std::string b)
 	{
@@ -93,6 +96,8 @@ void RPGSH_CURRENCY::AttachToCurrencySystem(RPGSH_CURRENCYSYSTEM* _CurrencySyste
 RPGSH_CURRENCY& RPGSH_CURRENCY::operator -= (const int b)
 {
 	fprintf(stdout,"Attempting to debit %d %s\n",b,Name.c_str());
+	ParentCurrencySystem->transaction.Name = Name;
+	ParentCurrencySystem->transaction.Quantity = b;
 
 	int ret = 0;
 	if(Quantity-b < 0 && ParentCurrencySystem && ParentCurrencySystem->HasEquivalentTo(b,Name))
@@ -117,43 +122,52 @@ bool RPGSH_CURRENCYSYSTEM::HasEquivalentTo(int Quantity, std::string Denominatio
 
 	int total = c.Quantity;
 	int totalFactor = 1;
-	fprintf(stdout,"total = %d, number of %s = %d, totalFactor = %d\n",total,c.Name.c_str(),c.Quantity,totalFactor);
 
-	while(true)
+	while(c.Larger != "")
 	{
-		c = Currency[c.ConversionUp];
-		int space = c.ConversionDown.find(" ");
-		int length = c.ConversionDown.length();
+		c = Currency[c.Larger];
 
-		totalFactor *= std::stoi(c.ConversionDown.substr(0,space));
+		totalFactor *= c.SmallerAmount;
 		total += c.Quantity * totalFactor;
-		fprintf(stdout,"total = %d, number of %s = %d, totalFactor = %d\n",total,c.Name.c_str(),c.Quantity,totalFactor);
-
-		if(c.ConversionUp == "")
-		{
-			break;
-		}
 	}
 
-	fprintf(stdout,"Checking if %d >= %d\n",total,Quantity);
 	return total >= Quantity;
 }
 int RPGSH_CURRENCYSYSTEM::MakeChange(RPGSH_CURRENCY* c)
 {
-	std::string NextHighest = c->ConversionUp;
+	std::string NextHighest = c->Larger;
 	int ret = 0;
-	int space = Currency[NextHighest].ConversionDown.find(" ");
-	int ConversionFactor = std::stoi(Currency[NextHighest].ConversionDown.substr(0,space));
+	int ConversionFactor = Currency[NextHighest].SmallerAmount;
 
 	//Number of Currency[NextHighest] that will need to be converted to current currency
-	int ChangeCount = ((abs(c->Quantity))/ConversionFactor)+1;
-	fprintf(stdout,"c->Quantity = %d, ConversionFactor = %d\n",c->Quantity,ConversionFactor);
+	int ChangeCount = (abs(c->Quantity)/ConversionFactor);
+
+	//Only break an extra higher denomination currency if we really need to
+	//e.g. If I owe 13 dimes, but I have 1 dollar and 5 dimes, don't try to break 2 dollars and claim I don't have enough money
+	int MinimumAmountToBreak = ChangeCount*ConversionFactor;
+	int PreTransactionQuantity = transaction.Quantity+c->Quantity;
+	if((MinimumAmountToBreak + PreTransactionQuantity) < transaction.Quantity)
+	{
+		//Fairly certain this is uneeded
+		//This is implicitly true on the first pass and *shouldn't(?)* be needed on subsequent passes
+		//if(c->Name == transaction.Name)
+		ChangeCount++;
+	}
+
+	//Prevent unneccesary subtraction
+	//Probaby should figure out why this happens and fix it
+	if(ChangeCount == 0)
+	{
+		return ret;
+	}
 
 	//If the player can't make change with the next highest up currency, try the currency after that
 	if(Currency[NextHighest].Quantity < ChangeCount)
 	{
 		MakeChange(&Currency[NextHighest]);
 	}
+
+	//Make change by breaking the larger denomination into the smaller denomination
 	c->Quantity += ConversionFactor*ChangeCount;
 	Currency[NextHighest] -= ChangeCount;
 
@@ -168,10 +182,10 @@ int main()
 	#define COPPER		"Copper"
 
 	RPGSH_CURRENCYSYSTEM C;
-	RPGSH_CURRENCY(PLATINUM,10,	"10 "+std::string(GOLD),	"").AttachToCurrencySystem(&C);
-	RPGSH_CURRENCY(GOLD,	10,	"10 "+std::string(SILVER),	PLATINUM).AttachToCurrencySystem(&C);
-	RPGSH_CURRENCY(SILVER,	10,	"10 "+std::string(COPPER),	GOLD).AttachToCurrencySystem(&C);
-	RPGSH_CURRENCY(COPPER,	10,	"",				SILVER).AttachToCurrencySystem(&C);
+	RPGSH_CURRENCY(PLATINUM,10,	10,	std::string(GOLD),	"").AttachToCurrencySystem(&C);
+	RPGSH_CURRENCY(GOLD,	10,	10,	std::string(SILVER),	PLATINUM).AttachToCurrencySystem(&C);
+	RPGSH_CURRENCY(SILVER,	10,	10,	std::string(COPPER),	GOLD).AttachToCurrencySystem(&C);
+	RPGSH_CURRENCY(COPPER,	10,	0,	"",			SILVER).AttachToCurrencySystem(&C);
 
 	fprintf(stdout,"Starting amount\n");
 	C.print();
