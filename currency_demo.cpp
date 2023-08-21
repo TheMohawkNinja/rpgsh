@@ -95,6 +95,54 @@ class RPGSH_CURRENCYSYSTEM
 		}
 	}
 };
+typedef std::pair<RPGSH_CURRENCY, int> money;
+class RPGSH_WALLET
+{
+	std::map<RPGSH_CURRENCY, int> Money;
+
+	int& operator [] (const RPGSH_CURRENCY b)
+	{
+		return Money[b];
+	}
+
+	//Iterator type for the class
+	using iterator = typename std::map<RPGSH_CURRENCY, int>::const_iterator;
+
+	//Beginning and end iterators. This is so I can use "for(const auto& [key,val] : RPGSH_CURRENCYSYSTEM){}"
+	iterator begin() const
+	{
+		return Money.begin();
+	}
+	iterator end() const
+	{
+		return Money.end();
+	}
+
+	RPGSH_WALLET& operator -= (const money m)
+	{
+		RPGSH_CURRENCY d = m.first;
+		int q = m.second;
+
+		fprintf(stdout,"Attempting to debit %d %s\n",q,d.Name.c_str());
+		d.System->transaction.Name = d.Name;
+		d.System->transaction.Quantity = q;
+
+		if(Money[d]-q < 0 && d.System && d.System->HasEquivalentTo(q,d.Name))
+		{
+			Money[d] -= q;
+			d.System->MakeChange(&d);
+		}
+		else if(Money[d]-q < 0 && d.System)
+		{
+			fprintf(stderr,"Insufficient funds!\n");
+		}
+		else if(Money[d]-q >= 0)
+		{
+			Money[d] -= q;
+		}
+		return *this;
+	}
+};
 
 //Links the instance of RPGSH_CURRENCY to the instance of RPGSH_CURRENCYSYSTEM
 //Allows the instance of RPGSH_CURRENCYSYSTEM to detect changes in the attached RGPSH_CURRENCY
@@ -104,6 +152,7 @@ void RPGSH_CURRENCY::AttachToCurrencySystem(RPGSH_CURRENCYSYSTEM* _CurrencySyste
 	System = _CurrencySystem;
 	System->Denomination[Name] = *this;
 }
+
 //Currency comparison operators order by position in hierarchy (e.g. Dollar > Dime == true)
 bool RPGSH_CURRENCY::operator < (const RPGSH_CURRENCY& b) const
 {
@@ -128,7 +177,6 @@ bool RPGSH_CURRENCY::operator < (const RPGSH_CURRENCY& b) const
 	}
 	return (Name < b.Name);
 }
-
 RPGSH_CURRENCY& RPGSH_CURRENCY::operator -= (const int b)
 {
 	fprintf(stdout,"Attempting to debit %d %s\n",b,Name.c_str());
@@ -152,6 +200,7 @@ RPGSH_CURRENCY& RPGSH_CURRENCY::operator -= (const int b)
 
 	return *this;
 }
+
 bool RPGSH_CURRENCYSYSTEM::HasEquivalentTo(int Quantity, std::string D)
 {
 	RPGSH_CURRENCY c = Denomination[D];
@@ -203,6 +252,7 @@ void RPGSH_CURRENCYSYSTEM::MakeChange(RPGSH_CURRENCY* c)
 	c->Quantity += ConversionFactor*ChangeCount;
 	Denomination[NextHighest] -= ChangeCount;
 }
+
 int main()
 {
 	#define PLATINUM	"Platinum"
