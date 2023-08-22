@@ -3,13 +3,13 @@
 #include <string>
 
 class RPGSH_CURRENCYSYSTEM;
+class RPGSH_WALLET;
 
 class RPGSH_CURRENCY
 {
 	public:
 		RPGSH_CURRENCYSYSTEM* System = nullptr;
 		std::string Name = "";
-		int Quantity = 0;
 		int SmallerAmount = 0;
 		std::string Smaller = "";
 		std::string Larger = "";
@@ -17,18 +17,16 @@ class RPGSH_CURRENCY
 	void AttachToCurrencySystem(RPGSH_CURRENCYSYSTEM* _CurrencySystem);
 
 	RPGSH_CURRENCY(){}
-	RPGSH_CURRENCY(std::string _Name, int _Quantity, int _SmallerAmount, std::string _Smaller, std::string _Larger)
+	RPGSH_CURRENCY(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
 	{
 		Name = _Name;
-		Quantity = _Quantity;
 		Smaller = _Smaller;
 		SmallerAmount = _SmallerAmount;
 		Larger = _Larger;
 	}
-	RPGSH_CURRENCY(RPGSH_CURRENCYSYSTEM* _CS, std::string _Name, int _Quantity, int _SmallerAmount, std::string _Smaller, std::string _Larger)
+	RPGSH_CURRENCY(RPGSH_CURRENCYSYSTEM* _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
 	{
 		Name = _Name;
-		Quantity = _Quantity;
 		Smaller = _Smaller;
 		SmallerAmount = _SmallerAmount;
 		Larger = _Larger;
@@ -65,8 +63,33 @@ class RPGSH_CURRENCYSYSTEM
 
 	RPGSH_CURRENCYSYSTEM(){}
 
-	void MakeChange(RPGSH_CURRENCY* c);
+	void MakeChange(RPGSH_CURRENCY c, RPGSH_WALLET* w);
 	bool HasEquivalentTo(int Quantity, std::string Denomination);
+};
+typedef std::pair<RPGSH_CURRENCY, int> money;
+class RPGSH_WALLET
+{
+	public:
+	std::map<RPGSH_CURRENCY, int> Money;
+	std::pair<RPGSH_CURRENCY,int> transaction;
+
+	bool HasEffectivelyAtLeast(int q, RPGSH_CURRENCY _d)
+	{
+		RPGSH_CURRENCY d = _d;
+
+		int total = Money[d];
+		int totalFactor = 1;
+
+		while(d.Larger != "")
+		{
+			d = d.System->Denomination[d.Larger];
+
+			totalFactor *= d.SmallerAmount;
+			total += Money[d] * totalFactor;
+		}
+
+		return total >= q;
+	}
 	void print()
 	{
 		#define PAD_OFFSET 5
@@ -77,7 +100,7 @@ class RPGSH_CURRENCYSYSTEM
 		//Get longest currency name as reference for spacing
 		for(const auto& [key,value] : *this)
 		{
-			NameLength = key.length();
+			NameLength = key.Name.length();
 			if(NameLength > LongestName)
 			{
 				LongestName = NameLength;
@@ -87,18 +110,13 @@ class RPGSH_CURRENCYSYSTEM
 		//Print formatted list of currencies and the currency values
 		for(const auto& [key,value] : *this)
 		{
-			unsigned int QuantityLength = std::to_string(value.Quantity).length();
-			unsigned int PadLength = (LongestName - key.length()) +
+			unsigned int QuantityLength = std::to_string(value).length();
+			unsigned int PadLength = (LongestName - key.Name.length()) +
 						 QuantityLength +
 						 PAD_OFFSET;
-			fprintf(stdout,"%s\e[97m%*d\e[0m\n",key.c_str(),PadLength,value.Quantity);
+			fprintf(stdout,"%s\e[97m%*d\e[0m\n",key.Name.c_str(),PadLength,value);
 		}
 	}
-};
-typedef std::pair<RPGSH_CURRENCY, int> money;
-class RPGSH_WALLET
-{
-	std::map<RPGSH_CURRENCY, int> Money;
 
 	int& operator [] (const RPGSH_CURRENCY b)
 	{
@@ -108,7 +126,7 @@ class RPGSH_WALLET
 	//Iterator type for the class
 	using iterator = typename std::map<RPGSH_CURRENCY, int>::const_iterator;
 
-	//Beginning and end iterators. This is so I can use "for(const auto& [key,val] : RPGSH_CURRENCYSYSTEM){}"
+	//Beginning and end iterators. This is so I can use "for(const auto& [key,val] : RPGSH_WALLET){}"
 	iterator begin() const
 	{
 		return Money.begin();
@@ -124,13 +142,12 @@ class RPGSH_WALLET
 		int q = m.second;
 
 		fprintf(stdout,"Attempting to debit %d %s\n",q,d.Name.c_str());
-		d.System->transaction.Name = d.Name;
-		d.System->transaction.Quantity = q;
+		transaction = m;
 
-		if(Money[d]-q < 0 && d.System && d.System->HasEquivalentTo(q,d.Name))
+		if(Money[d]-q < 0 && d.System && HasEffectivelyAtLeast(q,d))
 		{
 			Money[d] -= q;
-			d.System->MakeChange(&d);
+			d.System->MakeChange(d, this);
 		}
 		else if(Money[d]-q < 0 && d.System)
 		{
@@ -177,64 +194,22 @@ bool RPGSH_CURRENCY::operator < (const RPGSH_CURRENCY& b) const
 	}
 	return (Name < b.Name);
 }
-RPGSH_CURRENCY& RPGSH_CURRENCY::operator -= (const int b)
+
+void RPGSH_CURRENCYSYSTEM::MakeChange(RPGSH_CURRENCY c, RPGSH_WALLET* w)
 {
-	fprintf(stdout,"Attempting to debit %d %s\n",b,Name.c_str());
-	System->transaction.Name = Name;
-	System->transaction.Quantity = b;
-
-	int ret = 0;
-	if(Quantity-b < 0 && System && System->HasEquivalentTo(b,Name))
-	{
-		Quantity -= b;
-		System->MakeChange(this);
-	}
-	else if(Quantity-b < 0 && System)
-	{
-		fprintf(stderr,"Insufficient funds!\n");
-	}
-	else if(Quantity-b >= 0)
-	{
-		Quantity -= b;
-	}
-
-	return *this;
-}
-
-bool RPGSH_CURRENCYSYSTEM::HasEquivalentTo(int Quantity, std::string D)
-{
-	RPGSH_CURRENCY c = Denomination[D];
-
-	int total = c.Quantity;
-	int totalFactor = 1;
-
-	while(c.Larger != "")
-	{
-		c = Denomination[c.Larger];
-
-		totalFactor *= c.SmallerAmount;
-		total += c.Quantity * totalFactor;
-	}
-
-	return total >= Quantity;
-}
-void RPGSH_CURRENCYSYSTEM::MakeChange(RPGSH_CURRENCY* c)
-{
-	std::string NextHighest = c->Larger;
+	std::string NextHighest = c.Larger;
 	int ConversionFactor = Denomination[NextHighest].SmallerAmount;
+	int transactionAmount = (*w).transaction.second;
 
 	//Number of Currency[NextHighest] that will need to be converted to current currency
-	int ChangeCount = (abs(c->Quantity)/ConversionFactor);
+	int ChangeCount = (abs(((*w)[c]))/ConversionFactor);
 
 	//Only break an extra higher denomination currency if we really need to
 	//e.g. If I owe 13 dimes, but I have 1 dollar and 5 dimes, don't try to break 2 dollars and claim I don't have enough money
 	int MinimumAmountToBreak = ChangeCount*ConversionFactor;
-	int PreTransactionQuantity = transaction.Quantity+c->Quantity;
-	if((MinimumAmountToBreak + PreTransactionQuantity) < transaction.Quantity)
+	int PreTransactionQuantity = transactionAmount+(*w)[c];
+	if((MinimumAmountToBreak + PreTransactionQuantity) < transactionAmount)
 	{
-		//Fairly certain this is uneeded
-		//This is implicitly true on the first pass and *shouldn't(?)* be needed on subsequent passes
-		//if(c->Name == transaction.Name)
 		ChangeCount++;
 	}
 
@@ -243,14 +218,14 @@ void RPGSH_CURRENCYSYSTEM::MakeChange(RPGSH_CURRENCY* c)
 	{
 		return;
 	}
-	else if(Denomination[NextHighest].Quantity < ChangeCount)
+	else if((*w)[Denomination[NextHighest]] < ChangeCount)
 	{
-		MakeChange(&Denomination[NextHighest]);
+		MakeChange(Denomination[NextHighest],w);
 	}
 
 	//Make change by breaking the larger denomination into the smaller denomination
-	c->Quantity += ConversionFactor*ChangeCount;
-	Denomination[NextHighest] -= ChangeCount;
+	(*w)[c] += ConversionFactor*ChangeCount;
+	(*w) -= money(Denomination[NextHighest],ChangeCount);
 }
 
 int main()
@@ -261,11 +236,12 @@ int main()
 	#define COPPER		"Copper"
 
 	RPGSH_CURRENCYSYSTEM CS;
-	RPGSH_CURRENCY(&CS, PLATINUM,	10,	10,	std::string(GOLD),	"");
-	RPGSH_CURRENCY(&CS, GOLD,	10,	10,	std::string(SILVER),	PLATINUM);
-	RPGSH_CURRENCY(&CS, SILVER,	10,	10,	std::string(COPPER),	GOLD);
-	RPGSH_CURRENCY(&CS, COPPER,	10,	0,	"",			SILVER);
+	RPGSH_CURRENCY Platinum	= RPGSH_CURRENCY(&CS, PLATINUM,	10,	std::string(GOLD),	"");
+	RPGSH_CURRENCY Gold	= RPGSH_CURRENCY(&CS, GOLD,	10,	std::string(SILVER),	PLATINUM);
+	RPGSH_CURRENCY Silver	= RPGSH_CURRENCY(&CS, SILVER,	10,	std::string(COPPER),	GOLD);
+	RPGSH_CURRENCY Copper	= RPGSH_CURRENCY(&CS, COPPER,	0,	"",			SILVER);
 
+	/*
 	fprintf(stdout,"Starting amount\n");
 	CS.print();
 	fprintf(stdout,"\n");
@@ -288,6 +264,36 @@ int main()
 
 	CS[COPPER] -= 8637;
 	CS.print();
+	fprintf(stdout,"\n");*/
+
+	RPGSH_WALLET W;
+	W[Platinum] = 10;
+	W[Gold] = 10;
+	W[Silver] = 10;
+	W[Copper] = 10;
+
+	fprintf(stdout,"Starting amount\n");
+	W.print();
+	fprintf(stdout,"\n");
+
+	W -= money(Gold,10);
+	W.print();
+	fprintf(stdout,"\n");
+
+	W -= money(Silver,25);
+	W.print();
+	fprintf(stdout,"\n");
+
+	W -= money(Copper,1223);
+	W.print();
+	fprintf(stdout,"\n");
+
+	W -= money(Copper,9999);
+	W.print();
+	fprintf(stdout,"\n");
+
+	W -= money(Copper,8637);
+	W.print();
 	fprintf(stdout,"\n");
 
 	return 0;
