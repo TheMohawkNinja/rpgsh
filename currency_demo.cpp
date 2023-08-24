@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <map>
 #include <string>
+#include <vector>
+#include <stdarg.h>
+#include "headers/output.h"
 
 class RPGSH_CURRENCYSYSTEM;
 class RPGSH_WALLET;
@@ -36,6 +39,7 @@ class RPGSH_CURRENCY
 
 	RPGSH_CURRENCY& operator -= (const int b);
 	bool operator < (const RPGSH_CURRENCY& b) const;
+	bool operator == (const RPGSH_CURRENCY& b) const;
 };
 class RPGSH_CURRENCYSYSTEM
 {
@@ -51,7 +55,8 @@ class RPGSH_CURRENCYSYSTEM
 	//Iterator type for the class
 	using iterator = typename std::map<std::string, RPGSH_CURRENCY>::const_iterator;
 
-	//Beginning and end iterators. This is so I can use "for(const auto& [key,val] : RPGSH_CURRENCYSYSTEM){}"
+	//Beginning and end iterators.
+	//So I can use "for(const auto& [key,val] : RPGSH_CURRENCYSYSTEM){}"
 	iterator begin() const
 	{
 		return Denomination.begin();
@@ -64,14 +69,15 @@ class RPGSH_CURRENCYSYSTEM
 	RPGSH_CURRENCYSYSTEM(){}
 
 	void MakeChange(RPGSH_CURRENCY c, RPGSH_WALLET* w);
+	void TradeUp(RPGSH_CURRENCYSYSTEM* S, RPGSH_WALLET* w);
 	bool HasEquivalentTo(int Quantity, std::string Denomination);
 };
 typedef std::pair<RPGSH_CURRENCY, int> money;
 class RPGSH_WALLET
 {
 	public:
-	std::map<RPGSH_CURRENCY, int> Money;
-	std::pair<RPGSH_CURRENCY,int> transaction;
+		std::map<RPGSH_CURRENCY, int> Money;
+		std::pair<RPGSH_CURRENCY,int> transaction;
 
 	bool HasEffectivelyAtLeast(int q, RPGSH_CURRENCY _d)
 	{
@@ -114,7 +120,7 @@ class RPGSH_WALLET
 			unsigned int PadLength = (LongestName - key.Name.length()) +
 						 QuantityLength +
 						 PAD_OFFSET;
-			fprintf(stdout,"%s\e[97m%*d\e[0m\n",key.Name.c_str(),PadLength,value);
+			fprintf(stdout,"%s%s%*d%s\n",key.Name.c_str(),TEXT_WHITE,PadLength,value,TEXT_NORMAL);
 		}
 	}
 
@@ -123,7 +129,7 @@ class RPGSH_WALLET
 		return Money[b];
 	}
 
-	//Iterator type for the class
+	//Iterator for the class
 	using iterator = typename std::map<RPGSH_CURRENCY, int>::const_iterator;
 
 	//Beginning and end iterators. This is so I can use "for(const auto& [key,val] : RPGSH_WALLET){}"
@@ -141,7 +147,7 @@ class RPGSH_WALLET
 		RPGSH_CURRENCY d = m.first;
 		int q = m.second;
 
-		fprintf(stdout,"Attempting to debit %d %s\n",q,d.Name.c_str());
+		output(Info,"Attempting to debit %d %s",q,d.Name.c_str());
 		transaction = m;
 
 		if(Money[d]-q < 0 && d.System && HasEffectivelyAtLeast(q,d))
@@ -151,11 +157,27 @@ class RPGSH_WALLET
 		}
 		else if(Money[d]-q < 0 && d.System)
 		{
-			fprintf(stderr,"Insufficient funds!\n");
+			output(Error,"Insufficient funds!");
 		}
 		else if(Money[d]-q >= 0)
 		{
 			Money[d] -= q;
+		}
+		return *this;
+	}
+	RPGSH_WALLET& operator += (const money m)
+	{
+		RPGSH_CURRENCY d = m.first;
+		int q = m.second;
+
+		output(Info,"Crediting %d %s",q,d.Name.c_str());
+		transaction = m;
+
+		Money[d] += q;
+
+		if(d.System && (d.System->Denomination[d.Larger].SmallerAmount < Money[d]))
+		{
+			d.System->TradeUp(d.System,this);
 		}
 		return *this;
 	}
@@ -170,12 +192,20 @@ void RPGSH_CURRENCY::AttachToCurrencySystem(RPGSH_CURRENCYSYSTEM* _CurrencySyste
 	System->Denomination[Name] = *this;
 }
 
-//Currency comparison operators order by position in hierarchy (e.g. Dollar > Dime == true)
+//Required for compilation due to the use of RPGSH_CURRENCY as a key for an std::map in the RPGSH_WALLET class
+//Orders std::map from highest to lowest denomination
 bool RPGSH_CURRENCY::operator < (const RPGSH_CURRENCY& b) const
 {
 	for(const auto& [key,value] : *System)
 	{
-		if(b.Larger == Name)
+		if(System != b.System)
+		{
+			//Needs to be here, otherwise RPGSH_WALLET.print() doesn't work right
+			//and operations try doing cross-system exchanges that don't work.
+			//Probably due to some under-the-hood nonsense with std::map
+			continue;
+		}
+		else if(b.Larger == Name)
 		{
 			return true;
 		}
@@ -193,6 +223,14 @@ bool RPGSH_CURRENCY::operator < (const RPGSH_CURRENCY& b) const
 		}
 	}
 	return (Name < b.Name);
+}
+bool RPGSH_CURRENCY::operator == (const RPGSH_CURRENCY& b) const
+{
+	return  System == b.System &&
+		Name == b.Name &&
+		Smaller == b.Smaller &&
+		SmallerAmount == b.SmallerAmount &&
+		Larger == b.Larger;
 }
 
 void RPGSH_CURRENCYSYSTEM::MakeChange(RPGSH_CURRENCY c, RPGSH_WALLET* w)
@@ -213,7 +251,8 @@ void RPGSH_CURRENCYSYSTEM::MakeChange(RPGSH_CURRENCY c, RPGSH_WALLET* w)
 		ChangeCount++;
 	}
 
-	//Prevent unneccesary subtraction and check if the player has to make change with the currency after that to complete transation
+	//Prevent unneccesary subtraction
+	//Check if the player has to make change with the currency after that to complete transaction
 	if(ChangeCount == 0)
 	{
 		return;
@@ -227,6 +266,26 @@ void RPGSH_CURRENCYSYSTEM::MakeChange(RPGSH_CURRENCY c, RPGSH_WALLET* w)
 	(*w)[c] += ConversionFactor*ChangeCount;
 	(*w) -= money(Denomination[NextHighest],ChangeCount);
 }
+void RPGSH_CURRENCYSYSTEM::TradeUp(RPGSH_CURRENCYSYSTEM* S, RPGSH_WALLET* w)
+{
+	for(auto i = (*w).Money.rbegin(); i != (*w).Money.rend(); ++i)
+	{
+		//'c' and 'q' for the currency and quantity respectively
+		const auto& c = i->first;
+		const auto& q = i->second;
+
+		if(c.System == S &&
+		c.Larger != "" &&
+		q > S->Denomination[c.Larger].SmallerAmount)
+		{
+			//Make use of the trucation of the divison return value to int to simplify the math
+			int ConversionFactor = S->Denomination[c.Larger].SmallerAmount;
+			int AmountTradable = ((*w)[c] / ConversionFactor);
+			(*w)[S->Denomination[c.Larger]] += AmountTradable;
+			(*w)[c] -= (AmountTradable * ConversionFactor);
+		}
+	}
+}
 
 int main()
 {
@@ -235,42 +294,33 @@ int main()
 	#define SILVER		"Silver"
 	#define COPPER		"Copper"
 
-	RPGSH_CURRENCYSYSTEM CS;
-	RPGSH_CURRENCY Platinum	= RPGSH_CURRENCY(&CS, PLATINUM,	10,	std::string(GOLD),	"");
-	RPGSH_CURRENCY Gold	= RPGSH_CURRENCY(&CS, GOLD,	10,	std::string(SILVER),	PLATINUM);
-	RPGSH_CURRENCY Silver	= RPGSH_CURRENCY(&CS, SILVER,	10,	std::string(COPPER),	GOLD);
-	RPGSH_CURRENCY Copper	= RPGSH_CURRENCY(&CS, COPPER,	0,	"",			SILVER);
+	#define DOLLAR		"Dollar"
+	#define DIME		"Dime"
+	#define NICKEL		"Nickel"
+	#define PENNY		"Penny"
 
-	/*
-	fprintf(stdout,"Starting amount\n");
-	CS.print();
-	fprintf(stdout,"\n");
+	RPGSH_CURRENCYSYSTEM DND;
+	RPGSH_CURRENCY Platinum	= RPGSH_CURRENCY(&DND, PLATINUM,10, GOLD,	"");
+	RPGSH_CURRENCY Gold	= RPGSH_CURRENCY(&DND, GOLD,	10, SILVER,	PLATINUM);
+	RPGSH_CURRENCY Silver	= RPGSH_CURRENCY(&DND, SILVER,	10, COPPER,	GOLD);
+	RPGSH_CURRENCY Copper	= RPGSH_CURRENCY(&DND, COPPER,	0,  "",		SILVER);
 
-	CS[GOLD] -= 10;
-	CS.print();
-	fprintf(stdout,"\n");
-
-	CS[SILVER] -= 25;
-	CS.print();
-	fprintf(stdout,"\n");
-
-	CS[COPPER] -= 1223;
-	CS.print();
-	fprintf(stdout,"\n");
-
-	CS[COPPER] -= 9999;
-	CS.print();
-	fprintf(stdout,"\n");
-
-	CS[COPPER] -= 8637;
-	CS.print();
-	fprintf(stdout,"\n");*/
+	RPGSH_CURRENCYSYSTEM US;
+	RPGSH_CURRENCY Dollar	= RPGSH_CURRENCY(&US, DOLLAR,	10, DIME,	"");
+	RPGSH_CURRENCY Dime	= RPGSH_CURRENCY(&US, DIME,	2,  NICKEL,	DOLLAR);
+	RPGSH_CURRENCY Nickel	= RPGSH_CURRENCY(&US, NICKEL,	5,  PENNY,	DIME);
+	RPGSH_CURRENCY Penny	= RPGSH_CURRENCY(&US, PENNY,	0,  "",		NICKEL);
 
 	RPGSH_WALLET W;
-	W[Platinum] = 10;
-	W[Gold] = 10;
-	W[Silver] = 10;
-	W[Copper] = 10;
+	W[Platinum] =	10;
+	W[Gold] =	10;
+	W[Silver] =	10;
+	W[Copper] =	10;
+
+	W[Dollar] =	10;
+	W[Dime] =	10;
+	W[Nickel] =	10;
+	W[Penny] =	10;
 
 	fprintf(stdout,"Starting amount\n");
 	W.print();
@@ -293,6 +343,18 @@ int main()
 	fprintf(stdout,"\n");
 
 	W -= money(Copper,8637);
+	W.print();
+	fprintf(stdout,"\n");
+
+	W += money(Copper,1572);
+	W.print();
+	fprintf(stdout,"\n");
+
+	W -= money(Penny,420);
+	W.print();
+	fprintf(stdout,"\n");
+
+	W += money(Penny,397);
 	W.print();
 	fprintf(stdout,"\n");
 
