@@ -116,11 +116,14 @@ class RPGSH_WALLET
 		//Print formatted list of currencies and the currency values
 		for(const auto& [key,value] : *this)
 		{
-			unsigned int QuantityLength = std::to_string(value).length();
-			unsigned int PadLength = (LongestName - key.Name.length()) +
-						 QuantityLength +
-						 PAD_OFFSET;
-			fprintf(stdout,"%s%s%*d%s\n",key.Name.c_str(),TEXT_WHITE,PadLength,value,TEXT_NORMAL);
+			if(value > 0)
+			{
+				unsigned int QuantityLength = std::to_string(value).length();
+				unsigned int PadLength = (LongestName - key.Name.length()) +
+							 QuantityLength +
+							 PAD_OFFSET;
+				fprintf(stdout,"%s%s%*d%s\n",key.Name.c_str(),TEXT_WHITE,PadLength,value,TEXT_NORMAL);
+			}
 		}
 	}
 
