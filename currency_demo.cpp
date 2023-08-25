@@ -184,6 +184,35 @@ class RPGSH_WALLET
 		}
 		return *this;
 	}
+	RPGSH_WALLET& operator += (const RPGSH_WALLET w)
+	{
+		for(const auto& [c,q] : w)
+		{
+			*this += money(c,q);
+		}
+		return *this;
+	}
+	RPGSH_WALLET& operator -= (const RPGSH_WALLET w)
+	{
+		output(Info,"Attempting to debit the following:");
+		RPGSH_WALLET _w = w;
+		_w.print();
+
+		for(const auto& [c,q] : w)
+		{
+			if(!HasEffectivelyAtLeast(q,c))
+			{
+				output(Error,"Insufficient funds!");
+				return *this;
+			}
+		}
+
+		for(const auto& [c,q] : w)
+		{
+			*this -= money(c,q);
+		}
+		return *this;
+	}
 };
 
 //Links the instance of RPGSH_CURRENCY to the instance of RPGSH_CURRENCYSYSTEM
@@ -358,6 +387,29 @@ int main()
 	fprintf(stdout,"\n");
 
 	W += money(Penny,397);
+	W.print();
+	fprintf(stdout,"\n");
+
+	RPGSH_WALLET quest_reward = RPGSH_WALLET();
+	quest_reward[Gold] = 20;
+	quest_reward[Silver] = 5;
+	quest_reward[Penny] = 35;
+
+	W += quest_reward;
+	W.print();
+	fprintf(stdout,"\n");
+
+	RPGSH_WALLET item_cost = RPGSH_WALLET();
+	item_cost[Gold] = 12;
+	item_cost[Silver] = 5;
+	item_cost[Dollar] = 3;
+
+	W -= item_cost;
+	W.print();
+	fprintf(stdout,"\n");
+
+	item_cost[Platinum] = 10;
+	W -= item_cost;
 	W.print();
 	fprintf(stdout,"\n");
 
