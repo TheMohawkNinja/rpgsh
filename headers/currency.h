@@ -244,7 +244,7 @@ class RPGSH_WALLET
 		output(Info,"Decreasing wallet value by a factor of %d",f);
 		if(f == 0)
 		{
-			output(Error,"Attempted to divide wallet value by 0!\b");
+			output(Error,"Attempted to divide wallet value by 0!\n");
 			return *this;
 		}
 
