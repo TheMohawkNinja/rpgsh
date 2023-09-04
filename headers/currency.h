@@ -38,9 +38,7 @@ class RPGSH_CURRENCY
 		AttachToCurrencySystem(_CS);
 	}
 
-	RPGSH_CURRENCY& operator -= (const int b);
 	bool operator < (const RPGSH_CURRENCY& b) const;
-	bool operator == (const RPGSH_CURRENCY& b) const;
 };
 class RPGSH_CURRENCYSYSTEM
 {
@@ -312,14 +310,6 @@ bool RPGSH_CURRENCY::operator < (const RPGSH_CURRENCY& b) const
 		}
 	}
 	return (Name < b.Name);
-}
-bool RPGSH_CURRENCY::operator == (const RPGSH_CURRENCY& b) const
-{
-	return  System == b.System &&
-		Name == b.Name &&
-		Smaller == b.Smaller &&
-		SmallerAmount == b.SmallerAmount &&
-		Larger == b.Larger;
 }
 
 void RPGSH_CURRENCYSYSTEM::MakeChange(RPGSH_CURRENCY c, RPGSH_WALLET* w)
