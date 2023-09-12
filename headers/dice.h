@@ -189,6 +189,21 @@ class RPGSH_DICE
 		count = _count;
 	}
 
+	std::string dice()
+	{
+		std::string ret = "";
+		if(Quantity)
+		{
+			ret += std::to_string(Quantity);
+		}
+		ret += "d"+std::to_string(Faces);
+		if(Modifier)
+		{
+			ret += (Modifier>0) ? "+" : "";
+			ret += Modifier;
+		}
+		return ret;
+	}
 	void roll()
 	{
 		if(!std::filesystem::exists(random_seed_path))
