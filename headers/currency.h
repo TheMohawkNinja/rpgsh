@@ -2,9 +2,11 @@
 
 #include <map>
 #include <string>
+#include <string.h>
 #include <stdarg.h>
 #include <cmath>//floor()
 #include "output.h"
+#include "functions.h"
 
 class RPGSH_CURRENCYSYSTEM;
 class RPGSH_WALLET;
@@ -93,7 +95,7 @@ class RPGSH_WALLET
 
 		return total >= q;
 	}
-	void print()
+	void print(int tab)
 	{
 		#define PAD_OFFSET 5
 
@@ -119,6 +121,7 @@ class RPGSH_WALLET
 				unsigned int PadLength = (LongestName - key.Name.length()) +
 							 QuantityLength +
 							 PAD_OFFSET;
+				tab_over(tab);
 				fprintf(stdout,"%s%s%*d%s\n",key.Name.c_str(),TEXT_WHITE,PadLength,value,TEXT_NORMAL);
 			}
 		}
@@ -154,6 +157,17 @@ class RPGSH_WALLET
 		return Money.end();
 	}
 
+	RPGSH_WALLET(){}
+	//Construct wallet with initial amount of a currency parsed from a std::string
+	//String format must be "<amount> <currency>" e.g. "10 Gold"
+	RPGSH_WALLET(const money_t m)
+	{
+		RPGSH_CURRENCY c = m.first;
+		int q = m.second;
+
+		Money[c] = q;
+	}
+
 	RPGSH_WALLET& operator -= (const money_t m)
 	{
 		RPGSH_CURRENCY c = m.first;
@@ -181,7 +195,7 @@ class RPGSH_WALLET
 	{
 		output(Info,"Attempting to debit the following:");
 		RPGSH_WALLET _w = w;
-		_w.print();
+		_w.print(0);
 
 		for(const auto& [c,q] : w)
 		{
