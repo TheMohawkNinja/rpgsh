@@ -9,17 +9,17 @@ templates_dir="$root_dir""templates/"
 dice_lists_dir="$root_dir""dice-lists/"
 
 echo -e "Compiling:\tsrc/main.cpp\t\t->\t$bold_white""rpgsh"$normal
-g++ src/main.cpp -o rpgsh
+g++ src/main.cpp -lstdc++fs -std=c++17 -o rpgsh
 echo -e "Compiling:\tsrc/setname.cpp\t\t->\t$bold_white""rpgsh-setname"$normal
-g++ src/setname.cpp -o rpgsh-setname
+g++ src/setname.cpp -lstdc++fs -std=c++17 -o rpgsh-setname
 echo -e "Compiling:\tsrc/variables.cpp\t->\t$bold_white""rpgsh-variables"$normal
-g++ src/variables.cpp -o rpgsh-variables
+g++ src/variables.cpp -lstdc++fs -std=c++17 -o rpgsh-variables
 echo -e "Compiling:\tsrc/version.cpp\t\t->\t$bold_white""rpgsh-version"$normal
 g++ src/version.cpp -o rpgsh-version
 echo -e "Compiling:\tsrc/banner.cpp\t\t->\t$bold_white""rpgsh-banner"$normal
 g++ src/banner.cpp -o rpgsh-banner
 echo -e "Compiling:\tsrc/roll.cpp\t\t->\t$bold_white""rpgsh-roll"$normal
-g++ src/roll.cpp -o rpgsh-roll
+g++ src/roll.cpp -lstdc++fs -std=c++17 -o rpgsh-roll
 
 echo
 
