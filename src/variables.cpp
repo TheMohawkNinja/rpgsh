@@ -40,21 +40,21 @@ void set_var(std::string var, RPGSH_VAR old_value, RPGSH_VAR new_value, bool is_
 		var_type = "Character attribute";
 	}
 
-	bool old_value_is_digit, new_is_digit;
+	bool old_is_digit, new_is_digit;
 
 	try
 	{
-		int(old_value);
-		old_value_is_digit = true;
+		std::stoi(old_value.Value);
+		old_is_digit = true;
 	}
 	catch(...)
 	{
-		old_value_is_digit = false;
+		old_is_digit = false;
 	}
 
 	try
 	{
-		int(new_value);
+		std::stoi(new_value.Value);
 		new_is_digit = true;
 	}
 	catch(...)
@@ -62,11 +62,11 @@ void set_var(std::string var, RPGSH_VAR old_value, RPGSH_VAR new_value, bool is_
 		new_is_digit = false;
 	}
 
-	if(old_value_is_digit && !new_is_digit)
+	if(old_is_digit && !new_is_digit)
 	{
 		output(Warning,"%s \"%s\" is changing from an integer to a string.",var_type.c_str(),var.c_str());
 	}
-	else if(!old_value_is_digit && new_is_digit)
+	else if(!old_is_digit && new_is_digit)
 	{
 		output(Warning,"%s \"%s\" is changing from a string to an integer.",var_type.c_str(),var.c_str());
 	}
