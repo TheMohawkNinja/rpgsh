@@ -15,11 +15,11 @@ bool is_operator(std::string s)
 	}
 	else{return false;}
 }
-bool is_int(char* s)
+bool is_int(std::string s)
 {
 	try
 	{
-		std::stoi(std::string(s));
+		std::stoi(s);
 		return true;
 	}
 	catch(...)
@@ -40,27 +40,8 @@ void set_var(std::string var, RPGSH_VAR old_value, RPGSH_VAR new_value, bool is_
 		var_type = "Character attribute";
 	}
 
-	bool old_is_digit, new_is_digit;
-
-	try
-	{
-		std::stoi(old_value.Value);
-		old_is_digit = true;
-	}
-	catch(...)
-	{
-		old_is_digit = false;
-	}
-
-	try
-	{
-		std::stoi(new_value.Value);
-		new_is_digit = true;
-	}
-	catch(...)
-	{
-		new_is_digit = false;
-	}
+	bool old_is_digit = is_int(old_value.Value);
+	bool new_is_digit = is_int(new_value.Value);
 
 	if(old_is_digit && !new_is_digit)
 	{
