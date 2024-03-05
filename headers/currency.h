@@ -121,7 +121,6 @@ class RPGSH_WALLET
 				unsigned int PadLength = (LongestName - key.Name.length()) +
 							 QuantityLength +
 							 PAD_OFFSET;
-				tab_over(tab);
 				fprintf(stdout,"%s%s%*d%s\n",key.Name.c_str(),TEXT_WHITE,PadLength,value,TEXT_NORMAL);
 			}
 		}
