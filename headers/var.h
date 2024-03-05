@@ -346,6 +346,11 @@ RPGSH_VAR operator / (const int a, const RPGSH_VAR b)
 	return result;
 }
 
+// Comparison operators
+bool operator != (const RPGSH_VAR a, const RPGSH_VAR b)
+{
+	return (a.Value != b.Value);
+}
 template <typename T>
 class RPGSH_OBJ
 {
