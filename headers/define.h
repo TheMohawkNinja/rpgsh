@@ -6,14 +6,15 @@
 //Version info
 #define MAJOR_VERSION		0
 #define MINOR_VERSION		6
-#define PATCH_VERSION		0
+#define PATCH_VERSION		1
 
 //Comment character definition
 #define COMMENT			'#'
 
-//Variable character definitions
-#define SHELL_VAR		'$'
-#define CHAR_VAR		'%'
+//Variable character scope sigils
+#define SHELL_SIGIL		'$'
+#define CAMPAIGN_SIGIL		'#'
+#define CHAR_SIGIL		'@'
 
 //Built-in variables
 #define CURRENT_CHAR_SHELL_VAR	".CURRENT_CHAR"
