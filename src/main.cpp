@@ -45,9 +45,9 @@ void run_rpgsh_prog(std::string args)
 		{
 			params_start = args.find(" ", args.find(" ")+1);
 			std::string var = "";
-			if(args[i] == CHAR_VAR)
+			if(args[i] == CHAR_SIGIL)
 			{
-				int find_percent = args.find(CHAR_VAR,params_start);
+				int find_percent = args.find(CHAR_SIGIL,params_start);
 				for(int j=i+1; j<args.length() && args.substr(j,1) != " "; j++)
 				{
 					var+=args.substr(j,1);
@@ -56,9 +56,13 @@ void run_rpgsh_prog(std::string args)
 				args = args.substr(0,find_percent)+c.Attr[var].c_str()+
 				       args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
 			}
-			else if(args[i] == SHELL_VAR)
+			else if(args[i] == CAMPAIGN_SIGIL)
 			{
-				int find_dollar = args.find(SHELL_VAR,params_start);
+				// TODO
+			}
+			else if(args[i] == SHELL_SIGIL)
+			{
+				int find_dollar = args.find(SHELL_SIGIL,params_start);
 				for(int j=i+1; j<args.length() && args.substr(j,1) != " "; j++)
 				{
 					var+=args.substr(j,1);
@@ -107,7 +111,7 @@ void run_rpgsh_prog(std::string args)
 					return;
 				}
 				vars.push_back(args.substr(i+1,(args.find("\"",i+1)-i-1)));
-				i+=vars[vars.size()-1].length()+1;
+				i += vars[vars.size()-1].length()+1;
 			}
 			else
 			{
@@ -383,7 +387,9 @@ int prompt()
 		}
 		else
 		{
-			if(buffer[0] == SHELL_VAR || buffer[0] == CHAR_VAR)//Check if user is operating on a variable
+			if(buffer[0] == CHAR_SIGIL ||
+			buffer[0] == CAMPAIGN_SIGIL ||
+			buffer[0] == SHELL_SIGIL) //Check if user is operating on a variable
 			{
 				std::string prefix = "variables ";
 				prefix += buffer;
