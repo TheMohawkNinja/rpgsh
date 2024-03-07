@@ -23,7 +23,7 @@ bool is_int(std::string s)
 		return false;
 	}
 }
-void set_var(std::string var, RPGSH_VAR old_value, RPGSH_VAR new_value, char scope_sigil, std::vector<std::string> shell_vars)
+void set_var(std::string var, RPGSH_VAR old_value, RPGSH_VAR new_value, char scope_sigil)
 {
 	std::string var_type;
 
@@ -59,7 +59,7 @@ void set_var(std::string var, RPGSH_VAR old_value, RPGSH_VAR new_value, char sco
 			c.set_as_current();
 			break;
 		case CAMPAIGN_SIGIL:
-			//TODO
+			set_campaign_var(var,std::string(new_value));
 			break;
 		case SHELL_SIGIL:
 			set_shell_var(var,std::string(new_value));
@@ -77,7 +77,6 @@ int main(int argc, char** argv)
 		exit(-1);
 	}
 
-	std::vector<std::string> shell_vars;
 	std::string var = std::string(argv[1]).substr(1,std::string(argv[1]).length()-1);
 	RPGSH_VAR old_value;
 
@@ -88,7 +87,7 @@ int main(int argc, char** argv)
 			old_value = std::string(c.Attr[var]);
 			break;
 		case CAMPAIGN_SIGIL:
-			// TODO
+			old_value = get_campaign_var(var);
 			break;
 		case SHELL_SIGIL:
 			old_value = get_shell_var(var);
@@ -108,12 +107,12 @@ int main(int argc, char** argv)
 		{
 			if(std::string(argv[2]) == "++")
 			{
-				set_var(var,old_value,old_value+1,argv[1][0],shell_vars);
+				set_var(var,old_value,old_value+1,argv[1][0]);
 				return 0;
 			}
 			else if(std::string(argv[2]) == "--")
 			{
-				set_var(var,old_value,old_value-1,argv[1][0],shell_vars);
+				set_var(var,old_value,old_value-1,argv[1][0]);
 				return 0;
 			}
 			else
@@ -172,27 +171,27 @@ int main(int argc, char** argv)
 
 		if(!strcmp(argv[2],"="))
 		{
-			set_var(var,old_value,new_value,argv[1][0],shell_vars);
+			set_var(var,old_value,new_value,argv[1][0]);
 			return 0;
 		}
 		else if(!strcmp(argv[2],"+="))
 		{
-			set_var(var,old_value,std::string(old_value+new_value),argv[1][0],shell_vars);
+			set_var(var,old_value,std::string(old_value+new_value),argv[1][0]);
 			return 0;
 		}
 		else if(!strcmp(argv[2],"-="))
 		{
-			set_var(var,old_value,std::string(old_value-new_value),argv[1][0],shell_vars);
+			set_var(var,old_value,std::string(old_value-new_value),argv[1][0]);
 			return 0;
 		}
 		else if(!strcmp(argv[2],"*="))
 		{
-			set_var(var,old_value,std::string(old_value*new_value),argv[1][0],shell_vars);
+			set_var(var,old_value,std::string(old_value*new_value),argv[1][0]);
 			return 0;
 		}
 		else if(!strcmp(argv[2],"/="))
 		{
-			set_var(var,old_value,std::string(old_value/new_value),argv[1][0],shell_vars);
+			set_var(var,old_value,std::string(old_value/new_value),argv[1][0]);
 			return 0;
 		}
 		else

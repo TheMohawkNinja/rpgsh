@@ -9,6 +9,10 @@
 
 class RPGSH_CHAR
 {
+	private:
+		std::string characters_dir = campaigns_dir +
+						get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR) +
+						"characters/";
 	public:
 		std::string AttributeDesignator		=	"Attr";
 		std::string SpellDesignator		=	"Spell";

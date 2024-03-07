@@ -77,6 +77,62 @@ void set_shell_var(std::string var,std::string value)
 	std::filesystem::rename((shell_vars_file+".bak").c_str(),shell_vars_file.c_str());
 }
 
+std::string get_campaign_var(std::string var)
+{
+	std::string campaign_vars_file = campaigns_dir +
+					get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR) +
+					".vars";
+	std::ifstream ifs(campaign_vars_file.c_str());
+	while(!ifs.eof())
+	{
+		std::string data = "";
+		std::getline(ifs,data);
+
+		if(data.substr(0,data.find(DS)) == var)
+		{
+			return data.substr(data.find(DS)+DS.length(),
+				data.length()-(data.find(DS)+DS.length()));
+		}
+	}
+	ifs.close();
+	return "";
+}
+void set_campaign_var(std::string var,std::string value)
+{
+	std::string campaign_vars_file = campaigns_dir +
+					get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR) +
+					".vars";
+	std::ifstream ifs(campaign_vars_file.c_str());
+	std::filesystem::remove((campaign_vars_file+".bak").c_str());
+	std::ofstream ofs((campaign_vars_file+".bak").c_str());
+	bool ReplacedValue = false;
+
+	while(!ifs.eof())
+	{
+		std::string data = "";
+		std::getline(ifs,data);
+
+		if(data.substr(0,data.find(DS)) == var)
+		{
+			ofs<<var + DS + value + "\n";
+			ReplacedValue = true;
+		}
+		else
+		{
+			ofs<<data + "\n";
+		}
+	}
+
+	if(!ReplacedValue)
+	{
+		ofs<<var + DS + value + "\n";
+	}
+	ifs.close();
+	ofs.close();
+	std::filesystem::remove(campaign_vars_file.c_str());
+	std::filesystem::rename((campaign_vars_file+".bak").c_str(),campaign_vars_file.c_str());
+}
+
 template <typename T>
 void save_obj_to_file(std::string path, T obj, std::string obj_id)
 {

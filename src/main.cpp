@@ -58,11 +58,44 @@ void run_rpgsh_prog(std::string args)
 			}
 			else if(args[i] == CAMPAIGN_SIGIL)
 			{
-				// TODO
+				std::string campaign_vars_file = campaigns_dir +
+								get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR) +
+								".vars";
+				int sigil_pos = args.find(CAMPAIGN_SIGIL,params_start);
+				for(int j=i+1; j<args.length() && args.substr(j,1) != " "; j++)
+				{
+					var+=args.substr(j,1);
+				}
+
+				std::ifstream ifs(campaign_vars_file.c_str());
+				while(!ifs.eof())
+				{
+					std::string old;
+					std::string data = "";
+					std::getline(ifs,data);
+
+					if(data.substr(0,data.find(DS)) == var)
+					{
+						int new_args_start = sigil_pos + var.length() + 1;
+						old = data.substr(data.find(DS)+DS.length(),
+								  data.length()-(data.find(DS)+DS.length()));
+
+						if(old.find(" ") != std::string::npos)
+						{
+							old = "\"" + old + "\"";
+						}
+
+						args = args.substr(0,sigil_pos)+
+						       old+
+						       args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
+						break;
+					}
+				}
+				ifs.close();
 			}
 			else if(args[i] == SHELL_SIGIL)
 			{
-				int find_dollar = args.find(SHELL_SIGIL,params_start);
+				int sigil_pos = args.find(SHELL_SIGIL,params_start);
 				for(int j=i+1; j<args.length() && args.substr(j,1) != " "; j++)
 				{
 					var+=args.substr(j,1);
@@ -77,7 +110,7 @@ void run_rpgsh_prog(std::string args)
 
 					if(data.substr(0,data.find(DS)) == var)
 					{
-						int new_args_start = find_dollar + var.length() + 1;
+						int new_args_start = sigil_pos + var.length() + 1;
 						old = data.substr(data.find(DS)+DS.length(),
 								  data.length()-(data.find(DS)+DS.length()));
 
@@ -86,7 +119,7 @@ void run_rpgsh_prog(std::string args)
 							old = "\"" + old + "\"";
 						}
 
-						args = args.substr(0,find_dollar)+
+						args = args.substr(0,sigil_pos)+
 						       old+
 						       args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
 						break;
@@ -418,6 +451,7 @@ int main()
 		//Set default values for built-in shell variables
 		RPGSH_OBJ Attr = load_obj_from_file<RPGSH_VAR>(templates_dir+config.setting[DEFAULT_GAME],c.AttributeDesignator);
 		set_shell_var(CURRENT_CHAR_SHELL_VAR,std::string(Attr["Name"]));
+		set_shell_var(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
 	}
 
 	//(re)build default character on launch

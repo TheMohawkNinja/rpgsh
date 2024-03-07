@@ -4,7 +4,8 @@ bold_white="\e[1m\e[97m"
 normal="\e[0m"
 
 root_dir="/home/$USER/.rpgsh/"
-characters_dir="$root_dir""characters/"
+campaigns_dir="$root_dir""campaigns/"
+default_campaign_dir="$campaigns_dir""default/"
 templates_dir="$root_dir""templates/"
 dice_lists_dir="$root_dir""dice-lists/"
 
@@ -24,7 +25,9 @@ g++ src/roll.cpp -lstdc++fs -std=c++17 -o rpgsh-roll
 echo
 
 if [ ! -d "$root_dir" ]; then echo -e "Creating root directory at:\t\t$bold_white""$root_dir$normal"; mkdir "$root_dir"; fi
-if [ ! -d "$characters_dir" ]; then echo -e "Creating characters directory at:\t$bold_white""$characters_dir$normal"; mkdir "$characters_dir"; fi
+if [ ! -d "$campaigns_dir" ]; then echo -e "Creating campaigns directory at:\t$bold_white""$campaigns_dir$normal"; mkdir "$campaigns_dir"; fi
+if [ ! -d "$default_campaign_dir" ]; then echo -e "Creating default campaign at \t$bold_white""$default_campaign_dir$normal";
+	mkdir "$default_campaign_dir"; mkdir "$default_campaign_dir""characters/"; touch "$default_campaign_dir"".vars"; fi
 if [ ! -d "$templates_dir" ]; then echo -e "Creating templates directory at:\t$bold_white""$templates_dir$normal"; mkdir "$templates_dir"; fi
 if [ ! -d "$dice_lists_dir" ]; then echo -e "Creating dice lists directory at:\t$bold_white""$dice_lists_dir$normal"; mkdir "$dice_lists_dir"; fi
 
