@@ -1,1 +1,4 @@
+rpgsh
 rpgsh-*
+docs/*
+!docs/rpgsh-userguide.pdf
