@@ -77,31 +77,72 @@ int main(int argc, char** argv)
 		exit(-1);
 	}
 
+	std::map<std::string,std::string> m;
+	std::string path;
 	std::string var = std::string(argv[1]).substr(1,std::string(argv[1]).length()-1);
 	RPGSH_VAR old_value;
 
-	switch(argv[1][0])
+	switch(argv[1][0])// Get scope sigil
 	{
 		case CHAR_SIGIL:
 			c.load(get_shell_var(CURRENT_CHAR_SHELL_VAR),false);
 			old_value = std::string(c.Attr[var]);
+
+			// Convert character sheet to std::map<std::string,std::string>
+			// TODO Will need to add currency, currency system, and wallet
+			for(const auto& [k,v] : c.Attr)
+				m[k] = std::string(v);
+			for(const auto& [k,v] : c.Dice)
+				m[k] = std::string(v);
 			break;
 		case CAMPAIGN_SIGIL:
 			old_value = get_campaign_var(var);
+			path = campaigns_dir +
+				get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR) +
+				".vars";
+			m = load_vars_from_file(path);
 			break;
 		case SHELL_SIGIL:
 			old_value = get_shell_var(var);
+			path = shell_vars_file;
+			m = load_vars_from_file(path);
 			break;
 		default:
 			output(Error,"Unknown scope sigil \'%c\'.",argv[1][0]);
 			exit(-1);
 	}
 
-	if(argc == 2)
+	if(argc == 2)// Print value if all the user enters is a variable
 	{
-		fprintf(stdout,"%s\n",old_value.c_str());
+		unsigned int space = 0;
+		std::string var(argv[1]);
+
+		if(var[var.length()-1] != '/')// If last character isn't a '/', just print value
+			fprintf(stdout,"%s\n",old_value.c_str());
+		else
+		{
+			for(const auto& [k,v] : m)
+			{
+				if(k.substr(0,var.length()-1) == var.substr(1,var.length()-1) && k.length() > space)
+					space = k.length();
+			}
+			for(const auto& [k,v] : m)
+			{
+				try
+				{
+					if(k.substr(0,var.length()-1) == var.substr(1,var.length()-1))//TODO start of var.substr may need to change from 1 to 2 for scope sigil
+					{
+						fprintf(stdout,"%s",k.c_str());
+						for(int i=k.length(); i<space; i++)
+							fprintf(stdout," ");
+						fprintf(stdout,"\t%s\n",v.c_str());
+					}
+				}
+				catch(...){}
+			}
+		}
 	}
-	else if(argc == 3)
+	else if(argc == 3)// Iterators
 	{
 		if(is_operator(std::string(argv[2])))
 		{
@@ -127,7 +168,7 @@ int main(int argc, char** argv)
 			exit(-1);
 		}
 	}
-	else
+	else// All other operations
 	{
 		RPGSH_VAR new_value = std::string(argv[3]);
 		for(int i=4; i<argc; i++)
