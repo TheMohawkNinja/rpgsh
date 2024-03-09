@@ -9,37 +9,6 @@ void print_header(std::string s)
 		fprintf(stdout,"─");
 	fprintf(stdout,"%s\n",TEXT_NORMAL);
 }
-std::map<std::string,std::string> load_vars_from_file(std::string path)
-{
-	std::map<std::string,std::string> vars;
-
-	if(!std::filesystem::exists(path))
-	{
-		output(Error,"File not found at \'%s\'",path.c_str());
-		exit(-1);
-	}
-
-	std::ifstream ifs(path);
-	if(!ifs.good())
-	{
-		output(Error,"Unable to open \'%s\' for reading",path.c_str());
-		exit(-1);
-	}
-	while(!ifs.eof())
-	{
-		std::string data = "";
-		std::getline(ifs,data);
-		if(data == "")
-			break;
-		std::string var_name = data.substr(0,data.find(DS));
-		std::string var_value = data.substr(var_name.length()+DS.length(),
-						data.length()-(var_name.length()+DS.length()));
-		vars[var_name] = var_value;
-	}
-	ifs.close();
-
-	return vars;
-}
 template <typename T>
 void print_map(T m)
 {
