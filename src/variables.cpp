@@ -86,7 +86,16 @@ int main(int argc, char** argv)
 	{
 		case CHAR_SIGIL:
 			c.load(get_shell_var(CURRENT_CHAR_SHELL_VAR),false);
-			old_value = std::string(c.Attr[var]);
+			switch (var[var.length()-1])
+			{
+				case '/':
+				old_value = std::string(c.Attr[var.substr(0,var.length()-1)]);
+				break;
+
+				default:
+				old_value = std::string(c.Attr[var]);
+				break;
+			}
 
 			// Convert character sheet to std::map<std::string,std::string>
 			// TODO Will need to add currency, currency system, and wallet
@@ -96,14 +105,40 @@ int main(int argc, char** argv)
 				m[k] = std::string(v);
 			break;
 		case CAMPAIGN_SIGIL:
-			old_value = get_campaign_var(var);
+			switch (var[var.length()-1])
+			{
+				case '/':
+				try
+				{
+					old_value = get_campaign_var(var.substr(0,var.length()-1));
+				}
+				catch(...){old_value = "";}
+				break;
+
+				default:
+				old_value = get_campaign_var(var);
+				break;
+			}
 			path = campaigns_dir +
 				get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR) +
 				".vars";
 			m = load_vars_from_file(path);
 			break;
 		case SHELL_SIGIL:
-			old_value = get_shell_var(var);
+			switch (var[var.length()-1])
+			{
+				case '/':
+				try
+				{
+					old_value = get_shell_var(var.substr(0,var.length()-1));
+				}
+				catch(...){old_value = "";}
+				break;
+
+				default:
+				old_value = get_shell_var(var);
+				break;
+			}
 			path = shell_vars_file;
 			m = load_vars_from_file(path);
 			break;
@@ -119,23 +154,31 @@ int main(int argc, char** argv)
 
 		if(var[var.length()-1] != '/')// If last character isn't a '/', just print value
 			fprintf(stdout,"%s\n",old_value.c_str());
-		else
+		else// Print the value and everything downstream of it
 		{
 			for(const auto& [k,v] : m)
 			{
 				if(k.substr(0,var.length()-1) == var.substr(1,var.length()-1) && k.length() > space)
 					space = k.length();
 			}
+			if(old_value.Value != "")// Print parent value if exists
+			{
+				fprintf(stdout,"%c%s",argv[1][0],var.substr(1,var.length()-2).c_str());
+				for(int i=var.length()-2; i<space+5; i++)
+					fprintf(stdout," ");
+				fprintf(stdout,"%s\n",old_value.c_str());
+			}
 			for(const auto& [k,v] : m)
 			{
 				try
 				{
-					if(k.substr(0,var.length()-1) == var.substr(1,var.length()-1))//TODO start of var.substr may need to change from 1 to 2 for scope sigil
+					if(k.substr(0,var.length()-1) == var.substr(1,var.length()-1) &&
+					k != var.substr(1,var.length()-1 && v != ""))//TODO start of var.substr may need to change from 1 to 2 for scope sigil
 					{
-						fprintf(stdout,"%s",k.c_str());
-						for(int i=k.length(); i<space; i++)
+						fprintf(stdout,"%c%s",argv[1][0],k.c_str());
+						for(int i=k.length(); i<space+5; i++)
 							fprintf(stdout," ");
-						fprintf(stdout,"\t%s\n",v.c_str());
+						fprintf(stdout,"%s\n",v.c_str());
 					}
 				}
 				catch(...){}
