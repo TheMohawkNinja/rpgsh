@@ -29,7 +29,7 @@ class RPGSH_CHAR
 		RPGSH_CONFIG config = RPGSH_CONFIG();
 
 		Attr = load_obj_from_file<RPGSH_VAR>(templates_dir+config.setting[DEFAULT_GAME],AttributeDesignator);
-		Attr[CHAR_NAME_ATTR] = "Name";
+		Attr[CHAR_NAME_ATTR] = "/Name";
 
 		Dice = load_obj_from_file<RPGSH_DICE>(templates_dir+config.setting[DEFAULT_GAME],DiceDesignator);
 
@@ -37,7 +37,7 @@ class RPGSH_CHAR
 	RPGSH_CHAR(std::string game)
 	{
 		Attr = load_obj_from_file<RPGSH_VAR>(templates_dir+game,AttributeDesignator);
-		Attr[CHAR_NAME_ATTR] = "Name";
+		Attr[CHAR_NAME_ATTR] = "/Name";
 
 		Dice = load_obj_from_file<RPGSH_DICE>(templates_dir+game,DiceDesignator);
 	}
