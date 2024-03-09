@@ -5,19 +5,19 @@
 int main()
 {
 	fprintf(stdout,"                                         %s▟                   %s\n",TEXT_YELLOW,TEXT_NORMAL);
-	fprintf(stdout,"                                         %s█▙                  %s\n",TEXT_YELLOW,TEXT_NORMAL);
-	fprintf(stdout,"%s  ▜█████████████████████████████████████%s██████████■██      %s\n",TEXT_LIGHTGRAY,TEXT_YELLOW,TEXT_NORMAL);
-	fprintf(stdout,"                                         %s█▛                  %s\n",TEXT_YELLOW,TEXT_NORMAL);
+	fprintf(stdout,"                                         %s█▙        ▁▁        %s\n",TEXT_YELLOW,TEXT_NORMAL);
+	fprintf(stdout,"%s  ▜█████████████████████████████████████%s█%s███▒▒▒▒▒▒███%s     %s\n",TEXT_LIGHTGRAY,TEXT_YELLOW,TEXT_BG_BLACK,TEXT_BG_DEFAULTCOLOR,TEXT_NORMAL);
+	fprintf(stdout,"                                         %s█▛        ▔▔        %s\n",TEXT_YELLOW,TEXT_NORMAL);
 	fprintf(stdout,"                                         %s▜                   %s\n",TEXT_YELLOW,TEXT_NORMAL);
 	fprintf(stdout,"%s  ┌────────┐ ┌────────┐ ┌────────┐ %s                        %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
 	fprintf(stdout,"%s  │########└┐│########└┐│########└┐%s ┌──────┐┌─┐            %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
-	fprintf(stdout,"%s  │#┌─────┐#││#┌─────┐#││#┌─────┐#│%s┌┘######││#│            %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
-	fprintf(stdout,"%s  │#└─────┘#││#└─────┘#││#│     └─┘%s│#┌─────┘│#│            %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
-	fprintf(stdout,"%s  │########┌┘│########┌┘│#│   ┌───┐%s│#└────┐ │#└────┐       %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
-	fprintf(stdout,"%s  │#┌──┐##┌┘ │#┌──────┘ │#│   │###│%s└┐#####└┐│######└┐      %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
-	fprintf(stdout,"%s  │#│  └┐#└┐ │#│        │#│   └─┐#│%s └────┐#││#┌───┐#│      %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
-	fprintf(stdout,"%s  │#│   └┐#└┐│#│        │#└─────┘#│%s┌─────┘#││#│   │#│      %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
-	fprintf(stdout,"%s  │#│    └┐#││#│        └┐########│%s│######┌┘│#│   │#│      %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
+	fprintf(stdout,"%s  │#┌─────┐#││#┌─────┐#││#┌─────┐#│%s┌┘$$$$$$││$│            %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
+	fprintf(stdout,"%s  │#└─────┘#││#└─────┘#││#│     └─┘%s│$┌─────┘│$│            %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
+	fprintf(stdout,"%s  │########┌┘│########┌┘│#│   ┌───┐%s│$└────┐ │$└────┐       %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
+	fprintf(stdout,"%s  │#┌──┐##┌┘ │#┌──────┘ │#│   │###│%s└┐$$$$$└┐│$$$$$$└┐      %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
+	fprintf(stdout,"%s  │#│  └┐#└┐ │#│        │#│   └─┐#│%s └────┐$││$┌───┐$│      %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
+	fprintf(stdout,"%s  │#│   └┐#└┐│#│        │#└─────┘#│%s┌─────┘$││$│   │$│      %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
+	fprintf(stdout,"%s  │#│    └┐#││#│        └┐########│%s│$$$$$$┌┘│$│   │$│      %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
 	fprintf(stdout,"%s  └─┘     └─┘└─┘         └────────┘%s└──────┘ └─┘   └─┘      %s\n",TEXT_CYAN,TEXT_MAGENTA,TEXT_NORMAL);
 	fprintf(stdout,"%s                                            ▄▄▄▄▄▄▄▄         %s\n",TEXT_RED,TEXT_NORMAL);
 	fprintf(stdout,"%s                               ▄▄     ▄█   ██%s██████%s██    %s\n",TEXT_RED,TEXT_YELLOW,TEXT_RED,TEXT_NORMAL);
