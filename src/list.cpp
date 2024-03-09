@@ -10,7 +10,7 @@ void print_header(std::string s)
 	fprintf(stdout,"%s\n",TEXT_NORMAL);
 }
 template <typename T>
-void print_map(T m)
+void print_map(T m, char scope_sigil)
 {
 	unsigned int key_max_len = 0;
 	for(auto& [k,v] : m)
@@ -23,10 +23,10 @@ void print_map(T m)
 		if(k[0] == '.')
 			continue;
 
-		fprintf(stdout,"%s",k.c_str());
-		for(int i=k.length(); i<key_max_len; i++)
+		fprintf(stdout,"%c%s",scope_sigil,k.c_str());
+		for(int i=k.length(); i<key_max_len+5; i++)
 			fprintf(stdout," ");
-		fprintf(stdout,"\t%s\n",v.c_str());
+		fprintf(stdout,"%s\n",v.c_str());
 	}
 }
 void print_player_attrs()
@@ -34,7 +34,7 @@ void print_player_attrs()
 	RPGSH_CHAR c = RPGSH_CHAR();
 	std::string sigil(1,CHAR_SIGIL);
 	print_header("("+sigil+") "+c.Name());
-	print_map<RPGSH_OBJ<RPGSH_VAR>>(c.Attr);
+	print_map<RPGSH_OBJ<RPGSH_VAR>>(c.Attr,CHAR_SIGIL);
 }
 void print_campaign_vars()
 {
@@ -47,7 +47,7 @@ void print_campaign_vars()
 	std::string sigil(1,CAMPAIGN_SIGIL);// Omit trailing '/'
 	print_header("("+sigil+") "+current_campaign);
 	vars = load_vars_from_file(campaign_vars_file);
-	print_map<std::map<std::string,std::string>>(vars);
+	print_map<std::map<std::string,std::string>>(vars,CAMPAIGN_SIGIL);
 }
 void print_shell_vars()
 {
@@ -55,7 +55,7 @@ void print_shell_vars()
 	std::string sigil(1,SHELL_SIGIL);
 	print_header("("+sigil+") "+"Shell");
 	vars = load_vars_from_file(shell_vars_file);
-	print_map<std::map<std::string,std::string>>(vars);
+	print_map<std::map<std::string,std::string>>(vars,SHELL_SIGIL);
 }
 int main(int argc, char** argv)
 {
