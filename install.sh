@@ -21,6 +21,8 @@ echo -e "Compiling:\tsrc/banner.cpp\t\t->\t$bold_white""rpgsh-banner"$normal
 g++ src/banner.cpp -o rpgsh-banner
 echo -e "Compiling:\tsrc/roll.cpp\t\t->\t$bold_white""rpgsh-roll"$normal
 g++ src/roll.cpp -lstdc++fs -std=c++17 -o rpgsh-roll
+echo -e "Compiling:\tsrc/list.cpp\t\t->\t$bold_white""rpgsh-list"$normal
+g++ src/list.cpp -o rpgsh-list
 
 echo
 
