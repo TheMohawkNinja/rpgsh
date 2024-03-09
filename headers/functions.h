@@ -55,7 +55,8 @@ void set_shell_var(std::string var,std::string value)
 	{
 		std::string data = "";
 		std::getline(ifs,data);
-
+		if(data == "" || data == "\n")// Prevents writing blank lines back to file
+			continue;
 		if(data.substr(0,data.find(DS)) == var)
 		{
 			ofs<<var + DS + value + "\n";
@@ -111,7 +112,8 @@ void set_campaign_var(std::string var,std::string value)
 	{
 		std::string data = "";
 		std::getline(ifs,data);
-
+		if(data == "" || data == "\n")// Prevents writing blank lines back to file
+			continue;
 		if(data.substr(0,data.find(DS)) == var)
 		{
 			ofs<<var + DS + value + "\n";
