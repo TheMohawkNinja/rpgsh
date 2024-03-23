@@ -1,9 +1,14 @@
+#include <cstring>
+#include <filesystem>
+#include <fstream>
 #include <spawn.h>
 #include <termios.h>
 #include <sys/wait.h>
 #include "../headers/char.h"
 #include "../headers/config.h"
 #include "../headers/functions.h"
+#include "../headers/output.h"
+#include "../headers/text.h"
 
 #define MAX_BUFFER_SIZE 256
 
@@ -408,7 +413,15 @@ int prompt()
 	std::string in = input_handler();
 	if(in.length())
 	{
-		strncpy(buffer,in.c_str(),in.length()+1);
+		try
+		{
+			strncpy(buffer,in.c_str(),in.length()+1);
+		}
+		catch(...)
+		{
+			output(Error, "Unable to copy user input into buffer. Please check what you entered and try again.");
+			strcpy(buffer,"");
+		}
 	}
 
 	if(strcmp(buffer,""))
@@ -444,7 +457,7 @@ int main()
 	//Create shell vars file if it doesn't exist
 	if(!std::filesystem::exists(shell_vars_file.c_str()))
 	{
-		output(Info,"Shell variable storage file not found, creating file at \'%s\'.",shell_vars_file.c_str());
+		output(Info,"Shell variable file not found, creating file at \'%s\'.",shell_vars_file.c_str());
 		std::ofstream ofs(shell_vars_file.c_str());
 		ofs.close();
 
