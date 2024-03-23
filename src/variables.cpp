@@ -1,3 +1,4 @@
+#include <cstring>
 #include "../headers/char.h"
 #include "../headers/functions.h"
 #include "../headers/var.h"
@@ -66,7 +67,7 @@ void set_var(std::string var, RPGSH_VAR old_value, RPGSH_VAR new_value, char sco
 			break;
 	}
 	if(old_value != new_value)
-		output(Info,"%s \"%s\" has been changed from \"%s\" to \"%s\".",var_type.c_str(),var.c_str(),old_value.c_str(),new_value.c_str());
+		output(Info,"%s \"%s\" has been changed from \"%s\" to \"%s\".",var_type.c_str(),var.substr(1,var.length()-1).c_str(),old_value.c_str(),new_value.c_str());
 }
 
 int main(int argc, char** argv)
