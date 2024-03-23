@@ -18,9 +18,8 @@ Run `sudo ./install.sh; ./install.sh`
 
 Once the project is installed, run the program with the `rpgsh` command.
 
-See `docs/rpgsh-userguide.pdf` for detailed instructions on how everything works.
+**WIP:** See `docs/rpgsh-userguide.pdf` for detailed instructions on how everything works.
 
 ## Programming Third-Party Applications
 
-**WIP**
-See `docs/rpgsh-programmingguide.pdf` for full details.
+**TODO:** See `docs/rpgsh-programmingguide.pdf` for full details.
