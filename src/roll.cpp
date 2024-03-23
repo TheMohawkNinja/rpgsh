@@ -1,5 +1,6 @@
 #include "../headers/dice.h"
 #include "../headers/functions.h"
+#include "../headers/text.h"
 
 int main(int argc, char** argv)
 {
