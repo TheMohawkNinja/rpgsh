@@ -1,5 +1,9 @@
+#include <cstring>
 #include "../headers/char.h"
+#include "../headers/define.h"
 #include "../headers/functions.h"
+#include "../headers/output.h"
+#include "../headers/text.h"
 
 int main(int argc, char** argv)
 {
