@@ -1,5 +1,7 @@
+#include <cstring>
 #include "../headers/char.h"
 #include "../headers/functions.h"
+#include "../headers/text.h"
 
 void print_header(std::string s)
 {
