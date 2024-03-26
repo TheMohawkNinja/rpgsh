@@ -411,17 +411,15 @@ int prompt()
 	}
 
 	std::string in = input_handler();
-	if(in.length())
+	if(in.length() > MAX_BUFFER_SIZE)
 	{
-		try
-		{
-			strncpy(buffer,in.c_str(),in.length()+1);
-		}
-		catch(...)
-		{
-			output(Error, "Unable to copy user input into buffer. Please check what you entered and try again.");
-			strcpy(buffer,"");
-		}
+		fprintf(stdout,"\n\n");
+		output(Error,"Input too big (%llu characters)! Please enter <= %d characters.",in.length(),MAX_BUFFER_SIZE);
+		strcpy(buffer,"");
+	}
+	else
+	{
+		strncpy(buffer,in.c_str(),in.length()+1);
 	}
 
 	if(strcmp(buffer,""))
