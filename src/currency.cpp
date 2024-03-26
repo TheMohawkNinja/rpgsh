@@ -30,7 +30,7 @@ bool RPGSH_CURRENCY::operator == (const RPGSH_CURRENCY& b) const
 		Name == b.Name &&
 		Smaller == b.Smaller &&
 		SmallerAmount == b.SmallerAmount &&
-		Larger == Larger);
+		Larger == b.Larger);
 }
 
 RPGSH_CURRENCY& RPGSH_CURRENCYSYSTEM::operator [] (const std::string b)
