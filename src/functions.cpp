@@ -1,9 +1,13 @@
-#include <string.h>
-#include <map>
-#include <vector>
 #include <cstdarg>
-#include "../headers/functions.h"
+#include <map>
+#include <spawn.h>
+#include <string.h>
+#include <sys/wait.h>
+#include <vector>
+#include "../headers/char.h"
+#include "../headers/config.h"
 #include "../headers/dice.h"
+#include "../headers/functions.h"
 
 bool stob(std::string s)
 {
@@ -27,6 +31,227 @@ void printBadOpAndThrow(std::string bad_op)
 	output(Error,("Invalid operation: "+bad_op).c_str());
 	throw;
 	return;
+}
+
+void padding()
+{
+	RPGSH_CONFIG config = RPGSH_CONFIG();
+
+	//Pad output if set
+	try
+	{
+		if(stob(config.setting[PADDING]))
+		{
+			fprintf(stdout,"\n");
+		}
+	}
+	catch(...)
+	{
+		output(Error,"Invalid value \'%s\' for \'%s\'.",config.setting[PADDING].c_str(),PADDING);
+		exit(-1);
+	}
+}
+
+void run_rpgsh_prog(std::string args)
+{
+	RPGSH_CHAR c = RPGSH_CHAR();
+
+	std::vector<std::string> vars;
+	extern char** environ;
+	pid_t pid;
+
+	if(args[0] == CHAR_SIGIL ||
+	args[0] == CAMPAIGN_SIGIL ||
+	args[0] == SHELL_SIGIL) //Check if user is operating on a variable
+	{
+		args = "variables " + args;
+	}
+
+	int params_start = args.find(" ", args.find(" ")+1);
+	std::string prefix = "rpgsh-";
+	std::string path = "./";
+
+	if(params_start != std::string::npos)
+	{
+		//Replaces all instances of variables with their respective value
+		//Except for the first arg if it is a variable
+		//TODO if the regex lib is ever properly fully-implemented, replace this shit with regex like God intended
+		for(int i=params_start+1; i<args.length(); i++)
+		{
+			params_start = args.find(" ", args.find(" ")+1);
+			std::string var = "";
+			if(args[i] == CHAR_SIGIL)
+			{
+				int find_percent = args.find(CHAR_SIGIL,params_start);
+				for(int j=i+1; j<args.length() && args.substr(j,1) != " "; j++)
+				{
+					var+=args.substr(j,1);
+				}
+				int new_args_start = find_percent + var.length() + 1;
+				args = args.substr(0,find_percent)+c.Attr[var].c_str()+
+				       args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
+			}
+			else if(args[i] == CAMPAIGN_SIGIL)
+			{
+				std::string campaign_vars_file = campaigns_dir +
+								get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR) +
+								".vars";
+				int sigil_pos = args.find(CAMPAIGN_SIGIL,params_start);
+				for(int j=i+1; j<args.length() && args.substr(j,1) != " "; j++)
+				{
+					var+=args.substr(j,1);
+				}
+
+				std::ifstream ifs(campaign_vars_file.c_str());
+				while(!ifs.eof())
+				{
+					std::string old;
+					std::string data = "";
+					std::getline(ifs,data);
+
+					if(data.substr(0,data.find(DS)) == var)
+					{
+						int new_args_start = sigil_pos + var.length() + 1;
+						old = data.substr(data.find(DS)+DS.length(),
+								  data.length()-(data.find(DS)+DS.length()));
+
+						if(old.find(" ") != std::string::npos)
+						{
+							old = "\"" + old + "\"";
+						}
+
+						args = args.substr(0,sigil_pos)+
+						       old+
+						       args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
+						break;
+					}
+				}
+				ifs.close();
+			}
+			else if(args[i] == SHELL_SIGIL)
+			{
+				int sigil_pos = args.find(SHELL_SIGIL,params_start);
+				for(int j=i+1; j<args.length() && args.substr(j,1) != " "; j++)
+				{
+					var+=args.substr(j,1);
+				}
+
+				std::ifstream ifs(shell_vars_file.c_str());
+				while(!ifs.eof())
+				{
+					std::string old;
+					std::string data = "";
+					std::getline(ifs,data);
+
+					if(data.substr(0,data.find(DS)) == var)
+					{
+						int new_args_start = sigil_pos + var.length() + 1;
+						old = data.substr(data.find(DS)+DS.length(),
+								  data.length()-(data.find(DS)+DS.length()));
+
+						if(old.find(" ") != std::string::npos)
+						{
+							old = "\"" + old + "\"";
+						}
+
+						args = args.substr(0,sigil_pos)+
+						       old+
+						       args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
+						break;
+					}
+				}
+				ifs.close();
+			}
+		}
+	}
+	if(args.find(" ") != std::string::npos)
+	{
+		vars.push_back(path+prefix+args.substr(0,args.find(" ")));
+		args = args.substr(args.find(" ")+1,(args.length() - args.find(" ")+1));
+
+		for(int i=0; i<args.length(); i++)
+		{
+			if(args.substr(i,1) == "\"")//Combine args wrapped in quotes
+			{
+				if(args.find("\"",i+1) == std::string::npos)
+				{
+					output(Error,"Unmatched quote in argument list.");
+					return;
+				}
+				vars.push_back(args.substr(i+1,(args.find("\"",i+1)-i-1)));
+				i += vars[vars.size()-1].length()+1;
+			}
+			else
+			{
+				if(args.find(" ",i) != std::string::npos)
+				{
+					std::string var = args.substr(i,args.find(" ",i)-i);
+					bool var_is_valid = false;
+					for(int c_i=0; c_i<var.length(); c_i++)//Make sure we're not just grabbing extraneous whitespace
+					{
+						std::string c = var.substr(c_i,1);
+						if(c != " " && c != "")
+						{
+							var_is_valid = true;
+						}
+					}
+
+					if(var_is_valid)
+					{
+						vars.push_back(args.substr(i,args.find(" ",i)-i));
+						i+=vars[vars.size()-1].length();
+					}
+				}
+				else
+				{
+					vars.push_back(args.substr(i,args.length()-i));
+					break;
+				}
+			}
+		}
+	}
+	else//If only one arg is called
+	{
+		vars.push_back(path+prefix+args);
+	}
+
+	//Convert vector to char*[]
+	char* argv[vars.size()+1];
+	for(int i=0; i<vars.size(); i++)
+	{
+		argv[i] = (char*)vars[i].c_str();
+	}
+
+	//Add a NULL because posix_spawn() needs that for some reason
+	argv[vars.size()] = NULL;
+
+	padding();
+
+	int status = posix_spawn(&pid, argv[0], NULL, NULL, (char* const*)argv, environ);
+
+	if(status == 0)
+	{
+		do
+		{
+			if(waitpid(pid, &status, 0) == -1)
+			{
+				exit(1);
+			}
+		}while (!WIFEXITED(status) && !WIFSIGNALED(status));
+	}
+	else
+	{
+		if(status == 2)//File not found
+		{
+			std::string displayed_command = std::string(argv[0]).substr(prefix.length()+2,std::string(argv[0]).length()-prefix.length()-2);
+			output(Error,"\"%s\" is not a valid rpgsh command. (%d)",displayed_command.c_str(),status);
+		}
+		else
+		{
+			output(Error,"%s (%d)",strerror(status),status);
+		}
+	}
+	padding();
 }
 
 std::string get_shell_var(std::string var)

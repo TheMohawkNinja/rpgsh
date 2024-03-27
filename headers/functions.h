@@ -11,6 +11,10 @@ bool stob(std::string s);
 
 void printBadOpAndThrow(std::string bad_op);
 
+void padding();
+
+void run_rpgsh_prog(std::string args);
+
 std::string get_shell_var(std::string var);
 void set_shell_var(std::string var,std::string value);
 
