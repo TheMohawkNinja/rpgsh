@@ -106,9 +106,9 @@ int RPGSH_DICE::get_value(std::string d, std::string value, int start, std::stri
 }
 
 RPGSH_DICE::operator std::string() const
-	{
-		return (std::to_string(Quantity)+"d"+std::to_string(Faces));
-	}
+{
+	return (std::to_string(Quantity)+"d"+std::to_string(Faces));
+}
 
 RPGSH_DICE::RPGSH_DICE(){}
 RPGSH_DICE::RPGSH_DICE(std::string dice_str)
