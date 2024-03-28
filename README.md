@@ -4,11 +4,11 @@
 
 # rpgsh
 
-`rpgsh` is an interactive and extensible shell purpose-built for table-top RPGs like Dungeons and Dragons©, Pathfinder©, and more!
+`rpgsh` is an interactive and extensible shell purpose-built for table-top RPGs like Dungeons and Dragons®, Pathfinder®, and more!
 
 ## Disclaimer
 
-This project is entirely developed independantly. I am not associated in anyway with Wizards of the Coast, Paizo, or any other company. To any lawyers eyeing me up, I will not be adding information that would negate the need for players to puchase your products (e.g. spell descriptions).
+This project is entirely developed independantly. I am not associated in anyway with Wizards of the Coast, Paizo, or any other game development company. To any lawyers eyeing me up, I will not be adding information that would negate the need for players to puchase your products (e.g. game rules).
 
 ## Install
 
