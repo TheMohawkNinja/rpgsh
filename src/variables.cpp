@@ -186,7 +186,7 @@ int main(int argc, char** argv)
 			}
 		}
 	}
-	else if(argc == 3)// Iterators
+	else if(argc == 3)// Unary operators
 	{
 		if(is_operator(std::string(argv[2])))
 		{
@@ -212,7 +212,7 @@ int main(int argc, char** argv)
 			exit(-1);
 		}
 	}
-	else// All other operations
+	else// Binary operators
 	{
 		RPGSH_VAR new_value = std::string(argv[3]);
 		for(int i=4; i<argc; i++)
