@@ -241,39 +241,48 @@ RPGSH_VAR& RPGSH_VAR::operator -- (const int b)
 }
 RPGSH_VAR RPGSH_VAR::operator + (const RPGSH_VAR b)
 {
-	return (*this += b);
+	RPGSH_VAR lhs = *this;
+	return (lhs += b);
 }
 RPGSH_VAR RPGSH_VAR::operator + (const std::string b)
 {
-	return (*this += b);
+	RPGSH_VAR lhs = *this;
+	return (lhs += b);
 }
 RPGSH_VAR RPGSH_VAR::operator + (const int b)
 {
-	return (*this += b);
+	RPGSH_VAR lhs = *this;
+	return (lhs += b);
 }
 RPGSH_VAR RPGSH_VAR::operator - (const RPGSH_VAR b)
 {
-	return (*this -= b);
+	RPGSH_VAR lhs = *this;
+	return (lhs -= b);
 }
 RPGSH_VAR RPGSH_VAR::operator - (const int b)
 {
-	return (*this -= b);
+	RPGSH_VAR lhs = *this;
+	return (lhs -= b);
 }
 RPGSH_VAR RPGSH_VAR::operator * (const RPGSH_VAR b)
 {
-	return (*this *= b);
+	RPGSH_VAR lhs = *this;
+	return (lhs *= b);
 }
 RPGSH_VAR RPGSH_VAR::operator * (const int b)
 {
-	return (*this *= b);
+	RPGSH_VAR lhs = *this;
+	return (lhs *= b);
 }
 RPGSH_VAR RPGSH_VAR::operator / (const RPGSH_VAR b)
 {
-	return (*this /= b);
+	RPGSH_VAR lhs = *this;
+	return (lhs /= b);
 }
 RPGSH_VAR RPGSH_VAR::operator / (const int b)
 {
-	return (*this /= b);
+	RPGSH_VAR lhs = *this;
+	return (lhs /= b);
 }
 
 RPGSH_VAR::RPGSH_VAR(){}
