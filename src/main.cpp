@@ -230,17 +230,7 @@ int prompt()
 int main()
 {
 	//Create shell vars file if it doesn't exist
-	if(!std::filesystem::exists(shell_vars_file.c_str()))
-	{
-		output(Info,"Shell variable file not found, creating file at \'%s\'.",shell_vars_file.c_str());
-		std::ofstream ofs(shell_vars_file.c_str());
-		ofs.close();
-
-		//Set default values for built-in shell variables
-		RPGSH_OBJ Attr = load_obj_from_file<var_t>(templates_dir+config.setting[DEFAULT_GAME],c.AttributeDesignator);
-		set_shell_var(CURRENT_CHAR_SHELL_VAR,c.Name());
-		set_shell_var(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
-	}
+	confirmShellVarsFile();
 
 	//(re)build default character on launch
 	c.save();

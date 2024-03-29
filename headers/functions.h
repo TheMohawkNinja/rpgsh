@@ -9,6 +9,8 @@
 
 bool stob(std::string s);
 
+void confirmShellVarsFile();
+
 void printBadOpAndThrow(std::string bad_op);
 
 void padding();

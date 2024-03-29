@@ -26,6 +26,24 @@ bool stob(std::string s)
 	}
 }
 
+void confirmShellVarsFile()
+{
+	if(!std::filesystem::exists(shell_vars_file.c_str()))
+	{
+		output(Info,"Shell variable file not found, creating file at \'%s\'.",shell_vars_file.c_str());
+		std::ofstream ofs(shell_vars_file.c_str());
+		ofs.close();
+
+		rpgsh_config config = rpgsh_config();
+		rpgsh_char c = rpgsh_char();
+
+		//Set default values for built-in shell variables
+		RPGSH_OBJ Attr = load_obj_from_file<var_t>(templates_dir+config.setting[DEFAULT_GAME],c.AttributeDesignator);
+		set_shell_var(CURRENT_CHAR_SHELL_VAR,c.Name());
+		set_shell_var(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
+	}
+}
+
 void printBadOpAndThrow(std::string bad_op)
 {
 	output(Error,("Invalid operation: "+bad_op).c_str());
