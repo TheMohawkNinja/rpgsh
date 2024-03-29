@@ -54,20 +54,20 @@ if [[ $EUID -eq 0 ]]; then
 	echo
 
 	echo "Compiling applications:"
-	echo -e "\tsrc/main.cpp\t\t->\t$bold_white""rpgsh"$normal
-	g++ src/main.cpp -L $lib_dir -ldefine -lvar -lobj -lfunctions -loutput -lconfig -ldice -lcurrency -lchar $fs $debug -o rpgsh
-	echo -e "\tsrc/setname.cpp\t\t->\t$bold_white""rpgsh-setname"$normal
-	g++ src/setname.cpp -L $lib_dir -ldefine -loutput -ldice -lcurrency -lconfig -lchar -lfunctions -lvar $fs $debug -o rpgsh-setname
-	echo -e "\tsrc/variables.cpp\t->\t$bold_white""rpgsh-variables"$normal
-	g++ src/variables.cpp -L $lib_dir -ldefine -lvar -lobj -lfunctions -loutput -lconfig -ldice -lcurrency -lchar $fs $debug -o rpgsh-variables
-	echo -e "\tsrc/version.cpp\t\t->\t$bold_white""rpgsh-version"$normal
-	g++ src/version.cpp $debug -o rpgsh-version
-	echo -e "\tsrc/banner.cpp\t\t->\t$bold_white""rpgsh-banner"$normal
-	g++ src/banner.cpp $debug -o rpgsh-banner
-	echo -e "\tsrc/roll.cpp\t\t->\t$bold_white""rpgsh-roll"$normal
-	g++ src/roll.cpp -L $lib_dir -ldefine -ldice -loutput $fs $debug -o rpgsh-roll
-	echo -e "\tsrc/list.cpp\t\t->\t$bold_white""rpgsh-list"$normal
-	g++ src/list.cpp -L $lib_dir -ldefine -lconfig -lchar -ldice -lvar -lobj -lfunctions -loutput -lcurrency $debug -o rpgsh-list
+	echo -e "\tsrc/main.cpp\t\t->\t$bold_white""/bin/rpgsh"$normal
+	g++ src/main.cpp -L $lib_dir -ldefine -lvar -lobj -lfunctions -loutput -lconfig -ldice -lcurrency -lchar $fs $debug -o /bin/rpgsh
+	echo -e "\tsrc/setname.cpp\t\t->\t$bold_white""/bin/rpgsh-setname"$normal
+	g++ src/setname.cpp -L $lib_dir -ldefine -loutput -ldice -lcurrency -lconfig -lchar -lfunctions -lvar $fs $debug -o /bin/rpgsh-setname
+	echo -e "\tsrc/variables.cpp\t->\t$bold_white""/bin/rpgsh-variables"$normal
+	g++ src/variables.cpp -L $lib_dir -ldefine -lvar -lobj -lfunctions -loutput -lconfig -ldice -lcurrency -lchar $fs $debug -o /bin/rpgsh-variables
+	echo -e "\tsrc/version.cpp\t\t->\t$bold_white""/bin/rpgsh-version"$normal
+	g++ src/version.cpp $debug -o /bin/rpgsh-version
+	echo -e "\tsrc/banner.cpp\t\t->\t$bold_white""/bin/rpgsh-banner"$normal
+	g++ src/banner.cpp $debug -o /bin/rpgsh-banner
+	echo -e "\tsrc/roll.cpp\t\t->\t$bold_white""/bin/rpgsh-roll"$normal
+	g++ src/roll.cpp -L $lib_dir -ldefine -ldice -loutput $fs $debug -o /bin/rpgsh-roll
+	echo -e "\tsrc/list.cpp\t\t->\t$bold_white""/bin/rpgsh-list"$normal
+	g++ src/list.cpp -L $lib_dir -ldefine -lconfig -lchar -ldice -lvar -lobj -lfunctions -loutput -lcurrency $debug -o /bin/rpgsh-list
 
 	echo "Done!"
 else

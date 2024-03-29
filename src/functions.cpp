@@ -87,7 +87,7 @@ void run_rpgsh_prog(std::string args)
 
 	int params_start = args.find(" ", args.find(" ")+1);
 	std::string prefix = "rpgsh-";
-	std::string path = "./";
+	std::string path = "/bin/";
 
 	if(params_start != std::string::npos)
 	{
@@ -261,7 +261,7 @@ void run_rpgsh_prog(std::string args)
 	{
 		if(status == 2)//File not found
 		{
-			std::string displayed_command = std::string(argv[0]).substr(prefix.length()+2,std::string(argv[0]).length()-prefix.length()-2);
+			std::string displayed_command = std::string(argv[0]).substr(prefix.length()+path.length(),std::string(argv[0]).length()-prefix.length()-path.length());
 			output(Error,"\"%s\" is not a valid rpgsh command. (%d)",displayed_command.c_str(),status);
 		}
 		else
