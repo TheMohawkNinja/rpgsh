@@ -4,7 +4,6 @@
 #include <spawn.h>
 #include <string.h>
 #include <sys/wait.h>
-#include <vector>
 #include "../headers/char.h"
 #include "../headers/config.h"
 #include "../headers/dice.h"
@@ -58,11 +57,19 @@ void confirmCampaignVarsFile()
 	}
 }
 
+std::vector<std::string> getDirectoryListing(std::string path)
+{
+	std::vector<std::string> entries;
+	for(const auto& entry : std::filesystem::directory_iterator(path))
+		entries.push_back(entry.path().filename().string());
+
+	return entries;
+}
+
 void printBadOpAndThrow(std::string bad_op)
 {
 	output(Error,("Invalid operation: "+bad_op).c_str());
 	throw;
-	return;
 }
 
 void padding()
