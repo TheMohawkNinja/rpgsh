@@ -35,7 +35,7 @@ void printBadOpAndThrow(std::string bad_op)
 
 void padding()
 {
-	RPGSH_CONFIG config = RPGSH_CONFIG();
+	rpgsh_config config = rpgsh_config();
 
 	//Pad output if set
 	try
@@ -54,7 +54,7 @@ void padding()
 
 void run_rpgsh_prog(std::string args)
 {
-	RPGSH_CHAR c = RPGSH_CHAR();
+	rpgsh_char c = rpgsh_char();
 
 	std::vector<std::string> vars;
 	extern char** environ;
@@ -395,7 +395,7 @@ std::map<std::string,std::string> load_vars_from_file(std::string path)
 }
 /*std::string get_var(std::string var)
 {
-	RPGSH_CHAR c = RPGSH_CHAR();
+	rpgsh_char c = rpgsh_char();
 	std::string ret = "";
 	std::string path = "";
 	std::map<std::string,std::string> m;
@@ -466,9 +466,9 @@ std::map<std::string,std::string> load_vars_from_file(std::string path)
 }*/
 
 template <typename T>
-void save_obj_to_file(std::string path, RPGSH_OBJ<RPGSH_DICE> obj, std::string obj_id);
-void save_obj_to_file(std::string path, RPGSH_OBJ<RPGSH_VAR> obj, std::string obj_id);
+void save_obj_to_file(std::string path, RPGSH_OBJ<dice_t> obj, std::string obj_id);
+void save_obj_to_file(std::string path, RPGSH_OBJ<var_t> obj, std::string obj_id);
 
 template <typename T>
-RPGSH_OBJ<RPGSH_DICE> load_obj_from_file(std::string path, std::string var_id);
-RPGSH_OBJ<RPGSH_VAR> load_obj_from_file(std::string path, std::string var_id);
+RPGSH_OBJ<dice_t> load_obj_from_file(std::string path, std::string var_id);
+RPGSH_OBJ<var_t> load_obj_from_file(std::string path, std::string var_id);

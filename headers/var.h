@@ -3,43 +3,43 @@
 #include <map>
 #include <string>
 
-class RPGSH_VAR
+class var_t
 {
 	public:
 		std::string Value = "";
 
 		explicit operator std::string() const;
 		explicit operator int() const;
-		RPGSH_VAR& operator = (const RPGSH_VAR b);
-		RPGSH_VAR& operator = (const std::string b);
-		RPGSH_VAR& operator = (const int b);
-		RPGSH_VAR& operator += (const RPGSH_VAR b);
-		RPGSH_VAR& operator += (const std::string b);
-		RPGSH_VAR& operator += (const int b);
-		RPGSH_VAR& operator -= (const RPGSH_VAR b);
-		RPGSH_VAR& operator -= (const int b);
-		RPGSH_VAR& operator *= (const RPGSH_VAR b);
-		RPGSH_VAR& operator *= (const int b);
-		RPGSH_VAR& operator /= (const RPGSH_VAR b);
-		RPGSH_VAR& operator /= (const int b);
-		RPGSH_VAR& operator ++ (const int b);
-		RPGSH_VAR& operator -- (const int b);
-		RPGSH_VAR operator + (const RPGSH_VAR b);
-		RPGSH_VAR operator + (const std::string b);
-		RPGSH_VAR operator + (const int b);
-		RPGSH_VAR operator - (const RPGSH_VAR b);
-		RPGSH_VAR operator - (const int b);
-		RPGSH_VAR operator * (const RPGSH_VAR b);
-		RPGSH_VAR operator * (const int b);
-		RPGSH_VAR operator / (const RPGSH_VAR b);
-		RPGSH_VAR operator / (const int b);
+		var_t& operator = (const var_t b);
+		var_t& operator = (const std::string b);
+		var_t& operator = (const int b);
+		var_t& operator += (const var_t b);
+		var_t& operator += (const std::string b);
+		var_t& operator += (const int b);
+		var_t& operator -= (const var_t b);
+		var_t& operator -= (const int b);
+		var_t& operator *= (const var_t b);
+		var_t& operator *= (const int b);
+		var_t& operator /= (const var_t b);
+		var_t& operator /= (const int b);
+		var_t& operator ++ (const int b);
+		var_t& operator -- (const int b);
+		var_t operator + (const var_t b);
+		var_t operator + (const std::string b);
+		var_t operator + (const int b);
+		var_t operator - (const var_t b);
+		var_t operator - (const int b);
+		var_t operator * (const var_t b);
+		var_t operator * (const int b);
+		var_t operator / (const var_t b);
+		var_t operator / (const int b);
 
 		// Comparison operators
-		bool operator != (const RPGSH_VAR b);
+		bool operator != (const var_t b);
 
-	RPGSH_VAR();
-	RPGSH_VAR(std::string _value);
-	RPGSH_VAR(int _value);
+	var_t();
+	var_t(std::string _value);
+	var_t(int _value);
 
 	const char* c_str() const;
 };

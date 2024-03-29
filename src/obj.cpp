@@ -2,5 +2,5 @@
 #include "../headers/obj.h"
 #include "../headers/var.h"
 
-template class RPGSH_OBJ<RPGSH_DICE>;
-template class RPGSH_OBJ<RPGSH_VAR>;
+template class RPGSH_OBJ<dice_t>;
+template class RPGSH_OBJ<var_t>;

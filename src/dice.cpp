@@ -7,7 +7,7 @@
 #include "../headers/output.h"
 #include "../headers/text.h"
 
-int RPGSH_DICE::get_value(std::string d, std::string value, int start, std::string terminator, bool allow_sign, bool required)
+int dice_t::get_value(std::string d, std::string value, int start, std::string terminator, bool allow_sign, bool required)
 {
 	std::string value_str = "";
 	if(terminator != "")
@@ -105,13 +105,13 @@ int RPGSH_DICE::get_value(std::string d, std::string value, int start, std::stri
 	}
 }
 
-RPGSH_DICE::operator std::string() const
+dice_t::operator std::string() const
 {
 	return (std::to_string(Quantity)+"d"+std::to_string(Faces));
 }
 
-RPGSH_DICE::RPGSH_DICE(){}
-RPGSH_DICE::RPGSH_DICE(std::string dice_str)
+dice_t::dice_t(){}
+dice_t::dice_t(std::string dice_str)
 {
 	if(dice_str.substr(0,1) != "d")
 	{
@@ -126,14 +126,14 @@ RPGSH_DICE::RPGSH_DICE(std::string dice_str)
 		Modifier = get_value(dice_str,"modifier",dice_str.find(std::to_string(Faces),dice_str.find("d",0)) + std::to_string(Faces).length(),"",true,false);
 	}
 }
-RPGSH_DICE::RPGSH_DICE(unsigned int _Quantity, unsigned int _Faces, int _Modifier)
+dice_t::dice_t(unsigned int _Quantity, unsigned int _Faces, int _Modifier)
 {
 	Quantity = _Quantity;
 	Faces = _Faces;
 	Modifier = _Modifier;
 	just_show_total = true;
 }
-RPGSH_DICE::RPGSH_DICE(std::string dice_str, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count)
+dice_t::dice_t(std::string dice_str, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count)
 {
 	if(!_is_list)
 	{
@@ -161,7 +161,7 @@ RPGSH_DICE::RPGSH_DICE(std::string dice_str, bool _just_show_rolls, bool _just_s
 	count_expr = _count_expr;
 	count = _count;
 }
-RPGSH_DICE::RPGSH_DICE(unsigned int _Quantity, unsigned int _Faces, int _Modifier, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count)
+dice_t::dice_t(unsigned int _Quantity, unsigned int _Faces, int _Modifier, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count)
 {
 	Quantity = _Quantity;
 	Faces = _Faces;
@@ -173,7 +173,7 @@ RPGSH_DICE::RPGSH_DICE(unsigned int _Quantity, unsigned int _Faces, int _Modifie
 	count = _count;
 }
 
-std::string RPGSH_DICE::dice() const
+std::string dice_t::dice() const
 {
 	std::string ret = "";
 	if(Quantity)
@@ -188,11 +188,11 @@ std::string RPGSH_DICE::dice() const
 	}
 	return ret;
 }
-const char* RPGSH_DICE::c_str() const
+const char* dice_t::c_str() const
 {
 	return dice().c_str();
 }
-void RPGSH_DICE::roll()
+void dice_t::roll()
 {
 	if(!std::filesystem::exists(random_seed_path))
 	{
@@ -373,7 +373,7 @@ void RPGSH_DICE::roll()
 		}
 	}
 }
-void RPGSH_DICE::test()
+void dice_t::test()
 {
 	std::string plus = TEXT_WHITE;
 	plus += "+";

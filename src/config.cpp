@@ -6,7 +6,7 @@
 #include "../headers/define.h"
 #include "../headers/output.h"
 
-std::string RPGSH_CONFIG::get_config_item(std::string s)
+std::string rpgsh_config::get_config_item(std::string s)
 {
 	if(s.find("=")!=std::string::npos)
 	{
@@ -18,7 +18,7 @@ std::string RPGSH_CONFIG::get_config_item(std::string s)
 		return default_value;
 	}
 }
-std::string RPGSH_CONFIG::get_config_value(std::string s)
+std::string rpgsh_config::get_config_value(std::string s)
 {
 	if(s.find("=")!=std::string::npos)
 	{
@@ -47,7 +47,7 @@ std::string RPGSH_CONFIG::get_config_value(std::string s)
 	}
 }
 
-RPGSH_CONFIG::RPGSH_CONFIG()
+rpgsh_config::rpgsh_config()
 {
 	// Set defaults
 	setting[PADDING]	=	"true";

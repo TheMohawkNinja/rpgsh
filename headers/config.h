@@ -1,6 +1,6 @@
 #pragma once
 
-class RPGSH_CONFIG
+class rpgsh_config
 {
 	// Configuration file definition:
 	//
@@ -15,5 +15,5 @@ class RPGSH_CONFIG
 	std::string get_config_value(std::string s);
 
 	public:
-	RPGSH_CONFIG();
+	rpgsh_config();
 };

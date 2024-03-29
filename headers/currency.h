@@ -4,105 +4,105 @@
 #include <string>
 
 //External forward declarations
-class RPGSH_DICE;
-class RPGSH_VAR;
+class dice_t;
+class var_t;
 
 //Internal forward declarations
-class RPGSH_CURRENCYSYSTEM;
-class RPGSH_WALLET;
+class currency_tSYSTEM;
+class wallet_t;
 
-class RPGSH_CURRENCY
+class currency_t
 {
 	public:
-		RPGSH_CURRENCYSYSTEM* System = nullptr;
+		currency_tSYSTEM* System = nullptr;
 		std::string Name = "";
 		int SmallerAmount = 0;
 		std::string Smaller = "";
 		std::string Larger = "";
 
-	void AttachToCurrencySystem(RPGSH_CURRENCYSYSTEM* _CurrencySystem);
+	void AttachToCurrencySystem(currency_tSYSTEM* _CurrencySystem);
 
-	RPGSH_CURRENCY();
-	RPGSH_CURRENCY(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
-	RPGSH_CURRENCY(RPGSH_CURRENCYSYSTEM* _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
+	currency_t();
+	currency_t(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
+	currency_t(currency_tSYSTEM* _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
 
-	bool operator == (const RPGSH_CURRENCY& b) const;
-	bool operator < (const RPGSH_CURRENCY& b) const;
+	bool operator == (const currency_t& b) const;
+	bool operator < (const currency_t& b) const;
 };
-class RPGSH_CURRENCYSYSTEM
+class currency_tSYSTEM
 {
 	public:
-		std::map<std::string, RPGSH_CURRENCY> Denomination;
-		RPGSH_CURRENCY transaction = RPGSH_CURRENCY();
+		std::map<std::string, currency_t> Denomination;
+		currency_t transaction = currency_t();
 
-	RPGSH_CURRENCY& operator [] (const std::string b);
+	currency_t& operator [] (const std::string b);
 
 	//Iterator type for the class
-	using iterator = typename std::map<std::string, RPGSH_CURRENCY>::const_iterator;
+	using iterator = typename std::map<std::string, currency_t>::const_iterator;
 
 	//Beginning and end iterators.
-	//So I can use "for(const auto& [key,val] : RPGSH_CURRENCYSYSTEM){}"
-	std::map<std::string, RPGSH_CURRENCY>::const_iterator begin() const;
-	std::map<std::string, RPGSH_CURRENCY>::const_iterator end() const;
+	//So I can use "for(const auto& [key,val] : currency_tSYSTEM){}"
+	std::map<std::string, currency_t>::const_iterator begin() const;
+	std::map<std::string, currency_t>::const_iterator end() const;
 
-	RPGSH_CURRENCYSYSTEM();
+	currency_tSYSTEM();
 
-	void MakeChange(RPGSH_CURRENCY c, RPGSH_WALLET* w);
-	void TradeUp(RPGSH_CURRENCYSYSTEM* S, RPGSH_WALLET* w);
+	void MakeChange(currency_t c, wallet_t* w);
+	void TradeUp(currency_tSYSTEM* S, wallet_t* w);
 	bool HasEquivalentTo(int Quantity, std::string Denomination);
 };
-typedef std::pair<RPGSH_CURRENCY, int> money_t;
-class RPGSH_WALLET
+typedef std::pair<currency_t, int> money_t;
+class wallet_t
 {
 	public:
-		std::map<RPGSH_CURRENCY, int> Money;
-		std::pair<RPGSH_CURRENCY,int> transaction;
+		std::map<currency_t, int> Money;
+		std::pair<currency_t,int> transaction;
 
-	bool HasEffectivelyAtLeast(int q, RPGSH_CURRENCY c);
+	bool HasEffectivelyAtLeast(int q, currency_t c);
 	void print(int tab);
-	void FloatQuantityToWholeCurrency(RPGSH_CURRENCY c, float q);
+	void FloatQuantityToWholeCurrency(currency_t c, float q);
 
-	int& operator [] (const RPGSH_CURRENCY b);
+	int& operator [] (const currency_t b);
 
 	//Iterator for the class
-	using iterator = typename std::map<RPGSH_CURRENCY, int>::const_iterator;
+	using iterator = typename std::map<currency_t, int>::const_iterator;
 
-	//Beginning and end iterators. This is so I can use "for(const auto& [key,val] : RPGSH_WALLET){}"
-	std::map<RPGSH_CURRENCY, int>::const_iterator begin() const;
-	std::map<RPGSH_CURRENCY, int>::const_iterator end() const;
+	//Beginning and end iterators. This is so I can use "for(const auto& [key,val] : wallet_t){}"
+	std::map<currency_t, int>::const_iterator begin() const;
+	std::map<currency_t, int>::const_iterator end() const;
 
-	RPGSH_WALLET();
-	RPGSH_WALLET(const money_t m);
-	RPGSH_WALLET(std::string s);//TODO: Assumes a format "<quantity> <currency>"
+	wallet_t();
+	wallet_t(const money_t m);
+	wallet_t(std::string s);//TODO: Assumes a format "<quantity> <currency>"
 
-	RPGSH_WALLET& operator = (const unsigned int b);
-	RPGSH_WALLET& operator = (const money_t b);
-	RPGSH_WALLET& operator = (const RPGSH_DICE b);
-	RPGSH_WALLET& operator = (const RPGSH_VAR b);
-	RPGSH_WALLET& operator -= (const unsigned int b);
-	RPGSH_WALLET& operator -= (const money_t b);
-	RPGSH_WALLET& operator -= (const RPGSH_WALLET b);
-	RPGSH_WALLET& operator -= (const RPGSH_DICE b);
-	RPGSH_WALLET& operator -= (const RPGSH_VAR b);
-	RPGSH_WALLET& operator += (const unsigned int b);
-	RPGSH_WALLET& operator += (const money_t b);
-	RPGSH_WALLET& operator += (const RPGSH_WALLET b);
-	RPGSH_WALLET& operator += (const RPGSH_DICE b);
-	RPGSH_WALLET& operator += (const RPGSH_VAR b);
-	RPGSH_WALLET& operator *= (const unsigned int b);
-	RPGSH_WALLET& operator *= (const money_t b);
-	RPGSH_WALLET& operator *= (const RPGSH_WALLET b);
-	RPGSH_WALLET& operator *= (const RPGSH_DICE b);
-	RPGSH_WALLET& operator *= (const RPGSH_VAR b);
-	RPGSH_WALLET& operator /= (const unsigned int b);
-	RPGSH_WALLET& operator /= (const money_t b);
-	RPGSH_WALLET& operator /= (const RPGSH_WALLET b);
-	RPGSH_WALLET& operator /= (const RPGSH_DICE b);
-	RPGSH_WALLET& operator /= (const RPGSH_VAR b);
-	RPGSH_WALLET& operator ++ ();
-	RPGSH_WALLET& operator ++ (int);
-	RPGSH_WALLET& operator -- ();
-	RPGSH_WALLET& operator -- (int);
+	wallet_t& operator = (const unsigned int b);
+	wallet_t& operator = (const money_t b);
+	wallet_t& operator = (const dice_t b);
+	wallet_t& operator = (const var_t b);
+	wallet_t& operator -= (const unsigned int b);
+	wallet_t& operator -= (const money_t b);
+	wallet_t& operator -= (const wallet_t b);
+	wallet_t& operator -= (const dice_t b);
+	wallet_t& operator -= (const var_t b);
+	wallet_t& operator += (const unsigned int b);
+	wallet_t& operator += (const money_t b);
+	wallet_t& operator += (const wallet_t b);
+	wallet_t& operator += (const dice_t b);
+	wallet_t& operator += (const var_t b);
+	wallet_t& operator *= (const unsigned int b);
+	wallet_t& operator *= (const money_t b);
+	wallet_t& operator *= (const wallet_t b);
+	wallet_t& operator *= (const dice_t b);
+	wallet_t& operator *= (const var_t b);
+	wallet_t& operator /= (const unsigned int b);
+	wallet_t& operator /= (const money_t b);
+	wallet_t& operator /= (const wallet_t b);
+	wallet_t& operator /= (const dice_t b);
+	wallet_t& operator /= (const var_t b);
+	wallet_t& operator ++ ();
+	wallet_t& operator ++ (int);
+	wallet_t& operator -- ();
+	wallet_t& operator -- (int);
 
-	bool operator != (const std::string b);//TODO: May need to revisit this for a possible RPGSH_WALLET(std::string) constructor
+	bool operator != (const std::string b);//TODO: May need to revisit this for a possible wallet_t(std::string) constructor
 };

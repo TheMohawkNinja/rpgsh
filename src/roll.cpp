@@ -20,7 +20,7 @@ int main(int argc, char** argv)
 			if(current_arg == "-t" || current_arg == "--test")
 			{
 				fprintf(stdout,"Initiating roll test...\n\n");
-				RPGSH_DICE dice = RPGSH_DICE();
+				dice_t dice = dice_t();
 				dice.test();
 				return 0;
 			}
@@ -179,7 +179,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-	RPGSH_DICE dice = RPGSH_DICE(dice_str,only_rolls,only_total,is_list,count_expr,count);
+	dice_t dice = dice_t(dice_str,only_rolls,only_total,is_list,count_expr,count);
 
 	if(is_list)
 	{

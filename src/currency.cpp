@@ -6,15 +6,15 @@
 #include "../headers/text.h"
 #include "../headers/var.h"
 
-RPGSH_CURRENCY::RPGSH_CURRENCY(){}
-RPGSH_CURRENCY::RPGSH_CURRENCY(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
+currency_t::currency_t(){}
+currency_t::currency_t(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
 {
 	Name = _Name;
 	Smaller = _Smaller;
 	SmallerAmount = _SmallerAmount;
 	Larger = _Larger;
 }
-RPGSH_CURRENCY::RPGSH_CURRENCY(RPGSH_CURRENCYSYSTEM* _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
+currency_t::currency_t(currency_tSYSTEM* _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
 {
 	Name = _Name;
 	Smaller = _Smaller;
@@ -24,7 +24,7 @@ RPGSH_CURRENCY::RPGSH_CURRENCY(RPGSH_CURRENCYSYSTEM* _CS, std::string _Name, int
 	AttachToCurrencySystem(_CS);
 }
 
-bool RPGSH_CURRENCY::operator == (const RPGSH_CURRENCY& b) const
+bool currency_t::operator == (const currency_t& b) const
 {
 	return (System == b.System &&
 		Name == b.Name &&
@@ -33,25 +33,25 @@ bool RPGSH_CURRENCY::operator == (const RPGSH_CURRENCY& b) const
 		Larger == b.Larger);
 }
 
-RPGSH_CURRENCY& RPGSH_CURRENCYSYSTEM::operator [] (const std::string b)
+currency_t& currency_tSYSTEM::operator [] (const std::string b)
 {
 	return Denomination[b];
 }
 
 //Beginning and end iterators.
-//So I can use "for(const auto& [key,val] : RPGSH_CURRENCYSYSTEM){}"
-std::map<std::string, RPGSH_CURRENCY>::const_iterator RPGSH_CURRENCYSYSTEM::begin() const
+//So I can use "for(const auto& [key,val] : currency_tSYSTEM){}"
+std::map<std::string, currency_t>::const_iterator currency_tSYSTEM::begin() const
 {
 	return Denomination.begin();
 }
-std::map<std::string, RPGSH_CURRENCY>::const_iterator RPGSH_CURRENCYSYSTEM::end() const
+std::map<std::string, currency_t>::const_iterator currency_tSYSTEM::end() const
 {
 	return Denomination.end();
 }
 
-RPGSH_CURRENCYSYSTEM::RPGSH_CURRENCYSYSTEM(){}
+currency_tSYSTEM::currency_tSYSTEM(){}
 
-bool RPGSH_WALLET::HasEffectivelyAtLeast(int q, RPGSH_CURRENCY c)
+bool wallet_t::HasEffectivelyAtLeast(int q, currency_t c)
 {
 	int total = Money[c];
 	int totalFactor = 1;
@@ -66,7 +66,7 @@ bool RPGSH_WALLET::HasEffectivelyAtLeast(int q, RPGSH_CURRENCY c)
 
 	return total >= q;
 }
-void RPGSH_WALLET::print(int tab)
+void wallet_t::print(int tab)
 {
 	#define PAD_OFFSET 5
 
@@ -97,7 +97,7 @@ void RPGSH_WALLET::print(int tab)
 		}
 	}
 }
-void RPGSH_WALLET::FloatQuantityToWholeCurrency(RPGSH_CURRENCY c, float q)
+void wallet_t::FloatQuantityToWholeCurrency(currency_t c, float q)
 {
 	int totalFactor = 1;
 
@@ -110,30 +110,30 @@ void RPGSH_WALLET::FloatQuantityToWholeCurrency(RPGSH_CURRENCY c, float q)
 	*this += money_t(c,(int)(q*totalFactor));
 }
 
-int& RPGSH_WALLET::operator [] (const RPGSH_CURRENCY b)
+int& wallet_t::operator [] (const currency_t b)
 {
 	return Money[b];
 }
 
-//Beginning and end iterators. This is so I can use "for(const auto& [key,val] : RPGSH_WALLET){}"
-std::map<RPGSH_CURRENCY, int>::const_iterator RPGSH_WALLET::begin() const
+//Beginning and end iterators. This is so I can use "for(const auto& [key,val] : wallet_t){}"
+std::map<currency_t, int>::const_iterator wallet_t::begin() const
 {
 	return Money.begin();
 }
-std::map<RPGSH_CURRENCY, int>::const_iterator RPGSH_WALLET::end() const
+std::map<currency_t, int>::const_iterator wallet_t::end() const
 {
 	return Money.end();
 }
 
-RPGSH_WALLET::RPGSH_WALLET(){}
-RPGSH_WALLET::RPGSH_WALLET(const money_t m)
+wallet_t::wallet_t(){}
+wallet_t::wallet_t(const money_t m)
 {
-	RPGSH_CURRENCY c = m.first;
+	currency_t c = m.first;
 	int q = m.second;
 
 	Money[c] = q;
 }
-RPGSH_WALLET::RPGSH_WALLET(std::string s)//TODO: Assumes a format "<quantity> <currency>"
+wallet_t::wallet_t(std::string s)//TODO: Assumes a format "<quantity> <currency>"
 {
 	int s_space = s.find(" ");
 	int s_ln = s.length();
@@ -151,7 +151,7 @@ RPGSH_WALLET::RPGSH_WALLET(std::string s)//TODO: Assumes a format "<quantity> <c
 	try
 	{
 		std::string c = s.substr(s_space+1,s_ln-s_space);
-		m.first = RPGSH_CURRENCY();
+		m.first = currency_t();
 	}
 	catch(...)
 	{
@@ -159,12 +159,12 @@ RPGSH_WALLET::RPGSH_WALLET(std::string s)//TODO: Assumes a format "<quantity> <c
 	}
 }
 
-RPGSH_WALLET& RPGSH_WALLET::operator = (const unsigned int b)
+wallet_t& wallet_t::operator = (const unsigned int b)
 {
 	printBadOpAndThrow("Wallet = "+std::to_string(b));
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator = (const money_t b)
+wallet_t& wallet_t::operator = (const money_t b)
 {
 	for(const auto& [c,q] : Money)
 	{
@@ -173,24 +173,24 @@ RPGSH_WALLET& RPGSH_WALLET::operator = (const money_t b)
 	Money[b.first] = b.second;
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator = (const RPGSH_DICE b)
+wallet_t& wallet_t::operator = (const dice_t b)
 {
 	printBadOpAndThrow("Wallet = "+std::string(b));
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator = (const RPGSH_VAR b)
+wallet_t& wallet_t::operator = (const var_t b)
 {
 	printBadOpAndThrow("Wallet = "+std::string(b));
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator -= (const unsigned int b)
+wallet_t& wallet_t::operator -= (const unsigned int b)
 {
 	printBadOpAndThrow("Wallet -= "+std::to_string(b));
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator -= (const money_t b)
+wallet_t& wallet_t::operator -= (const money_t b)
 {
-	RPGSH_CURRENCY c = b.first;
+	currency_t c = b.first;
 	int q = b.second;
 
 	transaction = b;
@@ -212,7 +212,7 @@ RPGSH_WALLET& RPGSH_WALLET::operator -= (const money_t b)
 	}
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator -= (const RPGSH_WALLET b)
+wallet_t& wallet_t::operator -= (const wallet_t b)
 {
 	for(const auto& [c,q] : b)
 	{
@@ -229,24 +229,24 @@ RPGSH_WALLET& RPGSH_WALLET::operator -= (const RPGSH_WALLET b)
 	}
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator -= (const RPGSH_DICE b)
+wallet_t& wallet_t::operator -= (const dice_t b)
 {
 	printBadOpAndThrow("Wallet -= "+std::string(b));
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator -= (const RPGSH_VAR b)
+wallet_t& wallet_t::operator -= (const var_t b)
 {
 	printBadOpAndThrow("Wallet -= "+std::string(b));
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator += (const unsigned int b)
+wallet_t& wallet_t::operator += (const unsigned int b)
 {
 	printBadOpAndThrow("Wallet += "+std::to_string(b));
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator += (const money_t b)
+wallet_t& wallet_t::operator += (const money_t b)
 {
-	RPGSH_CURRENCY c = b.first;
+	currency_t c = b.first;
 	int q = b.second;
 
 	if(q > 0)
@@ -261,7 +261,7 @@ RPGSH_WALLET& RPGSH_WALLET::operator += (const money_t b)
 	}
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator += (const RPGSH_WALLET b)
+wallet_t& wallet_t::operator += (const wallet_t b)
 {
 	for(const auto& [c,q] : b)
 	{
@@ -269,17 +269,17 @@ RPGSH_WALLET& RPGSH_WALLET::operator += (const RPGSH_WALLET b)
 	}
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator += (const RPGSH_DICE b)
+wallet_t& wallet_t::operator += (const dice_t b)
 {
 	printBadOpAndThrow("Wallet += "+std::string(b));
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator += (const RPGSH_VAR b)
+wallet_t& wallet_t::operator += (const var_t b)
 {
 	printBadOpAndThrow("Wallet += "+std::string(b));
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator *= (const unsigned int b)
+wallet_t& wallet_t::operator *= (const unsigned int b)
 {
 	output(Info,"Increasing wallet value by a factor of %d",b);
 	for(const auto& [c,q] : *this)
@@ -293,29 +293,29 @@ RPGSH_WALLET& RPGSH_WALLET::operator *= (const unsigned int b)
 	}
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator *= (const money_t b)
+wallet_t& wallet_t::operator *= (const money_t b)
 {
 	std::string c = b.first.Name;
 	std::string q = std::to_string(b.second);
 	printBadOpAndThrow("Wallet *= "+q+" "+c);
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator *= (const RPGSH_WALLET b)
+wallet_t& wallet_t::operator *= (const wallet_t b)
 {
 	printBadOpAndThrow("Wallet *= Wallet");
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator *= (const RPGSH_DICE b)
+wallet_t& wallet_t::operator *= (const dice_t b)
 {
 	printBadOpAndThrow("Wallet *= "+std::string(b));
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator *= (const RPGSH_VAR b)
+wallet_t& wallet_t::operator *= (const var_t b)
 {
 	printBadOpAndThrow("Wallet *= "+std::string(b));
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator /= (const unsigned int b)
+wallet_t& wallet_t::operator /= (const unsigned int b)
 {
 	output(Info,"Decreasing wallet value by a factor of %d",b);
 	if(b == 0)
@@ -324,7 +324,7 @@ RPGSH_WALLET& RPGSH_WALLET::operator /= (const unsigned int b)
 		return *this;
 	}
 
-	std::map<RPGSH_CURRENCY,float> change;
+	std::map<currency_t,float> change;
 
 	for(const auto& [c,q] : *this)
 	{
@@ -346,29 +346,29 @@ RPGSH_WALLET& RPGSH_WALLET::operator /= (const unsigned int b)
 	}
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator /= (const money_t b)
+wallet_t& wallet_t::operator /= (const money_t b)
 {
 	std::string c = b.first.Name;
 	std::string q = std::to_string(b.second);
 	printBadOpAndThrow("Wallet /= "+q+" "+c);
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator /= (const RPGSH_WALLET b)
+wallet_t& wallet_t::operator /= (const wallet_t b)
 {
 	printBadOpAndThrow("Wallet /= Wallet");
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator /= (const RPGSH_DICE b)
+wallet_t& wallet_t::operator /= (const dice_t b)
 {
 	printBadOpAndThrow("Wallet /= "+std::string(b));
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator /= (const RPGSH_VAR b)
+wallet_t& wallet_t::operator /= (const var_t b)
 {
 	printBadOpAndThrow("Wallet /= "+std::string(b));
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator ++ ()
+wallet_t& wallet_t::operator ++ ()
 {
 	//Add 1 of the smallest currency
 	for(const auto& [c,q] : Money)
@@ -381,11 +381,11 @@ RPGSH_WALLET& RPGSH_WALLET::operator ++ ()
 	}
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator ++ (int)
+wallet_t& wallet_t::operator ++ (int)
 {
 	return ++(*this);
 }
-RPGSH_WALLET& RPGSH_WALLET::operator -- ()
+wallet_t& wallet_t::operator -- ()
 {
 	//Subtracy 1 of the smallest currency
 	for(const auto& [c,q] : Money)
@@ -398,29 +398,29 @@ RPGSH_WALLET& RPGSH_WALLET::operator -- ()
 	}
 	return *this;
 }
-RPGSH_WALLET& RPGSH_WALLET::operator -- (int)
+wallet_t& wallet_t::operator -- (int)
 {
 	return --(*this);
 }
 
-bool RPGSH_WALLET::operator != (const std::string b)//TODO: May need to revisit this for a possible RPGSH_WALLET(std::string) constructor
+bool wallet_t::operator != (const std::string b)//TODO: May need to revisit this for a possible wallet_t(std::string) constructor
 {
 	return true;
 }
-//Links the instance of RPGSH_CURRENCY to the instance of RPGSH_CURRENCYSYSTEM
-//Allows the instance of RPGSH_CURRENCYSYSTEM to detect changes in the attached RGPSH_CURRENCY
+//Links the instance of currency_t to the instance of currency_tSYSTEM
+//Allows the instance of currency_tSYSTEM to detect changes in the attached RGPSH_CURRENCY
 //Also automatically adds the Currency to the map of Currencies within the CurrencySystem
-void RPGSH_CURRENCY::AttachToCurrencySystem(RPGSH_CURRENCYSYSTEM* _CurrencySystem)
+void currency_t::AttachToCurrencySystem(currency_tSYSTEM* _CurrencySystem)
 {
 	System = _CurrencySystem;
 	System->Denomination[Name] = *this;
 }
 
-//Required for compilation due to the use of RPGSH_CURRENCY as a key for an std::map in the RPGSH_WALLET class
+//Required for compilation due to the use of currency_t as a key for an std::map in the wallet_t class
 //Orders std::map from highest to lowest denomination
-//If you use more than one RPGSH_CURRENCY, you will need to declare RPGSH_CURRENCYSYSTEM for each of them
-//Even if they are the only RPGSH_CURRENCY in the system. Otherwise, operators don't give expected behavior
-bool RPGSH_CURRENCY::operator < (const RPGSH_CURRENCY& b) const
+//If you use more than one currency_t, you will need to declare currency_tSYSTEM for each of them
+//Even if they are the only currency_t in the system. Otherwise, operators don't give expected behavior
+bool currency_t::operator < (const currency_t& b) const
 {
 	if(!System && b.System || !b.System && System)
 	{
@@ -449,7 +449,7 @@ bool RPGSH_CURRENCY::operator < (const RPGSH_CURRENCY& b) const
 	{
 		if(System != b.System)
 		{
-			//Needs to be here, otherwise RPGSH_WALLET.print() doesn't work right
+			//Needs to be here, otherwise wallet_t.print() doesn't work right
 			//and operations try doing cross-system exchanges that don't work.
 			//Probably due to some under-the-hood nonsense with std::map
 			continue;
@@ -474,7 +474,7 @@ bool RPGSH_CURRENCY::operator < (const RPGSH_CURRENCY& b) const
 	return (Name < b.Name);
 }
 
-void RPGSH_CURRENCYSYSTEM::MakeChange(RPGSH_CURRENCY c, RPGSH_WALLET* w)
+void currency_tSYSTEM::MakeChange(currency_t c, wallet_t* w)
 {
 	std::string NextHighest = c.Larger;
 	int ConversionFactor = Denomination[NextHighest].SmallerAmount;
@@ -507,7 +507,7 @@ void RPGSH_CURRENCYSYSTEM::MakeChange(RPGSH_CURRENCY c, RPGSH_WALLET* w)
 	(*w)[c] += ConversionFactor*ChangeCount;
 	(*w) -= money_t(Denomination[NextHighest],ChangeCount);
 }
-void RPGSH_CURRENCYSYSTEM::TradeUp(RPGSH_CURRENCYSYSTEM* S, RPGSH_WALLET* w)
+void currency_tSYSTEM::TradeUp(currency_tSYSTEM* S, wallet_t* w)
 {
 	for(auto i = (*w).Money.rbegin(); i != (*w).Money.rend(); ++i)
 	{

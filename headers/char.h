@@ -5,7 +5,7 @@
 #include "define.h"
 #include "functions.h"
 
-class RPGSH_CHAR
+class rpgsh_char
 {
 	private:
 		std::string characters_dir = campaigns_dir +
@@ -16,12 +16,12 @@ class RPGSH_CHAR
 		std::string DiceDesignator		=	"Dice";
 		std::string CurrencyDesignator		=	"Currency";
 
-		RPGSH_OBJ<RPGSH_VAR>	Attr;
-		RPGSH_OBJ<RPGSH_DICE>	Dice;
-		RPGSH_CURRENCY		Currency	=	RPGSH_CURRENCY();
+		RPGSH_OBJ<var_t>	Attr;
+		RPGSH_OBJ<dice_t>	Dice;
+		currency_t		Currency	=	currency_t();
 
-	RPGSH_CHAR();//Create character using default game
-	RPGSH_CHAR(std::string game);
+	rpgsh_char();//Create character using default game
+	rpgsh_char(std::string game);
 
 	std::string Name();
 	void save();

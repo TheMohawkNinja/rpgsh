@@ -1,30 +1,30 @@
 #include "../headers/output.h"
 #include "../headers/var.h"
 
-RPGSH_VAR::operator std::string() const
+var_t::operator std::string() const
 {
 	return Value;
 }
-RPGSH_VAR::operator int() const
+var_t::operator int() const
 {
 	return std::stoi(Value);
 }
-RPGSH_VAR& RPGSH_VAR::operator = (const RPGSH_VAR b)
+var_t& var_t::operator = (const var_t b)
 {
 	Value = b.Value;
 	return *this;
 }
-RPGSH_VAR& RPGSH_VAR::operator = (const std::string b)
+var_t& var_t::operator = (const std::string b)
 {
 	Value = b;
 	return *this;
 }
-RPGSH_VAR& RPGSH_VAR::operator = (const int b)
+var_t& var_t::operator = (const int b)
 {
 	Value = std::to_string(b);
 	return *this;
 }
-RPGSH_VAR& RPGSH_VAR::operator += (const RPGSH_VAR b)
+var_t& var_t::operator += (const var_t b)
 {
 	bool a_is_num = true;
 	bool b_is_num = true;
@@ -48,7 +48,7 @@ RPGSH_VAR& RPGSH_VAR::operator += (const RPGSH_VAR b)
 	}
 	return *this;
 }
-RPGSH_VAR& RPGSH_VAR::operator += (const std::string b)
+var_t& var_t::operator += (const std::string b)
 {
 	bool a_is_num = true;
 
@@ -65,7 +65,7 @@ RPGSH_VAR& RPGSH_VAR::operator += (const std::string b)
 	}
 	return *this;
 }
-RPGSH_VAR& RPGSH_VAR::operator += (const int b)
+var_t& var_t::operator += (const int b)
 {
 	bool a_is_num = true;
 
@@ -82,7 +82,7 @@ RPGSH_VAR& RPGSH_VAR::operator += (const int b)
 	}
 	return *this;
 }
-RPGSH_VAR& RPGSH_VAR::operator -= (const RPGSH_VAR b)
+var_t& var_t::operator -= (const var_t b)
 {
 	bool a_is_num = true;
 	bool b_is_num = true;
@@ -106,7 +106,7 @@ RPGSH_VAR& RPGSH_VAR::operator -= (const RPGSH_VAR b)
 	}
 	return *this;
 }
-RPGSH_VAR& RPGSH_VAR::operator -= (const int b)
+var_t& var_t::operator -= (const int b)
 {
 	bool a_is_num = true;
 
@@ -123,7 +123,7 @@ RPGSH_VAR& RPGSH_VAR::operator -= (const int b)
 	}
 	return *this;
 }
-RPGSH_VAR& RPGSH_VAR::operator *= (const RPGSH_VAR b)
+var_t& var_t::operator *= (const var_t b)
 {
 	bool a_is_num = true;
 	bool b_is_num = true;
@@ -147,7 +147,7 @@ RPGSH_VAR& RPGSH_VAR::operator *= (const RPGSH_VAR b)
 	}
 	return *this;
 }
-RPGSH_VAR& RPGSH_VAR::operator *= (const int b)
+var_t& var_t::operator *= (const int b)
 {
 	bool a_is_num = true;
 
@@ -164,7 +164,7 @@ RPGSH_VAR& RPGSH_VAR::operator *= (const int b)
 	}
 	return *this;
 }
-RPGSH_VAR& RPGSH_VAR::operator /= (const RPGSH_VAR b)
+var_t& var_t::operator /= (const var_t b)
 {
 	bool a_is_num = true;
 	bool b_is_num = true;
@@ -188,7 +188,7 @@ RPGSH_VAR& RPGSH_VAR::operator /= (const RPGSH_VAR b)
 	}
 	return *this;
 }
-RPGSH_VAR& RPGSH_VAR::operator /= (const int b)
+var_t& var_t::operator /= (const int b)
 {
 	bool a_is_num = true;
 
@@ -205,7 +205,7 @@ RPGSH_VAR& RPGSH_VAR::operator /= (const int b)
 	}
 	return *this;
 }
-RPGSH_VAR& RPGSH_VAR::operator ++ (const int b)
+var_t& var_t::operator ++ (const int b)
 {
 	bool a_is_num = true;
 
@@ -222,7 +222,7 @@ RPGSH_VAR& RPGSH_VAR::operator ++ (const int b)
 	}
 	return *this;
 }
-RPGSH_VAR& RPGSH_VAR::operator -- (const int b)
+var_t& var_t::operator -- (const int b)
 {
 	bool a_is_num = true;
 
@@ -239,69 +239,69 @@ RPGSH_VAR& RPGSH_VAR::operator -- (const int b)
 	}
 	return *this;
 }
-RPGSH_VAR RPGSH_VAR::operator + (const RPGSH_VAR b)
+var_t var_t::operator + (const var_t b)
 {
-	RPGSH_VAR lhs = *this;
+	var_t lhs = *this;
 	return (lhs += b);
 }
-RPGSH_VAR RPGSH_VAR::operator + (const std::string b)
+var_t var_t::operator + (const std::string b)
 {
-	RPGSH_VAR lhs = *this;
+	var_t lhs = *this;
 	return (lhs += b);
 }
-RPGSH_VAR RPGSH_VAR::operator + (const int b)
+var_t var_t::operator + (const int b)
 {
-	RPGSH_VAR lhs = *this;
+	var_t lhs = *this;
 	return (lhs += b);
 }
-RPGSH_VAR RPGSH_VAR::operator - (const RPGSH_VAR b)
+var_t var_t::operator - (const var_t b)
 {
-	RPGSH_VAR lhs = *this;
+	var_t lhs = *this;
 	return (lhs -= b);
 }
-RPGSH_VAR RPGSH_VAR::operator - (const int b)
+var_t var_t::operator - (const int b)
 {
-	RPGSH_VAR lhs = *this;
+	var_t lhs = *this;
 	return (lhs -= b);
 }
-RPGSH_VAR RPGSH_VAR::operator * (const RPGSH_VAR b)
+var_t var_t::operator * (const var_t b)
 {
-	RPGSH_VAR lhs = *this;
+	var_t lhs = *this;
 	return (lhs *= b);
 }
-RPGSH_VAR RPGSH_VAR::operator * (const int b)
+var_t var_t::operator * (const int b)
 {
-	RPGSH_VAR lhs = *this;
+	var_t lhs = *this;
 	return (lhs *= b);
 }
-RPGSH_VAR RPGSH_VAR::operator / (const RPGSH_VAR b)
+var_t var_t::operator / (const var_t b)
 {
-	RPGSH_VAR lhs = *this;
+	var_t lhs = *this;
 	return (lhs /= b);
 }
-RPGSH_VAR RPGSH_VAR::operator / (const int b)
+var_t var_t::operator / (const int b)
 {
-	RPGSH_VAR lhs = *this;
+	var_t lhs = *this;
 	return (lhs /= b);
 }
 
-RPGSH_VAR::RPGSH_VAR(){}
-RPGSH_VAR::RPGSH_VAR(std::string _value)
+var_t::var_t(){}
+var_t::var_t(std::string _value)
 {
 	Value = _value;
 }
-RPGSH_VAR::RPGSH_VAR(int _value)
+var_t::var_t(int _value)
 {
 	Value = std::to_string(_value);
 }
 
-const char* RPGSH_VAR::c_str() const
+const char* var_t::c_str() const
 {
 	return Value.c_str();
 }
 
 // Comparison operators
-bool RPGSH_VAR::operator != (const RPGSH_VAR b)
+bool var_t::operator != (const var_t b)
 {
 	return (Value != b.Value);
 }

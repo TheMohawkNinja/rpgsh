@@ -24,7 +24,7 @@ void set_campaign_var(std::string var,std::string value);
 std::map<std::string,std::string> load_vars_from_file(std::string path);
 /*std::string get_var(std::string var)
 {
-	RPGSH_CHAR c = RPGSH_CHAR();
+	rpgsh_char c = rpgsh_char();
 	std::string ret = "";
 	std::string path = "";
 	std::map<std::string,std::string> m;

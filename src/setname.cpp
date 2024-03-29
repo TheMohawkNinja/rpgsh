@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 
 	if(!strcmp(argv[1],"-l") || !strcmp(argv[1],"--list"))
 	{
-		RPGSH_CHAR c = RPGSH_CHAR();
+		rpgsh_char c = rpgsh_char();
 		c.load(get_shell_var(CURRENT_CHAR_SHELL_VAR),false);
 
 		fprintf(stdout,"Display name character attribute:\t%s%s%s\n",TEXT_WHITE,c.Attr[CHAR_NAME_ATTR].c_str(),TEXT_NORMAL);
@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	RPGSH_CHAR c = RPGSH_CHAR();
+	rpgsh_char c = rpgsh_char();
 	c.load(get_shell_var(CURRENT_CHAR_SHELL_VAR),false);
 
 	if(std::string(c.Attr[argv[1]]) == "")

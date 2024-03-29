@@ -33,10 +33,10 @@ void print_map(T m, char scope_sigil)
 }
 void print_player_attrs()
 {
-	RPGSH_CHAR c = RPGSH_CHAR();
+	rpgsh_char c = rpgsh_char();
 	std::string sigil(1,CHAR_SIGIL);
 	print_header("("+sigil+") "+c.Name());
-	print_map<RPGSH_OBJ<RPGSH_VAR>>(c.Attr,CHAR_SIGIL);
+	print_map<RPGSH_OBJ<var_t>>(c.Attr,CHAR_SIGIL);
 }
 void print_campaign_vars()
 {

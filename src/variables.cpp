@@ -3,7 +3,7 @@
 #include "../headers/functions.h"
 #include "../headers/var.h"
 
-RPGSH_CHAR c = RPGSH_CHAR();
+rpgsh_char c = rpgsh_char();
 
 bool is_operator(std::string s)
 {
@@ -24,7 +24,7 @@ bool is_int(std::string s)
 		return false;
 	}
 }
-void set_var(std::string var, RPGSH_VAR old_value, RPGSH_VAR new_value, char scope_sigil)
+void set_var(std::string var, var_t old_value, var_t new_value, char scope_sigil)
 {
 	std::string var_type;
 
@@ -81,7 +81,7 @@ int main(int argc, char** argv)
 	std::map<std::string,std::string> m;
 	std::string path;
 	std::string var = std::string(argv[1]).substr(1,std::string(argv[1]).length()-1);
-	RPGSH_VAR old_value;
+	var_t old_value;
 
 	switch(argv[1][0])// Get scope sigil
 	{
@@ -214,7 +214,7 @@ int main(int argc, char** argv)
 	}
 	else// Binary operators
 	{
-		RPGSH_VAR new_value = std::string(argv[3]);
+		var_t new_value = std::string(argv[3]);
 		for(int i=4; i<argc; i++)
 		{
 			if(i%2 == 1 && is_operator(argv[i]))
@@ -229,7 +229,7 @@ int main(int argc, char** argv)
 			}
 			else if(i%2 == 0)
 			{
-				RPGSH_VAR current_operand = std::string(argv[i+1]);
+				var_t current_operand = std::string(argv[i+1]);
 				if(!strcmp(argv[i],"+"))
 				{
 					new_value += current_operand;

@@ -9,8 +9,8 @@
 
 #define MAX_BUFFER_SIZE 256
 
-RPGSH_CONFIG config = RPGSH_CONFIG();
-RPGSH_CHAR c = RPGSH_CHAR();
+rpgsh_config config = rpgsh_config();
+rpgsh_char c = rpgsh_char();
 
 std::string input_handler()
 {
@@ -237,7 +237,7 @@ int main()
 		ofs.close();
 
 		//Set default values for built-in shell variables
-		RPGSH_OBJ Attr = load_obj_from_file<RPGSH_VAR>(templates_dir+config.setting[DEFAULT_GAME],c.AttributeDesignator);
+		RPGSH_OBJ Attr = load_obj_from_file<var_t>(templates_dir+config.setting[DEFAULT_GAME],c.AttributeDesignator);
 		set_shell_var(CURRENT_CHAR_SHELL_VAR,c.Name());
 		set_shell_var(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
 	}
