@@ -262,11 +262,11 @@ void run_rpgsh_prog(std::string args)
 		if(status == 2)//File not found
 		{
 			std::string displayed_command = std::string(argv[0]).substr(prefix.length()+path.length(),std::string(argv[0]).length()-prefix.length()-path.length());
-			output(Error,"\"%s\" is not a valid rpgsh command. (%d)",displayed_command.c_str(),status);
+			output(Error,"Error code %d while attempting to run \"%s\": Not a valid rpgsh command.",status,displayed_command.c_str());
 		}
 		else
 		{
-			output(Error,"%s (%d)",strerror(status),status);
+			output(Error,"Error code %d while attempting to run \"%s\": ",status,strerror(status));
 		}
 	}
 	padding();
