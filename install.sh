@@ -11,7 +11,7 @@ templates_dir="$root_dir""templates/"
 dice_lists_dir="$root_dir""dice-lists/"
 
 #debug="-g -fsanitize=address"
-debug=""
+debug="-g"
 fs="-lstdc++fs -std=c++17"
 
 if [[ $EUID -eq 0 ]]; then
@@ -65,7 +65,7 @@ if [[ $EUID -eq 0 ]]; then
 	echo -e "\tsrc/banner.cpp\t\t->\t$bold_white""/bin/rpgsh-banner"$normal
 	g++ src/banner.cpp $debug -o /bin/rpgsh-banner
 	echo -e "\tsrc/roll.cpp\t\t->\t$bold_white""/bin/rpgsh-roll"$normal
-	g++ src/roll.cpp -L $lib_dir -ldefine -ldice -loutput $fs $debug -o /bin/rpgsh-roll
+	g++ src/roll.cpp -L $lib_dir -ldefine -lchar -lcurrency -lconfig -lvar -lfunctions -ldice -loutput $fs $debug -o /bin/rpgsh-roll
 	echo -e "\tsrc/list.cpp\t\t->\t$bold_white""/bin/rpgsh-list"$normal
 	g++ src/list.cpp -L $lib_dir -ldefine -lconfig -lchar -ldice -lvar -lobj -lfunctions -loutput -lcurrency $debug -o /bin/rpgsh-list
 
