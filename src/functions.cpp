@@ -247,16 +247,21 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 	padding();
 
 	int status = 0;
+	posix_spawn_file_actions_t fa;
 	if(redirect_output)
 	{
 		//https://unix.stackexchange.com/questions/252901/get-output-of-posix-spawn
-		posix_spawn_file_actions_t fa;
-		posix_spawn_file_actions_init(&fa);
-		posix_spawn_file_actions_addopen(&fa, 1, rpgsh_output_redirect_file.c_str(),
-            					O_CREAT | O_TRUNC | O_WRONLY, 0644);
-		posix_spawn_file_actions_adddup2(&fa, 1, 2);
+
+		if(posix_spawn_file_actions_init(&fa))
+			output(Error,"Error code %d during posix_spawn_file_actions_init(): %s",status,strerror(status));
+
+		if(posix_spawn_file_actions_addopen(&fa, 1, rpgsh_output_redirect_file.c_str(), O_CREAT | O_TRUNC | O_WRONLY, 0644))
+			output(Error,"Error code %d during posix_spawn_file_actions_addopen(): %s",status,strerror(status));
+
+		if(posix_spawn_file_actions_adddup2(&fa, 1, 2))
+			output(Error,"Error code %d during posix_spawn_file_actions_adddup2(): %s",status,strerror(status));
+
 		status = posix_spawn(&pid, argv[0], &fa, NULL, (char* const*)argv, environ);
-		posix_spawn_file_actions_destroy(&fa);
 	}
 	else
 	{
@@ -268,24 +273,22 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 		do
 		{
 			if(waitpid(pid, &status, 0) == -1)
-			{
 				exit(1);
-			}
 		}while (!WIFEXITED(status) && !WIFSIGNALED(status));
 	}
 	else
 	{
+		std::string displayed_command = std::string(argv[0]).substr(prefix.length()+path.length(),
+									std::string(argv[0]).length()-prefix.length()-path.length());
 		if(status == 2)//File not found
-		{
-			std::string displayed_command = std::string(argv[0]).substr(prefix.length()+path.length(),
-										std::string(argv[0]).length()-prefix.length()-path.length());
 			output(Error,"Error code %d while attempting to run \"%s\": Not a valid rpgsh command.",status,displayed_command.c_str());
-		}
 		else
-		{
-			output(Error,"Error code %d while attempting to run \"%s\": ",status,strerror(status));
-		}
+			output(Error,"Error code %d while attempting to run \"%s\": %s",status,displayed_command.c_str(),strerror(status));
 	}
+
+	if(redirect_output && posix_spawn_file_actions_destroy(&fa))
+		output(Error,"Error code %d during posix_spawn_file_actions_destroy(): %s",status,strerror(status));
+
 	padding();
 }
 
