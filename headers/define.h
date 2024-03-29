@@ -36,6 +36,7 @@ extern std::string config_file;
 extern std::string campaigns_dir;
 extern std::string templates_dir;
 extern std::string dice_lists_dir;
+extern std::string rpgsh_output_redirect_file;
 
 //Data separator string. Name shortened for brevity in the code.
 extern std::string DS;

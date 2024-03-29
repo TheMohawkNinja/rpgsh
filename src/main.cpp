@@ -221,7 +221,7 @@ int prompt()
 		}
 		else
 		{
-			run_rpgsh_prog(buffer);
+			run_rpgsh_prog(buffer,false);
 			return 0;
 		}
 	}
@@ -235,8 +235,8 @@ int main()
 	//(re)build default character on launch
 	c.save();
 
-	run_rpgsh_prog((char*)"banner");
-	run_rpgsh_prog((char*)"version");
+	run_rpgsh_prog((char*)"banner",false);
+	run_rpgsh_prog((char*)"version",false);
 
 	while(prompt() == 0);
 

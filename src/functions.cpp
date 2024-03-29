@@ -1,4 +1,5 @@
 #include <cstdarg>
+#include <fcntl.h>
 #include <map>
 #include <spawn.h>
 #include <string.h>
@@ -70,7 +71,7 @@ void padding()
 	}
 }
 
-void run_rpgsh_prog(std::string args)
+void run_rpgsh_prog(std::string args, bool redirect_output)
 {
 	rpgsh_char c = rpgsh_char();
 
@@ -245,7 +246,22 @@ void run_rpgsh_prog(std::string args)
 
 	padding();
 
-	int status = posix_spawn(&pid, argv[0], NULL, NULL, (char* const*)argv, environ);
+	int status = 0;
+	if(redirect_output)
+	{
+		//https://unix.stackexchange.com/questions/252901/get-output-of-posix-spawn
+		posix_spawn_file_actions_t fa;
+		posix_spawn_file_actions_init(&fa);
+		posix_spawn_file_actions_addopen(&fa, 1, rpgsh_output_redirect_file.c_str(),
+            					O_CREAT | O_TRUNC | O_WRONLY, 0644);
+		posix_spawn_file_actions_adddup2(&fa, 1, 2);
+		status = posix_spawn(&pid, argv[0], &fa, NULL, (char* const*)argv, environ);
+		posix_spawn_file_actions_destroy(&fa);
+	}
+	else
+	{
+		status = posix_spawn(&pid, argv[0], NULL, NULL, (char* const*)argv, environ);
+	}
 
 	if(status == 0)
 	{
@@ -261,7 +277,8 @@ void run_rpgsh_prog(std::string args)
 	{
 		if(status == 2)//File not found
 		{
-			std::string displayed_command = std::string(argv[0]).substr(prefix.length()+path.length(),std::string(argv[0]).length()-prefix.length()-path.length());
+			std::string displayed_command = std::string(argv[0]).substr(prefix.length()+path.length(),
+										std::string(argv[0]).length()-prefix.length()-path.length());
 			output(Error,"Error code %d while attempting to run \"%s\": Not a valid rpgsh command.",status,displayed_command.c_str());
 		}
 		else

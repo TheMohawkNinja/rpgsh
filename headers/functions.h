@@ -15,7 +15,7 @@ void printBadOpAndThrow(std::string bad_op);
 
 void padding();
 
-void run_rpgsh_prog(std::string args);
+void run_rpgsh_prog(std::string args, bool redirect_output);
 
 std::string get_shell_var(std::string var);
 void set_shell_var(std::string var,std::string value);
