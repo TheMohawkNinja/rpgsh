@@ -4,6 +4,7 @@
 #include <string>
 #include "../headers/config.h"
 #include "../headers/define.h"
+#include "../headers/functions.h"
 #include "../headers/output.h"
 
 std::string rpgsh_config::get_config_item(std::string s)
@@ -49,6 +50,8 @@ std::string rpgsh_config::get_config_value(std::string s)
 
 rpgsh_config::rpgsh_config()
 {
+	confirmShellVarsFile();
+
 	// Set defaults
 	setting[PADDING]	=	"true";
 	setting[DEFAULT_GAME]	=	"dnd5e";

@@ -6,6 +6,7 @@
 
 rpgsh_char::rpgsh_char()//Create character using default game
 {
+	confirmShellVarsFile();
 	rpgsh_config config = rpgsh_config();
 
 	Attr = load_obj_from_file<var_t>(templates_dir+config.setting[DEFAULT_GAME],AttributeDesignator);
@@ -13,6 +14,7 @@ rpgsh_char::rpgsh_char()//Create character using default game
 }
 rpgsh_char::rpgsh_char(std::string game)
 {
+	confirmShellVarsFile();
 	Attr = load_obj_from_file<var_t>(templates_dir+game,AttributeDesignator);
 	Dice = load_obj_from_file<dice_t>(templates_dir+game,DiceDesignator);
 }
