@@ -31,7 +31,7 @@ void confirmShellVarsFile()
 {
 	if(!std::filesystem::exists(shell_vars_file.c_str()))
 	{
-		output(Info,"Shell variable file not found, creating file at \'%s\'.",shell_vars_file.c_str());
+		output(Info,"Shell variables file not found, creating file at \'%s\'.",shell_vars_file.c_str());
 		std::ofstream ofs(shell_vars_file.c_str());
 		ofs.close();
 
@@ -42,6 +42,19 @@ void confirmShellVarsFile()
 		RPGSH_OBJ Attr = load_obj_from_file<var_t>(templates_dir+config.setting[DEFAULT_GAME],c.AttributeDesignator);
 		set_shell_var(CURRENT_CHAR_SHELL_VAR,c.Name());
 		set_shell_var(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
+	}
+}
+
+void confirmCampaignVarsFile()
+{
+	std::string campaign_vars_file = campaigns_dir +
+					get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR) +
+					".vars";
+	if(!std::filesystem::exists(campaign_vars_file.c_str()))
+	{
+		output(Info,"Campaign variables file not found, creating file at \'%s\'.",campaign_vars_file.c_str());
+		std::ofstream ofs(campaign_vars_file.c_str());
+		ofs.close();
 	}
 }
 
@@ -294,6 +307,8 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 
 std::string get_shell_var(std::string var)
 {
+	confirmShellVarsFile();
+
 	std::ifstream ifs(shell_vars_file.c_str());
 	while(!ifs.eof())
 	{
@@ -345,6 +360,8 @@ void set_shell_var(std::string var,std::string value)
 
 std::string get_campaign_var(std::string var)
 {
+	confirmCampaignVarsFile();
+
 	std::string campaign_vars_file = campaigns_dir +
 					get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR) +
 					".vars";

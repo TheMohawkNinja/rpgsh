@@ -11,6 +11,8 @@ bool stob(std::string s);
 
 void confirmShellVarsFile();
 
+void confirmCampaignVarsFile();
+
 void printBadOpAndThrow(std::string bad_op);
 
 void padding();

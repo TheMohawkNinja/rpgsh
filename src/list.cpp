@@ -40,6 +40,7 @@ void print_player_attrs()
 }
 void print_campaign_vars()
 {
+	confirmCampaignVarsFile();
 	std::map<std::string,std::string> vars;
 	std::string current_campaign = get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR);
 	std::string campaign_vars_file = campaigns_dir +
@@ -53,6 +54,7 @@ void print_campaign_vars()
 }
 void print_shell_vars()
 {
+	confirmShellVarsFile();
 	std::map<std::string,std::string> vars;
 	std::string sigil(1,SHELL_SIGIL);
 	print_header("("+sigil+") "+"Shell");
