@@ -1,4 +1,3 @@
-#include <algorithm>
 #include <cstring>
 #include "../headers/functions.h"
 #include "../headers/text.h"
