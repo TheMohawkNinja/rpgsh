@@ -4,7 +4,7 @@
 
 int main(int argc, char** argv)
 {
-	if(!strcmp(argv[1],FLAG_APPDESCRIPTION))
+	if(argv[1] && !strcmp(argv[1],FLAG_APPDESCRIPTION))
 	{
 		fprintf(stdout,"Prints version information.\n");
 		return 0;
