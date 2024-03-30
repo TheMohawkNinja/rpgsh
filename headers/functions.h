@@ -22,6 +22,8 @@ void padding();
 
 void run_rpgsh_prog(std::string args, bool redirect_output);
 
+std::vector<std::string> get_prog_output(std::string prog);
+
 std::string get_shell_var(std::string var);
 void set_shell_var(std::string var,std::string value);
 

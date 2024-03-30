@@ -1,3 +1,4 @@
+#include <cstring>
 #include "../headers/dice.h"
 #include "../headers/functions.h"
 #include "../headers/text.h"
@@ -11,6 +12,12 @@ int main(int argc, char** argv)
 	unsigned int repeat = 1;
 	std::string dice_str, current_arg;
 	std::string count_expr = "";
+
+	if(argv[1] && !strcmp(argv[1],FLAG_APPDESCRIPTION))
+	{
+		fprintf(stdout,"A simple, yet featureful dice rolling program.\n");
+		return 0;
+	}
 
 	for(int arg=1; arg<argc; arg++)
 	{

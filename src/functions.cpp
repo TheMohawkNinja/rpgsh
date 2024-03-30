@@ -107,7 +107,6 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 	}
 
 	int params_start = args.find(" ", args.find(" ")+1);
-	std::string prefix = "rpgsh-";
 	std::string path = "/bin/";
 
 	if(params_start != std::string::npos)
@@ -264,7 +263,8 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 	//Add a NULL because posix_spawn() needs that for some reason
 	argv[vars.size()] = NULL;
 
-	padding();
+	if(!redirect_output)
+		padding();
 
 	int status = 0;
 	posix_spawn_file_actions_t fa;
@@ -309,7 +309,26 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 	if(redirect_output && posix_spawn_file_actions_destroy(&fa))
 		output(Error,"Error code %d during posix_spawn_file_actions_destroy(): %s",status,strerror(status));
 
-	padding();
+	if(!redirect_output)
+		padding();
+}
+
+std::vector<std::string> get_prog_output(std::string prog)
+{
+	std::vector<std::string> output;
+
+	run_rpgsh_prog(prog,true);
+
+	std::ifstream ifs(rpgsh_output_redirect_file.c_str());
+	while(!ifs.eof())
+	{
+		std::string data = "";
+		std::getline(ifs,data);
+		output.push_back(data);
+	}
+	ifs.close();
+
+	return output;
 }
 
 std::string get_shell_var(std::string var)
@@ -455,77 +474,6 @@ std::map<std::string,std::string> load_vars_from_file(std::string path)
 
 	return vars;
 }
-/*std::string get_var(std::string var)
-{
-	rpgsh_char c = rpgsh_char();
-	std::string ret = "";
-	std::string path = "";
-	std::map<std::string,std::string> m;
-	char last_char = var[var.length()-1];
-
-	switch(var[0])
-	{
-		case CHAR_SIGIL:
-			c.load(get_shell_var(CURRENT_CHAR_SHELL_VAR),false);
-			switch(last_char)
-			{
-				case '/':
-				ret += std::string(c.Attr[var.substr(0,var.length()-1)]);
-				break;
-
-				default:
-				return std::string(c.Attr[var]);
-			}
-
-			// Convert character sheet to std::map<std::string,std::string>
-			// TODO Will need to add currency, currency system, and wallet
-			for(const auto& [k,v] : c.Attr)
-				m[k] = std::string(v);
-			for(const auto& [k,v] : c.Dice)
-				m[k] = std::string(v);
-			break;
-		case CAMPAIGN_SIGIL:
-			switch(last_char)
-			{
-				case '/':
-				try
-				{
-					ret += get_campaign_var(var.substr(0,var.length()-1));
-				}
-				catch(...){}
-				break;
-
-				default:
-				return get_campaign_var(var);
-			}
-			path = campaigns_dir +
-				get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR) +
-				".vars";
-			m = load_vars_from_file(path);
-			break;
-		case SHELL_SIGIL:
-			switch(last_char)
-			{
-				case '/':
-				try
-				{
-					ret += get_shell_var(var.substr(0,var.length()-1));
-				}
-				catch(...){}
-				break;
-
-				default:
-				return get_shell_var(var);
-			}
-			path = shell_vars_file;
-			m = load_vars_from_file(path);
-			break;
-		default:
-			output(Error,"Unknown scope sigil \'%c\'.",last_char);
-			exit(-1);
-	}
-	return ret;
-}*/
 
 template <typename T>
 void save_obj_to_file(std::string path, RPGSH_OBJ<dice_t> obj, std::string obj_id);

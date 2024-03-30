@@ -72,6 +72,12 @@ void set_var(std::string var, var_t old_value, var_t new_value, char scope_sigil
 
 int main(int argc, char** argv)
 {
+	if(argv[1] && !strcmp(argv[1],FLAG_APPDESCRIPTION))
+	{
+		fprintf(stdout,"Not meant for direct call by user. Implicitly called when modifying variables.\n");
+		return 0;
+	}
+
 	if(std::string(argv[1]).length() == 1)// If the user only enters the scope sigil
 	{
 		output(Error,"Empty variable name.");

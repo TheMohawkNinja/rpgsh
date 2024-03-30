@@ -63,6 +63,12 @@ void print_shell_vars()
 }
 int main(int argc, char** argv)
 {
+	if(argv[1] && !strcmp(argv[1],FLAG_APPDESCRIPTION))
+	{
+		fprintf(stdout,"Prints one or all variable scopes.\n");
+		return 0;
+	}
+
 	if(argc > 2)
 	{
 		output(Warning,"Expected only one argument. All args past \"%s\" will be ignored.",argv[1]);

@@ -68,8 +68,6 @@ bool wallet_t::HasEffectivelyAtLeast(int q, currency_t c)
 }
 void wallet_t::print(int tab)
 {
-	#define PAD_OFFSET 5
-
 	unsigned int NameLength = 0;
 	unsigned int LongestName = 0;
 
@@ -91,9 +89,8 @@ void wallet_t::print(int tab)
 			unsigned int QuantityLength = std::to_string(value).length();
 			unsigned int PadLength = (LongestName - key.Name.length()) +
 						 QuantityLength +
-						 PAD_OFFSET;
-			//tab_over(tab);
-			fprintf(stdout,"\t%s%s%*d%s\n",key.Name.c_str(),TEXT_WHITE,PadLength,value,TEXT_NORMAL);
+						 COLUMN_PADDING;
+			fprintf(stdout,"%s%s%*d%s\n",key.Name.c_str(),TEXT_WHITE,PadLength,value,TEXT_NORMAL);
 		}
 	}
 }

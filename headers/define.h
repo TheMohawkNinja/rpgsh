@@ -4,8 +4,8 @@
 
 //Version info
 #define MAJOR_VERSION	0
-#define MINOR_VERSION	7
-#define PATCH_VERSION	4
+#define MINOR_VERSION	8
+#define PATCH_VERSION	0
 
 //Comment character definition
 #define COMMENT		'#'
@@ -24,6 +24,12 @@
 #define PADDING		"padding"
 #define DEFAULT_GAME	"default_game"
 
+//Universal flags
+#define FLAG_APPDESCRIPTION	"--appdescription"
+
+//Column formatting
+#define COLUMN_PADDING	5
+
 //Locations of files to get random data from for things like 'roll'
 extern const char* random_seed_path;
 extern const char* backup_random_seed_path;
@@ -37,6 +43,7 @@ extern std::string campaigns_dir;
 extern std::string templates_dir;
 extern std::string dice_lists_dir;
 extern std::string rpgsh_output_redirect_file;
+extern std::string prefix;
 
 //Data separator string. Name shortened for brevity in the code.
 extern std::string DS;

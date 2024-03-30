@@ -7,6 +7,12 @@
 
 int main(int argc, char** argv)
 {
+	if(argv[1] && !strcmp(argv[1],FLAG_APPDESCRIPTION))
+	{
+		fprintf(stdout,"Changes the variable used for the loaded character's name.\n");
+		return 0;
+	}
+
 	if(argc < 2)
 	{
 		output(Error,"setname requires at least one argument to function!");
@@ -26,7 +32,7 @@ int main(int argc, char** argv)
 		fprintf(stdout,"Current value of %s%%%s%s:\t\t\t%s%s%s\n",TEXT_WHITE,c.Attr[CHAR_NAME_ATTR].c_str(),TEXT_NORMAL,TEXT_WHITE,c.Name().c_str(),TEXT_NORMAL);
 		return 0;
 	}
-	if(!strcmp(argv[1],"-?") || !strcmp(argv[1],"--help"))
+	else if(!strcmp(argv[1],"-?") || !strcmp(argv[1],"--help"))
 	{
 		fprintf(stdout,"Sets the character attribute to be used when displaying the character's name.\n\n");
 		fprintf(stdout,"USAGE:\n");

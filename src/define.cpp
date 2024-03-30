@@ -14,6 +14,7 @@ std::string campaigns_dir = 			root_dir + "campaigns/";
 std::string templates_dir = 			root_dir + "templates/";
 std::string dice_lists_dir = 			root_dir + "dice-lists/";
 std::string rpgsh_output_redirect_file =	"/tmp/rpgsh";
+std::string prefix =				"rpgsh-";
 
 //Data separator string. Name shortened for brevity in the code.
 std::string DS = "::";
