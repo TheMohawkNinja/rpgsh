@@ -237,6 +237,7 @@ int main()
 
 	run_rpgsh_prog((char*)"banner",false);
 	run_rpgsh_prog((char*)"version",false);
+	fprintf(stdout,"Type \"help\" for a list of currently supported commands.\n\n");
 
 	while(prompt() == 0);
 
