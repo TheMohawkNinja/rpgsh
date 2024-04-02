@@ -8,28 +8,28 @@ class dice_t;
 class var_t;
 
 //Internal forward declarations
-class currency_tSYSTEM;
+class currencysystem_t;
 class wallet_t;
 
 class currency_t
 {
 	public:
-		currency_tSYSTEM* System = nullptr;
+		currencysystem_t* System = nullptr;
 		std::string Name = "";
 		int SmallerAmount = 0;
 		std::string Smaller = "";
 		std::string Larger = "";
 
-	void AttachToCurrencySystem(currency_tSYSTEM* _CurrencySystem);
+	void AttachToCurrencySystem(currencysystem_t* _CurrencySystem);
 
 	currency_t();
 	currency_t(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
-	currency_t(currency_tSYSTEM* _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
+	currency_t(currencysystem_t* _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
 
 	bool operator == (const currency_t& b) const;
 	bool operator < (const currency_t& b) const;
 };
-class currency_tSYSTEM
+class currencysystem_t
 {
 	public:
 		std::map<std::string, currency_t> Denomination;
@@ -41,14 +41,14 @@ class currency_tSYSTEM
 	using iterator = typename std::map<std::string, currency_t>::const_iterator;
 
 	//Beginning and end iterators.
-	//So I can use "for(const auto& [key,val] : currency_tSYSTEM){}"
+	//So I can use "for(const auto& [key,val] : currencysystem_t){}"
 	std::map<std::string, currency_t>::const_iterator begin() const;
 	std::map<std::string, currency_t>::const_iterator end() const;
 
-	currency_tSYSTEM();
+	currencysystem_t();
 
 	void MakeChange(currency_t c, wallet_t* w);
-	void TradeUp(currency_tSYSTEM* S, wallet_t* w);
+	void TradeUp(currencysystem_t* S, wallet_t* w);
 	bool HasEquivalentTo(int Quantity, std::string Denomination);
 };
 typedef std::pair<currency_t, int> money_t;

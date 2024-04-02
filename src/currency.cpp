@@ -14,7 +14,7 @@ currency_t::currency_t(std::string _Name, int _SmallerAmount, std::string _Small
 	SmallerAmount = _SmallerAmount;
 	Larger = _Larger;
 }
-currency_t::currency_t(currency_tSYSTEM* _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
+currency_t::currency_t(currencysystem_t* _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
 {
 	Name = _Name;
 	Smaller = _Smaller;
@@ -33,23 +33,23 @@ bool currency_t::operator == (const currency_t& b) const
 		Larger == b.Larger);
 }
 
-currency_t& currency_tSYSTEM::operator [] (const std::string b)
+currency_t& currencysystem_t::operator [] (const std::string b)
 {
 	return Denomination[b];
 }
 
 //Beginning and end iterators.
-//So I can use "for(const auto& [key,val] : currency_tSYSTEM){}"
-std::map<std::string, currency_t>::const_iterator currency_tSYSTEM::begin() const
+//So I can use "for(const auto& [key,val] : currencysystem_t){}"
+std::map<std::string, currency_t>::const_iterator currencysystem_t::begin() const
 {
 	return Denomination.begin();
 }
-std::map<std::string, currency_t>::const_iterator currency_tSYSTEM::end() const
+std::map<std::string, currency_t>::const_iterator currencysystem_t::end() const
 {
 	return Denomination.end();
 }
 
-currency_tSYSTEM::currency_tSYSTEM(){}
+currencysystem_t::currencysystem_t(){}
 
 bool wallet_t::HasEffectivelyAtLeast(int q, currency_t c)
 {
@@ -404,10 +404,10 @@ bool wallet_t::operator != (const std::string b)//TODO: May need to revisit this
 {
 	return true;
 }
-//Links the instance of currency_t to the instance of currency_tSYSTEM
-//Allows the instance of currency_tSYSTEM to detect changes in the attached RGPSH_CURRENCY
+//Links the instance of currency_t to the instance of currencysystem_t
+//Allows the instance of currencysystem_t to detect changes in the attached RGPSH_CURRENCY
 //Also automatically adds the Currency to the map of Currencies within the CurrencySystem
-void currency_t::AttachToCurrencySystem(currency_tSYSTEM* _CurrencySystem)
+void currency_t::AttachToCurrencySystem(currencysystem_t* _CurrencySystem)
 {
 	System = _CurrencySystem;
 	System->Denomination[Name] = *this;
@@ -415,7 +415,7 @@ void currency_t::AttachToCurrencySystem(currency_tSYSTEM* _CurrencySystem)
 
 //Required for compilation due to the use of currency_t as a key for an std::map in the wallet_t class
 //Orders std::map from highest to lowest denomination
-//If you use more than one currency_t, you will need to declare currency_tSYSTEM for each of them
+//If you use more than one currency_t, you will need to declare currencysystem_t for each of them
 //Even if they are the only currency_t in the system. Otherwise, operators don't give expected behavior
 bool currency_t::operator < (const currency_t& b) const
 {
@@ -471,7 +471,7 @@ bool currency_t::operator < (const currency_t& b) const
 	return (Name < b.Name);
 }
 
-void currency_tSYSTEM::MakeChange(currency_t c, wallet_t* w)
+void currencysystem_t::MakeChange(currency_t c, wallet_t* w)
 {
 	std::string NextHighest = c.Larger;
 	int ConversionFactor = Denomination[NextHighest].SmallerAmount;
@@ -504,7 +504,7 @@ void currency_tSYSTEM::MakeChange(currency_t c, wallet_t* w)
 	(*w)[c] += ConversionFactor*ChangeCount;
 	(*w) -= money_t(Denomination[NextHighest],ChangeCount);
 }
-void currency_tSYSTEM::TradeUp(currency_tSYSTEM* S, wallet_t* w)
+void currencysystem_t::TradeUp(currencysystem_t* S, wallet_t* w)
 {
 	for(auto i = (*w).Money.rbegin(); i != (*w).Money.rend(); ++i)
 	{
