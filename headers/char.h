@@ -16,8 +16,8 @@ class rpgsh_char
 		std::string DiceDesignator		=	"Dice";
 		std::string CurrencyDesignator		=	"Currency";
 
-		RPGSH_OBJ<var_t>	Attr;
-		RPGSH_OBJ<dice_t>	Dice;
+		datamap<var_t>	Attr;
+		datamap<dice_t>	Dice;
 		currency_t		Currency	=	currency_t();
 
 	rpgsh_char();//Create character using default game

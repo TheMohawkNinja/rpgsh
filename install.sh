@@ -34,11 +34,8 @@ if [[ $EUID -eq 0 ]]; then
 	g++ -c -fPIC src/define.cpp -o "$lib_dir""define.o"
 	g++ -shared "$lib_dir""define.o" -o "$lib_dir""libdefine.so"
 	echo -e "\tsrc/functions.cpp\t->\t$bold_white$lib_dir""libfunctions.so"$normal
-	g++ -c -fPIC src/functions.cpp -o "$lib_dir""functions.o"
+	g++ --std=c++20 -c -fPIC src/functions.cpp -o "$lib_dir""functions.o"
 	g++ -shared "$lib_dir""functions.o" -o "$lib_dir""libfunctions.so"
-	echo -e "\tsrc/obj.cpp\t\t->\t$bold_white$lib_dir""libobj.so"$normal
-	g++ -c -fPIC src/obj.cpp -o "$lib_dir""obj.o"
-	g++ -shared "$lib_dir""obj.o" -o "$lib_dir""libobj.so"
 	echo -e "\tsrc/output.cpp\t\t->\t$bold_white$lib_dir""liboutput.so"$normal
 	g++ -c -fPIC src/output.cpp -o "$lib_dir""output.o"
 	g++ -shared "$lib_dir""output.o" -o "$lib_dir""liboutput.so"
@@ -55,11 +52,11 @@ if [[ $EUID -eq 0 ]]; then
 
 	echo "Compiling applications:"
 	echo -e "\tsrc/main.cpp\t\t->\t$bold_white""/bin/rpgsh"$normal
-	g++ src/main.cpp -L $lib_dir -ldefine -lvar -lobj -lfunctions -loutput -lconfig -ldice -lcurrency -lchar $fs $debug -o /bin/rpgsh
+	g++ src/main.cpp -L $lib_dir -ldefine -lvar -lfunctions -loutput -lconfig -ldice -lcurrency -lchar $fs $debug -o /bin/rpgsh
 	echo -e "\tsrc/setname.cpp\t\t->\t$bold_white""/bin/rpgsh-setname"$normal
 	g++ src/setname.cpp -L $lib_dir -ldefine -loutput -ldice -lcurrency -lconfig -lchar -lfunctions -lvar $fs $debug -o /bin/rpgsh-setname
 	echo -e "\tsrc/variables.cpp\t->\t$bold_white""/bin/rpgsh-variables"$normal
-	g++ src/variables.cpp -L $lib_dir -ldefine -lvar -lobj -lfunctions -loutput -lconfig -ldice -lcurrency -lchar $fs $debug -o /bin/rpgsh-variables
+	g++ src/variables.cpp -L $lib_dir -ldefine -lvar -lfunctions -loutput -lconfig -ldice -lcurrency -lchar $fs $debug -o /bin/rpgsh-variables
 	echo -e "\tsrc/version.cpp\t\t->\t$bold_white""/bin/rpgsh-version"$normal
 	g++ src/version.cpp $debug -o /bin/rpgsh-version
 	echo -e "\tsrc/banner.cpp\t\t->\t$bold_white""/bin/rpgsh-banner"$normal
@@ -67,7 +64,7 @@ if [[ $EUID -eq 0 ]]; then
 	echo -e "\tsrc/roll.cpp\t\t->\t$bold_white""/bin/rpgsh-roll"$normal
 	g++ src/roll.cpp -L $lib_dir -ldefine -lchar -lcurrency -lconfig -lvar -lfunctions -ldice -loutput $fs $debug -o /bin/rpgsh-roll
 	echo -e "\tsrc/list.cpp\t\t->\t$bold_white""/bin/rpgsh-list"$normal
-	g++ src/list.cpp -L $lib_dir -ldefine -lconfig -lchar -ldice -lvar -lobj -lfunctions -loutput -lcurrency $debug -o /bin/rpgsh-list
+	g++ src/list.cpp -L $lib_dir -ldefine -lconfig -lchar -ldice -lvar -lfunctions -loutput -lcurrency $debug -o /bin/rpgsh-list
 	echo -e "\tsrc/help.cpp\t\t->\t$bold_white""/bin/rpgsh-help"$normal
 	g++ src/help.cpp -L $lib_dir -ldefine -lconfig -lchar -lcurrency -ldice -lvar -lfunctions -loutput $debug -o /bin/rpgsh-help
 

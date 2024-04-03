@@ -32,8 +32,8 @@ void rpgsh_char::save()
 		std::filesystem::rename(char_path.c_str(),(char_path+".bak").c_str());
 	}
 
-	save_obj_to_file<RPGSH_OBJ<var_t>>(char_path, Attr, AttributeDesignator);
-	save_obj_to_file<RPGSH_OBJ<dice_t>>(char_path, Dice, DiceDesignator);
+	save_obj_to_file<datamap<var_t>>(char_path, Attr, AttributeDesignator);
+	save_obj_to_file<datamap<dice_t>>(char_path, Dice, DiceDesignator);
 }
 void rpgsh_char::load(std::string character, bool load_bak)
 {

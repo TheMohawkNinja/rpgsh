@@ -5,8 +5,8 @@
 #include <string>
 #include <vector>
 #include "output.h"
-#include "obj.h"
 #include "define.h"
+#include "var.h"
 
 bool stob(std::string s);
 
@@ -57,9 +57,9 @@ void save_obj_to_file(std::string path, T obj, std::string obj_id)
 }
 
 template <typename T>
-RPGSH_OBJ<T> load_obj_from_file(std::string path, std::string var_id)
+datamap<T> load_obj_from_file(std::string path, std::string var_id)
 {
-	RPGSH_OBJ<T> obj;
+	datamap<T> obj;
 
 	if(!std::filesystem::exists(path))
 	{
