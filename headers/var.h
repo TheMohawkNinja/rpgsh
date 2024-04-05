@@ -1,6 +1,5 @@
 #pragma once
 
-#include <map>
 #include <string>
 
 class var_t
@@ -43,6 +42,3 @@ class var_t
 
 	const char* c_str() const;
 };
-
-template <typename T>
-using datamap = std::map<std::string, T>;

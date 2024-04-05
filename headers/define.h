@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <string>
 
 //Version info
@@ -47,3 +48,7 @@ extern std::string prefix;
 
 //Data separator string. Name shortened for brevity in the code.
 extern std::string DS;
+
+//typedef for handing the various std::string key'd maps that are used
+template <typename T>
+using datamap = std::map<std::string, T>;
