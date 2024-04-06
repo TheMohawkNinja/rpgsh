@@ -4,17 +4,24 @@
 #include <string>
 
 //Version info
-#define MAJOR_VERSION	0
-#define MINOR_VERSION	8
-#define PATCH_VERSION	1
+#define MAJOR_VERSION			0
+#define MINOR_VERSION			8
+#define PATCH_VERSION			1
 
 //Comment character definition
-#define COMMENT		'#'
+#define COMMENT				'!'
 
 //Variable character scope sigils
-#define SHELL_SIGIL	'$'
-#define CAMPAIGN_SIGIL	'#'
-#define CHAR_SIGIL	'@'
+#define SHELL_SIGIL			'$'
+#define CAMPAIGN_SIGIL			'#'
+#define CHAR_SIGIL			'@'
+
+//Variable character type sigils
+#define CURRENCY_SIGIL			'c'
+#define CURRENCYSYSTEM_SIGIL		's'
+#define DICE_SIGIL			'd'
+#define VAR_SIGIL			'v'
+#define WALLET_SIGIL			'w'
 
 //Built-in variables
 #define CURRENT_CHAR_SHELL_VAR		".CURRENT_CHAR"
@@ -22,14 +29,14 @@
 #define CHAR_NAME_ATTR			".NAME"
 
 //Setting names
-#define PADDING		"padding"
-#define DEFAULT_GAME	"default_game"
+#define PADDING				"padding"
+#define DEFAULT_GAME			"default_game"
 
 //Universal flags
-#define FLAG_APPDESCRIPTION	"--appdescription"
+#define FLAG_APPDESCRIPTION		"--appdescription"
 
 //Column formatting
-#define COLUMN_PADDING	5
+#define COLUMN_PADDING			5
 
 //Locations of files to get random data from for things like 'roll'
 extern const char* random_seed_path;
