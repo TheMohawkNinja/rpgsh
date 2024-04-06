@@ -12,13 +12,9 @@ class rpgsh_char
 						get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR) +
 						"characters/";
 	public:
-		std::string AttributeDesignator		=	"Attr";
-		std::string DiceDesignator		=	"Dice";
-		std::string CurrencyDesignator		=	"Currency";
-
 		datamap<var_t>	Attr;
 		datamap<dice_t>	Dice;
-		currency_t		Currency	=	currency_t();
+		currency_t	Currency = currency_t();
 
 	rpgsh_char();//Create character using default game
 	rpgsh_char(std::string game);

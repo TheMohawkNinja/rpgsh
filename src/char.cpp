@@ -9,14 +9,14 @@ rpgsh_char::rpgsh_char()//Create character using default game
 	confirmShellVarsFile();
 	rpgsh_config config = rpgsh_config();
 
-	Attr = load_obj_from_file<var_t>(templates_dir+config.setting[DEFAULT_GAME],AttributeDesignator);
-	Dice = load_obj_from_file<dice_t>(templates_dir+config.setting[DEFAULT_GAME],DiceDesignator);
+	Attr = load_obj_from_file<var_t>(templates_dir+config.setting[DEFAULT_GAME],VAR_SIGIL);
+	Dice = load_obj_from_file<dice_t>(templates_dir+config.setting[DEFAULT_GAME],DICE_SIGIL);
 }
 rpgsh_char::rpgsh_char(std::string game)
 {
 	confirmShellVarsFile();
-	Attr = load_obj_from_file<var_t>(templates_dir+game,AttributeDesignator);
-	Dice = load_obj_from_file<dice_t>(templates_dir+game,DiceDesignator);
+	Attr = load_obj_from_file<var_t>(templates_dir+game,VAR_SIGIL);
+	Dice = load_obj_from_file<dice_t>(templates_dir+game,DICE_SIGIL);
 }
 
 std::string rpgsh_char::Name()
@@ -32,8 +32,8 @@ void rpgsh_char::save()
 		std::filesystem::rename(char_path.c_str(),(char_path+".bak").c_str());
 	}
 
-	save_obj_to_file<datamap<var_t>>(char_path, Attr, AttributeDesignator);
-	save_obj_to_file<datamap<dice_t>>(char_path, Dice, DiceDesignator);
+	save_obj_to_file<datamap<var_t>>(char_path, Attr, VAR_SIGIL);
+	save_obj_to_file<datamap<dice_t>>(char_path, Dice, DICE_SIGIL);
 }
 void rpgsh_char::load(std::string character, bool load_bak)
 {
@@ -56,8 +56,8 @@ void rpgsh_char::load(std::string character, bool load_bak)
 	Attr.clear();
 	Dice.clear();
 
-	Attr = load_obj_from_file<var_t>(char_path,AttributeDesignator);
-	Dice = load_obj_from_file<dice_t>(char_path,DiceDesignator);
+	Attr = load_obj_from_file<var_t>(char_path,VAR_SIGIL);
+	Dice = load_obj_from_file<dice_t>(char_path,DICE_SIGIL);
 
 	fs.close();
 }

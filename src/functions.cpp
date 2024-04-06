@@ -38,7 +38,7 @@ void confirmShellVarsFile()
 		rpgsh_char c = rpgsh_char();
 
 		//Set default values for built-in shell variables
-		datamap<var_t> Attr = load_obj_from_file<var_t>(templates_dir+config.setting[DEFAULT_GAME],c.AttributeDesignator);
+		datamap<var_t> Attr = load_obj_from_file<var_t>(templates_dir+config.setting[DEFAULT_GAME],VAR_SIGIL);
 		set_shell_var(CURRENT_CHAR_SHELL_VAR,c.Name());
 		set_shell_var(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
 	}
@@ -476,9 +476,9 @@ std::map<std::string,std::string> load_vars_from_file(std::string path)
 }
 
 template <typename T>
-void save_obj_to_file(std::string path, datamap<dice_t> obj, std::string obj_id);
-void save_obj_to_file(std::string path, datamap<var_t> obj, std::string obj_id);
+void save_obj_to_file(std::string path, datamap<dice_t> obj, char obj_id);
+void save_obj_to_file(std::string path, datamap<var_t> obj, char obj_id);
 
 template <typename T>
-datamap<dice_t> load_obj_from_file(std::string path, std::string var_id);
-datamap<var_t> load_obj_from_file(std::string path, std::string var_id);
+datamap<dice_t> load_obj_from_file(std::string path, char var_id);
+datamap<var_t> load_obj_from_file(std::string path, char var_id);
