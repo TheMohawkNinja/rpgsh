@@ -161,9 +161,9 @@ int main(int argc, char** argv)
 				fprintf(stdout,"\t%sm%s			The modifier for the total roll.\n",TEXT_ITALIC,TEXT_NORMAL);
 				fprintf(stdout,"\t-r %sn%s|--repeat %sn%s		Repeat the roll %sn%s times.\n\t\t\t\tSet to 1 if omitted.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 				fprintf(stdout,"\t-l %slist%s|--list %slist%s	Rolls a die with custom faces sourced from %slist%s (newline delimited).\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
-				fprintf(stdout,"\t-L|--lists		Prints all of the available dice lists.\n");
 				fprintf(stdout,"\t\t\t\tIf %slist%s does not start with a \'/\', \'./\', or \'../\' roll will check the \"%s\" directory.\n",TEXT_ITALIC,TEXT_NORMAL,dice_lists_dir.c_str());
 				fprintf(stdout,"\t\t\t\tOtherwise it will check the path specified by the user.\n");
+				fprintf(stdout,"\t-L|--lists		Prints all of the available dice lists.\n");
 				fprintf(stdout,"\t-c %sexpr%s|--count %sexpr%s	Count how many dice rolls meet a criteria defined by a boolean expression (=,<,>,<=,>=,!=) and a numerical value.\n\t\t\t\tIf the boolean expression is omitted, it is assumed to be \"=\".\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 				fprintf(stdout,"\t--only-rolls		Only display dice rolls.\n");
 				fprintf(stdout,"\t--only-total		Only display total of the roll.\n");
