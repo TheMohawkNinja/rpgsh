@@ -98,3 +98,25 @@ datamap<T> load_obj_from_file(std::string path, char var_id)
 
 	return obj;
 }
+
+template <typename T>
+datamap<T> getDatamapFromAllScopes(char var_id)
+{
+	datamap<T> ret;
+
+	std::string character = get_shell_var(CURRENT_CHAR_SHELL_VAR);
+	std::string campaign = get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR);
+	std::string current_campaign_dir = campaigns_dir+campaign;
+	std::string current_character_dir = current_campaign_dir+"characters/";
+
+	for(const auto& [k,v] : load_obj_from_file<T>((current_character_dir+character+".char"),var_id))
+		ret[k] = v;
+
+	for(const auto& [k,v] : load_obj_from_file<T>((current_campaign_dir+".vars"),var_id))
+		ret[k] = v;
+
+	for(const auto& [k,v] : load_obj_from_file<T>(shell_vars_file,var_id))
+		ret[k] = v;
+
+	return ret;
+}

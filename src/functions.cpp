@@ -482,3 +482,6 @@ void save_obj_to_file(std::string path, datamap<var_t> obj, char obj_id);
 template <typename T>
 datamap<dice_t> load_obj_from_file(std::string path, char var_id);
 datamap<var_t> load_obj_from_file(std::string path, char var_id);
+
+template <typename T>
+datamap<currency_t> loadDatamapFromAllScopes(char var_id);
