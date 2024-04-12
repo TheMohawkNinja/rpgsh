@@ -2,6 +2,7 @@
 
 #include <map>
 #include <string>
+#include "define.h"
 
 //External forward declarations
 class dice_t;
@@ -22,7 +23,17 @@ class currency_t
 
 	void AttachToCurrencySystem(currencysystem_t* _CurrencySystem);
 
+	private:
+	//Parsing methods for currency_t(datamap<currencysystem_t, std::string)
+	void tryParseCurrencySystem(datamap<currencysystem_t> currencysystems, std::string* str, std::string fullstr);
+	void tryParseName(std::string* str, std::string fullstr);
+	void tryParseSmallerAmount(std::string* str, std::string fullstr);
+	void tryParseSmaller(std::string* str, std::string fullstr);
+	void tryParseLarger(std::string* str, std::string fullstr);
+
+	public:
 	currency_t();
+	currency_t(std::string str);
 	currency_t(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
 	currency_t(currencysystem_t* _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
 
@@ -32,6 +43,7 @@ class currency_t
 class currencysystem_t
 {
 	public:
+		std::string Name = "";
 		std::map<std::string, currency_t> Denomination;
 		currency_t transaction = currency_t();
 
@@ -46,6 +58,7 @@ class currencysystem_t
 	std::map<std::string, currency_t>::const_iterator end() const;
 
 	currencysystem_t();
+	currencysystem_t(std::string str);
 
 	void MakeChange(currency_t c, wallet_t* w);
 	void TradeUp(currencysystem_t* S, wallet_t* w);
@@ -60,7 +73,7 @@ class wallet_t
 
 	bool HasEffectivelyAtLeast(int q, currency_t c);
 	void print(int tab);
-	void FloatQuantityToWholeCurrency(currency_t c, float q);
+	void FloatQuantityToIntCurrency(currency_t c, float q);
 
 	int& operator [] (const currency_t b);
 
@@ -73,7 +86,7 @@ class wallet_t
 
 	wallet_t();
 	wallet_t(const money_t m);
-	wallet_t(std::string s);//TODO: Assumes a format "<quantity> <currency>"
+	wallet_t(std::string s);
 
 	wallet_t& operator = (const unsigned int b);
 	wallet_t& operator = (const money_t b);

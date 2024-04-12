@@ -1,4 +1,5 @@
 #include <cmath>//floor()
+#include <strings.h>//strcasecmp()
 #include "../headers/currency.h"
 #include "../headers/dice.h"
 #include "../headers/functions.h"
@@ -6,7 +7,191 @@
 #include "../headers/text.h"
 #include "../headers/var.h"
 
+void currency_t::tryParseCurrencySystem(datamap<currencysystem_t> currencysystems, std::string* str, std::string fullstr)
+{
+	std::string cs_match = "";
+	std::string str_temp = "";
+
+	try
+	{
+		cs_match = str->substr(0,str->find(","));
+		str_temp = str->substr(str->find(",")+1,
+				       str->length()-str->find(",")+1);
+		str = &str_temp;
+	}
+	catch(...)
+	{
+		output(Error,"Unable to parse currencysystem from \"%s\".",fullstr.c_str());
+		exit(-1);
+	}
+
+	for(const auto& [k,v] : currencysystems)
+	{
+		if(!strcasecmp(v.Name.c_str(),cs_match.c_str()))
+		{
+			//Can't just call function with &v for some reason
+			currencysystem_t cs = v;
+			AttachToCurrencySystem(&cs);
+		}
+	}
+	if(!System)
+	{
+		output(Error,"No currency system matches \"%s\".",cs_match.c_str());
+		exit(-1);
+	}
+}
+void currency_t::tryParseName(std::string* str, std::string fullstr)
+{
+	std::string str_temp = "";
+
+	try
+	{
+		Name = str->substr(0,str->find(","));
+		str_temp = str->substr(str->find(",")+1,
+				       str->length()-str->find(",")+1);
+		str = &str_temp;
+	}
+	catch(...)
+	{
+		output(Error,"Unable to parse currency Name from \"%s\".",fullstr.c_str());
+		exit(-1);
+	}
+}
+void currency_t::tryParseSmallerAmount(std::string* str, std::string fullstr)
+{
+	std::string SmallerAmountStr = "";
+	std::string str_temp = "";
+
+	try
+	{
+		SmallerAmountStr = str->substr(0,str->find(","));
+		str_temp = str->substr(str->find(",")+1,
+				       str->length()-str->find(",")+1);
+		str = &str_temp;
+	}
+	catch(...)
+	{
+		output(Error,"Unable to parse currency SmallerAmount from \"%s\".",fullstr.c_str());
+		exit(-1);
+	}
+
+	try
+	{
+		SmallerAmount = std::stoi(SmallerAmountStr);
+	}
+	catch(...)
+	{
+		output(Error,"\"%s\" is not an integer.",SmallerAmountStr.c_str());
+		exit(-1);
+	}
+}
+void currency_t::tryParseSmaller(std::string* str, std::string fullstr)
+{
+	std::string str_temp = "";
+
+	try
+	{
+		Smaller = str->substr(0,str->find(","));
+		str_temp = str->substr(str->find(",")+1,
+				       str->length()-str->find(",")+1);
+		str = &str_temp;
+	}
+	catch(...)
+	{
+		output(Error,"Unable to parse currency Smaller from \"%s\".",fullstr.c_str());
+		exit(-1);
+	}
+}
+void currency_t::tryParseLarger(std::string* str, std::string fullstr)
+{
+	if(str->find("}") == std::string::npos)
+	{
+		output(Error,"No ending \'}\' found in currency definition.");
+	}
+
+	try
+	{
+		Larger = str->substr(0,str->find("}"));
+	}
+	catch(...)
+	{
+		output(Error,"Unable to parse currency Larger from \"%s\".",fullstr.c_str());
+		exit(-1);
+	}
+}
+
 currency_t::currency_t(){}
+currency_t::currency_t(std::string str)
+{
+	//FORMAT
+	//@c/MyCurrency = {Name,SmallerAmount,Smaller,Larger}
+	//@c/MyCurrency = {CurrencySystem,Name,SmallerAmount,Smaller,Larger}
+
+	datamap<currencysystem_t> currencysystems = getDatamapFromAllScopes<currencysystem_t>(CURRENCYSYSTEM_SIGIL);
+	std::string fullstr = str;
+
+	//Get number of commas to determine if we are involving a currencysystem_t
+	int commas = 0;
+	for(const auto& c : str)
+	{
+		if(c == ',')
+			commas++;
+	}
+
+	if(commas < 3)
+	{
+		output(Error,"Too few arguments in currency definition.");
+		exit(-1);
+	}
+	else if(commas > 4)
+	{
+		output(Error,"Too many arguments in currency definition.");
+		exit(-1);
+	}
+
+	//Make sure starting character is '{'
+	if(str[0] != '{')
+	{
+		output(Error,"Expected starting \'{\' at beginning of currency definition.");
+		exit(-1);
+	}
+
+	//Nix the first character to make future substrings more intuitive
+	str = str.substr(1,str.length()-1);
+
+	//Name
+	//CurrencySystem
+	if(commas == 3)
+		tryParseName(&str, fullstr);
+	else
+		tryParseCurrencySystem(currencysystems, &str, fullstr);
+
+	//SmallerAmount
+	//Name
+	if(commas == 3)
+		tryParseSmallerAmount(&str, fullstr);
+	else
+		tryParseName(&str, fullstr);
+
+	//Smaller
+	//SmallerAmount
+	if(commas == 3)
+		tryParseSmaller(&str, fullstr);
+	else
+		tryParseSmallerAmount(&str, fullstr);
+
+	//Larger
+	//Smaller
+	if(commas == 3)
+		tryParseLarger(&str, fullstr);
+	else
+		tryParseSmaller(&str, fullstr);
+
+	//<N/A>
+	//Larger
+	if(commas == 4)
+		tryParseLarger(&str, fullstr);
+}
 currency_t::currency_t(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
 {
 	Name = _Name;
@@ -50,6 +235,10 @@ std::map<std::string, currency_t>::const_iterator currencysystem_t::end() const
 }
 
 currencysystem_t::currencysystem_t(){}
+currencysystem_t::currencysystem_t(std::string str)
+{
+	Name = str;
+}
 
 bool wallet_t::HasEffectivelyAtLeast(int q, currency_t c)
 {
@@ -94,7 +283,7 @@ void wallet_t::print(int tab)
 		}
 	}
 }
-void wallet_t::FloatQuantityToWholeCurrency(currency_t c, float q)
+void wallet_t::FloatQuantityToIntCurrency(currency_t c, float q)
 {
 	int totalFactor = 1;
 
@@ -130,29 +319,52 @@ wallet_t::wallet_t(const money_t m)
 
 	Money[c] = q;
 }
-wallet_t::wallet_t(std::string s)//TODO: Assumes a format "<quantity> <currency>"
+wallet_t::wallet_t(std::string str)
 {
-	int s_space = s.find(" ");
-	int s_ln = s.length();
-	money_t m;
-	try
+	//FORMAT
+	//@w/MyWallet = {<currency_1> <quantity_1>,<currency_2> <quantity_2>,...,<currency_n> <quantity_n>}
+
+	datamap<currency_t> currencies = getDatamapFromAllScopes<currency_t>(WALLET_SIGIL);
+
+	//Get map of currency names
+	datamap<std::string> currencynames;
+	for(auto& [k,v] : currencies)
+		currencynames[k] = v.Name;
+
+	if(str[0] != '{')
 	{
-		std::string q = s.substr(0,s_space);
-		m.second = std::stoi(q);
-	}
-	catch(...)
-	{
-		output(Error,"Invalid quantity in wallet constructor \'%s\'",s.c_str());
+		output(Error,"Expected starting \'{\' at beginning of wallet definition.");
+		exit(-1);
 	}
 
-	try
+	str = str.substr(1,str.length()-1);
+
+	//Get currency amounts
+	while(true)
 	{
-		std::string c = s.substr(s_space+1,s_ln-s_space);
-		m.first = currency_t();
-	}
-	catch(...)
-	{
-		output(Error,"Invalid currency in wallet constructor \'%s\'",s.c_str());
+		std::string cur_str = str.substr(0,str.find(" "));
+		char delimiter = ',';
+
+		if(str.find(",") == std::string::npos)
+			delimiter = '}';
+
+		if(str.find(delimiter) == std::string::npos)
+		{
+			output(Error,"Unable to parse currency for wallet, missing \'%c\'",delimiter);
+			exit(-1);
+		}
+
+		std::string quant_str = str.substr(str.find(" ")+1,
+						   str.find(delimiter)-(str.find(" ")+1));
+
+		try
+		{
+			Money[currencynames[cur_str]] += std::stoi(quant_str);
+		}
+		catch(...)
+		{
+			output(Error,"Unable to add the currency \"%s\" in the quantity \"%s\" to the wallet.",cur_str.c_str(),quant_str.c_str());
+		}
 	}
 }
 
@@ -339,7 +551,7 @@ wallet_t& wallet_t::operator /= (const unsigned int b)
 	//Will necessarily be a bit lossy just like real finances when dealing with repeating decimals and the like
 	for(const auto& [c,q] : change)
 	{
-		FloatQuantityToWholeCurrency(c,q);
+		FloatQuantityToIntCurrency(c,q);
 	}
 	return *this;
 }
