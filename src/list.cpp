@@ -1,6 +1,7 @@
 #include <cstring>
 #include "../headers/char.h"
 #include "../headers/functions.h"
+#include "../headers/scope.h"
 #include "../headers/text.h"
 
 void print_header(std::string s)
@@ -33,10 +34,11 @@ void print_map(T m, char scope_sigil)
 }
 void print_player_attrs()
 {
-	rpgsh_char c = rpgsh_char();
+	scope s = scope(Character);
+	//rpgsh_char c = rpgsh_char();
 	std::string sigil(1,CHAR_SIGIL);
-	print_header("("+sigil+") "+c.Name());
-	print_map<datamap<var_t>>(c.Attr,CHAR_SIGIL);
+	print_header("("+sigil+") "+s.getStr<var_t>(s.getStr<var_t>(std::string(CHAR_NAME_ATTR))));
+	print_map<datamap<var_t>>(s.getDatamap<var_t>(),CHAR_SIGIL);
 }
 void print_campaign_vars()
 {
