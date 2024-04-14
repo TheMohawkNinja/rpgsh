@@ -24,6 +24,7 @@ class currency_t
 	void AttachToCurrencySystem(currencysystem_t* _CurrencySystem);
 
 	private:
+
 	//Parsing methods for currency_t(datamap<currencysystem_t, std::string)
 	void tryParseCurrencySystem(datamap<currencysystem_t> currencysystems, std::string* str, std::string fullstr);
 	void tryParseName(std::string* str, std::string fullstr);
@@ -37,6 +38,7 @@ class currency_t
 	currency_t(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
 	currency_t(currencysystem_t* _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
 
+	explicit operator std::string() const;
 	bool operator == (const currency_t& b) const;
 	bool operator < (const currency_t& b) const;
 };
@@ -47,6 +49,7 @@ class currencysystem_t
 		std::map<std::string, currency_t> Denomination;
 		currency_t transaction = currency_t();
 
+	explicit operator std::string() const;
 	currency_t& operator [] (const std::string b);
 
 	//Iterator type for the class
@@ -72,7 +75,7 @@ class wallet_t
 		std::pair<currency_t,int> transaction;
 
 	bool HasEffectivelyAtLeast(int q, currency_t c);
-	void print(int tab);
+	void print();
 	void FloatQuantityToIntCurrency(currency_t c, float q);
 
 	int& operator [] (const currency_t b);
@@ -117,5 +120,6 @@ class wallet_t
 	wallet_t& operator -- ();
 	wallet_t& operator -- (int);
 
+	explicit operator std::string() const;
 	bool operator != (const std::string b);//TODO: May need to revisit this for a possible wallet_t(std::string) constructor
 };

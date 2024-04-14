@@ -209,6 +209,24 @@ currency_t::currency_t(currencysystem_t* _CS, std::string _Name, int _SmallerAmo
 	AttachToCurrencySystem(_CS);
 }
 
+currency_t::operator std::string() const
+{
+	if(System)
+	{
+		return "{" + System->Name + "," +
+			     Name + "," +
+			     std::to_string(SmallerAmount) + "," +
+			     Smaller + "," +
+			     Larger + "}";
+	}
+	else
+	{
+		return "{" + Name + "," +
+			     std::to_string(SmallerAmount) + "," +
+			     Smaller + "," +
+			     Larger + "}";
+	}
+}
 bool currency_t::operator == (const currency_t& b) const
 {
 	return (System == b.System &&
@@ -217,7 +235,11 @@ bool currency_t::operator == (const currency_t& b) const
 		SmallerAmount == b.SmallerAmount &&
 		Larger == b.Larger);
 }
-
+//TODO currency_t < operator
+currencysystem_t::operator std::string() const
+{
+	return Name;
+}
 currency_t& currencysystem_t::operator [] (const std::string b)
 {
 	return Denomination[b];
@@ -255,7 +277,7 @@ bool wallet_t::HasEffectivelyAtLeast(int q, currency_t c)
 
 	return total >= q;
 }
-void wallet_t::print(int tab)
+void wallet_t::print()
 {
 	unsigned int NameLength = 0;
 	unsigned int LongestName = 0;
@@ -612,6 +634,21 @@ wallet_t& wallet_t::operator -- (int)
 	return --(*this);
 }
 
+wallet_t::operator std::string() const
+{
+	//@w/MyWallet = {<currency_1> <quantity_1>,<currency_2> <quantity_2>,...,<currency_n> <quantity_n>}
+
+	std::string ret = "{";
+	for(const auto& [k,v] : Money)
+		ret += k.Name + " " + std::to_string(v) + ",";
+
+	//Cut final ','
+	ret = ret.substr(0,ret.length()-1);
+
+	ret += "}";
+
+	return ret;
+}
 bool wallet_t::operator != (const std::string b)//TODO: May need to revisit this for a possible wallet_t(std::string) constructor
 {
 	return true;
