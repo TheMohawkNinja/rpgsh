@@ -46,88 +46,26 @@ class scope
 
 		//Get single variable
 		template <typename T>
-		T get(std::string key)
-		{
-			if(std::is_same<T,currency_t>::value)
-				return currencies[key];
-			else if(std::is_same<T,currencysystem_t>::value)
-				return currencysystems[key];
-			else if(std::is_same<T,dice_t>::value)
-				return dice[key];
-			else if(std::is_same<T,var_t>::value)
-				return vars[key];
-			else if(std::is_same<T,wallet_t>::value)
-				return wallets[key];
-			else//Unsupported data type
-				throw;
-		}
+		T get(std::string key);
+
+		//Get single variable, but return a std::string
+		template <typename T>
+		std::string getStr(std::string key);
 
 		//Get all variables of a specific datatype
 		template <typename T>
-		datamap<T> getDatamap()
-		{
-			if(std::is_same<T,currency_t>::value)
-				return currencies;
-			else if(std::is_same<T,currencysystem_t>::value)
-				return currencysystems;
-			else if(std::is_same<T,dice_t>::value)
-				return dice;
-			else if(std::is_same<T,var_t>::value)
-				return vars;
-			else if(std::is_same<T,wallet_t>::value)
-				return wallets;
-			else//Unsupported data type
-				throw;
-		}
+		datamap<T> getDatamap();
 
 		//Set single variable
+		/*
+		May need to check key[1] as the type of 'T'
+		may not necessarily be the same as the type of the map that "value"
+		is being applied to.
+		*/
 		template <typename T>
-		void set(std::string key, T value)
-		{
-			/*
-			Switching key[1] instead of std::is_same as the type of 'T'
-			may not necessarily be the same as the type of the map that "value"
-			is being applied to.
-			*/
-
-			switch(key[1])
-			{
-				case CURRENCY_SIGIL:
-					currencies[key] = value;
-					break;
-				case CURRENCYSYSTEM_SIGIL:
-					currencysystems[key] = value;
-					break;
-				case DICE_SIGIL:
-					dice[key] = value;
-					break;
-				case VAR_SIGIL:
-				case '/'://If no type sigil is used, assume var
-					vars[key] = value;
-					break;
-				case WALLET_SIGIL:
-					wallets[key] = value;
-					break;
-				default://Unsupported data type
-					throw;
-			}
-		}
+		void set(std::string key, T value);
 
 		//Set entire datamap to another datamap
 		template <typename T>
-		void setDatamap(datamap<T> map)
-		{
-			if(std::is_same<T,currency_t>::value)
-				currencies = map;
-			else if(std::is_same<T,currencysystem_t>::value)
-				currencysystems = map;
-			else if(std::is_same<T,dice_t>::value)
-				dice = map;
-			else if(std::is_same<T,var_t>::value)
-				vars = map;
-			else if(std::is_same<T,wallet_t>::value)
-				wallets= map;
-			else//Unsupported data type
-				throw;
-		}
+		void setDatamap(datamap<T> map);
 };

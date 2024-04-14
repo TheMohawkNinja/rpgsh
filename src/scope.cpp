@@ -53,6 +53,8 @@ scope::scope(scope_level level)
 		case Shell:
 			datasource = shell_vars_file;
 	}
+
+	load();
 }
 
 //Load all data in from file
@@ -164,48 +166,135 @@ void scope::save()
 
 //Get single variable
 template<>
-currency_t scope::get<currency_t>(std::string key);
+currency_t scope::get<currency_t>(std::string key)
+{
+	return currencies[key];
+}
 template<>
-currencysystem_t scope::get<currencysystem_t>(std::string key);
+currencysystem_t scope::get<currencysystem_t>(std::string key)
+{
+	return currencysystems[key];
+}
 template<>
-dice_t scope::get<dice_t>(std::string key);
+dice_t scope::get<dice_t>(std::string key)
+{
+	return dice[key];
+}
 template<>
-var_t scope::get<var_t>(std::string key);
+var_t scope::get<var_t>(std::string key)
+{
+	return vars[key];
+}
 template<>
-wallet_t scope::get<wallet_t>(std::string key);
+wallet_t scope::get<wallet_t>(std::string key)
+{
+	return wallets[key];
+}
+
+//Get single variable, but return a std::string
+template<>
+std::string scope::getStr<currency_t>(std::string key)
+{
+	return std::string(scope::get<currency_t>(key));
+}
+template<>
+std::string scope::getStr<currencysystem_t>(std::string key)
+{
+	return std::string(scope::get<currencysystem_t>(key));
+}
+template<>
+std::string scope::getStr<dice_t>(std::string key)
+{
+	return std::string(scope::get<dice_t>(key));
+}
+template<>
+std::string scope::getStr<var_t>(std::string key)
+{
+	return std::string(scope::get<var_t>(key));
+}
+template<>
+std::string scope::getStr<wallet_t>(std::string key)
+{
+	return std::string(scope::get<wallet_t>(key));
+}
 
 //Get all variables of a specific datatype
 template<>
-datamap<currency_t> scope::getDatamap<currency_t>();
+datamap<currency_t> scope::getDatamap<currency_t>()
+{
+	return currencies;
+}
 template<>
-datamap<currencysystem_t> scope::getDatamap<currencysystem_t>();
+datamap<currencysystem_t> scope::getDatamap<currencysystem_t>()
+{
+	return currencysystems;
+}
 template<>
-datamap<dice_t> scope::getDatamap<dice_t>();
+datamap<dice_t> scope::getDatamap<dice_t>()
+{
+	return dice;
+}
 template<>
-datamap<var_t> scope::getDatamap<var_t>();
+datamap<var_t> scope::getDatamap<var_t>()
+{
+	return vars;
+}
 template<>
-datamap<wallet_t> scope::getDatamap<wallet_t>();
+datamap<wallet_t> scope::getDatamap<wallet_t>()
+{
+	return wallets;
+}
 
 //Set single variable
 template<>
-void scope::set<currency_t>(std::string key, currency_t value);
+void scope::set<currency_t>(std::string key, currency_t value)
+{
+	currencies[key] = value;
+}
 template<>
-void scope::set<currencysystem_t>(std::string key, currencysystem_t value);
+void scope::set<currencysystem_t>(std::string key, currencysystem_t value)
+{
+	currencysystems[key] = value;
+}
 template<>
-void scope::set<dice_t>(std::string key, dice_t value);
+void scope::set<dice_t>(std::string key, dice_t value)
+{
+	dice[key] = value;
+}
 template<>
-void scope::set<var_t>(std::string key, var_t value);
+void scope::set<var_t>(std::string key, var_t value)
+{
+	vars[key] = value;
+}
 template<>
-void scope::set<wallet_t>(std::string key, wallet_t value);
+void scope::set<wallet_t>(std::string key, wallet_t value)
+{
+	wallets[key] = value;
+}
 
 //Set entire datamap to another datamap
 template<>
-void scope::setDatamap<currency_t>(datamap<currency_t> map);
+void scope::setDatamap<currency_t>(datamap<currency_t> map)
+{
+	currencies = map;
+}
 template<>
-void scope::setDatamap<currencysystem_t>(datamap<currencysystem_t> map);
+void scope::setDatamap<currencysystem_t>(datamap<currencysystem_t> map)
+{
+	currencysystems = map;
+}
 template<>
-void scope::setDatamap<dice_t>(datamap<dice_t> map);
+void scope::setDatamap<dice_t>(datamap<dice_t> map)
+{
+	dice = map;
+}
 template<>
-void scope::setDatamap<var_t>(datamap<var_t> map);
+void scope::setDatamap<var_t>(datamap<var_t> map)
+{
+	vars = map;
+}
 template<>
-void scope::setDatamap<wallet_t>(datamap<wallet_t> map);
+void scope::setDatamap<wallet_t>(datamap<wallet_t> map)
+{
+	wallets = map;
+}
