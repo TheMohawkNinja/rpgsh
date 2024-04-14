@@ -39,6 +39,9 @@ if [[ $EUID -eq 0 ]]; then
 	echo -e "\tsrc/output.cpp\t\t->\t$bold_white$lib_dir""liboutput.so"$normal
 	g++ -c -fPIC src/output.cpp -o "$lib_dir""output.o"
 	g++ -shared "$lib_dir""output.o" -o "$lib_dir""liboutput.so"
+	echo -e "\tsrc/scope.cpp\t\t->\t$bold_white$lib_dir""libscope.so"$normal
+	g++ -c -fPIC src/scope.cpp -o "$lib_dir""scope.o"
+	g++ -shared "$lib_dir""scope.o" -o "$lib_dir""libscope.so"
 	echo -e "\tsrc/var.cpp\t\t->\t$bold_white$lib_dir""libvar.so"$normal
 	g++ -c -fPIC src/var.cpp -o "$lib_dir""var.o"
 	g++ -shared "$lib_dir""var.o" -o "$lib_dir""libvar.so"
@@ -64,7 +67,7 @@ if [[ $EUID -eq 0 ]]; then
 	echo -e "\tsrc/roll.cpp\t\t->\t$bold_white""/bin/rpgsh-roll"$normal
 	g++ src/roll.cpp -L $lib_dir -ldefine -lchar -lcurrency -lconfig -lvar -lfunctions -ldice -loutput $fs $debug -o /bin/rpgsh-roll
 	echo -e "\tsrc/list.cpp\t\t->\t$bold_white""/bin/rpgsh-list"$normal
-	g++ src/list.cpp -L $lib_dir -ldefine -lconfig -lchar -ldice -lvar -lfunctions -loutput -lcurrency $debug -o /bin/rpgsh-list
+	g++ src/list.cpp -L $lib_dir -ldefine -lconfig -lchar -ldice -lvar -lfunctions -loutput -lcurrency -lscope $debug -o /bin/rpgsh-list
 	echo -e "\tsrc/help.cpp\t\t->\t$bold_white""/bin/rpgsh-help"$normal
 	g++ src/help.cpp -L $lib_dir -ldefine -lconfig -lchar -lcurrency -ldice -lvar -lfunctions -loutput $debug -o /bin/rpgsh-help
 
