@@ -53,7 +53,6 @@ void confirmShellVarsFile()
 		rpgsh_char c = rpgsh_char();
 
 		//Set default values for built-in shell variables
-		//datamap<var_t> Attr = load_obj_from_file<var_t>(templates_dir+config.setting[DEFAULT_GAME],VAR_SIGIL);
 		set_shell_var(CURRENT_CHAR_SHELL_VAR,c.Name());
 		set_shell_var(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
 	}
