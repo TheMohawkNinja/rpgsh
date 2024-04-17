@@ -46,6 +46,7 @@ extern const char* backup_random_seed_path;
 extern std::string user;
 extern std::string root_dir;
 extern std::string shell_vars_file;
+extern std::string rpgsh_env_variables_file;
 extern std::string config_file;
 extern std::string campaigns_dir;
 extern std::string templates_dir;

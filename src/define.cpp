@@ -9,6 +9,7 @@ const char* backup_random_seed_path = 	"/dev/urandom";
 std::string user = 				getlogin();
 std::string root_dir =				"/home/" + user + "/.rpgsh/";
 std::string shell_vars_file = 			root_dir + ".vars";
+std::string rpgsh_env_variables_file =		root_dir + ".rpgsh_variables";
 std::string config_file = 			root_dir + "config";
 std::string campaigns_dir = 			root_dir + "campaigns/";
 std::string templates_dir = 			root_dir + "templates/";

@@ -26,6 +26,21 @@ bool stob(std::string s)
 	}
 }
 
+void confirmEnvVariablesFile()
+{
+	if(!std::filesystem::exists(rpgsh_env_variables_file.c_str()))
+	{
+		output(Info,"RPGSH environment variables file not found, creating file at \'%s\'.",rpgsh_env_variables_file.c_str());
+		std::ofstream ofs(rpgsh_env_variables_file.c_str());
+		ofs.close();
+
+		//Set default values for built-in env variables
+		rpgsh_char c = rpgsh_char();
+		set_rpgsh_env_variable(CURRENT_CHAR_SHELL_VAR,c.Name());
+		set_rpgsh_env_variable(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
+	}
+}
+
 void confirmShellVarsFile()
 {
 	if(!std::filesystem::exists(shell_vars_file.c_str()))
@@ -38,7 +53,7 @@ void confirmShellVarsFile()
 		rpgsh_char c = rpgsh_char();
 
 		//Set default values for built-in shell variables
-		datamap<var_t> Attr = load_obj_from_file<var_t>(templates_dir+config.setting[DEFAULT_GAME],VAR_SIGIL);
+		//datamap<var_t> Attr = load_obj_from_file<var_t>(templates_dir+config.setting[DEFAULT_GAME],VAR_SIGIL);
 		set_shell_var(CURRENT_CHAR_SHELL_VAR,c.Name());
 		set_shell_var(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
 	}
@@ -329,6 +344,59 @@ std::vector<std::string> get_prog_output(std::string prog)
 	ifs.close();
 
 	return output;
+}
+
+std::string get_rgpsh_env_variable(std::string v)
+{
+	confirmEnvVariablesFile();
+
+	std::ifstream ifs(rpgsh_env_variables_file.c_str());
+	while(!ifs.eof())
+	{
+		std::string data = "";
+		std::getline(ifs,data);
+
+		if(data.substr(0,data.find(DS)) == v)
+		{
+			return data.substr(data.find(DS)+DS.length(),
+			       data.length()-(data.find(DS)+DS.length()));
+		}
+	}
+	ifs.close();
+	return "";
+}
+void set_rpgsh_env_variable(std::string v,std::string value)
+{
+	std::ifstream ifs(rpgsh_env_variables_file.c_str());
+	std::filesystem::remove((rpgsh_env_variables_file+".bak").c_str());
+	std::ofstream ofs((rpgsh_env_variables_file+".bak").c_str());
+	bool ReplacedValue = false;
+
+	while(!ifs.eof())
+	{
+		std::string data = "";
+		std::getline(ifs,data);
+		if(data == "" || data == "\n")// Prevents writing blank lines back to file
+			continue;
+		if(data.substr(0,data.find(DS)) == v)
+		{
+			ofs<<v + DS + value + "\n";
+			ReplacedValue = true;
+		}
+		else
+		{
+			ofs<<data + "\n";
+		}
+	}
+
+	if(!ReplacedValue)
+	{
+		ofs<<v + DS + value + "\n";
+	}
+	ifs.close();
+	ofs.close();
+	std::filesystem::remove(rpgsh_env_variables_file.c_str());
+	std::filesystem::rename((rpgsh_env_variables_file+".bak").c_str(),rpgsh_env_variables_file.c_str());
 }
 
 std::string get_shell_var(std::string var)

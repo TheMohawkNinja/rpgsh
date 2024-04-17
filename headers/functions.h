@@ -10,6 +10,8 @@
 
 bool stob(std::string s);
 
+void confirmEnvVariablesFile();
+
 void confirmShellVarsFile();
 
 void confirmCampaignVarsFile();
@@ -23,6 +25,9 @@ void padding();
 void run_rpgsh_prog(std::string args, bool redirect_output);
 
 std::vector<std::string> get_prog_output(std::string prog);
+
+std::string get_rpgsh_env_variable(std::string v);
+void set_rpgsh_env_variable(std::string v, std::string value);
 
 std::string get_shell_var(std::string var);
 void set_shell_var(std::string var,std::string value);
@@ -107,12 +112,13 @@ datamap<T> getDatamapFromAllScopes(char var_id)
 	std::string character = get_shell_var(CURRENT_CHAR_SHELL_VAR);
 	std::string campaign = get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR);
 	std::string current_campaign_dir = campaigns_dir+campaign;
-	std::string current_character_dir = current_campaign_dir+"characters/";
+	std::string current_campaign_file = current_campaign_dir+campaigns_dir+".vars";
+	std::string current_character_file = current_campaign_dir+"characters/"+character+".char";
 
-	for(const auto& [k,v] : load_obj_from_file<T>((current_character_dir+character+".char"),var_id))
+	for(const auto& [k,v] : load_obj_from_file<T>(current_character_file,var_id))
 		ret[k] = v;
 
-	for(const auto& [k,v] : load_obj_from_file<T>((current_campaign_dir+".vars"),var_id))
+	for(const auto& [k,v] : load_obj_from_file<T>(current_campaign_file,var_id))
 		ret[k] = v;
 
 	for(const auto& [k,v] : load_obj_from_file<T>(shell_vars_file,var_id))
