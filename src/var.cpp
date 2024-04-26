@@ -1,30 +1,30 @@
 #include "../headers/output.h"
 #include "../headers/var.h"
 
-var_t::operator std::string() const
+Var::operator std::string() const
 {
 	return Value;
 }
-var_t::operator int() const
+Var::operator int() const
 {
 	return std::stoi(Value);
 }
-var_t& var_t::operator = (const var_t b)
+Var& Var::operator = (const Var b)
 {
 	Value = b.Value;
 	return *this;
 }
-var_t& var_t::operator = (const std::string b)
+Var& Var::operator = (const std::string b)
 {
 	Value = b;
 	return *this;
 }
-var_t& var_t::operator = (const int b)
+Var& Var::operator = (const int b)
 {
 	Value = std::to_string(b);
 	return *this;
 }
-var_t& var_t::operator += (const var_t b)
+Var& Var::operator += (const Var b)
 {
 	bool a_is_num = true;
 	bool b_is_num = true;
@@ -48,7 +48,7 @@ var_t& var_t::operator += (const var_t b)
 	}
 	return *this;
 }
-var_t& var_t::operator += (const std::string b)
+Var& Var::operator += (const std::string b)
 {
 	bool a_is_num = true;
 
@@ -65,7 +65,7 @@ var_t& var_t::operator += (const std::string b)
 	}
 	return *this;
 }
-var_t& var_t::operator += (const int b)
+Var& Var::operator += (const int b)
 {
 	bool a_is_num = true;
 
@@ -82,7 +82,7 @@ var_t& var_t::operator += (const int b)
 	}
 	return *this;
 }
-var_t& var_t::operator -= (const var_t b)
+Var& Var::operator -= (const Var b)
 {
 	bool a_is_num = true;
 	bool b_is_num = true;
@@ -106,7 +106,7 @@ var_t& var_t::operator -= (const var_t b)
 	}
 	return *this;
 }
-var_t& var_t::operator -= (const int b)
+Var& Var::operator -= (const int b)
 {
 	bool a_is_num = true;
 
@@ -123,7 +123,7 @@ var_t& var_t::operator -= (const int b)
 	}
 	return *this;
 }
-var_t& var_t::operator *= (const var_t b)
+Var& Var::operator *= (const Var b)
 {
 	bool a_is_num = true;
 	bool b_is_num = true;
@@ -147,7 +147,7 @@ var_t& var_t::operator *= (const var_t b)
 	}
 	return *this;
 }
-var_t& var_t::operator *= (const int b)
+Var& Var::operator *= (const int b)
 {
 	bool a_is_num = true;
 
@@ -164,7 +164,7 @@ var_t& var_t::operator *= (const int b)
 	}
 	return *this;
 }
-var_t& var_t::operator /= (const var_t b)
+Var& Var::operator /= (const Var b)
 {
 	bool a_is_num = true;
 	bool b_is_num = true;
@@ -188,7 +188,7 @@ var_t& var_t::operator /= (const var_t b)
 	}
 	return *this;
 }
-var_t& var_t::operator /= (const int b)
+Var& Var::operator /= (const int b)
 {
 	bool a_is_num = true;
 
@@ -205,7 +205,7 @@ var_t& var_t::operator /= (const int b)
 	}
 	return *this;
 }
-var_t& var_t::operator ++ (const int b)
+Var& Var::operator ++ (const int b)
 {
 	bool a_is_num = true;
 
@@ -222,7 +222,7 @@ var_t& var_t::operator ++ (const int b)
 	}
 	return *this;
 }
-var_t& var_t::operator -- (const int b)
+Var& Var::operator -- (const int b)
 {
 	bool a_is_num = true;
 
@@ -239,69 +239,69 @@ var_t& var_t::operator -- (const int b)
 	}
 	return *this;
 }
-var_t var_t::operator + (const var_t b)
+Var Var::operator + (const Var b)
 {
-	var_t lhs = *this;
+	Var lhs = *this;
 	return (lhs += b);
 }
-var_t var_t::operator + (const std::string b)
+Var Var::operator + (const std::string b)
 {
-	var_t lhs = *this;
+	Var lhs = *this;
 	return (lhs += b);
 }
-var_t var_t::operator + (const int b)
+Var Var::operator + (const int b)
 {
-	var_t lhs = *this;
+	Var lhs = *this;
 	return (lhs += b);
 }
-var_t var_t::operator - (const var_t b)
+Var Var::operator - (const Var b)
 {
-	var_t lhs = *this;
+	Var lhs = *this;
 	return (lhs -= b);
 }
-var_t var_t::operator - (const int b)
+Var Var::operator - (const int b)
 {
-	var_t lhs = *this;
+	Var lhs = *this;
 	return (lhs -= b);
 }
-var_t var_t::operator * (const var_t b)
+Var Var::operator * (const Var b)
 {
-	var_t lhs = *this;
+	Var lhs = *this;
 	return (lhs *= b);
 }
-var_t var_t::operator * (const int b)
+Var Var::operator * (const int b)
 {
-	var_t lhs = *this;
+	Var lhs = *this;
 	return (lhs *= b);
 }
-var_t var_t::operator / (const var_t b)
+Var Var::operator / (const Var b)
 {
-	var_t lhs = *this;
+	Var lhs = *this;
 	return (lhs /= b);
 }
-var_t var_t::operator / (const int b)
+Var Var::operator / (const int b)
 {
-	var_t lhs = *this;
+	Var lhs = *this;
 	return (lhs /= b);
 }
 
-var_t::var_t(){}
-var_t::var_t(std::string _value)
+Var::Var(){}
+Var::Var(std::string _value)
 {
 	Value = _value;
 }
-var_t::var_t(int _value)
+Var::Var(int _value)
 {
 	Value = std::to_string(_value);
 }
 
-const char* var_t::c_str() const
+const char* Var::c_str() const
 {
 	return Value.c_str();
 }
 
 // Comparison operators
-bool var_t::operator != (const var_t b)
+bool Var::operator != (const Var b)
 {
 	return (Value != b.Value);
 }

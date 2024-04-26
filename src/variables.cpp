@@ -24,23 +24,23 @@ bool is_int(std::string s)
 		return false;
 	}
 }
-void set_var(std::string var, var_t old_value, var_t new_value, char scope_sigil)
+void set_var(std::string var, Var old_value, Var new_value, char Scope_sigil)
 {
-	std::string var_type;
+	std::string Varype;
 
-	switch(scope_sigil)
+	switch(Scope_sigil)
 	{
 		case CHAR_SIGIL:
-			var_type = "Character attribute";
+			Varype = "Character attribute";
 			break;
 		case CAMPAIGN_SIGIL:
-			var_type = "Campaign variable";
+			Varype = "Campaign variable";
 			break;
 		case SHELL_SIGIL:
-			var_type = "Shell variable";
+			Varype = "Shell variable";
 			break;
 		default:
-			output(Error,"Unknown scope sigil \'%c\'.",scope_sigil);
+			output(Error,"Unknown Scope sigil \'%c\'.",Scope_sigil);
 			exit(-1);
 	}
 
@@ -48,11 +48,11 @@ void set_var(std::string var, var_t old_value, var_t new_value, char scope_sigil
 	bool new_is_int = is_int(new_value.Value);
 
 	if(old_is_int && !new_is_int)
-		output(Warning,"%s \"%s\" is changing from an integer to a string.",var_type.c_str(),var.c_str());
+		output(Warning,"%s \"%s\" is changing from an integer to a string.",Varype.c_str(),var.c_str());
 	else if(!old_is_int && new_is_int)
-		output(Warning,"%s \"%s\" is changing from a string to an integer.",var_type.c_str(),var.c_str());
+		output(Warning,"%s \"%s\" is changing from a string to an integer.",Varype.c_str(),var.c_str());
 
-	switch(scope_sigil)
+	switch(Scope_sigil)
 	{
 		case CHAR_SIGIL:
 			c.Attr[var] = new_value;
@@ -67,7 +67,7 @@ void set_var(std::string var, var_t old_value, var_t new_value, char scope_sigil
 			break;
 	}
 	if(old_value != new_value)
-		output(Info,"%s \"%s\" has been changed from \"%s\" to \"%s\".",var_type.c_str(),var.substr(1,var.length()-1).c_str(),old_value.c_str(),new_value.c_str());
+		output(Info,"%s \"%s\" has been changed from \"%s\" to \"%s\".",Varype.c_str(),var.substr(1,var.length()-1).c_str(),old_value.c_str(),new_value.c_str());
 }
 
 int main(int argc, char** argv)
@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	if(std::string(argv[1]).length() == 1)// If the user only enters the scope sigil
+	if(std::string(argv[1]).length() == 1)// If the user only enters the Scope sigil
 	{
 		output(Error,"Empty variable name.");
 		exit(-1);
@@ -87,9 +87,9 @@ int main(int argc, char** argv)
 	std::map<std::string,std::string> m;
 	std::string path;
 	std::string var = std::string(argv[1]).substr(1,std::string(argv[1]).length()-1);
-	var_t old_value;
+	Var old_value;
 
-	switch(argv[1][0])// Get scope sigil
+	switch(argv[1][0])// Get Scope sigil
 	{
 		case CHAR_SIGIL:
 			c.load(get_shell_var(CURRENT_CHAR_SHELL_VAR),false);
@@ -150,7 +150,7 @@ int main(int argc, char** argv)
 			m = load_vars_from_file(path);
 			break;
 		default:
-			output(Error,"Unknown scope sigil \'%c\'.",argv[1][0]);
+			output(Error,"Unknown Scope sigil \'%c\'.",argv[1][0]);
 			exit(-1);
 	}
 
@@ -180,7 +180,7 @@ int main(int argc, char** argv)
 				try
 				{
 					if(k.substr(0,var.length()-1) == var.substr(1,var.length()-1) &&
-					k != var.substr(1,var.length()-1 && v != ""))//TODO start of var.substr may need to change from 1 to 2 for scope sigil
+					k != var.substr(1,var.length()-1 && v != ""))//TODO start of var.substr may need to change from 1 to 2 for Scope sigil
 					{
 						fprintf(stdout,"%c%s",argv[1][0],k.c_str());
 						for(int i=k.length(); i<space+5; i++)
@@ -220,7 +220,7 @@ int main(int argc, char** argv)
 	}
 	else// Binary operators
 	{
-		var_t new_value = std::string(argv[3]);
+		Var new_value = std::string(argv[3]);
 		for(int i=4; i<argc; i++)
 		{
 			if(i%2 == 1 && is_operator(argv[i]))
@@ -235,7 +235,7 @@ int main(int argc, char** argv)
 			}
 			else if(i%2 == 0)
 			{
-				var_t current_operand = std::string(argv[i+1]);
+				Var current_operand = std::string(argv[i+1]);
 				if(!strcmp(argv[i],"+"))
 				{
 					new_value += current_operand;

@@ -11,7 +11,7 @@
 //Comment character definition
 #define COMMENT				'!'
 
-//Variable character scope sigils
+//Variable character Scope sigils
 #define SHELL_SIGIL			'$'
 #define CAMPAIGN_SIGIL			'#'
 #define CHAR_SIGIL			'@'

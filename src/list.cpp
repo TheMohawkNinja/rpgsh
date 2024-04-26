@@ -1,7 +1,7 @@
 #include <cstring>
 #include "../headers/char.h"
 #include "../headers/functions.h"
-#include "../headers/scope.h"
+#include "../headers/Scope.h"
 #include "../headers/text.h"
 
 void print_header(std::string s)
@@ -13,7 +13,7 @@ void print_header(std::string s)
 	fprintf(stdout,"%s\n",TEXT_NORMAL);
 }
 template <typename T>
-void print_map(T m, char scope_sigil)
+void print_map(T m, char Scope_sigil)
 {
 	unsigned int key_max_len = 0;
 	for(auto& [k,v] : m)
@@ -26,7 +26,7 @@ void print_map(T m, char scope_sigil)
 		if(k[0] == '.')
 			continue;
 
-		fprintf(stdout,"%c%s",scope_sigil,k.c_str());
+		fprintf(stdout,"%c%s",Scope_sigil,k.c_str());
 		for(int i=k.length(); i<key_max_len+5; i++)
 			fprintf(stdout," ");
 		fprintf(stdout,"%s\n",v.c_str());
@@ -34,11 +34,10 @@ void print_map(T m, char scope_sigil)
 }
 void print_player_attrs()
 {
-	scope s = scope(Character);
-	//rpgsh_char c = rpgsh_char();
+	Scope s = Scope(Character);
 	std::string sigil(1,CHAR_SIGIL);
-	print_header("("+sigil+") "+s.getStr<var_t>(s.getStr<var_t>(std::string(CHAR_NAME_ATTR))));
-	print_map<datamap<var_t>>(s.getDatamap<var_t>(),CHAR_SIGIL);
+	print_header("("+sigil+") "+s.getStr<Var>(s.getStr<Var>(std::string(CHAR_NAME_ATTR))));
+	print_map<datamap<Var>>(s.getDatamap<Var>(),CHAR_SIGIL);
 }
 void print_campaign_vars()
 {
@@ -67,7 +66,7 @@ int main(int argc, char** argv)
 {
 	if(argv[1] && !strcmp(argv[1],FLAG_APPDESCRIPTION))
 	{
-		fprintf(stdout,"Prints one or all variable scopes.\n");
+		fprintf(stdout,"Prints one or all variable Scopes.\n");
 		return 0;
 	}
 
@@ -92,11 +91,11 @@ int main(int argc, char** argv)
 		print_shell_vars();
 	else if(!strcmp(argv[1],"--help") || !strcmp(argv[1],"-?"))
 	{
-		fprintf(stdout,"Prints all variables contained in one or all scopes\n\n");
+		fprintf(stdout,"Prints all variables contained in one or all Scopes\n\n");
 		fprintf(stdout,"USAGE:\n");
 		fprintf(stdout,"\tlist %soption%s\n\n",TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"OPTIONS:\n");
-		fprintf(stdout,"\t%snone%s | --all\tPrints all variables in all scopes.\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t%snone%s | --all\tPrints all variables in all Scopes.\n",TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\t--character\tPrints all character attributes.\n",TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\t--campaign\tPrints all current campaign variables.\n",TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\t--shell\t\tPrints all shell variables.\n",TEXT_ITALIC,TEXT_NORMAL);

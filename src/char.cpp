@@ -9,19 +9,19 @@ rpgsh_char::rpgsh_char()//Create character using default game
 	confirmShellVarsFile();
 	rpgsh_config config = rpgsh_config();
 
-	Attr = load_obj_from_file<var_t>(templates_dir+config.setting[DEFAULT_GAME],VAR_SIGIL);
-	Dice = load_obj_from_file<dice_t>(templates_dir+config.setting[DEFAULT_GAME],DICE_SIGIL);
+	attr = load_obj_from_file<Var>(templates_dir+config.setting[DEFAULT_GAME],VAR_SIGIL);
+	dice = load_obj_from_file<Dice>(templates_dir+config.setting[DEFAULT_GAME],DICE_SIGIL);
 }
 rpgsh_char::rpgsh_char(std::string game)
 {
 	confirmShellVarsFile();
-	Attr = load_obj_from_file<var_t>(templates_dir+game,VAR_SIGIL);
-	Dice = load_obj_from_file<dice_t>(templates_dir+game,DICE_SIGIL);
+	attr = load_obj_from_file<Var>(templates_dir+game,VAR_SIGIL);
+	dice = load_obj_from_file<Dice>(templates_dir+game,DICE_SIGIL);
 }
 
 std::string rpgsh_char::Name()
 {
-	return std::string(Attr[std::string(Attr[CHAR_NAME_ATTR])]);
+	return std::string(attr[std::string(attr[CHAR_NAME_ATTR])]);
 }
 void rpgsh_char::save()
 {
@@ -32,8 +32,8 @@ void rpgsh_char::save()
 		std::filesystem::rename(char_path.c_str(),(char_path+".bak").c_str());
 	}
 
-	save_obj_to_file<datamap<var_t>>(char_path, Attr, VAR_SIGIL);
-	save_obj_to_file<datamap<dice_t>>(char_path, Dice, DICE_SIGIL);
+	save_obj_to_file<datamap<Var>>(char_path, attr, VAR_SIGIL);
+	save_obj_to_file<datamap<Dice>>(char_path, dice, DICE_SIGIL);
 }
 void rpgsh_char::load(std::string character, bool load_bak)
 {
@@ -53,11 +53,11 @@ void rpgsh_char::load(std::string character, bool load_bak)
 	}
 
 	//Clear attributes in-case a character from a non-default game is being loaded
-	Attr.clear();
-	Dice.clear();
+	attr.clear();
+	dice.clear();
 
-	Attr = load_obj_from_file<var_t>(char_path,VAR_SIGIL);
-	Dice = load_obj_from_file<dice_t>(char_path,DICE_SIGIL);
+	attr = load_obj_from_file<Var>(char_path,VAR_SIGIL);
+	dice = load_obj_from_file<Dice>(char_path,DICE_SIGIL);
 
 	fs.close();
 }
@@ -67,7 +67,7 @@ void rpgsh_char::set_as_current()
 }
 void rpgsh_char::update_Name(std::string new_name_attr)
 {
-	Attr[CHAR_NAME_ATTR] = new_name_attr;
+	attr[CHAR_NAME_ATTR] = new_name_attr;
 	set_as_current();
 	save();
 }

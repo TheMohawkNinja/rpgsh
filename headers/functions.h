@@ -26,8 +26,8 @@ void run_rpgsh_prog(std::string args, bool redirect_output);
 
 std::vector<std::string> get_prog_output(std::string prog);
 
-std::string get_rpgsh_env_variable(std::string v);
-void set_rpgsh_env_variable(std::string v, std::string value);
+std::string get_env_variable(std::string v);
+void set_env_variable(std::string v, std::string value);
 
 std::string get_shell_var(std::string var);
 void set_shell_var(std::string var,std::string value);
@@ -43,7 +43,7 @@ void save_obj_to_file(std::string path, T obj, char obj_id)
 	std::ofstream fs(path, std::ios::app);
 	if(!fs.good())
 	{
-		output(Error,"Unable to open \'%s\' for writing",path.c_str());
+		output(Error,"Unable to open \"%s\" for writing",path.c_str());
 		exit(-1);
 	}
 
@@ -68,14 +68,14 @@ datamap<T> load_obj_from_file(std::string path, char var_id)
 
 	if(!std::filesystem::exists(path))
 	{
-		output(Error,"File not found at \'%s\'",path.c_str());
+		output(Error,"File not found at \"%s\"",path.c_str());
 		exit(-1);
 	}
 
 	std::ifstream fs(path);
 	if(!fs.good())
 	{
-		output(Error,"Unable to open \'%s\' for reading",path.c_str());
+		output(Error,"Unable to open \"%s\" for reading",path.c_str());
 		exit(-1);
 	}
 

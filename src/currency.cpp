@@ -7,7 +7,7 @@
 #include "../headers/text.h"
 #include "../headers/var.h"
 
-void currency_t::tryParseCurrencySystem(datamap<currencysystem_t> currencysystems, std::string* str, std::string fullstr)
+void Currency::tryParseCurrencySystem(datamap<CurrencySystem> currencysystems, std::string* str, std::string fullstr)
 {
 	std::string cs_match = "";
 	std::string str_temp = "";
@@ -30,7 +30,7 @@ void currency_t::tryParseCurrencySystem(datamap<currencysystem_t> currencysystem
 		if(!strcasecmp(v.Name.c_str(),cs_match.c_str()))
 		{
 			//Can't just call function with &v for some reason
-			currencysystem_t cs = v;
+			CurrencySystem cs = v;
 			AttachToCurrencySystem(&cs);
 		}
 	}
@@ -40,7 +40,7 @@ void currency_t::tryParseCurrencySystem(datamap<currencysystem_t> currencysystem
 		exit(-1);
 	}
 }
-void currency_t::tryParseName(std::string* str, std::string fullstr)
+void Currency::tryParseName(std::string* str, std::string fullstr)
 {
 	std::string str_temp = "";
 
@@ -57,7 +57,7 @@ void currency_t::tryParseName(std::string* str, std::string fullstr)
 		exit(-1);
 	}
 }
-void currency_t::tryParseSmallerAmount(std::string* str, std::string fullstr)
+void Currency::tryParseSmallerAmount(std::string* str, std::string fullstr)
 {
 	std::string SmallerAmountStr = "";
 	std::string str_temp = "";
@@ -85,7 +85,7 @@ void currency_t::tryParseSmallerAmount(std::string* str, std::string fullstr)
 		exit(-1);
 	}
 }
-void currency_t::tryParseSmaller(std::string* str, std::string fullstr)
+void Currency::tryParseSmaller(std::string* str, std::string fullstr)
 {
 	std::string str_temp = "";
 
@@ -102,7 +102,7 @@ void currency_t::tryParseSmaller(std::string* str, std::string fullstr)
 		exit(-1);
 	}
 }
-void currency_t::tryParseLarger(std::string* str, std::string fullstr)
+void Currency::tryParseLarger(std::string* str, std::string fullstr)
 {
 	if(str->find("}") == std::string::npos)
 	{
@@ -120,17 +120,17 @@ void currency_t::tryParseLarger(std::string* str, std::string fullstr)
 	}
 }
 
-currency_t::currency_t(){}
-currency_t::currency_t(std::string str)
+Currency::Currency(){}
+Currency::Currency(std::string str)
 {
 	//FORMAT
 	//@c/MyCurrency = {Name,SmallerAmount,Smaller,Larger}
 	//@c/MyCurrency = {CurrencySystem,Name,SmallerAmount,Smaller,Larger}
 
-	datamap<currencysystem_t> currencysystems = getDatamapFromAllScopes<currencysystem_t>(CURRENCYSYSTEM_SIGIL);
+	datamap<CurrencySystem> currencysystems = getDatamapFromAllScopes<CurrencySystem>(CURRENCYSYSTEM_SIGIL);
 	std::string fullstr = str;
 
-	//Get number of commas to determine if we are involving a currencysystem_t
+	//Get number of commas to determine if we are involving a CurrencySystem
 	int commas = 0;
 	for(const auto& c : str)
 	{
@@ -192,14 +192,14 @@ currency_t::currency_t(std::string str)
 	if(commas == 4)
 		tryParseLarger(&str, fullstr);
 }
-currency_t::currency_t(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
+Currency::Currency(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
 {
 	Name = _Name;
 	Smaller = _Smaller;
 	SmallerAmount = _SmallerAmount;
 	Larger = _Larger;
 }
-currency_t::currency_t(currencysystem_t* _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
+Currency::Currency(CurrencySystem* _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
 {
 	Name = _Name;
 	Smaller = _Smaller;
@@ -209,7 +209,7 @@ currency_t::currency_t(currencysystem_t* _CS, std::string _Name, int _SmallerAmo
 	AttachToCurrencySystem(_CS);
 }
 
-currency_t::operator std::string() const
+Currency::operator std::string() const
 {
 	if(System)
 	{
@@ -227,7 +227,7 @@ currency_t::operator std::string() const
 			     Larger + "}";
 	}
 }
-bool currency_t::operator == (const currency_t& b) const
+bool Currency::operator == (const Currency& b) const
 {
 	return (System == b.System &&
 		Name == b.Name &&
@@ -235,34 +235,34 @@ bool currency_t::operator == (const currency_t& b) const
 		SmallerAmount == b.SmallerAmount &&
 		Larger == b.Larger);
 }
-//TODO currency_t < operator
-currencysystem_t::operator std::string() const
+//TODO Currency < operator
+CurrencySystem::operator std::string() const
 {
 	return Name;
 }
-currency_t& currencysystem_t::operator [] (const std::string b)
+Currency& CurrencySystem::operator [] (const std::string b)
 {
 	return Denomination[b];
 }
 
 //Beginning and end iterators.
-//So I can use "for(const auto& [key,val] : currencysystem_t){}"
-std::map<std::string, currency_t>::const_iterator currencysystem_t::begin() const
+//So I can use "for(const auto& [key,val] : CurrencySystem){}"
+std::map<std::string, Currency>::const_iterator CurrencySystem::begin() const
 {
 	return Denomination.begin();
 }
-std::map<std::string, currency_t>::const_iterator currencysystem_t::end() const
+std::map<std::string, Currency>::const_iterator CurrencySystem::end() const
 {
 	return Denomination.end();
 }
 
-currencysystem_t::currencysystem_t(){}
-currencysystem_t::currencysystem_t(std::string str)
+CurrencySystem::CurrencySystem(){}
+CurrencySystem::CurrencySystem(std::string str)
 {
 	Name = str;
 }
 
-bool wallet_t::HasEffectivelyAtLeast(int q, currency_t c)
+bool Wallet::HasEffectivelyAtLeast(int q, Currency c)
 {
 	int total = Money[c];
 	int totalFactor = 1;
@@ -277,7 +277,7 @@ bool wallet_t::HasEffectivelyAtLeast(int q, currency_t c)
 
 	return total >= q;
 }
-void wallet_t::print()
+void Wallet::print()
 {
 	unsigned int NameLength = 0;
 	unsigned int LongestName = 0;
@@ -305,7 +305,7 @@ void wallet_t::print()
 		}
 	}
 }
-void wallet_t::FloatQuantityToIntCurrency(currency_t c, float q)
+void Wallet::FloatQuantityToIntCurrency(Currency c, float q)
 {
 	int totalFactor = 1;
 
@@ -318,35 +318,35 @@ void wallet_t::FloatQuantityToIntCurrency(currency_t c, float q)
 	*this += money_t(c,(int)(q*totalFactor));
 }
 
-int& wallet_t::operator [] (const currency_t b)
+int& Wallet::operator [] (const Currency b)
 {
 	return Money[b];
 }
 
-//Beginning and end iterators. This is so I can use "for(const auto& [key,val] : wallet_t){}"
-std::map<currency_t, int>::const_iterator wallet_t::begin() const
+//Beginning and end iterators. This is so I can use "for(const auto& [key,val] : Wallet){}"
+std::map<Currency, int>::const_iterator Wallet::begin() const
 {
 	return Money.begin();
 }
-std::map<currency_t, int>::const_iterator wallet_t::end() const
+std::map<Currency, int>::const_iterator Wallet::end() const
 {
 	return Money.end();
 }
 
-wallet_t::wallet_t(){}
-wallet_t::wallet_t(const money_t m)
+Wallet::Wallet(){}
+Wallet::Wallet(const money_t m)
 {
-	currency_t c = m.first;
+	Currency c = m.first;
 	int q = m.second;
 
 	Money[c] = q;
 }
-wallet_t::wallet_t(std::string str)
+Wallet::Wallet(std::string str)
 {
 	//FORMAT
 	//@w/MyWallet = {<currency_1> <quantity_1>,<currency_2> <quantity_2>,...,<currency_n> <quantity_n>}
 
-	datamap<currency_t> currencies = getDatamapFromAllScopes<currency_t>(WALLET_SIGIL);
+	datamap<Currency> currencies = getDatamapFromAllScopes<Currency>(WALLET_SIGIL);
 
 	//Get map of currency names
 	datamap<std::string> currencynames;
@@ -390,12 +390,12 @@ wallet_t::wallet_t(std::string str)
 	}
 }
 
-wallet_t& wallet_t::operator = (const unsigned int b)
+Wallet& Wallet::operator = (const unsigned int b)
 {
 	printBadOpAndThrow("Wallet = "+std::to_string(b));
 	return *this;
 }
-wallet_t& wallet_t::operator = (const money_t b)
+Wallet& Wallet::operator = (const money_t b)
 {
 	for(const auto& [c,q] : Money)
 	{
@@ -404,24 +404,24 @@ wallet_t& wallet_t::operator = (const money_t b)
 	Money[b.first] = b.second;
 	return *this;
 }
-wallet_t& wallet_t::operator = (const dice_t b)
+Wallet& Wallet::operator = (const Dice b)
 {
 	printBadOpAndThrow("Wallet = "+std::string(b));
 	return *this;
 }
-wallet_t& wallet_t::operator = (const var_t b)
+Wallet& Wallet::operator = (const Var b)
 {
 	printBadOpAndThrow("Wallet = "+std::string(b));
 	return *this;
 }
-wallet_t& wallet_t::operator -= (const unsigned int b)
+Wallet& Wallet::operator -= (const unsigned int b)
 {
 	printBadOpAndThrow("Wallet -= "+std::to_string(b));
 	return *this;
 }
-wallet_t& wallet_t::operator -= (const money_t b)
+Wallet& Wallet::operator -= (const money_t b)
 {
-	currency_t c = b.first;
+	Currency c = b.first;
 	int q = b.second;
 
 	transaction = b;
@@ -443,7 +443,7 @@ wallet_t& wallet_t::operator -= (const money_t b)
 	}
 	return *this;
 }
-wallet_t& wallet_t::operator -= (const wallet_t b)
+Wallet& Wallet::operator -= (const Wallet b)
 {
 	for(const auto& [c,q] : b)
 	{
@@ -460,24 +460,24 @@ wallet_t& wallet_t::operator -= (const wallet_t b)
 	}
 	return *this;
 }
-wallet_t& wallet_t::operator -= (const dice_t b)
+Wallet& Wallet::operator -= (const Dice b)
 {
 	printBadOpAndThrow("Wallet -= "+std::string(b));
 	return *this;
 }
-wallet_t& wallet_t::operator -= (const var_t b)
+Wallet& Wallet::operator -= (const Var b)
 {
 	printBadOpAndThrow("Wallet -= "+std::string(b));
 	return *this;
 }
-wallet_t& wallet_t::operator += (const unsigned int b)
+Wallet& Wallet::operator += (const unsigned int b)
 {
 	printBadOpAndThrow("Wallet += "+std::to_string(b));
 	return *this;
 }
-wallet_t& wallet_t::operator += (const money_t b)
+Wallet& Wallet::operator += (const money_t b)
 {
-	currency_t c = b.first;
+	Currency c = b.first;
 	int q = b.second;
 
 	if(q > 0)
@@ -492,7 +492,7 @@ wallet_t& wallet_t::operator += (const money_t b)
 	}
 	return *this;
 }
-wallet_t& wallet_t::operator += (const wallet_t b)
+Wallet& Wallet::operator += (const Wallet b)
 {
 	for(const auto& [c,q] : b)
 	{
@@ -500,17 +500,17 @@ wallet_t& wallet_t::operator += (const wallet_t b)
 	}
 	return *this;
 }
-wallet_t& wallet_t::operator += (const dice_t b)
+Wallet& Wallet::operator += (const Dice b)
 {
 	printBadOpAndThrow("Wallet += "+std::string(b));
 	return *this;
 }
-wallet_t& wallet_t::operator += (const var_t b)
+Wallet& Wallet::operator += (const Var b)
 {
 	printBadOpAndThrow("Wallet += "+std::string(b));
 	return *this;
 }
-wallet_t& wallet_t::operator *= (const unsigned int b)
+Wallet& Wallet::operator *= (const unsigned int b)
 {
 	output(Info,"Increasing wallet value by a factor of %d",b);
 	for(const auto& [c,q] : *this)
@@ -524,29 +524,29 @@ wallet_t& wallet_t::operator *= (const unsigned int b)
 	}
 	return *this;
 }
-wallet_t& wallet_t::operator *= (const money_t b)
+Wallet& Wallet::operator *= (const money_t b)
 {
 	std::string c = b.first.Name;
 	std::string q = std::to_string(b.second);
 	printBadOpAndThrow("Wallet *= "+q+" "+c);
 	return *this;
 }
-wallet_t& wallet_t::operator *= (const wallet_t b)
+Wallet& Wallet::operator *= (const Wallet b)
 {
 	printBadOpAndThrow("Wallet *= Wallet");
 	return *this;
 }
-wallet_t& wallet_t::operator *= (const dice_t b)
+Wallet& Wallet::operator *= (const Dice b)
 {
 	printBadOpAndThrow("Wallet *= "+std::string(b));
 	return *this;
 }
-wallet_t& wallet_t::operator *= (const var_t b)
+Wallet& Wallet::operator *= (const Var b)
 {
 	printBadOpAndThrow("Wallet *= "+std::string(b));
 	return *this;
 }
-wallet_t& wallet_t::operator /= (const unsigned int b)
+Wallet& Wallet::operator /= (const unsigned int b)
 {
 	output(Info,"Decreasing wallet value by a factor of %d",b);
 	if(b == 0)
@@ -555,7 +555,7 @@ wallet_t& wallet_t::operator /= (const unsigned int b)
 		return *this;
 	}
 
-	std::map<currency_t,float> change;
+	std::map<Currency,float> change;
 
 	for(const auto& [c,q] : *this)
 	{
@@ -577,29 +577,29 @@ wallet_t& wallet_t::operator /= (const unsigned int b)
 	}
 	return *this;
 }
-wallet_t& wallet_t::operator /= (const money_t b)
+Wallet& Wallet::operator /= (const money_t b)
 {
 	std::string c = b.first.Name;
 	std::string q = std::to_string(b.second);
 	printBadOpAndThrow("Wallet /= "+q+" "+c);
 	return *this;
 }
-wallet_t& wallet_t::operator /= (const wallet_t b)
+Wallet& Wallet::operator /= (const Wallet b)
 {
 	printBadOpAndThrow("Wallet /= Wallet");
 	return *this;
 }
-wallet_t& wallet_t::operator /= (const dice_t b)
+Wallet& Wallet::operator /= (const Dice b)
 {
 	printBadOpAndThrow("Wallet /= "+std::string(b));
 	return *this;
 }
-wallet_t& wallet_t::operator /= (const var_t b)
+Wallet& Wallet::operator /= (const Var b)
 {
 	printBadOpAndThrow("Wallet /= "+std::string(b));
 	return *this;
 }
-wallet_t& wallet_t::operator ++ ()
+Wallet& Wallet::operator ++ ()
 {
 	//Add 1 of the smallest currency
 	for(const auto& [c,q] : Money)
@@ -612,11 +612,11 @@ wallet_t& wallet_t::operator ++ ()
 	}
 	return *this;
 }
-wallet_t& wallet_t::operator ++ (int)
+Wallet& Wallet::operator ++ (int)
 {
 	return ++(*this);
 }
-wallet_t& wallet_t::operator -- ()
+Wallet& Wallet::operator -- ()
 {
 	//Subtracy 1 of the smallest currency
 	for(const auto& [c,q] : Money)
@@ -629,12 +629,12 @@ wallet_t& wallet_t::operator -- ()
 	}
 	return *this;
 }
-wallet_t& wallet_t::operator -- (int)
+Wallet& Wallet::operator -- (int)
 {
 	return --(*this);
 }
 
-wallet_t::operator std::string() const
+Wallet::operator std::string() const
 {
 	//@w/MyWallet = {<currency_1> <quantity_1>,<currency_2> <quantity_2>,...,<currency_n> <quantity_n>}
 
@@ -649,24 +649,24 @@ wallet_t::operator std::string() const
 
 	return ret;
 }
-bool wallet_t::operator != (const std::string b)//TODO: May need to revisit this for a possible wallet_t(std::string) constructor
+bool Wallet::operator != (const std::string b)//TODO: May need to revisit this for a possible Wallet(std::string) constructor
 {
 	return true;
 }
-//Links the instance of currency_t to the instance of currencysystem_t
-//Allows the instance of currencysystem_t to detect changes in the attached RGPSH_CURRENCY
+//Links the instance of Currency to the instance of CurrencySystem
+//Allows the instance of CurrencySystem to detect changes in the attached RGPSH_CURRENCY
 //Also automatically adds the Currency to the map of Currencies within the CurrencySystem
-void currency_t::AttachToCurrencySystem(currencysystem_t* _CurrencySystem)
+void Currency::AttachToCurrencySystem(CurrencySystem* _CurrencySystem)
 {
 	System = _CurrencySystem;
 	System->Denomination[Name] = *this;
 }
 
-//Required for compilation due to the use of currency_t as a key for an std::map in the wallet_t class
+//Required for compilation due to the use of Currency as a key for an std::map in the Wallet class
 //Orders std::map from highest to lowest denomination
-//If you use more than one currency_t, you will need to declare currencysystem_t for each of them
-//Even if they are the only currency_t in the system. Otherwise, operators don't give expected behavior
-bool currency_t::operator < (const currency_t& b) const
+//If you use more than one Currency, you will need to declare CurrencySystem for each of them
+//Even if they are the only Currency in the system. Otherwise, operators don't give expected behavior
+bool Currency::operator < (const Currency& b) const
 {
 	if(!System && b.System || !b.System && System)
 	{
@@ -695,7 +695,7 @@ bool currency_t::operator < (const currency_t& b) const
 	{
 		if(System != b.System)
 		{
-			//Needs to be here, otherwise wallet_t.print() doesn't work right
+			//Needs to be here, otherwise Wallet.print() doesn't work right
 			//and operations try doing cross-system exchanges that don't work.
 			//Probably due to some under-the-hood nonsense with std::map
 			continue;
@@ -720,7 +720,7 @@ bool currency_t::operator < (const currency_t& b) const
 	return (Name < b.Name);
 }
 
-void currencysystem_t::MakeChange(currency_t c, wallet_t* w)
+void CurrencySystem::MakeChange(Currency c, Wallet* w)
 {
 	std::string NextHighest = c.Larger;
 	int ConversionFactor = Denomination[NextHighest].SmallerAmount;
@@ -753,7 +753,7 @@ void currencysystem_t::MakeChange(currency_t c, wallet_t* w)
 	(*w)[c] += ConversionFactor*ChangeCount;
 	(*w) -= money_t(Denomination[NextHighest],ChangeCount);
 }
-void currencysystem_t::TradeUp(currencysystem_t* S, wallet_t* w)
+void CurrencySystem::TradeUp(CurrencySystem* S, Wallet* w)
 {
 	for(auto i = (*w).Money.rbegin(); i != (*w).Money.rend(); ++i)
 	{

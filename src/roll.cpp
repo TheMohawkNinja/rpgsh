@@ -27,7 +27,7 @@ int main(int argc, char** argv)
 			if(current_arg == "-t" || current_arg == "--test")
 			{
 				fprintf(stdout,"Initiating roll test...\n\n");
-				dice_t dice = dice_t();
+				Dice dice = Dice();
 				dice.test();
 				return 0;
 			}
@@ -197,7 +197,7 @@ int main(int argc, char** argv)
 		}
 	}
 
-	dice_t dice = dice_t(dice_str,only_rolls,only_total,is_list,count_expr,count);
+	Dice dice = Dice(dice_str,only_rolls,only_total,is_list,count_expr,count);
 
 	if(is_list)
 	{

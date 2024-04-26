@@ -55,7 +55,7 @@ if [[ $EUID -eq 0 ]]; then
 
 	echo "Compiling applications:"
 	echo -e "\tsrc/main.cpp\t\t->\t$bold_white""/bin/rpgsh"$normal
-	g++ src/main.cpp -L $lib_dir -ldefine -lvar -lfunctions -loutput -lconfig -ldice -lcurrency -lchar $fs $debug -o /bin/rpgsh
+	g++ src/main.cpp -L $lib_dir -ldefine -lscope -lvar -lfunctions -loutput -lconfig -ldice -lcurrency -lchar $fs $debug -o /bin/rpgsh
 	echo -e "\tsrc/setname.cpp\t\t->\t$bold_white""/bin/rpgsh-setname"$normal
 	g++ src/setname.cpp -L $lib_dir -ldefine -loutput -ldice -lcurrency -lconfig -lchar -lfunctions -lvar $fs $debug -o /bin/rpgsh-setname
 	echo -e "\tsrc/variables.cpp\t->\t$bold_white""/bin/rpgsh-variables"$normal

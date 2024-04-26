@@ -4,7 +4,7 @@
 #include <vector>
 #include "../headers/var.h"
 
-class dice_t
+class Dice
 {
 	private:
 		bool just_show_rolls = false;
@@ -27,11 +27,11 @@ class dice_t
 
 		operator std::string() const;
 
-	dice_t();
-	dice_t(std::string dice_str);
-	dice_t(unsigned int _Quantity, unsigned int _Faces, int _Modifier);
-	dice_t(std::string dice_str, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count);
-	dice_t(unsigned int _Quantity, unsigned int _Faces, int _Modifier, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count);
+	Dice();
+	Dice(std::string dice_str);
+	Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier);
+	Dice(std::string dice_str, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count);
+	Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count);
 
 	std::string dice() const;
 	const char* c_str() const;

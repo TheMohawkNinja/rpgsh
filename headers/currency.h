@@ -5,121 +5,121 @@
 #include "define.h"
 
 //External forward declarations
-class dice_t;
-class var_t;
+class Dice;
+class Var;
 
 //Internal forward declarations
-class currencysystem_t;
-class wallet_t;
+class CurrencySystem;
+class Wallet;
 
-class currency_t
+class Currency
 {
 	public:
-		currencysystem_t* System = nullptr;
+		CurrencySystem* System = nullptr;
 		std::string Name = "";
 		int SmallerAmount = 0;
 		std::string Smaller = "";
 		std::string Larger = "";
 
-	void AttachToCurrencySystem(currencysystem_t* _CurrencySystem);
+	void AttachToCurrencySystem(CurrencySystem* _CurrencySystem);
 
 	private:
 
-	//Parsing methods for currency_t(datamap<currencysystem_t, std::string)
-	void tryParseCurrencySystem(datamap<currencysystem_t> currencysystems, std::string* str, std::string fullstr);
+	//Parsing methods for Currency(datamap<CurrencySystem, std::string)
+	void tryParseCurrencySystem(datamap<CurrencySystem> currencysystems, std::string* str, std::string fullstr);
 	void tryParseName(std::string* str, std::string fullstr);
 	void tryParseSmallerAmount(std::string* str, std::string fullstr);
 	void tryParseSmaller(std::string* str, std::string fullstr);
 	void tryParseLarger(std::string* str, std::string fullstr);
 
 	public:
-	currency_t();
-	currency_t(std::string str);
-	currency_t(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
-	currency_t(currencysystem_t* _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
+	Currency();
+	Currency(std::string str);
+	Currency(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
+	Currency(CurrencySystem* _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
 
 	explicit operator std::string() const;
-	bool operator == (const currency_t& b) const;
-	bool operator < (const currency_t& b) const;
+	bool operator == (const Currency& b) const;
+	bool operator < (const Currency& b) const;
 };
-class currencysystem_t
+class CurrencySystem
 {
 	public:
 		std::string Name = "";
-		std::map<std::string, currency_t> Denomination;
-		currency_t transaction = currency_t();
+		std::map<std::string, Currency> Denomination;
+		Currency transaction = Currency();
 
 	explicit operator std::string() const;
-	currency_t& operator [] (const std::string b);
+	Currency& operator [] (const std::string b);
 
 	//Iterator type for the class
-	using iterator = typename std::map<std::string, currency_t>::const_iterator;
+	using iterator = typename std::map<std::string, Currency>::const_iterator;
 
 	//Beginning and end iterators.
-	//So I can use "for(const auto& [key,val] : currencysystem_t){}"
-	std::map<std::string, currency_t>::const_iterator begin() const;
-	std::map<std::string, currency_t>::const_iterator end() const;
+	//So I can use "for(const auto& [key,val] : CurrencySystem){}"
+	std::map<std::string, Currency>::const_iterator begin() const;
+	std::map<std::string, Currency>::const_iterator end() const;
 
-	currencysystem_t();
-	currencysystem_t(std::string str);
+	CurrencySystem();
+	CurrencySystem(std::string str);
 
-	void MakeChange(currency_t c, wallet_t* w);
-	void TradeUp(currencysystem_t* S, wallet_t* w);
+	void MakeChange(Currency c, Wallet* w);
+	void TradeUp(CurrencySystem* S, Wallet* w);
 	bool HasEquivalentTo(int Quantity, std::string Denomination);
 };
-typedef std::pair<currency_t, int> money_t;
-class wallet_t
+typedef std::pair<Currency, int> money_t;
+class Wallet
 {
 	public:
-		std::map<currency_t, int> Money;
-		std::pair<currency_t,int> transaction;
+		std::map<Currency, int> Money;
+		std::pair<Currency,int> transaction;
 
-	bool HasEffectivelyAtLeast(int q, currency_t c);
+	bool HasEffectivelyAtLeast(int q, Currency c);
 	void print();
-	void FloatQuantityToIntCurrency(currency_t c, float q);
+	void FloatQuantityToIntCurrency(Currency c, float q);
 
-	int& operator [] (const currency_t b);
+	int& operator [] (const Currency b);
 
 	//Iterator for the class
-	using iterator = typename std::map<currency_t, int>::const_iterator;
+	using iterator = typename std::map<Currency, int>::const_iterator;
 
-	//Beginning and end iterators. This is so I can use "for(const auto& [key,val] : wallet_t){}"
-	std::map<currency_t, int>::const_iterator begin() const;
-	std::map<currency_t, int>::const_iterator end() const;
+	//Beginning and end iterators. This is so I can use "for(const auto& [key,val] : Wallet){}"
+	std::map<Currency, int>::const_iterator begin() const;
+	std::map<Currency, int>::const_iterator end() const;
 
-	wallet_t();
-	wallet_t(const money_t m);
-	wallet_t(std::string s);
+	Wallet();
+	Wallet(const money_t m);
+	Wallet(std::string s);
 
-	wallet_t& operator = (const unsigned int b);
-	wallet_t& operator = (const money_t b);
-	wallet_t& operator = (const dice_t b);
-	wallet_t& operator = (const var_t b);
-	wallet_t& operator -= (const unsigned int b);
-	wallet_t& operator -= (const money_t b);
-	wallet_t& operator -= (const wallet_t b);
-	wallet_t& operator -= (const dice_t b);
-	wallet_t& operator -= (const var_t b);
-	wallet_t& operator += (const unsigned int b);
-	wallet_t& operator += (const money_t b);
-	wallet_t& operator += (const wallet_t b);
-	wallet_t& operator += (const dice_t b);
-	wallet_t& operator += (const var_t b);
-	wallet_t& operator *= (const unsigned int b);
-	wallet_t& operator *= (const money_t b);
-	wallet_t& operator *= (const wallet_t b);
-	wallet_t& operator *= (const dice_t b);
-	wallet_t& operator *= (const var_t b);
-	wallet_t& operator /= (const unsigned int b);
-	wallet_t& operator /= (const money_t b);
-	wallet_t& operator /= (const wallet_t b);
-	wallet_t& operator /= (const dice_t b);
-	wallet_t& operator /= (const var_t b);
-	wallet_t& operator ++ ();
-	wallet_t& operator ++ (int);
-	wallet_t& operator -- ();
-	wallet_t& operator -- (int);
+	Wallet& operator = (const unsigned int b);
+	Wallet& operator = (const money_t b);
+	Wallet& operator = (const Dice b);
+	Wallet& operator = (const Var b);
+	Wallet& operator -= (const unsigned int b);
+	Wallet& operator -= (const money_t b);
+	Wallet& operator -= (const Wallet b);
+	Wallet& operator -= (const Dice b);
+	Wallet& operator -= (const Var b);
+	Wallet& operator += (const unsigned int b);
+	Wallet& operator += (const money_t b);
+	Wallet& operator += (const Wallet b);
+	Wallet& operator += (const Dice b);
+	Wallet& operator += (const Var b);
+	Wallet& operator *= (const unsigned int b);
+	Wallet& operator *= (const money_t b);
+	Wallet& operator *= (const Wallet b);
+	Wallet& operator *= (const Dice b);
+	Wallet& operator *= (const Var b);
+	Wallet& operator /= (const unsigned int b);
+	Wallet& operator /= (const money_t b);
+	Wallet& operator /= (const Wallet b);
+	Wallet& operator /= (const Dice b);
+	Wallet& operator /= (const Var b);
+	Wallet& operator ++ ();
+	Wallet& operator ++ (int);
+	Wallet& operator -- ();
+	Wallet& operator -- (int);
 
 	explicit operator std::string() const;
-	bool operator != (const std::string b);//TODO: May need to revisit this for a possible wallet_t(std::string) constructor
+	bool operator != (const std::string b);//TODO: May need to revisit this for a possible Wallet(std::string) constructor
 };

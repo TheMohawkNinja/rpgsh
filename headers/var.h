@@ -2,43 +2,43 @@
 
 #include <string>
 
-class var_t
+class Var
 {
 	public:
 		std::string Value = "";
 
 		explicit operator std::string() const;
 		explicit operator int() const;
-		var_t& operator = (const var_t b);
-		var_t& operator = (const std::string b);
-		var_t& operator = (const int b);
-		var_t& operator += (const var_t b);
-		var_t& operator += (const std::string b);
-		var_t& operator += (const int b);
-		var_t& operator -= (const var_t b);
-		var_t& operator -= (const int b);
-		var_t& operator *= (const var_t b);
-		var_t& operator *= (const int b);
-		var_t& operator /= (const var_t b);
-		var_t& operator /= (const int b);
-		var_t& operator ++ (const int b);
-		var_t& operator -- (const int b);
-		var_t operator + (const var_t b);
-		var_t operator + (const std::string b);
-		var_t operator + (const int b);
-		var_t operator - (const var_t b);
-		var_t operator - (const int b);
-		var_t operator * (const var_t b);
-		var_t operator * (const int b);
-		var_t operator / (const var_t b);
-		var_t operator / (const int b);
+		Var& operator = (const Var b);
+		Var& operator = (const std::string b);
+		Var& operator = (const int b);
+		Var& operator += (const Var b);
+		Var& operator += (const std::string b);
+		Var& operator += (const int b);
+		Var& operator -= (const Var b);
+		Var& operator -= (const int b);
+		Var& operator *= (const Var b);
+		Var& operator *= (const int b);
+		Var& operator /= (const Var b);
+		Var& operator /= (const int b);
+		Var& operator ++ (const int b);
+		Var& operator -- (const int b);
+		Var operator + (const Var b);
+		Var operator + (const std::string b);
+		Var operator + (const int b);
+		Var operator - (const Var b);
+		Var operator - (const int b);
+		Var operator * (const Var b);
+		Var operator * (const int b);
+		Var operator / (const Var b);
+		Var operator / (const int b);
 
 		// Comparison operators
-		bool operator != (const var_t b);
+		bool operator != (const Var b);
 
-	var_t();
-	var_t(std::string _value);
-	var_t(int _value);
+	Var();
+	Var(std::string _value);
+	Var(int _value);
 
 	const char* c_str() const;
 };

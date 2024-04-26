@@ -8,6 +8,7 @@
 #include "../headers/config.h"
 #include "../headers/dice.h"
 #include "../headers/functions.h"
+#include "../headers/scope.h"
 
 bool stob(std::string s)
 {
@@ -30,14 +31,14 @@ void confirmEnvVariablesFile()
 {
 	if(!std::filesystem::exists(rpgsh_env_variables_file.c_str()))
 	{
-		output(Info,"RPGSH environment variables file not found, creating file at \'%s\'.",rpgsh_env_variables_file.c_str());
+		output(Info,"rpgsh environment variables file not found, creating file at \"%s\".",rpgsh_env_variables_file.c_str());
 		std::ofstream ofs(rpgsh_env_variables_file.c_str());
 		ofs.close();
 
 		//Set default values for built-in env variables
 		rpgsh_char c = rpgsh_char();
-		set_rpgsh_env_variable(CURRENT_CHAR_SHELL_VAR,c.Name());
-		set_rpgsh_env_variable(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
+		set_env_variable(CURRENT_CHAR_SHELL_VAR,c.Name());
+		set_env_variable(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
 	}
 }
 
@@ -45,16 +46,9 @@ void confirmShellVarsFile()
 {
 	if(!std::filesystem::exists(shell_vars_file.c_str()))
 	{
-		output(Info,"Shell variables file not found, creating file at \'%s\'.",shell_vars_file.c_str());
+		output(Info,"Shell variables file not found, creating file at \"%s\".",shell_vars_file.c_str());
 		std::ofstream ofs(shell_vars_file.c_str());
 		ofs.close();
-
-		rpgsh_config config = rpgsh_config();
-		rpgsh_char c = rpgsh_char();
-
-		//Set default values for built-in shell variables
-		set_shell_var(CURRENT_CHAR_SHELL_VAR,c.Name());
-		set_shell_var(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
 	}
 }
 
@@ -107,7 +101,7 @@ void padding()
 
 void run_rpgsh_prog(std::string args, bool redirect_output)
 {
-	rpgsh_char c = rpgsh_char();
+	Character c = Character(false);
 
 	std::vector<std::string> vars;
 	extern char** environ;
@@ -140,7 +134,7 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 					var+=args.substr(j,1);
 				}
 				int new_args_start = find_percent + var.length() + 1;
-				args = args.substr(0,find_percent)+c.Attr[var].c_str()+
+				args = args.substr(0,find_percent)+c.getStr<Var>(var).c_str()+ //TODO check for type sigil
 				       args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
 			}
 			else if(args[i] == CAMPAIGN_SIGIL)
@@ -345,7 +339,7 @@ std::vector<std::string> get_prog_output(std::string prog)
 	return output;
 }
 
-std::string get_rgpsh_env_variable(std::string v)
+std::string get_env_variable(std::string v)
 {
 	confirmEnvVariablesFile();
 
@@ -364,7 +358,7 @@ std::string get_rgpsh_env_variable(std::string v)
 	ifs.close();
 	return "";
 }
-void set_rpgsh_env_variable(std::string v,std::string value)
+void set_env_variable(std::string v,std::string value)
 {
 	std::ifstream ifs(rpgsh_env_variables_file.c_str());
 	std::filesystem::remove((rpgsh_env_variables_file+".bak").c_str());
@@ -516,14 +510,14 @@ std::map<std::string,std::string> load_vars_from_file(std::string path)
 
 	if(!std::filesystem::exists(path))
 	{
-		output(Error,"File not found at \'%s\'",path.c_str());
+		output(Error,"File not found at \"%s\"",path.c_str());
 		exit(-1);
 	}
 
 	std::ifstream ifs(path);
 	if(!ifs.good())
 	{
-		output(Error,"Unable to open \'%s\' for reading",path.c_str());
+		output(Error,"Unable to open \"%s\" for reading",path.c_str());
 		exit(-1);
 	}
 	while(!ifs.eof())
@@ -543,12 +537,12 @@ std::map<std::string,std::string> load_vars_from_file(std::string path)
 }
 
 template <typename T>
-void save_obj_to_file(std::string path, datamap<dice_t> obj, char obj_id);
-void save_obj_to_file(std::string path, datamap<var_t> obj, char obj_id);
+void save_obj_to_file(std::string path, datamap<Dice> obj, char obj_id);
+void save_obj_to_file(std::string path, datamap<Var> obj, char obj_id);
 
 template <typename T>
-datamap<dice_t> load_obj_from_file(std::string path, char var_id);
-datamap<var_t> load_obj_from_file(std::string path, char var_id);
+datamap<Dice> load_obj_from_file(std::string path, char var_id);
+datamap<Var> load_obj_from_file(std::string path, char var_id);
 
 template <typename T>
-datamap<currency_t> loadDatamapFromAllScopes(char var_id);
+datamap<Currency> loadDatamapFromAllScopes(char var_id);
