@@ -1,16 +1,17 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>
+#include <map>
 #include <termios.h>
-#include "../headers/char.h"
 #include "../headers/config.h"
 #include "../headers/functions.h"
+#include "../headers/scope.h"
 #include "../headers/text.h"
 
 #define MAX_BUFFER_SIZE 256
 
 rpgsh_config config = rpgsh_config();
-rpgsh_char c = rpgsh_char();
+Character c = Character(false);
 
 std::string input_handler()
 {
@@ -163,11 +164,11 @@ int prompt()
 	bool backup = false;
 
 	prompt:
-	c.load(get_shell_var(CURRENT_CHAR_SHELL_VAR),backup);
+	c.load();
 
 	try
 	{
-		fprintf(stdout,"%s┌─%s[%s%s%s%s%s%s%s]%s─%s(%s%hhu/%hhu%s %s(%hhu)%s%s%s)%s%s\n",TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_ITALIC,TEXT_RED,c.Name().c_str(),TEXT_NOITALIC,TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_BOLD,TEXT_GREEN,int(c.Attr["/HP/Current"]),int(c.Attr["/HP/Max"]),TEXT_NOBOLD,TEXT_ITALIC,int(c.Attr["/HP/Temp"]),TEXT_NOITALIC,TEXT_BOLD,TEXT_WHITE,TEXT_NOBOLD,TEXT_NORMAL);
+		fprintf(stdout,"%s┌─%s[%s%s%s%s%s%s%s]%s─%s(%s%hhu/%hhu%s %s(%hhu)%s%s%s)%s%s\n",TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_ITALIC,TEXT_RED,c.getName().c_str(),TEXT_NOITALIC,TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_BOLD,TEXT_GREEN,int(c.get<Var>("/HP/Current")),int(c.get<Var>("/HP/Max")),TEXT_NOBOLD,TEXT_ITALIC,int(c.get<Var>("/HP/Temp")),TEXT_NOITALIC,TEXT_BOLD,TEXT_WHITE,TEXT_NOBOLD,TEXT_NORMAL);
 		fprintf(stdout,"%s└─%s$%s ",TEXT_WHITE,TEXT_CYAN,TEXT_NORMAL);
 
 		if(backup)
@@ -229,11 +230,12 @@ int prompt()
 }
 int main()
 {
-	//Create shell vars file if it doesn't exist
+	//Create vars files if they doesn't exist
+	confirmEnvVariablesFile();
 	confirmShellVarsFile();
 
-	//(re)build default character on launch
-	c.save();
+	if(!c.confirmDatasource())
+		c = Character(templates_dir + config.setting[DEFAULT_GAME].c_str());
 
 	run_rpgsh_prog((char*)"banner",false);
 	run_rpgsh_prog((char*)"version",false);

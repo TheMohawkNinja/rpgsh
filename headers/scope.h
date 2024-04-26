@@ -10,23 +10,16 @@
 #include "output.h"
 #include "var.h"
 
-enum scope_level
+class Scope
 {
-	Character,
-	Campaign,
-	Shell
-};
-class scope
-{
-	private:
+	protected:
 		std::string datasource;
-		scope_level level;
 
-		datamap<currency_t>		currencies;
-		datamap<currencysystem_t>	currencysystems;
-		datamap<dice_t>			dice;
-		datamap<var_t>			vars;
-		datamap<wallet_t>		wallets;
+		datamap<Currency>		currencies;
+		datamap<CurrencySystem>		currencysystems;
+		datamap<Dice>			dice;
+		datamap<Var>			vars;
+		datamap<Wallet>			wallets;
 
 		//Try to create a filestream
 		template<typename T>
@@ -36,9 +29,8 @@ class scope
 		void saveline(std::ofstream &ofs, char type, std::string k, std::string v);
 
 	public:
-		//Constructors
-		scope();
-		scope(scope_level level);
+		//Confirm datasource exists
+		bool confirmDatasource();
 
 		//Load/save data
 		void load();
@@ -68,4 +60,17 @@ class scope
 		//Set entire datamap to another datamap
 		template <typename T>
 		void setDatamap(datamap<T> map);
+};
+
+class Character: public Scope
+{
+	public:
+		//Load current character
+		Character(bool backup);
+
+		//Load other character/template
+		Character(std::string path);
+
+		//Get character name
+		std::string getName();
 };

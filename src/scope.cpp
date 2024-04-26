@@ -4,7 +4,7 @@
 
 //Try to create a filestream
 template<>
-std::ifstream scope::tryCreateFileStream<std::ifstream>(std::string path)
+std::ifstream Scope::tryCreateFileStream<std::ifstream>(std::string path)
 {
 	if(!std::filesystem::exists(path))
 	{
@@ -22,7 +22,7 @@ std::ifstream scope::tryCreateFileStream<std::ifstream>(std::string path)
 	return fs;
 }
 template<>
-std::ofstream scope::tryCreateFileStream<std::ofstream>(std::string path)
+std::ofstream Scope::tryCreateFileStream<std::ofstream>(std::string path)
 {
 	//Open as an appending stream
 	std::ofstream fs(path, std::ios::app);
@@ -35,30 +35,14 @@ std::ofstream scope::tryCreateFileStream<std::ofstream>(std::string path)
 	return fs;
 }
 
-//Constructors
-scope::scope(){}
-scope::scope(scope_level level)
+//Confirm datasource exists
+bool Scope::confirmDatasource()
 {
-	std::string character = get_shell_var(CURRENT_CHAR_SHELL_VAR);
-	std::string campaign = get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR);
-	std::string current_campaign_dir = campaigns_dir+campaign;
-	std::string current_character_dir = current_campaign_dir+"characters/";
-
-	switch(level)
-	{
-		case Character:
-			datasource = current_character_dir + character + ".char";
-		case Campaign:
-			datasource = current_campaign_dir + ".vars";
-		case Shell:
-			datasource = shell_vars_file;
-	}
-
-	load();
+	return std::filesystem::exists(datasource);
 }
 
 //Load all data in from file
-void scope::load()
+void Scope::load()
 {
 	std::ifstream ifs = tryCreateFileStream<std::ifstream>(datasource);
 	int linenum = 0;
@@ -73,9 +57,11 @@ void scope::load()
 
 		std::getline(ifs,data);
 
+		if(ifs.eof()) break;
+
 		/*
 		Handle multi-character type specifiers.
-		This is neccessarily an error with the scope file formatting,
+		This is neccessarily an error with the Scope file formatting,
 		but it is not neccessarily a fatal error, so just print a warning and keep going.
 		*/
 		if(data.find(DS) > 1)
@@ -84,7 +70,7 @@ void scope::load()
 			continue;
 		}
 
-		if(data != "" && data[0] == COMMENT)
+		if(data != "" && data[0] != COMMENT)
 		{
 			type = data[0];
 			try
@@ -113,19 +99,19 @@ void scope::load()
 			switch(type)
 			{
 				case CURRENCY_SIGIL:
-					currencies[key] = currency_t(value);
+					currencies[key] = Currency(value);
 					break;
 				case CURRENCYSYSTEM_SIGIL:
-					currencysystems[key] = currencysystem_t(value);
+					currencysystems[key] = CurrencySystem(value);
 					break;
 				case DICE_SIGIL:
-					dice[key] = dice_t(value);
+					dice[key] = Dice(value);
 					break;
 				case VAR_SIGIL:
-					vars[key] = var_t(value);
+					vars[key] = Var(value);
 					break;
 				case WALLET_SIGIL:
-					wallets[key] = wallet_t(value);
+					wallets[key] = Wallet(value);
 					break;
 				default:
 					output(Warning,"Unknown type specifier \'%c\' in \"%s:%d\"",type,datasource.c_str(),linenum);
@@ -136,20 +122,20 @@ void scope::load()
 	ifs.close();
 }
 //Save file formatting
-void scope::saveline(std::ofstream &ofs, char type, std::string k, std::string v)
+void Scope::saveline(std::ofstream &ofs, char type, std::string k, std::string v)
 {
 	std::string data = std::to_string(type) + DS + k + DS + v + "\n";
 	ofs<<data;
 }
 //Save all data to file
-void scope::save()
+void Scope::save()
 {
 	//Make backup first
 	if(std::filesystem::exists(datasource.c_str()))
 		 std::filesystem::rename(datasource.c_str(),(datasource+".bak").c_str());
 
 	std::ofstream ofs = tryCreateFileStream<std::ofstream>(datasource);
-/*
+
 	for(const auto& [k,v] : currencies)
 		saveline(ofs,CURRENCY_SIGIL,k,std::string(v));
 	for(const auto& [k,v] : currencysystems)
@@ -160,141 +146,165 @@ void scope::save()
 		saveline(ofs,VAR_SIGIL,k,std::string(v));
 	for(const auto& [k,v] : wallets)
 		saveline(ofs,WALLET_SIGIL,k,std::string(v));
-*/
+
 	ofs.close();
 }
 
 //Get single variable
 template<>
-currency_t scope::get<currency_t>(std::string key)
+Currency Scope::get<Currency>(std::string key)
 {
 	return currencies[key];
 }
 template<>
-currencysystem_t scope::get<currencysystem_t>(std::string key)
+CurrencySystem Scope::get<CurrencySystem>(std::string key)
 {
 	return currencysystems[key];
 }
 template<>
-dice_t scope::get<dice_t>(std::string key)
+Dice Scope::get<Dice>(std::string key)
 {
 	return dice[key];
 }
 template<>
-var_t scope::get<var_t>(std::string key)
+Var Scope::get<Var>(std::string key)
 {
 	return vars[key];
 }
 template<>
-wallet_t scope::get<wallet_t>(std::string key)
+Wallet Scope::get<Wallet>(std::string key)
 {
 	return wallets[key];
 }
 
 //Get single variable, but return a std::string
 template<>
-std::string scope::getStr<currency_t>(std::string key)
+std::string Scope::getStr<Currency>(std::string key)
 {
-	return std::string(scope::get<currency_t>(key));
+	return std::string(Scope::get<Currency>(key));
 }
 template<>
-std::string scope::getStr<currencysystem_t>(std::string key)
+std::string Scope::getStr<CurrencySystem>(std::string key)
 {
-	return std::string(scope::get<currencysystem_t>(key));
+	return std::string(Scope::get<CurrencySystem>(key));
 }
 template<>
-std::string scope::getStr<dice_t>(std::string key)
+std::string Scope::getStr<Dice>(std::string key)
 {
-	return std::string(scope::get<dice_t>(key));
+	return std::string(Scope::get<Dice>(key));
 }
 template<>
-std::string scope::getStr<var_t>(std::string key)
+std::string Scope::getStr<Var>(std::string key)
 {
-	return std::string(scope::get<var_t>(key));
+	return std::string(Scope::get<Var>(key));
 }
 template<>
-std::string scope::getStr<wallet_t>(std::string key)
+std::string Scope::getStr<Wallet>(std::string key)
 {
-	return std::string(scope::get<wallet_t>(key));
+	return std::string(Scope::get<Wallet>(key));
 }
 
 //Get all variables of a specific datatype
 template<>
-datamap<currency_t> scope::getDatamap<currency_t>()
+datamap<Currency> Scope::getDatamap<Currency>()
 {
 	return currencies;
 }
 template<>
-datamap<currencysystem_t> scope::getDatamap<currencysystem_t>()
+datamap<CurrencySystem> Scope::getDatamap<CurrencySystem>()
 {
 	return currencysystems;
 }
 template<>
-datamap<dice_t> scope::getDatamap<dice_t>()
+datamap<Dice> Scope::getDatamap<Dice>()
 {
 	return dice;
 }
 template<>
-datamap<var_t> scope::getDatamap<var_t>()
+datamap<Var> Scope::getDatamap<Var>()
 {
 	return vars;
 }
 template<>
-datamap<wallet_t> scope::getDatamap<wallet_t>()
+datamap<Wallet> Scope::getDatamap<Wallet>()
 {
 	return wallets;
 }
 
 //Set single variable
 template<>
-void scope::set<currency_t>(std::string key, currency_t value)
+void Scope::set<Currency>(std::string key, Currency value)
 {
 	currencies[key] = value;
 }
 template<>
-void scope::set<currencysystem_t>(std::string key, currencysystem_t value)
+void Scope::set<CurrencySystem>(std::string key, CurrencySystem value)
 {
 	currencysystems[key] = value;
 }
 template<>
-void scope::set<dice_t>(std::string key, dice_t value)
+void Scope::set<Dice>(std::string key, Dice value)
 {
 	dice[key] = value;
 }
 template<>
-void scope::set<var_t>(std::string key, var_t value)
+void Scope::set<Var>(std::string key, Var value)
 {
 	vars[key] = value;
 }
 template<>
-void scope::set<wallet_t>(std::string key, wallet_t value)
+void Scope::set<Wallet>(std::string key, Wallet value)
 {
 	wallets[key] = value;
 }
 
 //Set entire datamap to another datamap
 template<>
-void scope::setDatamap<currency_t>(datamap<currency_t> map)
+void Scope::setDatamap<Currency>(datamap<Currency> map)
 {
 	currencies = map;
 }
 template<>
-void scope::setDatamap<currencysystem_t>(datamap<currencysystem_t> map)
+void Scope::setDatamap<CurrencySystem>(datamap<CurrencySystem> map)
 {
 	currencysystems = map;
 }
 template<>
-void scope::setDatamap<dice_t>(datamap<dice_t> map)
+void Scope::setDatamap<Dice>(datamap<Dice> map)
 {
 	dice = map;
 }
 template<>
-void scope::setDatamap<var_t>(datamap<var_t> map)
+void Scope::setDatamap<Var>(datamap<Var> map)
 {
 	vars = map;
 }
 template<>
-void scope::setDatamap<wallet_t>(datamap<wallet_t> map)
+void Scope::setDatamap<Wallet>(datamap<Wallet> map)
 {
 	wallets = map;
+}
+
+Character::Character(bool backup)
+{
+	confirmEnvVariablesFile();
+
+	std::string character = get_env_variable(CURRENT_CHAR_SHELL_VAR);
+	std::string campaign = get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR);
+	std::string current_campaign_dir = campaigns_dir+campaign;
+	std::string current_character_dir = current_campaign_dir+"characters/";
+
+	datasource = current_character_dir + character + ".char";
+
+	if(backup) datasource += ".bak";
+}
+Character::Character(std::string path)
+{
+	datasource = path;
+}
+
+//Get character name
+std::string Character::getName()
+{
+	return getStr<Var>(getStr<Var>(std::string(CHAR_NAME_ATTR)));
 }
