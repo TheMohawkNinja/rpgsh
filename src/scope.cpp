@@ -122,30 +122,31 @@ void Scope::load()
 	ifs.close();
 }
 //Save file formatting
-void Scope::saveline(std::ofstream &ofs, char type, std::string k, std::string v)
+std::string Scope::formatLine(char type, std::string k, std::string v)
 {
-	std::string data = std::to_string(type) + DS + k + DS + v + "\n";
-	ofs<<data;
+	std::string type_str(1,type);
+	return (type_str + DS + k + DS + v + "\n");
 }
 //Save all data to file
 void Scope::save()
 {
 	//Make backup first
-	if(std::filesystem::exists(datasource.c_str()))
+	if(std::filesystem::exists(datasource.c_str()) &&
+	datasource.substr(datasource.length()-4,4) != ".bak")
 		 std::filesystem::rename(datasource.c_str(),(datasource+".bak").c_str());
 
 	std::ofstream ofs = tryCreateFileStream<std::ofstream>(datasource);
 
 	for(const auto& [k,v] : currencies)
-		saveline(ofs,CURRENCY_SIGIL,k,std::string(v));
+		ofs<<formatLine(CURRENCY_SIGIL,k,std::string(v));
 	for(const auto& [k,v] : currencysystems)
-		saveline(ofs,CURRENCYSYSTEM_SIGIL,k,std::string(v));
+		ofs<<formatLine(CURRENCYSYSTEM_SIGIL,k,std::string(v));
 	for(const auto& [k,v] : dice)
-		saveline(ofs,DICE_SIGIL,k,std::string(v));
+		ofs<<formatLine(DICE_SIGIL,k,std::string(v));
 	for(const auto& [k,v] : vars)
-		saveline(ofs,VAR_SIGIL,k,std::string(v));
+		ofs<<formatLine(VAR_SIGIL,k,std::string(v));
 	for(const auto& [k,v] : wallets)
-		saveline(ofs,WALLET_SIGIL,k,std::string(v));
+		ofs<<formatLine(WALLET_SIGIL,k,std::string(v));
 
 	ofs.close();
 }
@@ -287,14 +288,7 @@ void Scope::setDatamap<Wallet>(datamap<Wallet> map)
 
 Character::Character(bool backup)
 {
-	confirmEnvVariablesFile();
-
-	std::string character = get_env_variable(CURRENT_CHAR_SHELL_VAR);
-	std::string campaign = get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR);
-	std::string current_campaign_dir = campaigns_dir+campaign;
-	std::string current_character_dir = current_campaign_dir+"characters/";
-
-	datasource = current_character_dir + character + ".char";
+	datasource = getCurrentCharacterFilePath();
 
 	if(backup) datasource += ".bak";
 }
@@ -303,8 +297,25 @@ Character::Character(std::string path)
 	datasource = path;
 }
 
+std::string Character::getCurrentCharacterFilePath()
+{
+	confirmEnvVariablesFile();
+	std::string character = get_env_variable(CURRENT_CHAR_SHELL_VAR);
+	std::string campaign = get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR);
+	std::string current_campaign_dir = campaigns_dir+campaign;
+	std::string current_character_dir = current_campaign_dir+"characters/";
+
+	return (current_character_dir + character + ".char");
+}
+
 //Get character name
 std::string Character::getName()
 {
 	return getStr<Var>(getStr<Var>(std::string(CHAR_NAME_ATTR)));
+}
+
+//Set datasource to save, mainly to ensure new characters don't save back to template file
+void Character::setDatasource(std::string path)
+{
+	datasource = path;
 }

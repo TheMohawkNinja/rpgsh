@@ -26,7 +26,7 @@ class Scope
 		T tryCreateFileStream(std::string path);
 
 		//Save formatting
-		void saveline(std::ofstream &ofs, char type, std::string k, std::string v);
+		std::string formatLine(char type, std::string k, std::string v);
 
 	public:
 		//Confirm datasource exists
@@ -71,6 +71,13 @@ class Character: public Scope
 		//Load other character/template
 		Character(std::string path);
 
+		//Get current character file path
+		std::string getCurrentCharacterFilePath();
+
 		//Get character name
 		std::string getName();
+
+		//Set datasource to save, mainly to ensure new characters don't save back to template file
+		void setDatasource(std::string path);
+
 };

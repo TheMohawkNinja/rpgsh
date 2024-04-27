@@ -219,8 +219,16 @@ int main()
 	confirmEnvVariablesFile();
 	confirmShellVarsFile();
 
+	//Generate default character if needed
 	if(!c.confirmDatasource())
-		c = Character(templates_dir + config.setting[DEFAULT_GAME].c_str());
+	{
+		c.setDatasource(templates_dir + config.setting[DEFAULT_GAME].c_str());
+		c.load();
+		c.setDatasource(c.getCurrentCharacterFilePath());
+		c.save();
+	}
+
+	c.load();
 
 	run_rpgsh_prog((char*)"banner",false);
 	run_rpgsh_prog((char*)"version",false);
