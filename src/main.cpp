@@ -27,57 +27,49 @@ std::string input_handler()
 	tcsetattr(fileno(stdin), TCSANOW, &t_new);
 
 	std::vector<char> input;
-	char c = 0;
+	char k = 0;
 	int cur_pos = 0;
 	bool insert_mode = false;
 
-	while(c != KB_ENTER)
+	while(k != KB_ENTER)
 	{
-		c = getchar();
+		k = getchar();
 
-		if(isprint(c))
+		if(isprint(k))
 		{
 			if(insert_mode)	//If the "Insert" key is toggled
 			{
 				if(cur_pos < input.size())
-				{
-					input[cur_pos] = c;
-				}
+					input[cur_pos] = k;
 				else
-				{
-					input.push_back(c);
-				}
+					input.push_back(k);
 			}
 			else
 			{
-				input.insert(input.begin()+cur_pos,c);
+				input.insert(input.begin()+cur_pos,k);
 			}
+
 			fprintf(stdout,"\e[K");
+
 			for(int i=cur_pos; i<input.size(); i++)
-			{
 				fprintf(stdout,"%c",input[i]);
-			}
+
 			if(cur_pos < input.size()-1)
-			{
 				fprintf(stdout,"\e[%dD",input.size()-1-cur_pos);
-			}
+
 			cur_pos++;
 		}
-		else if(c == KB_BACKSPACE && cur_pos > 0)
+		else if(k == KB_BACKSPACE && cur_pos > 0)
 		{
 			fprintf(stdout,"\b\e[K");// \b backs up one character and \e[K deletes everything to EOL
 			cur_pos--;
 			input.erase(input.begin()+cur_pos);
 			for(int i=cur_pos; i<input.size(); i++)
-			{
 				fprintf(stdout,"%c",input[i]);
-			}
 			if(cur_pos < input.size())
-			{
 				fprintf(stdout,"\e[%dD",input.size()-cur_pos);
-			}
 		}
-		else if(c == ESC_SEQ)//Escape sequences
+		else if(k == ESC_SEQ)//Escape sequences
 		{
 			getchar();//skip '['
 			switch(getchar())
@@ -131,21 +123,16 @@ std::string input_handler()
 					}
 					break;
 				case '3':
-					if(getchar() == '~')	//Delete
+					if(getchar() == '~' && cur_pos < input.size())	// Delete
 					{
+						fprintf(stdout,"\e[K");// \b backs up one character and \e[K deletes everything to EOL
+						input.erase(input.begin()+cur_pos);
+
+						for(int i=cur_pos; i<input.size(); i++)
+							fprintf(stdout,"%c",input[i]);
+
 						if(cur_pos < input.size())
-						{
-							fprintf(stdout,"\e[K");// \b backs up one character and \e[K deletes everything to EOL
-							input.erase(input.begin()+cur_pos);
-							for(int i=cur_pos; i<input.size(); i++)
-							{
-								fprintf(stdout,"%c",input[i]);
-							}
-							if(cur_pos < input.size())
-							{
-								fprintf(stdout,"\e[%dD",input.size()-cur_pos);
-							}
-						}
+							fprintf(stdout,"\e[%dD",input.size()-cur_pos);
 					}
 					break;
 			}
@@ -196,9 +183,7 @@ int prompt()
 
 	//Zero-out buffer so we have a known dataset
 	for(int i=0; i<MAX_BUFFER_SIZE; i++)
-	{
 		buffer[i] = '\0';
-	}
 
 	std::string in = input_handler();
 	if(in.length() > MAX_BUFFER_SIZE)
