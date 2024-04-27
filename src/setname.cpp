@@ -1,8 +1,8 @@
 #include <cstring>
-#include "../headers/char.h"
 #include "../headers/define.h"
 #include "../headers/functions.h"
 #include "../headers/output.h"
+#include "../headers/scope.h"
 #include "../headers/text.h"
 
 int main(int argc, char** argv)
@@ -25,11 +25,11 @@ int main(int argc, char** argv)
 
 	if(!strcmp(argv[1],"-l") || !strcmp(argv[1],"--list"))
 	{
-		rpgsh_char c = rpgsh_char();
-		c.load(get_shell_var(CURRENT_CHAR_SHELL_VAR),false);
+		Character c = Character(false);
+		c.load();
 
-		fprintf(stdout,"Display name character attribute:\t%s%s%s\n",TEXT_WHITE,c.Attr[CHAR_NAME_ATTR].c_str(),TEXT_NORMAL);
-		fprintf(stdout,"Current value of %s%%%s%s:\t\t\t%s%s%s\n",TEXT_WHITE,c.Attr[CHAR_NAME_ATTR].c_str(),TEXT_NORMAL,TEXT_WHITE,c.Name().c_str(),TEXT_NORMAL);
+		fprintf(stdout,"Display name character attribute:\t%s%s%s\n",TEXT_WHITE,c.getStr<Var>(CHAR_NAME_ATTR).c_str(),TEXT_NORMAL);
+		fprintf(stdout,"Current value of %s%%%s%s:\t\t\t%s%s%s\n",TEXT_WHITE,c.getStr<Var>(CHAR_NAME_ATTR).c_str(),TEXT_NORMAL,TEXT_WHITE,c.getName().c_str(),TEXT_NORMAL);
 		return 0;
 	}
 	else if(!strcmp(argv[1],"-?") || !strcmp(argv[1],"--help"))
@@ -47,16 +47,15 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	rpgsh_char c = rpgsh_char();
-	c.load(get_shell_var(CURRENT_CHAR_SHELL_VAR),false);
+	Character c = Character(false);
+	c.load();
 
-	if(std::string(c.Attr[argv[1]]) == "")
-	{
+	if(std::string(argv[1]) == "")
 		output(Warning,"%s is empty.",argv[1]);
-	}
 
-	c.update_Name(argv[1]);
-	output(Info,"Character's display name is now set to the character attribute \"%s\" (Current value: \"%s\")",argv[1],c.Attr[argv[1]].c_str());
+	c.set<Var>(CHAR_NAME_ATTR,std::string(argv[1]));
+	c.save();
+	output(Info,"Character's display name is now set to the character attribute \"%s\" (Current value: \"%s\")",argv[1],c.getStr<Var>(argv[1]).c_str());
 
 	return 0;
 }
