@@ -64,7 +64,7 @@ void print_shell_vars()
 }
 int main(int argc, char** argv)
 {
-	check_print_app_description(argv,"Prints one or all variable Scopes.");
+	check_print_app_description(argv,"Prints one or all variable scopes.");
 
 	if(argc > 2)
 	{
