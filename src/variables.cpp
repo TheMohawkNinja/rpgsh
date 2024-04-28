@@ -1,9 +1,10 @@
 #include <cstring>
 #include "../headers/char.h"
 #include "../headers/functions.h"
+#include "../headers/scope.h"
 #include "../headers/var.h"
 
-rpgsh_char c = rpgsh_char();
+Character c = Character(false);
 
 bool is_operator(std::string s)
 {
@@ -24,23 +25,23 @@ bool is_int(std::string s)
 		return false;
 	}
 }
-void set_var(std::string var, Var old_value, Var new_value, char Scope_sigil)
+void set_var(std::string var, Var old_value, Var new_value, char scope_sigil)
 {
-	std::string Varype;
+	std::string var_type;
 
-	switch(Scope_sigil)
+	switch(scope_sigil)
 	{
 		case CHAR_SIGIL:
-			Varype = "Character attribute";
+			var_type = "Character attribute";
 			break;
 		case CAMPAIGN_SIGIL:
-			Varype = "Campaign variable";
+			var_type = "Campaign variable";
 			break;
 		case SHELL_SIGIL:
-			Varype = "Shell variable";
+			var_type = "Shell variable";
 			break;
 		default:
-			output(Error,"Unknown Scope sigil \'%c\'.",Scope_sigil);
+			output(Error,"Unknown Scope sigil \'%c\'.",scope_sigil);
 			exit(-1);
 	}
 
@@ -48,16 +49,15 @@ void set_var(std::string var, Var old_value, Var new_value, char Scope_sigil)
 	bool new_is_int = is_int(new_value.Value);
 
 	if(old_is_int && !new_is_int)
-		output(Warning,"%s \"%s\" is changing from an integer to a string.",Varype.c_str(),var.c_str());
+		output(Warning,"%s \"%s\" is changing from an integer to a string.",var_type.c_str(),var.c_str());
 	else if(!old_is_int && new_is_int)
-		output(Warning,"%s \"%s\" is changing from a string to an integer.",Varype.c_str(),var.c_str());
+		output(Warning,"%s \"%s\" is changing from a string to an integer.",var_type.c_str(),var.c_str());
 
-	switch(Scope_sigil)
+	switch(scope_sigil)
 	{
 		case CHAR_SIGIL:
-			c.Attr[var] = new_value;
+			c.set<Var>(var,new_value);
 			c.save();
-			c.set_as_current();
 			break;
 		case CAMPAIGN_SIGIL:
 			set_campaign_var(var,std::string(new_value));
@@ -67,7 +67,7 @@ void set_var(std::string var, Var old_value, Var new_value, char Scope_sigil)
 			break;
 	}
 	if(old_value != new_value)
-		output(Info,"%s \"%s\" has been changed from \"%s\" to \"%s\".",Varype.c_str(),var.substr(1,var.length()-1).c_str(),old_value.c_str(),new_value.c_str());
+		output(Info,"%s \"%s\" has been changed from \"%s\" to \"%s\".",var_type.c_str(),var.substr(1,var.length()-1).c_str(),old_value.c_str(),new_value.c_str());
 }
 
 int main(int argc, char** argv)
@@ -92,23 +92,23 @@ int main(int argc, char** argv)
 	switch(argv[1][0])// Get Scope sigil
 	{
 		case CHAR_SIGIL:
-			c.load(get_shell_var(CURRENT_CHAR_SHELL_VAR),false);
+			c.load();
 			switch (var[var.length()-1])
 			{
 				case '/':
-				old_value = std::string(c.Attr[var.substr(0,var.length()-1)]);
+				old_value = c.getStr<Var>(var.substr(0,var.length()-1));
 				break;
 
 				default:
-				old_value = std::string(c.Attr[var]);
+				old_value = c.getStr<Var>(var);
 				break;
 			}
 
 			// Convert character sheet to std::map<std::string,std::string>
 			// TODO Will need to add currency, currency system, and wallet
-			for(const auto& [k,v] : c.Attr)
+			for(const auto& [k,v] : c.getDatamap<Var>())
 				m[k] = std::string(v);
-			for(const auto& [k,v] : c.Dice)
+			for(const auto& [k,v] : c.getDatamap<Dice>())
 				m[k] = std::string(v);
 			break;
 		case CAMPAIGN_SIGIL:
