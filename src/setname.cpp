@@ -7,11 +7,7 @@
 
 int main(int argc, char** argv)
 {
-	if(argv[1] && !strcmp(argv[1],FLAG_APPDESCRIPTION))
-	{
-		fprintf(stdout,"Changes the variable used for the loaded character's name.\n");
-		return 0;
-	}
+	check_print_app_description(argv,"Changes the variable used for the loaded character's name.");
 
 	if(argc < 2)
 	{

@@ -2,15 +2,12 @@
 #include <stdio.h>
 #include <string>
 #include "../headers/define.h"
+#include "../headers/functions.h"
 #include "../headers/text.h"
 
 int main(int argc, char** argv)
 {
-	if(argv[1] && !strcmp(argv[1],FLAG_APPDESCRIPTION))
-	{
-		fprintf(stdout,"Prints pretty banner art and the author's signature.\n");
-		return 0;
-	}
+	check_print_app_description(argv,"Prints pretty banner art and the author's signature.");
 
 	fprintf(stdout,"                                         %s▟                   %s\n",TEXT_YELLOW,TEXT_NORMAL);
 	fprintf(stdout,"                                         %s█▙        ▁▁        %s\n",TEXT_YELLOW,TEXT_NORMAL);

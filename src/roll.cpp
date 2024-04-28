@@ -13,11 +13,7 @@ int main(int argc, char** argv)
 	std::string dice_str, current_arg;
 	std::string count_expr = "";
 
-	if(argv[1] && !strcmp(argv[1],FLAG_APPDESCRIPTION))
-	{
-		fprintf(stdout,"A simple, yet featureful dice rolling program.\n");
-		return 0;
-	}
+	check_print_app_description(argv,"A simple, yet featureful dice rolling program.");
 
 	for(int arg=1; arg<argc; arg++)
 	{

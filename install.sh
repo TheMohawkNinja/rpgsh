@@ -61,9 +61,9 @@ if [[ $EUID -eq 0 ]]; then
 	echo -e "\tsrc/variables.cpp\t->\t$bold_white""/bin/rpgsh-variables"$normal
 	g++ src/variables.cpp -L $lib_dir -ldefine -lvar -lfunctions -loutput -lconfig -ldice -lcurrency -lchar -lscope $fs $debug -o /bin/rpgsh-variables
 	echo -e "\tsrc/version.cpp\t\t->\t$bold_white""/bin/rpgsh-version"$normal
-	g++ src/version.cpp $debug -o /bin/rpgsh-version
+	g++ src/version.cpp -L $lib_dir -ldefine -lfunctions -lconfig -lcurrency -ldice -lvar -lchar -lscope -loutput $debug -o /bin/rpgsh-version
 	echo -e "\tsrc/banner.cpp\t\t->\t$bold_white""/bin/rpgsh-banner"$normal
-	g++ src/banner.cpp -L $lib_dir -ldefine $debug -o /bin/rpgsh-banner
+	g++ src/banner.cpp -L $lib_dir -ldefine -lfunctions -lconfig -lcurrency -ldice -lvar -lchar -lscope -loutput $debug -o /bin/rpgsh-banner
 	echo -e "\tsrc/roll.cpp\t\t->\t$bold_white""/bin/rpgsh-roll"$normal
 	g++ src/roll.cpp -L $lib_dir -ldefine -lchar -lcurrency -lconfig -lvar -lfunctions -ldice -loutput -lscope $fs $debug -o /bin/rpgsh-roll
 	echo -e "\tsrc/list.cpp\t\t->\t$bold_white""/bin/rpgsh-list"$normal

@@ -339,6 +339,15 @@ std::vector<std::string> get_prog_output(std::string prog)
 	return output;
 }
 
+void check_print_app_description(char** _argv, std::string description)
+{
+	if(_argv[1] && !strcmp(_argv[1],FLAG_APPDESCRIPTION))
+	{
+		fprintf(stdout,"%s\n",description.c_str());
+		exit(0);
+	}
+}
+
 std::string get_env_variable(std::string v)
 {
 	confirmEnvVariablesFile();

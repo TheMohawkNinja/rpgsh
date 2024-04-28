@@ -64,11 +64,7 @@ void print_shell_vars()
 }
 int main(int argc, char** argv)
 {
-	if(argv[1] && !strcmp(argv[1],FLAG_APPDESCRIPTION))
-	{
-		fprintf(stdout,"Prints one or all variable Scopes.\n");
-		return 0;
-	}
+	check_print_app_description(argv,"Prints one or all variable Scopes.");
 
 	if(argc > 2)
 	{

@@ -26,6 +26,8 @@ void run_rpgsh_prog(std::string args, bool redirect_output);
 
 std::vector<std::string> get_prog_output(std::string prog);
 
+void check_print_app_description(char** _argv, std::string description);
+
 std::string get_env_variable(std::string v);
 void set_env_variable(std::string v, std::string value);
 
