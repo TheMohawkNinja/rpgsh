@@ -5,25 +5,58 @@
 #include "../headers/var.h"
 
 Character c = Character(false);
+Campaign m = Campaign();
+Shell s = Shell();
 
-bool is_operator(std::string s)
+void load_scope(Scope* p_scope, std::string key, std::map<std::string,std::string>* p_map, Var* p_old_value)
 {
-	return (s == "="  ||
-	   	s == "+"  || s == "-"  || s == "*"  || s == "/"  ||
-	  	s == "+=" || s == "-=" || s == "*=" || s == "/=" ||
-	  	s == "++" || s == "--");
+	p_scope->load();
+	switch (key[key.length()-1])
+	{
+		case '/':
+		(*p_old_value) = p_scope->getStr<Var>(key.substr(0,key.length()-1));
+		break;
+
+		default:
+		(*p_old_value) = p_scope->getStr<Var>(key);
+		break;
+	}
+
+	// Convert character sheet to std::map<std::string,std::string>
+	// TODO Will need to add currency, currency system, and wallet
+	for(const auto& [k,v] : p_scope->getDatamap<Currency>())
+		(*p_map)[k] = std::string(v);
+	for(const auto& [k,v] : p_scope->getDatamap<CurrencySystem>())
+		(*p_map)[k] = std::string(v);
+	for(const auto& [k,v] : p_scope->getDatamap<Dice>())
+		(*p_map)[k] = std::string(v);
+	for(const auto& [k,v] : p_scope->getDatamap<Var>())
+		(*p_map)[k] = std::string(v);
+	for(const auto& [k,v] : p_scope->getDatamap<Wallet>())
+		(*p_map)[k] = std::string(v);
 }
-bool is_int(std::string s)
+bool is_operator(std::string str)
 {
-	try
-	{
-		std::stoi(s);
-		return true;
-	}
-	catch(...)
-	{
-		return false;
-	}
+	return (str == "="  ||
+	   	str == "+"  || str == "-"  || str == "*"  || str == "/"  ||
+	  	str == "+=" || str == "-=" || str == "*=" || str == "/=" ||
+	  	str == "++" || str == "--");
+}
+bool is_int(std::string str)
+{
+	try{std::stoi(str);}
+	catch(...){return false;}
+
+	return true;
+}
+bool is_type_sigil(char sigil)
+{
+	return (sigil == CURRENCY_SIGIL ||
+		sigil == DICE_SIGIL ||
+		sigil == CURRENCYSYSTEM_SIGIL ||
+		sigil == VAR_SIGIL ||
+		sigil == WALLET_SIGIL ||
+		sigil == '/'); // '/' Assumes var type
 }
 void set_var(std::string var, Var old_value, Var new_value, char scope_sigil)
 {
@@ -78,13 +111,13 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	if(std::string(argv[1]).length() == 1)// If the user only enters the Scope sigil
+	if(std::string(argv[1]).length() == 1)// If the user only enters the scope sigil
 	{
-		output(Error,"Empty variable name.");
+		output(Error,"No variable type specified.");
 		exit(-1);
 	}
 
-	std::map<std::string,std::string> m;
+	std::map<std::string,std::string> map;
 	std::string path;
 	std::string var = std::string(argv[1]).substr(1,std::string(argv[1]).length()-1);
 	Var old_value;
@@ -92,62 +125,13 @@ int main(int argc, char** argv)
 	switch(argv[1][0])// Get Scope sigil
 	{
 		case CHAR_SIGIL:
-			c.load();
-			switch (var[var.length()-1])
-			{
-				case '/':
-				old_value = c.getStr<Var>(var.substr(0,var.length()-1));
-				break;
-
-				default:
-				old_value = c.getStr<Var>(var);
-				break;
-			}
-
-			// Convert character sheet to std::map<std::string,std::string>
-			// TODO Will need to add currency, currency system, and wallet
-			for(const auto& [k,v] : c.getDatamap<Var>())
-				m[k] = std::string(v);
-			for(const auto& [k,v] : c.getDatamap<Dice>())
-				m[k] = std::string(v);
+			load_scope(&c,var,&map,&old_value);
 			break;
 		case CAMPAIGN_SIGIL:
-			switch (var[var.length()-1])
-			{
-				case '/':
-				try
-				{
-					old_value = get_campaign_var(var.substr(0,var.length()-1));
-				}
-				catch(...){old_value = "";}
-				break;
-
-				default:
-				old_value = get_campaign_var(var);
-				break;
-			}
-			path = campaigns_dir +
-				get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR) +
-				".vars";
-			m = load_vars_from_file(path);
+			load_scope(&m,var,&map,&old_value);
 			break;
 		case SHELL_SIGIL:
-			switch (var[var.length()-1])
-			{
-				case '/':
-				try
-				{
-					old_value = get_shell_var(var.substr(0,var.length()-1));
-				}
-				catch(...){old_value = "";}
-				break;
-
-				default:
-				old_value = get_shell_var(var);
-				break;
-			}
-			path = shell_vars_file;
-			m = load_vars_from_file(path);
+			load_scope(&s,var,&map,&old_value);
 			break;
 		default:
 			output(Error,"Unknown Scope sigil \'%c\'.",argv[1][0]);
@@ -163,7 +147,7 @@ int main(int argc, char** argv)
 			fprintf(stdout,"%s\n",old_value.c_str());
 		else// Print the value and everything downstream of it
 		{
-			for(const auto& [k,v] : m)
+			for(const auto& [k,v] : map)
 			{
 				if(k.substr(0,var.length()-1) == var.substr(1,var.length()-1) && k.length() > space)
 					space = k.length();
@@ -175,7 +159,7 @@ int main(int argc, char** argv)
 					fprintf(stdout," ");
 				fprintf(stdout,"%s\n",old_value.c_str());
 			}
-			for(const auto& [k,v] : m)
+			for(const auto& [k,v] : map)
 			{
 				try
 				{
