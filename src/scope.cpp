@@ -1,6 +1,11 @@
 #include <filesystem>
+#include <fstream>
 #include "../headers/functions.h"
 #include "../headers/scope.h"
+
+//			//
+//	BASE CLASS	//
+//			//
 
 //Try to create a filestream
 template<>
@@ -286,6 +291,10 @@ void Scope::setDatamap<Wallet>(datamap<Wallet> map)
 	wallets = map;
 }
 
+//			//
+//	CHARACTER	//
+//			//
+
 Character::Character(bool backup)
 {
 	datasource = getCurrentCharacterFilePath();
@@ -318,4 +327,26 @@ std::string Character::getName()
 void Character::setDatasource(std::string path)
 {
 	datasource = path;
+}
+
+//			//
+//	CAMPAIGN	//
+//			//
+
+Campaign::Campaign()
+{
+	datasource = campaigns_dir + get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR) + ".vars";
+}
+Campaign::Campaign(std::string path)
+{
+	datasource = path;
+}
+
+//			//
+//	SHELL		//
+//			//
+
+Shell::Shell()
+{
+	datasource = shell_vars_file;
 }

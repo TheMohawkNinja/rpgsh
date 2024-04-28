@@ -1,9 +1,8 @@
 #pragma once
 
-#include <fstream>
 #include <map>
 #include <string>
-#include <type_traits>//std::is_same<T,U>
+//#include <type_traits>//std::is_same<T,U>
 #include "currency.h"
 #include "define.h"
 #include "dice.h"
@@ -80,4 +79,21 @@ class Character: public Scope
 		//Set datasource to save, mainly to ensure new characters don't save back to template file
 		void setDatasource(std::string path);
 
+};
+
+class Campaign: public Scope
+{
+	public:
+		//Load current campaign
+		Campaign();
+
+		//Load other campaign
+		Campaign(std::string path);
+};
+
+class Shell: public Scope
+{
+	public:
+		//Load shell variables
+		Shell();
 };
