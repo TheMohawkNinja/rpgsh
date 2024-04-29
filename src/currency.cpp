@@ -25,6 +25,12 @@ void Currency::tryParseCurrencySystem(datamap<CurrencySystem> currencysystems, s
 		exit(-1);
 	}
 
+	if(cs_match == "")
+	{
+		output(Error,"CurrencySystem cannot be empty.");
+		exit(-1);
+	}
+
 	for(const auto& [k,v] : currencysystems)
 	{
 		if(!strcasecmp(v.Name.c_str(),cs_match.c_str()))
@@ -54,6 +60,12 @@ void Currency::tryParseName(std::string* str, std::string fullstr)
 	catch(...)
 	{
 		output(Error,"Unable to parse currency Name from \"%s\".",fullstr.c_str());
+		exit(-1);
+	}
+
+	if(Name == "")
+	{
+		output(Error,"Currency Name cannot be empty.");
 		exit(-1);
 	}
 }
@@ -124,7 +136,6 @@ Currency::Currency(){}
 Currency::Currency(std::string str)
 {
 	//FORMAT
-	//@c/MyCurrency = {Name,SmallerAmount,Smaller,Larger}
 	//@c/MyCurrency = {CurrencySystem,Name,SmallerAmount,Smaller,Larger}
 
 	datamap<CurrencySystem> currencysystems = getDatamapFromAllScopes<CurrencySystem>(CURRENCYSYSTEM_SIGIL);
@@ -138,59 +149,35 @@ Currency::Currency(std::string str)
 			commas++;
 	}
 
-	if(commas < 3)
-	{
-		output(Error,"Too few arguments in currency definition.");
-		exit(-1);
-	}
-	else if(commas > 4)
+	if(commas != 4)
 	{
 		output(Error,"Too many arguments in currency definition.");
 		exit(-1);
 	}
 
-	//Make sure starting character is '{'
-	if(str[0] != '{')
+	//Make sure first character is 'c'
+	if(str[0] != CURRENCY_SIGIL)
+	{
+		output(Error,"Incorrect data type specifier sigil for currency definition.");
+		exit(-1);
+	}
+
+	//Check for start of definition structure
+	if(str[1] != '{')
 	{
 		output(Error,"Expected starting \'{\' at beginning of currency definition.");
 		exit(-1);
 	}
 
-	//Nix the first character to make future substrings more intuitive
-	str = str.substr(1,str.length()-1);
+	//Nix the first two characters to make future substrings more intuitive
+	str = str.substr(2,str.length()-2);
 
-	//Name
-	//CurrencySystem
-	if(commas == 3)
-		tryParseName(&str, fullstr);
-	else
-		tryParseCurrencySystem(currencysystems, &str, fullstr);
-
-	//SmallerAmount
-	//Name
-	if(commas == 3)
-		tryParseSmallerAmount(&str, fullstr);
-	else
-		tryParseName(&str, fullstr);
-
-	//Smaller
-	//SmallerAmount
-	if(commas == 3)
-		tryParseSmaller(&str, fullstr);
-	else
-		tryParseSmallerAmount(&str, fullstr);
-
-	//Larger
-	//Smaller
-	if(commas == 3)
-		tryParseLarger(&str, fullstr);
-	else
-		tryParseSmaller(&str, fullstr);
-
-	//<N/A>
-	//Larger
-	if(commas == 4)
-		tryParseLarger(&str, fullstr);
+	//Parse everything
+	tryParseCurrencySystem(currencysystems, &str, fullstr);
+	tryParseName(&str, fullstr);
+	tryParseSmallerAmount(&str, fullstr);
+	tryParseSmaller(&str, fullstr);
+	tryParseLarger(&str, fullstr);
 }
 Currency::Currency(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
 {
