@@ -113,13 +113,61 @@ Dice::operator std::string() const
 Dice::Dice(){}
 Dice::Dice(std::string dice_str)
 {
-	if(dice_str.substr(0,1) != "d")
+	//
+	// Determine if we are working with an explicit constructor or an string
+	//
+	if(dice_str.substr(0,2) == "d{")// Explicit constructor
+	{
+		// Get number of commas in explicit constructor
+		unsigned int commas = 0;
+		for(const auto& c : dice_str)
+			if(c == ',') commas++;
+
+		if(commas != 2)
+		{
+			output(Error,"Dice explicit constructors should contain exactly 3 commas.");
+			exit(-1);
+		}
+
+		try
+		{
+			Quantity = std::stoi(dice_str.substr(2,dice_str.find(",")-2));
+		}
+		catch(...)
+		{
+			output(Error,"Unable to parse dice Quantity from explicit constructor.");
+			exit(-1);
+		}
+		dice_str = dice_str.substr(dice_str.find(",")+1,dice_str.length()-(dice_str.find(",")+1));
+
+		try
+		{
+			Faces = std::stoi(dice_str.substr(0,dice_str.find(",")));
+		}
+		catch(...)
+		{
+			output(Error,"Unable to parse dice Faces from explicit constructor.");
+			exit(-1);
+		}
+		dice_str = dice_str.substr(dice_str.find(",")+1,dice_str.length()-(dice_str.find(",")+1));
+
+		try
+		{
+			Modifier = std::stoi(dice_str.substr(0,dice_str.find("}")));
+		}
+		catch(...)
+		{
+			output(Error,"Unable to parse dice Modifier from explicit constructor.");
+			exit(-1);
+		}
+	}
+	else if(dice_str.substr(0,1) != "d")// Implicit string constructor with explicitly defined Quantity
 	{
 		Quantity = get_value(dice_str,"quantity",0,"d",false,true);
 		Faces = get_value(dice_str,"faces",dice_str.find("d",0) + 1,"",false,true);
 		Modifier = get_value(dice_str,"modifier",dice_str.find(std::to_string(Faces),dice_str.find("d",0)) + std::to_string(Faces).length(),"",true,false);
 	}
-	else
+	else// Implicit string construct with implicit Quantity = 1
 	{
 		Quantity = 1;
 		Faces = get_value(dice_str,"faces",dice_str.find("d",0) + 1,"",false,true);
