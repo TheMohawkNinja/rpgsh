@@ -1,5 +1,4 @@
 #include <cstring>
-#include "../headers/char.h"
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 #include "../headers/text.h"
@@ -43,7 +42,7 @@ void print_campaign_vars()
 {
 	confirmCampaignVarsFile();
 	std::map<std::string,std::string> vars;
-	std::string current_campaign = get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR);
+	std::string current_campaign = get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR);
 	std::string campaign_vars_file = campaigns_dir +
 					current_campaign +
 					".vars";

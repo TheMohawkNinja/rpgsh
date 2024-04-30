@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 class rpgsh_config
 {
 	// Configuration file definition:

@@ -4,7 +4,6 @@
 #include <spawn.h>
 #include <string.h>
 #include <sys/wait.h>
-#include "../headers/char.h"
 #include "../headers/config.h"
 #include "../headers/dice.h"
 #include "../headers/functions.h"
@@ -31,13 +30,16 @@ void confirmEnvVariablesFile()
 {
 	if(!std::filesystem::exists(rpgsh_env_variables_file.c_str()))
 	{
-		output(Info,"rpgsh environment variables file not found, creating file at \"%s\".",rpgsh_env_variables_file.c_str());
+		output(Info,"Environment variables file not found, creating file at \"%s\".",rpgsh_env_variables_file.c_str());
 		std::ofstream ofs(rpgsh_env_variables_file.c_str());
 		ofs.close();
 
 		//Set default values for built-in env variables
-		rpgsh_char c = rpgsh_char();
-		set_env_variable(CURRENT_CHAR_SHELL_VAR,c.Name());
+		Character c = Character(false);
+		rpgsh_config config = rpgsh_config();
+		c.setDatasource(templates_dir + config.setting[DEFAULT_GAME].c_str());
+		c.load();
+		set_env_variable(CURRENT_CHAR_SHELL_VAR,c.getName());
 		set_env_variable(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
 	}
 }
@@ -54,8 +56,10 @@ void confirmShellVarsFile()
 
 void confirmCampaignVarsFile()
 {
+	confirmEnvVariablesFile();
+
 	std::string campaign_vars_file = campaigns_dir +
-					get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR) +
+					get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR) +
 					".vars";
 	if(!std::filesystem::exists(campaign_vars_file.c_str()))
 	{
@@ -140,7 +144,7 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 			else if(args[i] == CAMPAIGN_SIGIL)
 			{
 				std::string campaign_vars_file = campaigns_dir +
-								get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR) +
+								get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR) +
 								".vars";
 				int sigil_pos = args.find(CAMPAIGN_SIGIL,params_start);
 				for(int j=i+1; j<args.length() && args.substr(j,1) != " "; j++)
@@ -399,118 +403,6 @@ void set_env_variable(std::string v,std::string value)
 	ofs.close();
 	std::filesystem::remove(rpgsh_env_variables_file.c_str());
 	std::filesystem::rename((rpgsh_env_variables_file+".bak").c_str(),rpgsh_env_variables_file.c_str());
-}
-
-std::string get_shell_var(std::string var)
-{
-	confirmShellVarsFile();
-
-	std::ifstream ifs(shell_vars_file.c_str());
-	while(!ifs.eof())
-	{
-		std::string data = "";
-		std::getline(ifs,data);
-
-		if(data.substr(0,data.find(DS)) == var)
-		{
-			return data.substr(data.find(DS)+DS.length(),
-				data.length()-(data.find(DS)+DS.length()));
-		}
-	}
-	ifs.close();
-	return "";
-}
-void set_shell_var(std::string var,std::string value)
-{
-	std::ifstream ifs(shell_vars_file.c_str());
-	std::filesystem::remove((shell_vars_file+".bak").c_str());
-	std::ofstream ofs((shell_vars_file+".bak").c_str());
-	bool ReplacedValue = false;
-
-	while(!ifs.eof())
-	{
-		std::string data = "";
-		std::getline(ifs,data);
-		if(data == "" || data == "\n")// Prevents writing blank lines back to file
-			continue;
-		if(data.substr(0,data.find(DS)) == var)
-		{
-			ofs<<var + DS + value + "\n";
-			ReplacedValue = true;
-		}
-		else
-		{
-			ofs<<data + "\n";
-		}
-	}
-
-	if(!ReplacedValue)
-	{
-		ofs<<var + DS + value + "\n";
-	}
-	ifs.close();
-	ofs.close();
-	std::filesystem::remove(shell_vars_file.c_str());
-	std::filesystem::rename((shell_vars_file+".bak").c_str(),shell_vars_file.c_str());
-}
-
-std::string get_campaign_var(std::string var)
-{
-	confirmCampaignVarsFile();
-
-	std::string campaign_vars_file = campaigns_dir +
-					get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR) +
-					".vars";
-	std::ifstream ifs(campaign_vars_file.c_str());
-	while(!ifs.eof())
-	{
-		std::string data = "";
-		std::getline(ifs,data);
-
-		if(data.substr(0,data.find(DS)) == var)
-		{
-			return data.substr(data.find(DS)+DS.length(),
-				data.length()-(data.find(DS)+DS.length()));
-		}
-	}
-	ifs.close();
-	return "";
-}
-void set_campaign_var(std::string var,std::string value)
-{
-	std::string campaign_vars_file = campaigns_dir +
-					get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR) +
-					".vars";
-	std::ifstream ifs(campaign_vars_file.c_str());
-	std::filesystem::remove((campaign_vars_file+".bak").c_str());
-	std::ofstream ofs((campaign_vars_file+".bak").c_str());
-	bool ReplacedValue = false;
-
-	while(!ifs.eof())
-	{
-		std::string data = "";
-		std::getline(ifs,data);
-		if(data == "" || data == "\n")// Prevents writing blank lines back to file
-			continue;
-		if(data.substr(0,data.find(DS)) == var)
-		{
-			ofs<<var + DS + value + "\n";
-			ReplacedValue = true;
-		}
-		else
-		{
-			ofs<<data + "\n";
-		}
-	}
-
-	if(!ReplacedValue)
-	{
-		ofs<<var + DS + value + "\n";
-	}
-	ifs.close();
-	ofs.close();
-	std::filesystem::remove(campaign_vars_file.c_str());
-	std::filesystem::rename((campaign_vars_file+".bak").c_str(),campaign_vars_file.c_str());
 }
 
 std::map<std::string,std::string> load_vars_from_file(std::string path)

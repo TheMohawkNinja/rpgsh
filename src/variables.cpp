@@ -1,5 +1,4 @@
 #include <cstring>
-#include "../headers/char.h"
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 #include "../headers/var.h"
@@ -93,10 +92,10 @@ void set_var(std::string var, Var old_value, Var new_value, char scope_sigil)
 			c.save();
 			break;
 		case CAMPAIGN_SIGIL:
-			set_campaign_var(var,std::string(new_value));
+			m.set<Var>(var,new_value);
 			break;
 		case SHELL_SIGIL:
-			set_shell_var(var,std::string(new_value));
+			s.set<Var>(var,new_value);
 			break;
 	}
 	if(old_value != new_value)

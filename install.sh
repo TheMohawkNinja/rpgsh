@@ -18,9 +18,6 @@ if [[ $EUID -eq 0 ]]; then
 	if [ ! -d "$lib_dir" ]; then echo -e "Creating lib directory at:\t$bold_white""$lib_dir$normal"; mkdir "$lib_dir"; fi
 
 	echo "Compiling shared library objects:"
-	echo -e "\tsrc/char.cpp\t\t->\t$bold_white$lib_dir""libchar.so"$normal
-	g++ -c -fPIC src/char.cpp -o "$lib_dir""char.o"
-	g++ -shared "$lib_dir""char.o" -o "$lib_dir""libchar.so"
 	echo -e "\tsrc/config.cpp\t\t->\t$bold_white$lib_dir""libconfig.so"$normal
 	g++ -c -fPIC src/config.cpp -o "$lib_dir""config.o"
 	g++ -shared "$lib_dir""config.o" -o "$lib_dir""libconfig.so"
@@ -55,21 +52,21 @@ if [[ $EUID -eq 0 ]]; then
 
 	echo "Compiling applications:"
 	echo -e "\tsrc/main.cpp\t\t->\t$bold_white""/bin/rpgsh"$normal
-	g++ src/main.cpp -L $lib_dir -ldefine -lscope -lvar -lchar -lfunctions -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh
+	g++ src/main.cpp -L $lib_dir -ldefine -lscope -lvar -lfunctions -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh
 	echo -e "\tsrc/setname.cpp\t\t->\t$bold_white""/bin/rpgsh-setname"$normal
-	g++ src/setname.cpp -L $lib_dir -ldefine -loutput -ldice -lcurrency -lconfig -lchar -lfunctions -lvar -lscope $fs $debug -o /bin/rpgsh-setname
+	g++ src/setname.cpp -L $lib_dir -ldefine -loutput -ldice -lcurrency -lconfig -lfunctions -lvar -lscope $fs $debug -o /bin/rpgsh-setname
 	echo -e "\tsrc/variables.cpp\t->\t$bold_white""/bin/rpgsh-variables"$normal
-	g++ src/variables.cpp -L $lib_dir -ldefine -lvar -lfunctions -loutput -lconfig -ldice -lcurrency -lchar -lscope $fs $debug -o /bin/rpgsh-variables
+	g++ src/variables.cpp -L $lib_dir -ldefine -lvar -lfunctions -loutput -lconfig -ldice -lcurrency -lscope $fs $debug -o /bin/rpgsh-variables
 	echo -e "\tsrc/version.cpp\t\t->\t$bold_white""/bin/rpgsh-version"$normal
-	g++ src/version.cpp -L $lib_dir -ldefine -lfunctions -lconfig -lcurrency -ldice -lvar -lchar -lscope -loutput $debug -o /bin/rpgsh-version
+	g++ src/version.cpp -L $lib_dir -ldefine -lfunctions -lconfig -lcurrency -ldice -lvar -lscope -loutput $debug -o /bin/rpgsh-version
 	echo -e "\tsrc/banner.cpp\t\t->\t$bold_white""/bin/rpgsh-banner"$normal
-	g++ src/banner.cpp -L $lib_dir -ldefine -lfunctions -lconfig -lcurrency -ldice -lvar -lchar -lscope -loutput $debug -o /bin/rpgsh-banner
+	g++ src/banner.cpp -L $lib_dir -ldefine -lfunctions -lconfig -lcurrency -ldice -lvar -lscope -loutput $debug -o /bin/rpgsh-banner
 	echo -e "\tsrc/roll.cpp\t\t->\t$bold_white""/bin/rpgsh-roll"$normal
-	g++ src/roll.cpp -L $lib_dir -ldefine -lchar -lcurrency -lconfig -lvar -lfunctions -ldice -loutput -lscope $fs $debug -o /bin/rpgsh-roll
+	g++ src/roll.cpp -L $lib_dir -ldefine -lcurrency -lconfig -lvar -lfunctions -ldice -loutput -lscope $fs $debug -o /bin/rpgsh-roll
 	echo -e "\tsrc/list.cpp\t\t->\t$bold_white""/bin/rpgsh-list"$normal
-	g++ src/list.cpp -L $lib_dir -ldefine -lconfig -lchar -ldice -lvar -lfunctions -loutput -lcurrency -lscope $debug -o /bin/rpgsh-list
+	g++ src/list.cpp -L $lib_dir -ldefine -lconfig -ldice -lvar -lfunctions -loutput -lcurrency -lscope $debug -o /bin/rpgsh-list
 	echo -e "\tsrc/help.cpp\t\t->\t$bold_white""/bin/rpgsh-help"$normal
-	g++ src/help.cpp -L $lib_dir -ldefine -lconfig -lchar -lcurrency -ldice -lvar -lfunctions -loutput -lscope $debug -o /bin/rpgsh-help
+	g++ src/help.cpp -L $lib_dir -ldefine -lconfig -lcurrency -ldice -lvar -lfunctions -loutput -lscope $debug -o /bin/rpgsh-help
 
 	echo "Done!"
 else

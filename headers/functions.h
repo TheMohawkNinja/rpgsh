@@ -31,12 +31,6 @@ void check_print_app_description(char** _argv, std::string description);
 std::string get_env_variable(std::string v);
 void set_env_variable(std::string v, std::string value);
 
-std::string get_shell_var(std::string var);
-void set_shell_var(std::string var,std::string value);
-
-std::string get_campaign_var(std::string var);
-void set_campaign_var(std::string var,std::string value);
-
 std::map<std::string,std::string> load_vars_from_file(std::string path);
 
 template <typename T>
@@ -109,10 +103,11 @@ datamap<T> load_obj_from_file(std::string path, char var_id)
 template <typename T>
 datamap<T> getDatamapFromAllScopes(char var_id)
 {
+	confirmEnvVariablesFile();
 	datamap<T> ret;
 
-	std::string character = get_shell_var(CURRENT_CHAR_SHELL_VAR);
-	std::string campaign = get_shell_var(CURRENT_CAMPAIGN_SHELL_VAR);
+	std::string character = get_env_variable(CURRENT_CHAR_SHELL_VAR);
+	std::string campaign = get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR);
 	std::string current_campaign_dir = campaigns_dir+campaign;
 	std::string current_campaign_file = current_campaign_dir+campaigns_dir+".vars";
 	std::string current_character_file = current_campaign_dir+"characters/"+character+".char";
