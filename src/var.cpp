@@ -288,7 +288,12 @@ Var Var::operator / (const int b)
 Var::Var(){}
 Var::Var(std::string _value)
 {
-	Value = _value;
+	if(_value.substr(0,2) == (std::string(VAR_SIGIL)+"{") && _value[_value.length()] == '}')// Explicit constructor
+		Value = _value.substr(2,_value.length()-3);
+	else if(_value.substr(0,2) == (std::string(VAR_SIGIL)+"{"))
+		output(Error,"Var explicit constructor missing terminating \'}\'."); exit(-1);
+	else
+		Value = _value;
 }
 Var::Var(int _value)
 {
