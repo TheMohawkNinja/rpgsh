@@ -290,9 +290,9 @@ Var::Var(){}
 Var::Var(std::string _value)
 {
 	std::string v(1,VAR_SIGIL);
-	if(_value.substr(0,2) == (v+"{") && _value[_value.length()-1] == '}')// Explicit constructor
+	if(_value.substr(0,2) == (v+"{") && _value.find("}") != std::string::npos)// Explicit constructor
 	{
-		Value = _value.substr(2,_value.length()-3);
+		Value = _value.substr(2,_value.find("}")-2);
 	}
 	else if(_value.substr(0,2) == (v+"{"))
 	{
