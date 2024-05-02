@@ -10,7 +10,7 @@
 
 #define MAX_BUFFER_SIZE 256
 
-rpgsh_config config = rpgsh_config();
+Config config = Config();
 Character c = Character(false);
 
 std::string input_handler()

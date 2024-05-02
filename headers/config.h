@@ -2,7 +2,7 @@
 
 #include <string>
 
-class rpgsh_config
+class Config
 {
 	// Configuration file definition:
 	//
@@ -17,5 +17,5 @@ class rpgsh_config
 	std::string get_config_value(std::string s);
 
 	public:
-	rpgsh_config();
+	Config();
 };

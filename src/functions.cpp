@@ -36,7 +36,7 @@ void confirmEnvVariablesFile()
 
 		//Set default values for built-in env variables
 		Character c = Character(false);
-		rpgsh_config config = rpgsh_config();
+		Config config = Config();
 		c.setDatasource(templates_dir + config.setting[DEFAULT_GAME].c_str());
 		c.load();
 		set_env_variable(CURRENT_CHAR_SHELL_VAR,c.getName());
@@ -86,7 +86,7 @@ void printBadOpAndThrow(std::string bad_op)
 
 void padding()
 {
-	rpgsh_config config = rpgsh_config();
+	Config config = Config();
 
 	//Pad output if set
 	try

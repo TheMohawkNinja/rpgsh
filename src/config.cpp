@@ -7,7 +7,7 @@
 #include "../headers/functions.h"
 #include "../headers/output.h"
 
-std::string rpgsh_config::get_config_item(std::string s)
+std::string Config::get_config_item(std::string s)
 {
 	if(s.find("=")!=std::string::npos)
 	{
@@ -19,7 +19,7 @@ std::string rpgsh_config::get_config_item(std::string s)
 		return default_value;
 	}
 }
-std::string rpgsh_config::get_config_value(std::string s)
+std::string Config::get_config_value(std::string s)
 {
 	if(s.find("=")!=std::string::npos)
 	{
@@ -48,7 +48,7 @@ std::string rpgsh_config::get_config_value(std::string s)
 	}
 }
 
-rpgsh_config::rpgsh_config()
+Config::Config()
 {
 	confirmShellVarsFile();
 
