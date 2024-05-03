@@ -116,8 +116,16 @@ Dice::Dice(std::string dice_str)
 	//
 	// Determine if we are working with an explicit constructor or an string
 	//
-	if(dice_str.substr(0,2) == "d{")// Explicit constructor
+
+	srd::string d(1,DICE_SIGIL);
+	if(dice_str.substr(0,2) == (d+"{"))// Explicit constructor
 	{
+		if(dice_str.find("}") == std::string::npos)
+		{
+			output(Error,"Dice explicit constructor missing terminating \'}\'.");
+			exit(-1);
+		}
+
 		// Get number of commas in explicit constructor
 		unsigned int commas = 0;
 		for(const auto& c : dice_str)
@@ -160,6 +168,11 @@ Dice::Dice(std::string dice_str)
 			output(Error,"Unable to parse dice Modifier from explicit constructor.");
 			exit(-1);
 		}
+	}
+	else if(islower(dice_str[0]) && dice_str[1] == '{')
+	{
+		output(Error,"Incorrect explicit constructor type sigil for dice.");
+		exit(-1);
 	}
 	else if(dice_str.substr(0,1) != "d")// Implicit string constructor with explicitly defined Quantity
 	{
