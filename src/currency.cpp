@@ -173,7 +173,7 @@ Currency::Currency(std::string str)
 	//Do we at least have the correct number of args?
 	if(commas != 4)
 	{
-		output(Error,"Invalid argument count in currency definition. There should be exactly five arguments for currency explicit constructor.");
+		output(Error,"Invalid argument count in currency explicit constructor. There should be exactly five arguments.");
 		exit(-1);
 	}
 
