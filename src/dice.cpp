@@ -122,7 +122,7 @@ Dice::Dice(std::string dice_str)
 	{
 		if(dice_str.find("}") == std::string::npos)
 		{
-			output(Error,"Dice explicit constructor missing terminating \'}\'.");
+			output(Error,"Missing terminating \'}\' from dice explicit constructor.");
 			exit(-1);
 		}
 
@@ -131,9 +131,14 @@ Dice::Dice(std::string dice_str)
 		for(const auto& c : dice_str)
 			if(c == ',') commas++;
 
-		if(commas != 2)
+		if(commas && commas != 2)
 		{
-			output(Error,"Dice explicit constructors should contain exactly 3 commas.");
+			output(Error,"Invalid argument count in dice explicit constructor. There should be exactly three arguments.");
+			exit(-1);
+		}
+		else if(!commas)//If no commas, assume list
+		{
+			//TODO Add list as property of dice
 			exit(-1);
 		}
 
@@ -171,7 +176,7 @@ Dice::Dice(std::string dice_str)
 	}
 	else if(islower(dice_str[0]) && dice_str[1] == '{')
 	{
-		output(Error,"Incorrect explicit constructor type sigil for dice.");
+		output(Error,"Incorrect data type specifier sigil for dice explicit constructor.");
 		exit(-1);
 	}
 	else if(dice_str.substr(0,1) != "d")// Implicit string constructor with explicitly defined Quantity
