@@ -136,7 +136,7 @@ Currency::Currency(){}
 Currency::Currency(std::string str)
 {
 	//FORMAT
-	//@c/MyCurrency = {CurrencySystem,Name,SmallerAmount,Smaller,Larger}
+	//@c/MyCurrency = c{CurrencySystem,Name,SmallerAmount,Smaller,Larger}
 
 	datamap<CurrencySystem> currencysystems = getDatamapFromAllScopes<CurrencySystem>(CURRENCYSYSTEM_SIGIL);
 	std::string fullstr = str;
@@ -149,9 +149,10 @@ Currency::Currency(std::string str)
 			commas++;
 	}
 
-	if(commas != 4)
+	//Make sure start of explicit constructor is formatted correctly
+	if(str[1] != '{')
 	{
-		output(Error,"Too many arguments in currency definition.");
+		output(Error,"Missing or misplaced starting \'{\' in currency explicit constructor");
 		exit(-1);
 	}
 
@@ -162,10 +163,17 @@ Currency::Currency(std::string str)
 		exit(-1);
 	}
 
-	//Check for start of definition structure
-	if(str[1] != '{')
+	//Check for end of explicit constructor definition
+	if(str.find("}") == std::string::npos)
 	{
-		output(Error,"Expected starting \'{\' at beginning of currency definition.");
+		output(Error,"Currency explicit constructor missing terminating \'}\'.");
+		exit(-1);
+	}
+
+	//Do we at least have the correct number of args?
+	if(commas != 4)
+	{
+		output(Error,"Invalid argument count in currency definition. There should be exactly five arguments for currency explicit constructor.");
 		exit(-1);
 	}
 
