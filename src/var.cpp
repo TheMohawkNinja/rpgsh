@@ -299,6 +299,11 @@ Var::Var(std::string _value)
 		output(Error,"Var explicit constructor missing terminating \'}\'.");
 		exit(-1);
 	}
+	else if(islower(_value[0]) && _value[1] == '{')
+	{
+		output(Error,"Incorrect explicit constructor type sigil for var.");
+		exit(-1);
+	}
 	else
 	{
 		Value = _value;
