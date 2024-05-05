@@ -287,34 +287,34 @@ Var Var::operator / (const int b)
 }
 
 Var::Var(){}
-Var::Var(std::string _value)
+Var::Var(std::string str)
 {
 	std::string v(1,VAR_SIGIL);
 
 	//If second character isn't a '{', this isn't an explicit constructor, so just treat it as a normal value
-	if(_value[1] != '{')
+	if(str[1] != '{')
 	{
-		Value = _value;
+		Value = str;
 		exit(-1);
 	}
 
 	//Make sure first character is 'c'
-	if(_value[0] != VAR_SIGIL)
+	if(str[0] != VAR_SIGIL)
 	{
 		output(Error,"Incorrect data type specifier sigil for var explicit constructor.");
 		exit(-1);
 	}
 
 	//Check for end of explicit constructor definition
-	if(_value.find("}") == std::string::npos)
+	if(str.find("}") == std::string::npos)
 	{
 		output(Error,"Missing terminating \'}\' for var explicit constructor.");
 		exit(-1);
 	}
 
-	if(_value.substr(0,2) == (v+"{") && _value.find("}") != std::string::npos)// Explicit constructor
+	if(str.substr(0,2) == (v+"{") && str.find("}") != std::string::npos)// Explicit constructor
 	{
-		Value = _value.substr(2,_value.find("}")-2);
+		Value = str.substr(2,str.find("}")-2);
 	}
 }
 Var::Var(int _value)
