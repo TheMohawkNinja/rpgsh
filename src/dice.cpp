@@ -117,7 +117,7 @@ Dice::Dice(std::string dice_str)
 	// Determine if we are working with an explicit constructor or an string
 	//
 
-	srd::string d(1,DICE_SIGIL);
+	std::string d(1,DICE_SIGIL);
 	if(dice_str.substr(0,2) == (d+"{"))// Explicit constructor
 	{
 		if(dice_str.find("}") == std::string::npos)
