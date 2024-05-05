@@ -254,7 +254,33 @@ std::map<std::string, Currency>::const_iterator CurrencySystem::end() const
 CurrencySystem::CurrencySystem(){}
 CurrencySystem::CurrencySystem(std::string str)
 {
-	Name = str;
+	std::string s(1,CURRENCYSYSTEM_SIGIL);
+
+	//If second character isn't a '{', this isn't an explicit constructor, so just treat it as a normal value
+	if(str[1] != '{')
+	{
+		Name = str;
+		exit(-1);
+	}
+
+	//Make sure first character is 's'
+	if(str[0] != CURRENCYSYSTEM_SIGIL)
+	{
+		output(Error,"Incorrect data type specifier sigil for currency system explicit constructor.");
+		exit(-1);
+	}
+
+	//Check for end of explicit constructor definition
+	if(str.find("}") == std::string::npos)
+	{
+		output(Error,"Missing terminating \'}\' for currency system explicit constructor.");
+		exit(-1);
+	}
+
+	if(str.substr(0,2) == (s+"{") && str.find("}") != std::string::npos)// Explicit constructor
+	{
+		Name = str.substr(2,str.find("}")-2);
+	}
 }
 
 bool Wallet::HasEffectivelyAtLeast(int q, Currency c)
