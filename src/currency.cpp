@@ -365,7 +365,7 @@ Wallet::Wallet(const money_t m)
 Wallet::Wallet(std::string str)
 {
 	//FORMAT
-	//@w/MyWallet = {<currency_1> <quantity_1>,<currency_2> <quantity_2>,...,<currency_n> <quantity_n>}
+	//@w/MyWallet = w{currency_1,quantity_1,currency_2,quantity_2,...,currency_n,quantity_n}
 
 	datamap<Currency> currencies = getDatamapFromAllScopes<Currency>(WALLET_SIGIL);
 
@@ -374,22 +374,31 @@ Wallet::Wallet(std::string str)
 	for(auto& [k,v] : currencies)
 		currencynames[k] = v.Name;
 
-	if(str[0] != '{')
+	if(str[1] != '{')
 	{
-		output(Error,"Expected starting \'{\' at beginning of wallet definition.");
+		output(Error,"Expected starting \'{\' at beginning of wallet explicit constructor.");
 		exit(-1);
 	}
 
-	str = str.substr(1,str.length()-1);
+	if(str[0] != WALLET_SIGIL)
+	{
+		output(Error,"Incorrect data type specifier sigil for wallet explicit constructor.");
+		exit(-1);
+	}
+
+	str = str.substr(2,str.length()-2);
 
 	//Get currency amounts
 	while(true)
 	{
-		std::string cur_str = str.substr(0,str.find(" "));
-		char delimiter = ',';
+		//Go from beginning to second ','
+		std::string delimiter = ",";
+		int d_pos = str.find(delimiter);
+		std::string cur_str = str.substr(0,d_pos);
 
-		if(str.find(",") == std::string::npos)
-			delimiter = '}';
+		//If we're at the end of the constructor
+		if(d_pos == std::string::npos)
+			delimiter = "}";
 
 		if(str.find(delimiter) == std::string::npos)
 		{
@@ -397,17 +406,23 @@ Wallet::Wallet(std::string str)
 			exit(-1);
 		}
 
-		std::string quant_str = str.substr(str.find(" ")+1,
-						   str.find(delimiter)-(str.find(" ")+1));
+		std::string quant_str = str.substr(d_pos+1,str.find(delimiter,d_pos+1));
 
 		try
 		{
+			//TODO: Parse currency name and check that it starts with a scope sigil
 			Money[currencynames[cur_str]] += std::stoi(quant_str);
 		}
 		catch(...)
 		{
 			output(Error,"Unable to add the currency \"%s\" in the quantity \"%s\" to the wallet.",cur_str.c_str(),quant_str.c_str());
 		}
+
+		//Remove what we just worked on
+		if(delimiter != "}")
+			str = str.substr(str.find(delimiter,d_pos+1)+1,str.length()-str.find(delimiter,d_pos+1));
+		else
+			break;
 	}
 }
 
