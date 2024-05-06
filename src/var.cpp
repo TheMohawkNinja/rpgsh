@@ -295,7 +295,7 @@ Var::Var(std::string str)
 	if(str[1] != '{')
 	{
 		Value = str;
-		exit(-1);
+		return;
 	}
 
 	//Make sure first character is 'c'
