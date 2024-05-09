@@ -308,7 +308,6 @@ Character::Character(std::string path)
 
 std::string Character::getCurrentCharacterFilePath()
 {
-	confirmEnvVariablesFile();
 	std::string character = get_env_variable(CURRENT_CHAR_SHELL_VAR);
 	std::string campaign = get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR);
 	std::string current_campaign_dir = campaigns_dir+campaign;

@@ -215,9 +215,6 @@ int prompt()
 }
 int main()
 {
-	//Create vars files if they doesn't exist
-	confirmEnvVariablesFile();
-
 	//Generate default character if needed
 	if(!c.confirmDatasource())
 	{

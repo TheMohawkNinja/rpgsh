@@ -56,8 +56,6 @@ void confirmShellVarsFile()
 
 void confirmCampaignVarsFile()
 {
-	confirmEnvVariablesFile();
-
 	std::string campaign_vars_file = campaigns_dir +
 					get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR) +
 					".vars";
@@ -373,6 +371,8 @@ std::string get_env_variable(std::string v)
 }
 void set_env_variable(std::string v,std::string value)
 {
+	confirmEnvVariablesFile();
+
 	std::ifstream ifs(rpgsh_env_variables_file.c_str());
 	std::filesystem::remove((rpgsh_env_variables_file+".bak").c_str());
 	std::ofstream ofs((rpgsh_env_variables_file+".bak").c_str());
