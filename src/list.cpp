@@ -53,7 +53,6 @@ void print_campaign_vars()
 }
 void print_shell_vars()
 {
-	confirmShellVarsFile();
 	Shell s = Shell();
 	s.load();
 	std::string sigil(1,SHELL_SIGIL);

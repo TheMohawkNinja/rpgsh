@@ -217,17 +217,17 @@ int main()
 {
 	//Create vars files if they doesn't exist
 	confirmEnvVariablesFile();
-	confirmShellVarsFile();
 
 	//Generate default character if needed
 	if(!c.confirmDatasource())
 	{
+		fprintf(stdout,"Loading default character\n");
 		c.setDatasource(templates_dir + config.setting[DEFAULT_GAME].c_str());
 		c.load();
 		c.setDatasource(c.getCurrentCharacterFilePath());
 		c.save();
 	}
-
+	fprintf(stdout,"Loading current character\n");
 	c.load();
 
 	run_rpgsh_prog((char*)"banner",false);

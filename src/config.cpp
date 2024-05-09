@@ -50,8 +50,6 @@ std::string Config::get_config_value(std::string s)
 
 Config::Config()
 {
-	confirmShellVarsFile();
-
 	// Set defaults
 	setting[PADDING]	=	"true";
 	setting[DEFAULT_GAME]	=	"dnd5e";

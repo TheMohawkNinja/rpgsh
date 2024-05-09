@@ -348,5 +348,6 @@ Campaign::Campaign(std::string path)
 
 Shell::Shell()
 {
+	confirmShellVarsFile();
 	datasource = shell_vars_file;
 }
