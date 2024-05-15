@@ -1,6 +1,7 @@
 #include <cstdarg>
 #include <fcntl.h>
 #include <map>
+#include <regex>
 #include <spawn.h>
 #include <string.h>
 #include <sys/wait.h>
@@ -104,6 +105,8 @@ void padding()
 void run_rpgsh_prog(std::string args, bool redirect_output)
 {
 	Character c = Character(false);
+	Campaign m = Campaign();
+	Shell s = Shell();
 
 	std::vector<std::string> vars;
 	extern char** environ;
@@ -116,151 +119,52 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 		args = "variables " + args;
 	}
 
-	int params_start = args.find(" ", args.find(" ")+1);
 	std::string path = "/bin/";
+	std::regex arg_pattern("[\\@\\#\\$\\/a-zA-Z0-9\\=\\+\\-\\*]{1,}");
 
-	if(params_start != std::string::npos)
+	std::sregex_iterator args_it(args.begin(), args.end(), arg_pattern);
+	std::sregex_iterator args_end;
+
+	//Replaces all instances of variables with their respective value
+	//Except for the first arg if it is a variable
+	vars.push_back(path+prefix+args_it->str());
+	args_it++;
+	while (args_it != args_end)
 	{
-		//Replaces all instances of variables with their respective value
-		//Except for the first arg if it is a variable
-		//TODO if the regex lib is ever properly fully-implemented, replace this shit with regex like God intended
-		for(int i=params_start+1; i<args.length(); i++)
+		std::string arg = args_it->str();
+
+		switch(args_it->str()[0])
 		{
-			params_start = args.find(" ", args.find(" ")+1);
-			std::string var = "";
-			if(args[i] == CHAR_SIGIL)
+			case CHAR_SIGIL:
 			{
-				int find_percent = args.find(CHAR_SIGIL,params_start);
-				for(int j=i+1; j<args.length() && args.substr(j,1) != " "; j++)
-				{
-					var+=args.substr(j,1);
-				}
-				int new_args_start = find_percent + var.length() + 1;
-				args = args.substr(0,find_percent)+c.getStr<Var>(var).c_str()+ //TODO check for type sigil
-				       args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
+				arg = std::regex_replace(arg,
+							 std::regex(args_it->str()),
+							 c.getStr<Var>(args_it->str()));
+				vars.push_back(arg);
+				args_it++;
+				continue;
 			}
-			else if(args[i] == CAMPAIGN_SIGIL)
+			case CAMPAIGN_SIGIL:
 			{
-				std::string campaign_vars_file = campaigns_dir +
-								get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR) +
-								".vars";
-				int sigil_pos = args.find(CAMPAIGN_SIGIL,params_start);
-				for(int j=i+1; j<args.length() && args.substr(j,1) != " "; j++)
-				{
-					var+=args.substr(j,1);
-				}
-
-				std::ifstream ifs(campaign_vars_file.c_str());
-				while(!ifs.eof())
-				{
-					std::string old;
-					std::string data = "";
-					std::getline(ifs,data);
-
-					if(data.substr(0,data.find(DS)) == var)
-					{
-						int new_args_start = sigil_pos + var.length() + 1;
-						old = data.substr(data.find(DS)+DS.length(),
-								  data.length()-(data.find(DS)+DS.length()));
-
-						if(old.find(" ") != std::string::npos)
-						{
-							old = "\"" + old + "\"";
-						}
-
-						args = args.substr(0,sigil_pos)+
-						       old+
-						       args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
-						break;
-					}
-				}
-				ifs.close();
+				arg = std::regex_replace(arg,
+							 std::regex(args_it->str()),
+							 m.getStr<Var>(args_it->str()));
+				vars.push_back(arg);
+				args_it++;
+				continue;
 			}
-			else if(args[i] == SHELL_SIGIL)
+			case SHELL_SIGIL:
 			{
-				int sigil_pos = args.find(SHELL_SIGIL,params_start);
-				for(int j=i+1; j<args.length() && args.substr(j,1) != " "; j++)
-				{
-					var+=args.substr(j,1);
-				}
-
-				std::ifstream ifs(shell_vars_file.c_str());
-				while(!ifs.eof())
-				{
-					std::string old;
-					std::string data = "";
-					std::getline(ifs,data);
-
-					if(data.substr(0,data.find(DS)) == var)
-					{
-						int new_args_start = sigil_pos + var.length() + 1;
-						old = data.substr(data.find(DS)+DS.length(),
-								  data.length()-(data.find(DS)+DS.length()));
-
-						if(old.find(" ") != std::string::npos)
-						{
-							old = "\"" + old + "\"";
-						}
-
-						args = args.substr(0,sigil_pos)+
-						       old+
-						       args.substr(new_args_start,args.length()-(args.substr(0,new_args_start).length()));
-						break;
-					}
-				}
-				ifs.close();
+				arg = std::regex_replace(arg,
+							 std::regex(args_it->str()),
+							 s.getStr<Var>(args_it->str()));
+				vars.push_back(arg);
+				args_it++;
+				continue;
 			}
 		}
-	}
-	if(args.find(" ") != std::string::npos)
-	{
-		vars.push_back(path+prefix+args.substr(0,args.find(" ")));
-		args = args.substr(args.find(" ")+1,(args.length() - args.find(" ")+1));
-
-		for(int i=0; i<args.length(); i++)
-		{
-			if(args.substr(i,1) == "\"")//Combine args wrapped in quotes
-			{
-				if(args.find("\"",i+1) == std::string::npos)
-				{
-					output(Error,"Unmatched quote in argument list.");
-					return;
-				}
-				vars.push_back(args.substr(i+1,(args.find("\"",i+1)-i-1)));
-				i += vars[vars.size()-1].length()+1;
-			}
-			else
-			{
-				if(args.find(" ",i) != std::string::npos)
-				{
-					std::string var = args.substr(i,args.find(" ",i)-i);
-					bool var_is_valid = false;
-					for(int c_i=0; c_i<var.length(); c_i++)//Make sure we're not just grabbing extraneous whitespace
-					{
-						std::string c = var.substr(c_i,1);
-						if(c != " " && c != "")
-						{
-							var_is_valid = true;
-						}
-					}
-
-					if(var_is_valid)
-					{
-						vars.push_back(args.substr(i,args.find(" ",i)-i));
-						i+=vars[vars.size()-1].length();
-					}
-				}
-				else
-				{
-					vars.push_back(args.substr(i,args.length()-i));
-					break;
-				}
-			}
-		}
-	}
-	else//If only one arg is called
-	{
-		vars.push_back(path+prefix+args);
+		vars.push_back(arg);
+		args_it++;
 	}
 
 	//Convert vector to char*[]
