@@ -19,28 +19,28 @@ if [[ $EUID -eq 0 ]]; then
 
 	echo "Compiling shared library objects:"
 	echo -e "\tsrc/config.cpp\t\t->\t$bold_white$lib_dir""libconfig.so"$normal
-	g++ -c -fPIC src/config.cpp -o "$lib_dir""config.o"
+	g++ $debug -c -fPIC src/config.cpp -o "$lib_dir""config.o"
 	g++ -shared "$lib_dir""config.o" -o "$lib_dir""libconfig.so"
 	echo -e "\tsrc/currency.cpp\t->\t$bold_white$lib_dir""libcurrency.so"$normal
-	g++ -c -fPIC src/currency.cpp -o "$lib_dir""currency.o"
+	g++ $debug -c -fPIC src/currency.cpp -o "$lib_dir""currency.o"
 	g++ -shared "$lib_dir""currency.o" -o "$lib_dir""libcurrency.so"
 	echo -e "\tsrc/dice.cpp\t\t->\t$bold_white$lib_dir""libdice.so"$normal
-	g++ -c -fPIC src/dice.cpp -o "$lib_dir""dice.o"
+	g++ $debug -c -fPIC src/dice.cpp -o "$lib_dir""dice.o"
 	g++ -shared "$lib_dir""dice.o" -o "$lib_dir""libdice.so"
 	echo -e "\tsrc/define.cpp\t\t->\t$bold_white$lib_dir""libdefine.so"$normal
-	g++ -c -fPIC src/define.cpp -o "$lib_dir""define.o"
+	g++ $debug -c -fPIC src/define.cpp -o "$lib_dir""define.o"
 	g++ -shared "$lib_dir""define.o" -o "$lib_dir""libdefine.so"
 	echo -e "\tsrc/functions.cpp\t->\t$bold_white$lib_dir""libfunctions.so"$normal
-	g++ --std=c++20 -c -fPIC src/functions.cpp -o "$lib_dir""functions.o"
+	g++ $debug --std=c++20 -c -fPIC src/functions.cpp -o "$lib_dir""functions.o"
 	g++ -shared "$lib_dir""functions.o" -o "$lib_dir""libfunctions.so"
 	echo -e "\tsrc/output.cpp\t\t->\t$bold_white$lib_dir""liboutput.so"$normal
-	g++ -c -fPIC src/output.cpp -o "$lib_dir""output.o"
+	g++ $debug -c -fPIC src/output.cpp -o "$lib_dir""output.o"
 	g++ -shared "$lib_dir""output.o" -o "$lib_dir""liboutput.so"
 	echo -e "\tsrc/scope.cpp\t\t->\t$bold_white$lib_dir""libscope.so"$normal
-	g++ -c -fPIC src/scope.cpp -o "$lib_dir""scope.o"
+	g++ $debug -c -fPIC src/scope.cpp -o "$lib_dir""scope.o"
 	g++ -shared "$lib_dir""scope.o" -o "$lib_dir""libscope.so"
 	echo -e "\tsrc/var.cpp\t\t->\t$bold_white$lib_dir""libvar.so"$normal
-	g++ -c -fPIC src/var.cpp -o "$lib_dir""var.o"
+	g++ $debug -c -fPIC src/var.cpp -o "$lib_dir""var.o"
 	g++ -shared "$lib_dir""var.o" -o "$lib_dir""libvar.so"
 
 	echo
