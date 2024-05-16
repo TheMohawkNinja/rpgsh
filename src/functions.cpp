@@ -102,11 +102,20 @@ void padding()
 	}
 }
 
+std::string replaceVariableWithValue(std::string arg, Scope scope, std::sregex_iterator i)
+{
+	arg = arg.substr(arg.find("/"),arg.length()-arg.find("/"));
+	return std::regex_replace(arg,std::regex(arg),scope.getStr<Var>(arg));
+}
 void run_rpgsh_prog(std::string args, bool redirect_output)
 {
 	Character c = Character(false);
 	Campaign m = Campaign();
 	Shell s = Shell();
+
+	c.load();
+	m.load();
+	s.load();
 
 	std::vector<std::string> vars;
 	extern char** environ;
@@ -120,7 +129,7 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 	}
 
 	std::string path = "/bin/";
-	std::regex arg_pattern("[\\@\\#\\$\\/a-zA-Z0-9\\=\\+\\-\\*]{1,}");
+	std::regex arg_pattern("[\\@\\#\\$\\/a-zA-Z0-9\\=\\+\\-\\*\\.\\_\\\"]{1,}");
 
 	std::sregex_iterator args_it(args.begin(), args.end(), arg_pattern);
 	std::sregex_iterator args_end;
@@ -129,7 +138,14 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 	//Except for the first arg if it is a variable
 	vars.push_back(path+prefix+args_it->str());
 	args_it++;
-	while (args_it != args_end)
+
+	if(args.substr(0,9) == "variables")
+	{
+		vars.push_back(args_it->str());
+		args_it++;
+	}
+
+	while(args_it != args_end)
 	{
 		std::string arg = args_it->str();
 
@@ -137,27 +153,21 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 		{
 			case CHAR_SIGIL:
 			{
-				arg = std::regex_replace(arg,
-							 std::regex(args_it->str()),
-							 c.getStr<Var>(args_it->str()));
+				arg = replaceVariableWithValue(arg,c,args_it);
 				vars.push_back(arg);
 				args_it++;
 				continue;
 			}
 			case CAMPAIGN_SIGIL:
 			{
-				arg = std::regex_replace(arg,
-							 std::regex(args_it->str()),
-							 m.getStr<Var>(args_it->str()));
+				arg = replaceVariableWithValue(arg,m,args_it);
 				vars.push_back(arg);
 				args_it++;
 				continue;
 			}
 			case SHELL_SIGIL:
 			{
-				arg = std::regex_replace(arg,
-							 std::regex(args_it->str()),
-							 s.getStr<Var>(args_it->str()));
+				arg = replaceVariableWithValue(arg,s,args_it);
 				vars.push_back(arg);
 				args_it++;
 				continue;
@@ -167,12 +177,48 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 		args_it++;
 	}
 
+	//Combine args wrapped in quotes
+	for(int i=0; i<vars.size(); i++)
+	{
+		if(vars[i].find("\"") != std::string::npos &&
+		   vars[i].find("\"",vars[i].find("\"")+1) != std::string::npos)//Quote-wrapped arg doesn't contain a space
+		{
+			vars[i] = vars[i].substr(vars[i].find("\""),
+						(vars[i].find("\"",vars[i].find("\"")+1)+1)-vars[i].find("\""));
+		}
+		else if(vars[i].find("\"") != std::string::npos)//Quote-wrapped arg with space
+		{
+			if(i == vars.size())
+			{
+				output(Error,"Missing terminating quotation mark.");
+				exit(-1);
+			}
+
+			vars[i] = vars[i].substr(vars[i].find("\""),
+						 vars[i].length()-vars[i].find("\""));
+
+			for(int j=i+1; j<vars.size(); j++)
+			{
+				if(vars[j].find("\"") != std::string::npos)
+				{
+					vars[i] += " " + vars[j].substr(0,vars[j].find("\"")+1);
+					vars.erase(vars.begin()+j);
+					break;
+				}
+				else
+				{
+					vars[i] += " " + vars[j];
+					vars.erase(vars.begin()+j);
+					j--;
+				}
+			}
+		}
+	}
+
 	//Convert vector to char*[]
 	char* argv[vars.size()+1];
 	for(int i=0; i<vars.size(); i++)
-	{
 		argv[i] = (char*)vars[i].c_str();
-	}
 
 	//Add a NULL because posix_spawn() needs that for some reason
 	argv[vars.size()] = NULL;
