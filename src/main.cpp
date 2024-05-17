@@ -223,7 +223,6 @@ int main()
 		c.setDatasource(c.getCurrentCharacterFilePath());
 		c.save();
 	}
-	c.load();
 
 	run_rpgsh_prog((char*)"banner",false);
 	run_rpgsh_prog((char*)"version",false);

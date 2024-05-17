@@ -49,9 +49,18 @@ bool Scope::confirmDatasource()
 //Load all data in from file
 void Scope::load()
 {
+	//Start from a clean slate
+	currencies.clear();
+	currencysystems.clear();
+	dice.clear();
+	vars.clear();
+	wallets.clear();
+
+	//Open file
 	std::ifstream ifs = tryCreateFileStream<std::ifstream>(datasource);
 	int linenum = 0;
 
+	//Load in the data
 	while(!ifs.eof())
 	{
 		linenum++;
@@ -298,12 +307,13 @@ void Scope::setDatamap<Wallet>(datamap<Wallet> map)
 Character::Character(bool backup)
 {
 	datasource = getCurrentCharacterFilePath();
-
 	if(backup) datasource += ".bak";
+	load();
 }
 Character::Character(std::string path)
 {
 	datasource = path;
+	load();
 }
 
 std::string Character::getCurrentCharacterFilePath()
@@ -335,10 +345,12 @@ void Character::setDatasource(std::string path)
 Campaign::Campaign()
 {
 	datasource = campaigns_dir + get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR) + ".vars";
+	load();
 }
 Campaign::Campaign(std::string path)
 {
 	datasource = path;
+	load();
 }
 
 //			//
@@ -349,4 +361,5 @@ Shell::Shell()
 {
 	confirmShellVarsFile();
 	datasource = shell_vars_file;
+	load();
 }

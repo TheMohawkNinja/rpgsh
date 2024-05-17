@@ -36,10 +36,8 @@ void confirmEnvVariablesFile()
 		ofs.close();
 
 		//Set default values for built-in env variables
-		Character c = Character(false);
 		Config config = Config();
-		c.setDatasource(templates_dir + config.setting[DEFAULT_GAME].c_str());
-		c.load();
+		Character c = Character(templates_dir + config.setting[DEFAULT_GAME].c_str());
 		set_env_variable(CURRENT_CHAR_SHELL_VAR,c.getName());
 		set_env_variable(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
 	}
@@ -112,10 +110,6 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 	Character c = Character(false);
 	Campaign m = Campaign();
 	Shell s = Shell();
-
-	c.load();
-	m.load();
-	s.load();
 
 	std::vector<std::string> vars;
 	extern char** environ;

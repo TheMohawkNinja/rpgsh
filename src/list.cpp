@@ -36,7 +36,6 @@ void print_map(T m, char scope_sigil)
 void print_player_attrs()
 {
 	Character c = Character(false);
-	c.load();
 	std::string sigil(1,CHARACTER_SIGIL);
 	print_header("("+sigil+") "+c.getStr<Var>(c.getStr<Var>(std::string(CHAR_NAME_ATTR))));
 	print_map<datamap<Var>>(c.getDatamap<Var>(),CHARACTER_SIGIL);
@@ -45,7 +44,6 @@ void print_campaign_vars()
 {
 	confirmCampaignVarsFile();
 	Campaign m = Campaign();
-	m.load();
 	std::string sigil(1,CAMPAIGN_SIGIL);
 	std::string m_name = get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR);
 	print_header("("+sigil+") "+m_name.substr(0,m_name.length()-1));// Omit trailing '/'
@@ -54,7 +52,6 @@ void print_campaign_vars()
 void print_shell_vars()
 {
 	Shell s = Shell();
-	s.load();
 	std::string sigil(1,SHELL_SIGIL);
 	print_header("("+sigil+") "+"Shell");
 	print_map<datamap<Var>>(s.getDatamap<Var>(),SHELL_SIGIL);
