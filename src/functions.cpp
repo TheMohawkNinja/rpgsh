@@ -175,23 +175,17 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 			case CHARACTER_SIGIL:
 			{
 				arg = replaceVariableWithValue(arg,c,args_it);
-				vars.push_back(arg);
-				args_it++;
-				continue;
+				break;
 			}
 			case CAMPAIGN_SIGIL:
 			{
 				arg = replaceVariableWithValue(arg,m,args_it);
-				vars.push_back(arg);
-				args_it++;
-				continue;
+				break;
 			}
 			case SHELL_SIGIL:
 			{
 				arg = replaceVariableWithValue(arg,s,args_it);
-				vars.push_back(arg);
-				args_it++;
-				continue;
+				break;
 			}
 		}
 		vars.push_back(arg);
