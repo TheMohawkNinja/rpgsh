@@ -77,13 +77,13 @@ void set_var(std::string var, Var old_value, Var new_value, char scope_sigil)
 			exit(-1);
 	}
 
+	std::string subvar = var.substr(var.find("/"),var.length()-var.find("/"));
 	bool old_is_int = is_int(old_value.Value);
 	bool new_is_int = is_int(new_value.Value);
-
-	if(old_is_int && !new_is_int)
-		output(Warning,"%s \"%s\" is changing from an integer to a string.",var_type.c_str(),var.c_str());
-	else if(!old_is_int && new_is_int)
-		output(Warning,"%s \"%s\" is changing from a string to an integer.",var_type.c_str(),var.c_str());
+	if(old_is_int && !new_is_int && new_value.Value != "")
+		output(Warning,"%s \"%s\" is changing from an integer to a string.",var_type.c_str(),subvar.c_str());
+	else if(!old_is_int && new_is_int && old_value.Value != "")
+		output(Warning,"%s \"%s\" is changing from a string to an integer.",var_type.c_str(),subvar.c_str());
 
 	switch(scope_sigil)
 	{
@@ -93,13 +93,15 @@ void set_var(std::string var, Var old_value, Var new_value, char scope_sigil)
 			break;
 		case CAMPAIGN_SIGIL:
 			m.set<Var>(var,new_value);
+			m.save();
 			break;
 		case SHELL_SIGIL:
 			s.set<Var>(var,new_value);
+			s.save();
 			break;
 	}
 	if(old_value != new_value)
-		output(Info,"%s \"%s\" has been changed from \"%s\" to \"%s\".",var_type.c_str(),var.substr(1,var.length()-1).c_str(),old_value.c_str(),new_value.c_str());
+		output(Info,"%s \"%s\" has been changed from \"%s\" to \"%s\".",var_type.c_str(),subvar.c_str(),old_value.c_str(),new_value.c_str());
 }
 
 int main(int argc, char** argv)
