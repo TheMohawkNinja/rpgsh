@@ -74,19 +74,19 @@ int main(int argc, char** argv)
 		fprintf(stdout,"\n");
 		print_player_attrs();
 	}
-	else if(!strcmp(argv[1],"--character"))
+	else if(!strcmp(argv[1],"-c") || !strcmp(argv[1],"--character"))
 	{
 		print_player_attrs();
 	}
-	else if(!strcmp(argv[1],"--campaign"))
+	else if(!strcmp(argv[1],"-m") || !strcmp(argv[1],"--campaign"))
 	{
 		print_campaign_vars();
 	}
-	else if(!strcmp(argv[1],"--shell"))
+	else if(!strcmp(argv[1],"-s") || !strcmp(argv[1],"--shell"))
 	{
 		print_shell_vars();
 	}
-	else if(!strcmp(argv[1],"--help") || !strcmp(argv[1],"-?"))
+	else if(!strcmp(argv[1],"-?") || !strcmp(argv[1],"--help"))
 	{
 		fprintf(stdout,"Prints all variables contained in one or all Scopes\n\n");
 		fprintf(stdout,"USAGE:\n");
