@@ -123,8 +123,8 @@ std::string replaceVariableWithValue(std::string arg, Scope scope, std::sregex_i
 			replace_str = scope.getStr<Wallet>(key);
 			break;
 		default:
-			output(Warning,"Unknown type specifier \'%c\' in \"%s\"",arg[1],arg.c_str());
-			break;
+			output(Error,"Unknown type specifier \'%c\' in \"%s\"",arg[1],arg.c_str());
+			return "";
 	}
 
 	return std::regex_replace(key,std::regex(key),replace_str);
@@ -170,7 +170,7 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 	{
 		std::string arg = args_it->str();
 
-		switch(args_it->str()[0])
+		switch(arg[0])
 		{
 			case CHARACTER_SIGIL:
 			{
@@ -188,6 +188,16 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 				break;
 			}
 		}
+
+		//Don't try to run a program if the data type sigil was invalid
+		if(arg == "")
+		{
+			if(!redirect_output)
+				padding();
+
+			return;
+		}
+
 		vars.push_back(arg);
 		args_it++;
 	}
