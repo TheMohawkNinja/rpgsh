@@ -77,7 +77,7 @@ void set_var(std::string var, Var old_value, Var new_value, char scope_sigil)
 			exit(-1);
 	}
 
-	std::string subvar = var.substr(var.find("/"),var.length()-var.find("/"));
+	std::string subvar = var.substr(var.find("/")+1,var.length()-(var.find("/")+1));
 	bool old_is_int = is_int(old_value.Value);
 	bool new_is_int = is_int(new_value.Value);
 	if(old_is_int && !new_is_int && new_value.Value != "")
