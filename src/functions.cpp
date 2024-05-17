@@ -102,8 +102,37 @@ void padding()
 
 std::string replaceVariableWithValue(std::string arg, Scope scope, std::sregex_iterator i)
 {
-	arg = arg.substr(arg.find("/"),arg.length()-arg.find("/"));
-	return std::regex_replace(arg,std::regex(arg),scope.getStr<Var>(arg));
+	std::string replace_str = "";
+	switch(arg[1])
+	{
+		case CURRENCY_SIGIL:
+			arg = arg.substr(arg.find("/"),arg.length()-arg.find("/"));
+			replace_str = scope.getStr<Currency>(arg);
+			break;
+		case CURRENCYSYSTEM_SIGIL:
+			arg = arg.substr(arg.find("/"),arg.length()-arg.find("/"));
+			replace_str = scope.getStr<CurrencySystem>(arg);
+			break;
+		case DICE_SIGIL:
+			arg = arg.substr(arg.find("/"),arg.length()-arg.find("/"));
+			replace_str = scope.getStr<Dice>(arg);
+			break;
+		case VAR_SIGIL:
+		case '/':
+			arg = arg.substr(arg.find("/"),arg.length()-arg.find("/"));
+			replace_str = scope.getStr<Var>(arg);
+			break;
+		case WALLET_SIGIL:
+			arg = arg.substr(arg.find("/"),arg.length()-arg.find("/"));
+			replace_str = scope.getStr<Wallet>(arg);
+			break;
+		default:
+			output(Warning,"Unknown type specifier \'%c\' in \"%s\"",arg[1],arg.c_str());
+			arg = arg.substr(arg.find("/"),arg.length()-arg.find("/"));
+			break;
+	}
+
+	return std::regex_replace(arg,std::regex(arg),replace_str);
 }
 void run_rpgsh_prog(std::string args, bool redirect_output)
 {
@@ -114,6 +143,9 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 	std::vector<std::string> vars;
 	extern char** environ;
 	pid_t pid;
+
+	if(!redirect_output)
+		padding();
 
 	if(args[0] == CHARACTER_SIGIL ||
 	args[0] == CAMPAIGN_SIGIL ||
@@ -216,9 +248,6 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 
 	//Add a NULL because posix_spawn() needs that for some reason
 	argv[vars.size()] = NULL;
-
-	if(!redirect_output)
-		padding();
 
 	int status = 0;
 	posix_spawn_file_actions_t fa;
