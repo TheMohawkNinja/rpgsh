@@ -103,36 +103,31 @@ void padding()
 std::string replaceVariableWithValue(std::string arg, Scope scope, std::sregex_iterator i)
 {
 	std::string replace_str = "";
+	std::string key = arg.substr(arg.find("/"),arg.length()-arg.find("/"));
 	switch(arg[1])
 	{
 		case CURRENCY_SIGIL:
-			arg = arg.substr(arg.find("/"),arg.length()-arg.find("/"));
-			replace_str = scope.getStr<Currency>(arg);
+			replace_str = scope.getStr<Currency>(key);
 			break;
 		case CURRENCYSYSTEM_SIGIL:
-			arg = arg.substr(arg.find("/"),arg.length()-arg.find("/"));
-			replace_str = scope.getStr<CurrencySystem>(arg);
+			replace_str = scope.getStr<CurrencySystem>(key);
 			break;
 		case DICE_SIGIL:
-			arg = arg.substr(arg.find("/"),arg.length()-arg.find("/"));
-			replace_str = scope.getStr<Dice>(arg);
+			replace_str = scope.getStr<Dice>(key);
 			break;
 		case VAR_SIGIL:
 		case '/':
-			arg = arg.substr(arg.find("/"),arg.length()-arg.find("/"));
-			replace_str = scope.getStr<Var>(arg);
+			replace_str = scope.getStr<Var>(key);
 			break;
 		case WALLET_SIGIL:
-			arg = arg.substr(arg.find("/"),arg.length()-arg.find("/"));
-			replace_str = scope.getStr<Wallet>(arg);
+			replace_str = scope.getStr<Wallet>(key);
 			break;
 		default:
 			output(Warning,"Unknown type specifier \'%c\' in \"%s\"",arg[1],arg.c_str());
-			arg = arg.substr(arg.find("/"),arg.length()-arg.find("/"));
 			break;
 	}
 
-	return std::regex_replace(arg,std::regex(arg),replace_str);
+	return std::regex_replace(key,std::regex(key),replace_str);
 }
 void run_rpgsh_prog(std::string args, bool redirect_output)
 {
