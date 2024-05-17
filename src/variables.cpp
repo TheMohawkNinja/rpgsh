@@ -63,7 +63,7 @@ void set_var(std::string var, Var old_value, Var new_value, char scope_sigil)
 
 	switch(scope_sigil)
 	{
-		case CHAR_SIGIL:
+		case CHARACTER_SIGIL:
 			var_type = "Character attribute";
 			break;
 		case CAMPAIGN_SIGIL:
@@ -87,7 +87,7 @@ void set_var(std::string var, Var old_value, Var new_value, char scope_sigil)
 
 	switch(scope_sigil)
 	{
-		case CHAR_SIGIL:
+		case CHARACTER_SIGIL:
 			c.set<Var>(var,new_value);
 			c.save();
 			break;
@@ -121,7 +121,7 @@ int main(int argc, char** argv)
 
 	switch(argv[1][0])// Get Scope sigil
 	{
-		case CHAR_SIGIL:
+		case CHARACTER_SIGIL:
 			load_scope(&c,var,&map,&old_value);
 			break;
 		case CAMPAIGN_SIGIL:

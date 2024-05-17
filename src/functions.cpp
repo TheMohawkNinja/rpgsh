@@ -121,7 +121,7 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 	extern char** environ;
 	pid_t pid;
 
-	if(args[0] == CHAR_SIGIL ||
+	if(args[0] == CHARACTER_SIGIL ||
 	args[0] == CAMPAIGN_SIGIL ||
 	args[0] == SHELL_SIGIL) //Check if user is operating on a variable
 	{
@@ -151,7 +151,7 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 
 		switch(args_it->str()[0])
 		{
-			case CHAR_SIGIL:
+			case CHARACTER_SIGIL:
 			{
 				arg = replaceVariableWithValue(arg,c,args_it);
 				vars.push_back(arg);

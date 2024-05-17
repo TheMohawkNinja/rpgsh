@@ -14,7 +14,7 @@
 //Variable character Scope sigils
 #define SHELL_SIGIL			'$'
 #define CAMPAIGN_SIGIL			'#'
-#define CHAR_SIGIL			'@'
+#define CHARACTER_SIGIL			'@'
 
 //Variable character type sigils
 #define CURRENCY_SIGIL			'c'

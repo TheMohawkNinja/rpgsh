@@ -37,9 +37,9 @@ void print_player_attrs()
 {
 	Character c = Character(false);
 	c.load();
-	std::string sigil(1,CHAR_SIGIL);
+	std::string sigil(1,CHARACTER_SIGIL);
 	print_header("("+sigil+") "+c.getStr<Var>(c.getStr<Var>(std::string(CHAR_NAME_ATTR))));
-	print_map<datamap<Var>>(c.getDatamap<Var>(),CHAR_SIGIL);
+	print_map<datamap<Var>>(c.getDatamap<Var>(),CHARACTER_SIGIL);
 }
 void print_campaign_vars()
 {
