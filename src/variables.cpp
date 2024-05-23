@@ -1,4 +1,5 @@
-#include <cstring>
+#include "../headers/currency.h"
+#include "../headers/dice.h"
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 #include "../headers/var.h"
@@ -7,103 +8,37 @@ Character c = Character(false);
 Campaign m = Campaign();
 Shell s = Shell();
 
-void load_scope(Scope* p_scope, std::string key, std::map<std::string,std::string>* p_map, Var* p_old_value)
+template<typename T>
+void check_key(Scope scope, std::string key)
 {
-	p_scope->load();
-	switch (key[key.length()-1])
+	for(const auto& [k,v] : scope.getDatamap<T>())
 	{
-		case '/':
-		(*p_old_value) = p_scope->getStr<Var>(key.substr(0,key.length()-1));
-		break;
-
-		default:
-		(*p_old_value) = p_scope->getStr<Var>(key);
-		break;
+		if(k == key)
+		{
+			fprintf(stdout,"%s\n",scope.getStr<T>(key).c_str());
+			exit(0);
+		}
 	}
-
-	// Convert character sheet to std::map<std::string,std::string>
-	// TODO Will need to add currency, currency system, and wallet
-	for(const auto& [k,v] : p_scope->getDatamap<Currency>())
-		(*p_map)[k] = std::string(v);
-	for(const auto& [k,v] : p_scope->getDatamap<CurrencySystem>())
-		(*p_map)[k] = std::string(v);
-	for(const auto& [k,v] : p_scope->getDatamap<Dice>())
-		(*p_map)[k] = std::string(v);
-	for(const auto& [k,v] : p_scope->getDatamap<Var>())
-		(*p_map)[k] = std::string(v);
-	for(const auto& [k,v] : p_scope->getDatamap<Wallet>())
-		(*p_map)[k] = std::string(v);
 }
-bool is_operator(std::string str)
+template<typename T>
+void get_map(Scope scope, std::map<std::string,std::string>* p_map)
 {
-	return (str == "="  ||
-	   	str == "+"  || str == "-"  || str == "*"  || str == "/"  ||
-	  	str == "+=" || str == "-=" || str == "*=" || str == "/=" ||
-	  	str == "++" || str == "--");
+	for(const auto& [k,v] : scope.getDatamap<T>())
+		(*p_map)[k] = scope.getStr<T>(k);
 }
-bool is_int(std::string str)
+void append_output(std::map<std::string,std::string> map, std::string key, std::string* output)
 {
-	try{std::stoi(str);}
-	catch(...){return false;}
-
-	return true;
-}
-bool is_type_sigil(char sigil)
-{
-	return (sigil == CURRENCY_SIGIL ||
-		sigil == DICE_SIGIL ||
-		sigil == CURRENCYSYSTEM_SIGIL ||
-		sigil == VAR_SIGIL ||
-		sigil == WALLET_SIGIL ||
-		sigil == '/'); // '/' Assumes var type
-}
-void set_var(std::string var, Var old_value, Var new_value, char scope_sigil)
-{
-	std::string var_type;
-
-	switch(scope_sigil)
+	for(const auto& [k,v] : map)
 	{
-		case CHARACTER_SIGIL:
-			var_type = "Character attribute";
-			break;
-		case CAMPAIGN_SIGIL:
-			var_type = "Campaign variable";
-			break;
-		case SHELL_SIGIL:
-			var_type = "Shell variable";
-			break;
-		default:
-			output(Error,"Unknown Scope sigil \'%c\'.",scope_sigil);
-			exit(-1);
-	}
+		// Get root variable if it exists
+		if(("/"+k.substr(0,key.length()-1)+"/") == key)
+			output->append(k + DS + v + DS);
 
-	std::string subvar = var.substr(var.find("/")+1,var.length()-(var.find("/")+1));
-	bool old_is_int = is_int(old_value.Value);
-	bool new_is_int = is_int(new_value.Value);
-	if(old_is_int && !new_is_int && new_value.Value != "")
-		output(Warning,"%s \"%s\" is changing from an integer to a string.",var_type.c_str(),subvar.c_str());
-	else if(!old_is_int && new_is_int && old_value.Value != "")
-		output(Warning,"%s \"%s\" is changing from a string to an integer.",var_type.c_str(),subvar.c_str());
-
-	switch(scope_sigil)
-	{
-		case CHARACTER_SIGIL:
-			c.set<Var>(var,new_value);
-			c.save();
-			break;
-		case CAMPAIGN_SIGIL:
-			m.set<Var>(var,new_value);
-			m.save();
-			break;
-		case SHELL_SIGIL:
-			s.set<Var>(var,new_value);
-			s.save();
-			break;
+		// Get all subkeys
+		if("/"+k.substr(0,key.length()-1) == key)
+			output->append(k + DS + v + DS);
 	}
-	if(old_value != new_value)
-		output(Info,"%s \"%s\" has been changed from \"%s\" to \"%s\".",var_type.c_str(),subvar.c_str(),old_value.c_str(),new_value.c_str());
 }
-
 int main(int argc, char** argv)
 {
 	check_print_app_description(argv,"Not meant for direct call by user. Implicitly called when modifying variables.");
@@ -114,77 +49,130 @@ int main(int argc, char** argv)
 		exit(-1);
 	}
 
-	std::map<std::string,std::string> map;
-	std::string path;
-	std::string var = std::string(argv[1]).substr(1,std::string(argv[1]).length()-1);
-	Var old_value;
+	std::string arg(argv[1]);
+	std::string key = arg.substr(arg.find("/"),arg.length()-(arg.find("/")));
+	Scope scope;
 
-	switch(argv[1][0])// Get Scope sigil
+	// Check scope sigil
+	switch(argv[1][0])
 	{
 		case CHARACTER_SIGIL:
-			load_scope(&c,var,&map,&old_value);
+			scope = c;
 			break;
 		case CAMPAIGN_SIGIL:
-			load_scope(&m,var,&map,&old_value);
+			scope = m;
 			break;
 		case SHELL_SIGIL:
-			load_scope(&s,var,&map,&old_value);
+			scope = s;
 			break;
 		default:
-			output(Error,"Unknown Scope sigil \'%c\'.",argv[1][0]);
+			output(Error,"Unknown scope sigil \'%c\'.",argv[1][0]);
 			exit(-1);
 	}
 
-	if(argc == 2)// Print value if all the user enters is a variable
+	if(argc == 2)// If the user just submits a variable...
 	{
 		unsigned int space = 0;
-		std::string var(argv[1]);
 
-		if(var[var.length()-1] != '/')// If last character isn't a '/', just print value
-			fprintf(stdout,"%s\n",old_value.c_str());
-		else// Print the value and everything downstream of it
+		if(key[key.length()-1] != '/')// ...and the last character isn't a '/', just print value
 		{
-			for(const auto& [k,v] : map)
+			switch(argv[1][1])
 			{
-				if(k.substr(0,var.length()-1) == var.substr(1,var.length()-1) && k.length() > space)
-					space = k.length();
+				case CURRENCY_SIGIL:
+					fprintf(stdout,"%s\n",scope.getStr<Currency>(key).c_str());
+					exit(0);
+				case CURRENCYSYSTEM_SIGIL:
+					fprintf(stdout,"%s\n",scope.getStr<CurrencySystem>(key).c_str());
+					exit(0);
+				case DICE_SIGIL:
+					fprintf(stdout,"%s\n",scope.getStr<Dice>(key).c_str());
+					exit(0);
+				case VAR_SIGIL:
+					fprintf(stdout,"%s\n",scope.getStr<Var>(key).c_str());
+					exit(0);
+				case WALLET_SIGIL:
+					fprintf(stdout,"%s\n",scope.getStr<Wallet>(key).c_str());
+					exit(0);
+				case '/':
+					// If a type specifier is not specified, check for match.
+					// Specifically, check in order of what is most to least likely
+					check_key<Var>(scope,key);
+					check_key<Dice>(scope,key);
+					check_key<Wallet>(scope,key);
+					check_key<Currency>(scope,key);
+					check_key<CurrencySystem>(scope,key);
+
+					// If we get here, there was no match, so just output nothing and exit like we would for any other non-existent variable
+					exit(0);
+				default:
+					output(Error,"Unknown type specifier \'%c\' in \"%s\"",arg[1],arg.c_str());
+					exit(-1);
 			}
-			if(old_value.Value != "")// Print parent value if exists
+		}
+		else// ...and the last character is a '/', print a list of keys and constructors
+		{
+			int space = 0;
+			std::map<std::string,std::string> c_map;
+			std::map<std::string,std::string> cs_map;
+			std::map<std::string,std::string> d_map;
+			std::map<std::string,std::string> v_map;
+			std::map<std::string,std::string> w_map;
+
+			// When printing entire containers, treat type sigil as a filter
+			switch(arg[1])
 			{
-				fprintf(stdout,"%c%s",argv[1][0],var.substr(1,var.length()-2).c_str());
-				for(int i=var.length()-2; i<space+5; i++)
-					fprintf(stdout," ");
-				fprintf(stdout,"%s\n",old_value.c_str());
+				case CURRENCY_SIGIL:
+					get_map<Currency>(scope,&c_map);
+					break;
+				case CURRENCYSYSTEM_SIGIL:
+					get_map<CurrencySystem>(scope,&cs_map);
+					break;
+				case DICE_SIGIL:
+					get_map<Dice>(scope,&d_map);
+					break;
+				case VAR_SIGIL:
+					get_map<Var>(scope,&v_map);
+					break;
+				case WALLET_SIGIL:
+					get_map<Wallet>(scope,&w_map);
+					break;
+				case '/':
+					get_map<Currency>(scope,&c_map);
+					get_map<CurrencySystem>(scope,&cs_map);
+					get_map<Dice>(scope,&d_map);
+					get_map<Var>(scope,&v_map);
+					get_map<Wallet>(scope,&w_map);
+					break;
+				default:
+					output(Error,"Unknown type specifier \'%c\' in \"%s\"",arg[1],arg.c_str());
+					exit(-1);
 			}
-			for(const auto& [k,v] : map)
-			{
-				try
-				{
-					if(k.substr(0,var.length()-1) == var.substr(1,var.length()-1) &&
-					k != var.substr(1,var.length()-1 && v != ""))//TODO start of var.substr may need to change from 1 to 2 for Scope sigil
-					{
-						fprintf(stdout,"%c%s",argv[1][0],k.c_str());
-						for(int i=k.length(); i<space+5; i++)
-							fprintf(stdout," ");
-						fprintf(stdout,"%s\n",v.c_str());
-					}
-				}
-				catch(...){}
-			}
+
+			// Create output string from map
+			std::string output = "";
+			append_output(c_map,key,&output);
+			append_output(cs_map,key,&output);
+			append_output(d_map,key,&output);
+			append_output(v_map,key,&output);
+			append_output(w_map,key,&output);
+
+			// Cut off the extraneous DS
+			output = output.substr(0,output.length()-DS.length());
+			fprintf(stdout,"%s\n",output.c_str());
 		}
 	}
 	else if(argc == 3)// Unary operators
 	{
-		if(is_operator(std::string(argv[2])))
+		/*if(is_operator(std::string(argv[2])))
 		{
 			if(std::string(argv[2]) == "++")
 			{
-				set_var(var,old_value,old_value+1,argv[1][0]);
+				set_variable(key,old_value,old_value+1,argv[1][0]);
 				return 0;
 			}
 			else if(std::string(argv[2]) == "--")
 			{
-				set_var(var,old_value,old_value-1,argv[1][0]);
+				set_variable(key,old_value,old_value-1,argv[1][0]);
 				return 0;
 			}
 			else
@@ -197,11 +185,11 @@ int main(int argc, char** argv)
 		{
 			output(Error,"Expected operator before \'%s\'.",argv[argc-1]);
 			exit(-1);
-		}
+		}*/
 	}
 	else// Binary operators
 	{
-		Var new_value = std::string(argv[3]);
+		/*Var new_value = std::string(argv[3]);
 		for(int i=4; i<argc; i++)
 		{
 			if(i%2 == 1 && is_operator(argv[i]))
@@ -243,34 +231,34 @@ int main(int argc, char** argv)
 
 		if(!strcmp(argv[2],"="))
 		{
-			set_var(var,old_value,new_value,argv[1][0]);
+			set_variable(key,old_value,new_value,argv[1][0]);
 			return 0;
 		}
 		else if(!strcmp(argv[2],"+="))
 		{
-			set_var(var,old_value,std::string(old_value+new_value),argv[1][0]);
+			set_variable(key,old_value,std::string(old_value+new_value),argv[1][0]);
 			return 0;
 		}
 		else if(!strcmp(argv[2],"-="))
 		{
-			set_var(var,old_value,std::string(old_value-new_value),argv[1][0]);
+			set_variable(key,old_value,std::string(old_value-new_value),argv[1][0]);
 			return 0;
 		}
 		else if(!strcmp(argv[2],"*="))
 		{
-			set_var(var,old_value,std::string(old_value*new_value),argv[1][0]);
+			set_variable(key,old_value,std::string(old_value*new_value),argv[1][0]);
 			return 0;
 		}
 		else if(!strcmp(argv[2],"/="))
 		{
-			set_var(var,old_value,std::string(old_value/new_value),argv[1][0]);
+			set_variable(key,old_value,std::string(old_value/new_value),argv[1][0]);
 			return 0;
 		}
 		else
 		{
 			output(Error,"Invalid operator \'%s\'.",argv[2]);
 			exit(-1);
-		}
+		}*/
 	}
 	return 0;
 }
