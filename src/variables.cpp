@@ -13,8 +13,9 @@ void check_key(Scope scope, std::string key)
 {
 	for(const auto& [k,v] : scope.getDatamap<T>())
 	{
-		if(k == key)
+		if(("/"+k.substr(0,key.length()-1)) == key)
 		{
+			key = key.substr(1,key.length()-1);
 			fprintf(stdout,"%s\n",scope.getStr<T>(key).c_str());
 			exit(0);
 		}
@@ -79,18 +80,23 @@ int main(int argc, char** argv)
 			switch(argv[1][1])
 			{
 				case CURRENCY_SIGIL:
+					key = key.substr(1,key.length()-1);
 					fprintf(stdout,"%s\n",scope.getStr<Currency>(key).c_str());
 					exit(0);
 				case CURRENCYSYSTEM_SIGIL:
+					key = key.substr(1,key.length()-1);
 					fprintf(stdout,"%s\n",scope.getStr<CurrencySystem>(key).c_str());
 					exit(0);
 				case DICE_SIGIL:
+					key = key.substr(1,key.length()-1);
 					fprintf(stdout,"%s\n",scope.getStr<Dice>(key).c_str());
 					exit(0);
 				case VAR_SIGIL:
+					key = key.substr(1,key.length()-1);
 					fprintf(stdout,"%s\n",scope.getStr<Var>(key).c_str());
 					exit(0);
 				case WALLET_SIGIL:
+					key = key.substr(1,key.length()-1);
 					fprintf(stdout,"%s\n",scope.getStr<Wallet>(key).c_str());
 					exit(0);
 				case '/':
