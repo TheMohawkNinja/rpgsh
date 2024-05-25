@@ -33,6 +33,7 @@ class Scope
 
 		//Load/save data
 		void load();
+		void load(std::string path);
 		void save();
 
 		//Get single variable

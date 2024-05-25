@@ -135,6 +135,11 @@ void Scope::load()
 	}
 	ifs.close();
 }
+void Scope::load(std::string path)
+{
+	datasource = path;
+	load();
+}
 //Save file formatting
 std::string Scope::formatLine(char type, std::string k, std::string v)
 {
