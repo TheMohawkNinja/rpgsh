@@ -10,6 +10,8 @@
 
 bool stob(std::string s);
 
+int stringcasecmp(std::string a, std::string b);
+
 void confirmEnvVariablesFile();
 
 void confirmShellVarsFile();
