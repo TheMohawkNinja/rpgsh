@@ -4,19 +4,19 @@
 #include <regex>
 #include <spawn.h>
 #include <string.h>
+#include <strings.h>
 #include <sys/wait.h>
 #include "../headers/config.h"
-#include "../headers/dice.h"
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 
 bool stob(std::string s)
 {
-	if(!strcasecmp(s.c_str(),"true"))
+	if(!stringcasecmp(s,"true"))
 	{
 		return true;
 	}
-	else if(!strcasecmp(s.c_str(),"false"))
+	else if(!stringcasecmp(s,"false"))
 	{
 		return false;
 	}
@@ -25,6 +25,11 @@ bool stob(std::string s)
 		throw std::invalid_argument("Parameter for stob() was not \'true\' or \'false\'.");
 		return false;
 	}
+}
+
+int stringcasecmp(std::string a, std::string b)
+{
+	return strcasecmp(a.c_str(),b.c_str());
 }
 
 void confirmEnvVariablesFile()

@@ -33,7 +33,7 @@ void Currency::tryParseCurrencySystem(datamap<CurrencySystem> currencysystems, s
 
 	for(const auto& [k,v] : currencysystems)
 	{
-		if(!strcasecmp(v.Name.c_str(),cs_match.c_str()))
+		if(!stringcasecmp(v.Name,cs_match))
 		{
 			//Can't just call function with &v for some reason
 			CurrencySystem cs = v;
