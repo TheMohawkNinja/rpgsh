@@ -138,7 +138,7 @@ Dice::Dice(std::string dice_str)
 		}
 		else if(!commas)//If no commas, assume list
 		{
-			//TODO Add list as property of dice
+			List = dice_str.substr(2,dice_str.length()-3);
 			exit(-1);
 		}
 
@@ -371,7 +371,7 @@ void Dice::roll()
 		}
 		fs.close();
 	}
-	else if(is_list)
+	else if(is_list)//TODO Reimplement with list member variable
 	{
 		std::string list_line = "";
 		std::string list_path = "";

@@ -24,6 +24,7 @@ class Dice
 		unsigned int	Quantity	=	0;
 		unsigned int	Faces		=	0;
 			 int	Modifier	=	0;
+		std::string	List		=	"";
 
 		operator std::string() const;
 
