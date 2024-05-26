@@ -398,7 +398,7 @@ std::string Character::getCurrentCharacterFilePath()
 //Get character name
 std::string Character::getName()
 {
-	return getStr<Var>(getStr<Var>(std::string(CHAR_NAME_ATTR)));
+	return getProperty<Var>(getProperty<Var>(std::string(CHAR_NAME_ATTR),"Value"),"Value");
 }
 
 //Set datasource to save, mainly to ensure new characters don't save back to template file

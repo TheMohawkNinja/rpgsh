@@ -107,7 +107,13 @@ int Dice::get_value(std::string d, std::string value, int start, std::string ter
 
 Dice::operator std::string() const
 {
-	return (std::to_string(Quantity)+"d"+std::to_string(Faces));
+	if(List == "")
+		return std::string(1,DICE_SIGIL)+"{"+
+		       std::to_string(Quantity)+","+
+		       std::to_string(Faces)+","+
+		       std::to_string(Modifier)+"}";
+	else
+		return std::string(1,DICE_SIGIL)+"{"+List+"}";
 }
 
 Dice::Dice(){}

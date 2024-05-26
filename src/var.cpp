@@ -4,7 +4,7 @@
 
 Var::operator std::string() const
 {
-	return Value;
+	return std::string(1,VAR_SIGIL)+"{"+Value+"}";
 }
 Var::operator int() const
 {

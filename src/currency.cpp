@@ -207,20 +207,18 @@ Currency::Currency(CurrencySystem* _CS, std::string _Name, int _SmallerAmount, s
 Currency::operator std::string() const
 {
 	if(System)
-	{
-		return "{" + System->Name + "," +
-			     Name + "," +
-			     std::to_string(SmallerAmount) + "," +
-			     Smaller + "," +
-			     Larger + "}";
-	}
+		return std::string(1,CURRENCY_SIGIL)+"{"+
+		       System->Name+","+
+		       Name+","+
+		       std::to_string(SmallerAmount)+","+
+		       Smaller+","+
+		       Larger+"}";
 	else
-	{
-		return "{" + Name + "," +
-			     std::to_string(SmallerAmount) + "," +
-			     Smaller + "," +
-			     Larger + "}";
-	}
+		return std::string(1,CURRENCY_SIGIL)+"{"+
+		       Name+","+
+		       std::to_string(SmallerAmount)+","+
+		       Smaller+","+
+		       Larger+"}";
 }
 bool Currency::operator == (const Currency& b) const
 {
@@ -233,7 +231,7 @@ bool Currency::operator == (const Currency& b) const
 //TODO Currency < operator
 CurrencySystem::operator std::string() const
 {
-	return Name;
+	return std::string(1,CURRENCYSYSTEM_SIGIL)+"{"+Name+"}";
 }
 Currency& CurrencySystem::operator [] (const std::string b)
 {
@@ -674,7 +672,7 @@ Wallet::operator std::string() const
 {
 	//@w/MyWallet = {<currency_1> <quantity_1>,<currency_2> <quantity_2>,...,<currency_n> <quantity_n>}
 
-	std::string ret = "{";
+	std::string ret = std::string(1,WALLET_SIGIL)+"{";
 	for(const auto& [k,v] : Money)
 		ret += k.Name + " " + std::to_string(v) + ",";
 
