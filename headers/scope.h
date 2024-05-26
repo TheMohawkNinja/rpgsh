@@ -44,6 +44,10 @@ class Scope
 		template <typename T>
 		std::string getStr(std::string key);
 
+		//Get property from a variable
+		template <typename T>
+		std::string getProperty(std::string key, std::string property);
+
 		//Get all variables of a specific datatype
 		template <typename T>
 		datamap<T> getDatamap();

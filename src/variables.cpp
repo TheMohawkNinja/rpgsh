@@ -9,14 +9,40 @@ Campaign m = Campaign();
 Shell s = Shell();
 
 template<typename T>
+void print_requested_data(Scope scope, std::string key)
+{
+	//Directly evaulating the methods doesn't work for some reason, so we have to use interim variables, weird...
+	int period = key.find(".");
+	int slash = key.rfind("/");
+	if(period < slash)//If any periods are before the last '/', print the explicit constructor
+	{
+		key = key.substr(1,key.length()-1);
+		fprintf(stdout,"%s\n",scope.getStr<T>(key).c_str());
+	}
+	else//Otherwise, print the requested property
+	{
+		std::string property = key.substr(key.rfind(".")+1,
+						  key.length()-(key.rfind(".")+1));
+		key = key.substr(1,key.rfind(".")-1);
+		fprintf(stdout,"%s\n",scope.getProperty<T>(key,property).c_str());
+	}
+}
+template<typename T>
 void check_key(Scope scope, std::string key)
 {
+	int period = key.find(".");
+	int slash = key.rfind("/");
 	for(const auto& [k,v] : scope.getDatamap<T>())
 	{
-		if(("/"+k.substr(0,key.length()-1)) == key)
+		std::string chk_str = "";
+		if(period < slash)
+			chk_str = key.substr(1,key.length()-1);
+		else
+			chk_str = key.substr(1,key.rfind(".")-1);
+
+		if(chk_str == k)
 		{
-			key = key.substr(1,key.length()-1);
-			fprintf(stdout,"%s\n",scope.getStr<T>(key).c_str());
+			print_requested_data<T>(scope,key);
 			exit(0);
 		}
 	}
@@ -74,6 +100,7 @@ std::string load_external_reference(std::string arg, Scope* p_scope)
 	      arg.substr(arg.find(']')+1,arg.length()-(arg.find(']')+1));
 	return arg;
 }
+
 int main(int argc, char** argv)
 {
 	check_print_app_description(argv,"Not meant for direct call by user. Implicitly called when modifying variables.");
@@ -118,24 +145,19 @@ int main(int argc, char** argv)
 			switch(arg[1])
 			{
 				case CURRENCY_SIGIL:
-					key = key.substr(1,key.length()-1);
-					fprintf(stdout,"%s\n",scope.getStr<Currency>(key).c_str());
+					print_requested_data<Currency>(scope,key);
 					exit(0);
 				case CURRENCYSYSTEM_SIGIL:
-					key = key.substr(1,key.length()-1);
-					fprintf(stdout,"%s\n",scope.getStr<CurrencySystem>(key).c_str());
+					print_requested_data<CurrencySystem>(scope,key);
 					exit(0);
 				case DICE_SIGIL:
-					key = key.substr(1,key.length()-1);
-					fprintf(stdout,"%s\n",scope.getStr<Dice>(key).c_str());
+					print_requested_data<Dice>(scope,key);
 					exit(0);
 				case VAR_SIGIL:
-					key = key.substr(1,key.length()-1);
-					fprintf(stdout,"%s\n",scope.getStr<Var>(key).c_str());
+					print_requested_data<Var>(scope,key);
 					exit(0);
 				case WALLET_SIGIL:
-					key = key.substr(1,key.length()-1);
-					fprintf(stdout,"%s\n",scope.getStr<Wallet>(key).c_str());
+					print_requested_data<Wallet>(scope,key);
 					exit(0);
 				case '/':
 					//If a type specifier is not specified, check for match.

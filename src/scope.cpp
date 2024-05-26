@@ -224,6 +224,70 @@ std::string Scope::getStr<Wallet>(std::string key)
 	return std::string(Scope::get<Wallet>(key));
 }
 
+//Get property from a variable
+template<>
+std::string Scope::getProperty<Currency>(std::string key, std::string property)
+{
+	if(!stringcasecmp(property,"CurrencySystem"))
+		return currencies[key].System->Name;
+	else if(!stringcasecmp(property,"Name"))
+		return currencies[key].Name;
+	else if(!stringcasecmp(property,"SmallerAmount"))
+		return std::to_string(currencies[key].SmallerAmount);
+	else if(!stringcasecmp(property,"Smaller"))
+		return currencies[key].Smaller;
+	else if(!stringcasecmp(property,"Larger"))
+		return currencies[key].Larger;
+
+	output(Error,"\"%s\" is not a valid currency property.",property.c_str());
+	exit(-1);
+}
+template<>
+std::string Scope::getProperty<CurrencySystem>(std::string key, std::string property)
+{
+	if(!stringcasecmp(property,"Name"))
+		return currencysystems[key].Name;
+
+	output(Error,"\"%s\" is not a valid currency system property.",property.c_str());
+	exit(-1);
+}
+template<>
+std::string Scope::getProperty<Dice>(std::string key, std::string property)
+{
+	if(!stringcasecmp(property,"Quantity"))
+		return std::to_string(dice[key].Quantity);
+	else if(!stringcasecmp(property,"Faces"))
+		return std::to_string(dice[key].Faces);
+	else if(!stringcasecmp(property,"Modifier"))
+		return std::to_string(dice[key].Modifier);
+	else if(!stringcasecmp(property,"List"))
+		return dice[key].List;
+
+	output(Error,"\"%s\" is not a valid dice property.",property.c_str());
+	exit(-1);
+}
+template<>
+std::string Scope::getProperty<Var>(std::string key, std::string property)
+{
+	if(!stringcasecmp(property,"Value"))
+		return vars[key].Value;
+
+	output(Error,"\"%s\" is not a valid var property.",property.c_str());
+	exit(-1);
+}
+template<>
+std::string Scope::getProperty<Wallet>(std::string key, std::string property)
+{
+	for(const auto& [currency,quantity] : wallets[key])
+	{
+		if(!stringcasecmp(property,currency.Name))
+			return std::to_string(quantity);
+	}
+
+	output(Error,"Currency \"%s\" not found in \"%s\".",property.c_str(),key.c_str());
+	exit(-1);
+}
+
 //Get all variables of a specific datatype
 template<>
 datamap<Currency> Scope::getDatamap<Currency>()
