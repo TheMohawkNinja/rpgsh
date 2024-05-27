@@ -31,6 +31,7 @@
 //Setting names
 #define PADDING				"padding"
 #define DEFAULT_GAME			"default_game"
+#define HIDE_TIPS			"hide_tips"
 
 //Universal flags
 #define FLAG_APPDESCRIPTION		"--appdescription"

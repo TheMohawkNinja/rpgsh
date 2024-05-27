@@ -53,6 +53,7 @@ Config::Config()
 	// Set defaults
 	setting[PADDING]	=	"true";
 	setting[DEFAULT_GAME]	=	"dnd5e";
+	setting[HIDE_TIPS]	=	"false";
 
 	// Create default config file if one does not exist
 	if(!std::filesystem::exists(config_file.c_str()))
@@ -63,10 +64,14 @@ Config::Config()
 		fs<<COMMENT<<" Default: "<<setting[PADDING]<<"\n";
 		fs<<PADDING<<"="<<setting[PADDING]<<"\n";
 		fs<<"\n";
-		fs<<COMMENT<<" Sets the default game for use by RPGSH.\n";
+		fs<<COMMENT<<" Sets the default game for use by rpgsh.\n";
 		fs<<COMMENT<<" Will change things like the character sheet used for the \'print\' command, and what attributes will be created for new characters when using default settings.\n";
 		fs<<COMMENT<<" Default: "<<setting[DEFAULT_GAME]<<"\n";
 		fs<<DEFAULT_GAME<<"="<<setting[DEFAULT_GAME]<<"\n";
+		fs<<"\n";
+		fs<<COMMENT<<" If set to \"true\", hides the tip text that appears when launching rpgsh.\n";
+		fs<<COMMENT<<" Default: "<<setting[HIDE_TIPS]<<"\n";
+		fs<<HIDE_TIPS<<"="<<setting[HIDE_TIPS]<<"\n";
 		fs.close();
 	}
 	std::ifstream fs(config_file.c_str());
