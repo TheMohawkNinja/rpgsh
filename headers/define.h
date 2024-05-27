@@ -39,6 +39,13 @@
 //Column formatting
 #define COLUMN_PADDING			5
 
+//Color-coding for variable data types
+#define CURRENCY_COLOR			TEXT_YELLOW
+#define CURRENCYSYSTEM_COLOR		TEXT_RED
+#define DICE_COLOR			TEXT_LIGHTBLUE
+#define VAR_COLOR			TEXT_WHITE
+#define WALLET_COLOR			TEXT_MAGENTA
+
 //Locations of files to get random data from for things like 'roll'
 extern const char* random_seed_path;
 extern const char* backup_random_seed_path;
