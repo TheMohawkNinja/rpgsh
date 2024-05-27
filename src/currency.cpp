@@ -10,14 +10,12 @@
 void Currency::tryParseCurrencySystem(datamap<CurrencySystem> currencysystems, std::string* str, std::string fullstr)
 {
 	std::string cs_match = "";
-	std::string str_temp = "";
 
 	try
 	{
 		cs_match = str->substr(0,str->find(","));
-		str_temp = str->substr(str->find(",")+1,
-				       str->length()-str->find(",")+1);
-		str = &str_temp;
+		(*str) = str->substr(str->find(",")+1,
+				     str->length()-str->find(",")+1);
 	}
 	catch(...)
 	{
@@ -27,7 +25,7 @@ void Currency::tryParseCurrencySystem(datamap<CurrencySystem> currencysystems, s
 
 	if(cs_match == "")
 	{
-		output(Error,"CurrencySystem cannot be empty.");
+		//Currency isn't part of a CurrencySystem, so just exit
 		exit(-1);
 	}
 
@@ -48,14 +46,11 @@ void Currency::tryParseCurrencySystem(datamap<CurrencySystem> currencysystems, s
 }
 void Currency::tryParseName(std::string* str, std::string fullstr)
 {
-	std::string str_temp = "";
-
 	try
 	{
 		Name = str->substr(0,str->find(","));
-		str_temp = str->substr(str->find(",")+1,
-				       str->length()-str->find(",")+1);
-		str = &str_temp;
+		(*str) = str->substr(str->find(",")+1,
+				     str->length()-str->find(",")+1);
 	}
 	catch(...)
 	{
@@ -72,14 +67,12 @@ void Currency::tryParseName(std::string* str, std::string fullstr)
 void Currency::tryParseSmallerAmount(std::string* str, std::string fullstr)
 {
 	std::string SmallerAmountStr = "";
-	std::string str_temp = "";
 
 	try
 	{
 		SmallerAmountStr = str->substr(0,str->find(","));
-		str_temp = str->substr(str->find(",")+1,
-				       str->length()-str->find(",")+1);
-		str = &str_temp;
+		(*str) = str->substr(str->find(",")+1,
+				     str->length()-str->find(",")+1);
 	}
 	catch(...)
 	{
@@ -89,6 +82,12 @@ void Currency::tryParseSmallerAmount(std::string* str, std::string fullstr)
 
 	try
 	{
+		//Allow an empty SmallerAmount to imply 0
+		if(SmallerAmountStr == "")
+		{
+			SmallerAmount = 0;
+			return;
+		}
 		SmallerAmount = std::stoi(SmallerAmountStr);
 	}
 	catch(...)
@@ -99,14 +98,11 @@ void Currency::tryParseSmallerAmount(std::string* str, std::string fullstr)
 }
 void Currency::tryParseSmaller(std::string* str, std::string fullstr)
 {
-	std::string str_temp = "";
-
 	try
 	{
 		Smaller = str->substr(0,str->find(","));
-		str_temp = str->substr(str->find(",")+1,
-				       str->length()-str->find(",")+1);
-		str = &str_temp;
+		(*str) = str->substr(str->find(",")+1,
+				     str->length()-str->find(",")+1);
 	}
 	catch(...)
 	{
@@ -173,7 +169,7 @@ Currency::Currency(std::string str)
 	//Do we at least have the correct number of args?
 	if(commas != 4)
 	{
-		output(Error,"Invalid argument count in currency explicit constructor. There should be exactly five arguments.");
+		output(Error,"Invalid argument count in currency explicit constructor. There should be exactly four commas delimiters.");
 		exit(-1);
 	}
 
@@ -688,7 +684,7 @@ bool Wallet::operator != (const std::string b)//TODO: May need to revisit this f
 	return true;
 }
 //Links the instance of Currency to the instance of CurrencySystem
-//Allows the instance of CurrencySystem to detect changes in the attached RGPSH_CURRENCY
+//Allows the instance of CurrencySystem to detect changes in the attached Currency
 //Also automatically adds the Currency to the map of Currencies within the CurrencySystem
 void Currency::AttachToCurrencySystem(CurrencySystem* _CurrencySystem)
 {
