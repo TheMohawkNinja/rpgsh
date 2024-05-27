@@ -14,31 +14,90 @@ void print_header(std::string s)
 	fprintf(stdout,"%s\n",TEXT_NORMAL);
 }
 template <typename T>
-void print_map(T m, char scope_sigil)
+void get_longest_key_from_datamap(datamap<T> m, unsigned int* p_current_longest_len)
 {
-	unsigned int key_max_len = 0;
 	for(auto& [k,v] : m)
 	{
-		if(k[0] != '.' && k.length() > key_max_len)
-			key_max_len = k.length();
+		//Get longest key length, omitting hidden variables
+		if(k[0] != '.' && k.length() > (*p_current_longest_len))
+			(*p_current_longest_len) = k.length();
 	}
-	for(auto& [k,v] : m)
+}
+void print_spaces(unsigned int start, unsigned int end)
+{
+	for(int i=start; i<end; i++)
+		fprintf(stdout," ");
+}
+void print_data(Scope scope)
+{
+	for(auto& [k,v] : scope.getDatamap<CurrencySystem>())
 	{
+		//Skip hidden variables
 		if(k[0] == '.')
 			continue;
 
-		fprintf(stdout,"%c%s",scope_sigil,k.c_str());
-		for(int i=k.length(); i<key_max_len+5; i++)
-			fprintf(stdout," ");
-		fprintf(stdout,"%s\n",v.c_str());
+		fprintf(stdout,"%s%sCurrencySystem%s",TEXT_BOLD,CURRENCYSYSTEM_COLOR,TEXT_NORMAL);
+		print_spaces(0,COLUMN_PADDING);
+		fprintf(stdout,"%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,k.c_str(),TEXT_NORMAL);
+		fprintf(stdout,"%sName:              %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.Name.c_str());
+		fprintf(stdout,"\n");
+	}
+	for(auto& [k,v] : scope.getDatamap<Currency>())
+	{
+		//Skip hidden variables
+		if(k[0] == '.')
+			continue;
+
+		fprintf(stdout,"%s%sCurrency%s",TEXT_BOLD,CURRENCY_COLOR,TEXT_NORMAL);
+		print_spaces(0,2*COLUMN_PADDING);
+		fprintf(stdout,"%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,k.c_str(),TEXT_NORMAL);
+		fprintf(stdout,"%sSystem:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.System->Name.c_str());
+		fprintf(stdout,"%sName:             %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.Name.c_str());
+		fprintf(stdout,"%sSmallerAmount:    %s%d\n",TEXT_ITALIC,TEXT_NORMAL,v.SmallerAmount);
+		fprintf(stdout,"%sSmaller:          %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.Smaller.c_str());
+		fprintf(stdout,"%sLarger:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.Larger.c_str());
+		fprintf(stdout,"\n");
+	}
+	for(auto& [k,v] : scope.getDatamap<Dice>())
+	{
+		//Skip hidden variables
+		if(k[0] == '.')
+			continue;
+
+		fprintf(stdout,"%s%sDice%s",TEXT_BOLD,DICE_COLOR,TEXT_NORMAL);
+		print_spaces(0,2*COLUMN_PADDING);
+		fprintf(stdout,"%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,k.c_str(),TEXT_NORMAL);
+		if(v.List != "")
+		{
+			fprintf(stdout,"%sList:         %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.List.c_str());
+		}
+		else
+		{
+			fprintf(stdout,"%sQuantity:     %s%d\n",TEXT_ITALIC,TEXT_NORMAL,v.Quantity);
+			fprintf(stdout,"%sFaces:        %s%d\n",TEXT_ITALIC,TEXT_NORMAL,v.Faces);
+			fprintf(stdout,"%sModifier:     %s%d\n",TEXT_ITALIC,TEXT_NORMAL,v.Modifier);
+		}
+		fprintf(stdout,"\n");
+	}
+	for(auto& [k,v] : scope.getDatamap<Var>())
+	{
+		//Skip hidden variables
+		if(k[0] == '.')
+			continue;
+
+		fprintf(stdout,"%s%sVar%s",TEXT_BOLD,VAR_COLOR,TEXT_NORMAL);
+		print_spaces(0,COLUMN_PADDING);
+		fprintf(stdout,"%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,k.c_str(),TEXT_NORMAL);
+		fprintf(stdout,"%sValue:  %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.c_str());
+		fprintf(stdout,"\n");
 	}
 }
 void print_player_attrs()
 {
 	Character c = Character(false);
 	std::string sigil(1,CHARACTER_SIGIL);
-	print_header("("+sigil+") "+c.getStr<Var>(c.getStr<Var>(std::string(CHAR_NAME_ATTR))));
-	print_map<datamap<Var>>(c.getDatamap<Var>(),CHARACTER_SIGIL);
+	print_header("("+sigil+") "+c.getName());
+	print_data(c);
 }
 void print_campaign_vars()
 {
@@ -47,14 +106,14 @@ void print_campaign_vars()
 	std::string sigil(1,CAMPAIGN_SIGIL);
 	std::string m_name = get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR);
 	print_header("("+sigil+") "+m_name.substr(0,m_name.length()-1));// Omit trailing '/'
-	print_map<datamap<Var>>(m.getDatamap<Var>(),CAMPAIGN_SIGIL);
+	print_data(m);
 }
 void print_shell_vars()
 {
 	Shell s = Shell();
 	std::string sigil(1,SHELL_SIGIL);
 	print_header("("+sigil+") "+"Shell");
-	print_map<datamap<Var>>(s.getDatamap<Var>(),SHELL_SIGIL);
+	print_data(s);
 }
 int main(int argc, char** argv)
 {
