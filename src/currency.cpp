@@ -32,11 +32,7 @@ void Currency::tryParseCurrencySystem(datamap<CurrencySystem> currencysystems, s
 	for(const auto& [k,v] : currencysystems)
 	{
 		if(!stringcasecmp(v.Name,cs_match))
-		{
-			//Can't just call function with &v for some reason
-			CurrencySystem cs = v;
-			AttachToCurrencySystem(&cs);
-		}
+			AttachToCurrencySystem(std::make_shared<CurrencySystem>(v));
 	}
 	if(!System)
 	{
@@ -190,7 +186,7 @@ Currency::Currency(std::string _Name, int _SmallerAmount, std::string _Smaller, 
 	SmallerAmount = _SmallerAmount;
 	Larger = _Larger;
 }
-Currency::Currency(CurrencySystem* _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
+Currency::Currency(std::shared_ptr<CurrencySystem> _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
 {
 	Name = _Name;
 	Smaller = _Smaller;
@@ -686,7 +682,7 @@ bool Wallet::operator != (const std::string b)//TODO: May need to revisit this f
 //Links the instance of Currency to the instance of CurrencySystem
 //Allows the instance of CurrencySystem to detect changes in the attached Currency
 //Also automatically adds the Currency to the map of Currencies within the CurrencySystem
-void Currency::AttachToCurrencySystem(CurrencySystem* _CurrencySystem)
+void Currency::AttachToCurrencySystem(std::shared_ptr<CurrencySystem> _CurrencySystem)
 {
 	System = _CurrencySystem;
 	System->Denomination[Name] = *this;
@@ -783,7 +779,7 @@ void CurrencySystem::MakeChange(Currency c, Wallet* w)
 	(*w)[c] += ConversionFactor*ChangeCount;
 	(*w) -= money_t(Denomination[NextHighest],ChangeCount);
 }
-void CurrencySystem::TradeUp(CurrencySystem* S, Wallet* w)
+void CurrencySystem::TradeUp(std::shared_ptr<CurrencySystem> S, Wallet* w)
 {
 	for(auto i = (*w).Money.rbegin(); i != (*w).Money.rend(); ++i)
 	{

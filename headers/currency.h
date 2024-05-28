@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <memory>
 #include <string>
 #include "define.h"
 
@@ -15,13 +16,13 @@ class Wallet;
 class Currency
 {
 	public:
-		CurrencySystem* System = nullptr;
+		std::shared_ptr<CurrencySystem> System = nullptr;
 		std::string Name = "";
 		int SmallerAmount = 0;
 		std::string Smaller = "";
 		std::string Larger = "";
 
-	void AttachToCurrencySystem(CurrencySystem* _CurrencySystem);
+	void AttachToCurrencySystem(std::shared_ptr<CurrencySystem> _CurrencySystem);
 
 	private:
 
@@ -36,7 +37,7 @@ class Currency
 	Currency();
 	Currency(std::string str);
 	Currency(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
-	Currency(CurrencySystem* _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
+	Currency(std::shared_ptr<CurrencySystem> _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
 
 	explicit operator std::string() const;
 	bool operator == (const Currency& b) const;
@@ -64,7 +65,7 @@ class CurrencySystem
 	CurrencySystem(std::string str);
 
 	void MakeChange(Currency c, Wallet* w);
-	void TradeUp(CurrencySystem* S, Wallet* w);
+	void TradeUp(std::shared_ptr<CurrencySystem> S, Wallet* w);
 	bool HasEquivalentTo(int Quantity, std::string Denomination);
 };
 typedef std::pair<Currency, int> money_t;
