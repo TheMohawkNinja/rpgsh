@@ -23,10 +23,17 @@ void get_longest_key_from_datamap(datamap<T> m, unsigned int* p_current_longest_
 			(*p_current_longest_len) = k.length();
 	}
 }
-void print_spaces(unsigned int start, unsigned int end)
+void print_spaces(unsigned int end)
 {
-	for(int i=start; i<end; i++)
+	for(int i=0; i<end; i++)
 		fprintf(stdout," ");
+}
+const char* print_value(std::string value)
+{
+	if(value != "")
+		return value.c_str();
+	else
+		return empty_str.c_str();
 }
 void print_data(Scope scope)
 {
@@ -37,9 +44,9 @@ void print_data(Scope scope)
 			continue;
 
 		fprintf(stdout,"%s%sCurrencySystem%s",TEXT_BOLD,CURRENCYSYSTEM_COLOR,TEXT_NORMAL);
-		print_spaces(0,COLUMN_PADDING);
+		print_spaces(COLUMN_PADDING);
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
-		fprintf(stdout,"%sName:              %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.Name.c_str());
+		fprintf(stdout,"%sName:              %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Name));
 		fprintf(stdout,"\n");
 	}
 	for(auto& [k,v] : scope.getDatamap<Currency>())
@@ -49,13 +56,13 @@ void print_data(Scope scope)
 			continue;
 
 		fprintf(stdout,"%s%sCurrency%s",TEXT_BOLD,CURRENCY_COLOR,TEXT_NORMAL);
-		print_spaces(0,2*COLUMN_PADDING);
+		print_spaces(2*COLUMN_PADDING);
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
-		fprintf(stdout,"%sSystem:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.System->Name.c_str());
-		fprintf(stdout,"%sName:             %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.Name.c_str());
-		fprintf(stdout,"%sSmallerAmount:    %s%d\n",TEXT_ITALIC,TEXT_NORMAL,v.SmallerAmount);
-		fprintf(stdout,"%sSmaller:          %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.Smaller.c_str());
-		fprintf(stdout,"%sLarger:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.Larger.c_str());
+		fprintf(stdout,"%sSystem:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.System->Name));
+		fprintf(stdout,"%sName:             %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Name));
+		fprintf(stdout,"%sSmallerAmount:    %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(std::to_string(v.SmallerAmount)));
+		fprintf(stdout,"%sSmaller:          %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Smaller));
+		fprintf(stdout,"%sLarger:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Larger));
 		fprintf(stdout,"\n");
 	}
 	for(auto& [k,v] : scope.getDatamap<Dice>())
@@ -65,17 +72,17 @@ void print_data(Scope scope)
 			continue;
 
 		fprintf(stdout,"%s%sDice%s",TEXT_BOLD,DICE_COLOR,TEXT_NORMAL);
-		print_spaces(0,2*COLUMN_PADDING);
+		print_spaces(2*COLUMN_PADDING);
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		if(v.List != "")
 		{
-			fprintf(stdout,"%sList:         %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.List.c_str());
+			fprintf(stdout,"%sList:         %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.List));
 		}
 		else
 		{
-			fprintf(stdout,"%sQuantity:     %s%d\n",TEXT_ITALIC,TEXT_NORMAL,v.Quantity);
-			fprintf(stdout,"%sFaces:        %s%d\n",TEXT_ITALIC,TEXT_NORMAL,v.Faces);
-			fprintf(stdout,"%sModifier:     %s%d\n",TEXT_ITALIC,TEXT_NORMAL,v.Modifier);
+			fprintf(stdout,"%sQuantity:     %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(std::to_string(v.Quantity)));
+			fprintf(stdout,"%sFaces:        %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(std::to_string(v.Faces)));
+			fprintf(stdout,"%sModifier:     %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(std::to_string(v.Modifier)));
 		}
 		fprintf(stdout,"\n");
 	}
@@ -86,9 +93,9 @@ void print_data(Scope scope)
 			continue;
 
 		fprintf(stdout,"%s%sVar%s",TEXT_BOLD,VAR_COLOR,TEXT_NORMAL);
-		print_spaces(0,COLUMN_PADDING);
+		print_spaces(COLUMN_PADDING);
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
-		fprintf(stdout,"%sValue:  %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.c_str());
+		fprintf(stdout,"%sValue:  %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Value));
 		fprintf(stdout,"\n");
 	}
 	for(auto& [k,v] : scope.getDatamap<Wallet>())
@@ -106,15 +113,15 @@ void print_data(Scope scope)
 		}
 
 		fprintf(stdout,"%s%sWallet%s",TEXT_BOLD,WALLET_COLOR,TEXT_NORMAL);
-		print_spaces(0,longest_cur+COLUMN_PADDING-5);//6 = length of "Wallet" + ':' in printed values below
+		print_spaces(longest_cur+COLUMN_PADDING-5);//6 = length of "Wallet" + ':' in printed values below
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 
 		//Print values
 		for(auto& [c,q] : v)
 		{
 			fprintf(stdout,"%s%s:%s",TEXT_ITALIC,c.Name.c_str(),TEXT_NORMAL);
-			print_spaces(0,longest_cur-c.Name.length()+COLUMN_PADDING);
-			fprintf(stdout,"%d\n",q);
+			print_spaces(longest_cur-c.Name.length()+COLUMN_PADDING);
+			fprintf(stdout,"%s\n",print_value(std::to_string(q)));
 		}
 
 		fprintf(stdout,"\n");

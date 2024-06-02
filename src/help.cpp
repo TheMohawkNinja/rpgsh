@@ -40,7 +40,7 @@ int main(int argc, char** argv)
 		if(appdescription[0] != "")
 			fprintf(stdout,"%s\n",appdescription[0].c_str());
 		else
-			fprintf(stdout,"%s%s%s%s<NO_DESCRIPTION>%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_BG_YELLOW,TEXT_BLACK,TEXT_NORMAL);
+			fprintf(stdout,"%s\n",empty_str.c_str());
 	}
 	return 0;
 }
