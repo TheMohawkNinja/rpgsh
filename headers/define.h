@@ -43,7 +43,7 @@
 #define CURRENCY_COLOR			TEXT_YELLOW
 #define CURRENCYSYSTEM_COLOR		TEXT_RED
 #define DICE_COLOR			TEXT_LIGHTBLUE
-#define VAR_COLOR			TEXT_WHITE
+#define VAR_COLOR			TEXT_CYAN
 #define WALLET_COLOR			TEXT_MAGENTA
 
 //Locations of files to get random data from for things like 'roll'
