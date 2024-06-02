@@ -91,6 +91,34 @@ void print_data(Scope scope)
 		fprintf(stdout,"%sValue:  %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.c_str());
 		fprintf(stdout,"\n");
 	}
+	for(auto& [k,v] : scope.getDatamap<Wallet>())
+	{
+		//Skip hidden variables
+		if(k[0] == '.')
+			continue;
+
+		//Get longest currency name
+		int longest_cur = 0;
+		for(auto& [c,q] : v)
+		{
+			if(c.Name.length() > longest_cur)
+				longest_cur = c.Name.length();
+		}
+
+		fprintf(stdout,"%s%sWallet%s",TEXT_BOLD,WALLET_COLOR,TEXT_NORMAL);
+		print_spaces(0,longest_cur+COLUMN_PADDING-5);//6 = length of "Wallet" + ':' in printed values below
+		fprintf(stdout,"%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,k.c_str(),TEXT_NORMAL);
+
+		//Print values
+		for(auto& [c,q] : v)
+		{
+			fprintf(stdout,"%s%s:%s",TEXT_ITALIC,c.Name.c_str(),TEXT_NORMAL);
+			print_spaces(0,longest_cur-c.Name.length()+COLUMN_PADDING);
+			fprintf(stdout,"%d\n",q);
+		}
+
+		fprintf(stdout,"\n");
+	}
 }
 void print_player_attrs()
 {
