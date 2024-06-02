@@ -357,7 +357,8 @@ Wallet::Wallet(std::string str)
 	//FORMAT
 	//@w/MyWallet = w{currency_1,quantity_1,currency_2,quantity_2,...,currency_n,quantity_n}
 
-	datamap<Currency> currencies = getDatamapFromAllScopes<Currency>(WALLET_SIGIL);
+	datamap<Currency> currencies = getDatamapFromAllScopes<Currency>(CURRENCY_SIGIL);
+	Currency currency = Currency();
 
 	//Get map of currency names
 	datamap<std::string> currencynames;
@@ -376,41 +377,51 @@ Wallet::Wallet(std::string str)
 		exit(-1);
 	}
 
+	//Cut off the initial "w{" to make parsing consistent
 	str = str.substr(2,str.length()-2);
 
-	//Get currency amounts
+	//Main parsing loop
 	while(true)
 	{
-		//Go from beginning to second ','
+		int str_ln = str.length();
 		std::string delimiter = ",";
-		int d_pos = str.find(delimiter);
-		std::string cur_str = str.substr(0,d_pos);
-
-		//If we're at the end of the constructor
-		if(d_pos == std::string::npos)
-			delimiter = "}";
 
 		if(str.find(delimiter) == std::string::npos)
 		{
-			output(Error,"Unable to parse currency for wallet, missing \'%c\'",delimiter);
+			output(Error,"Unable to parse currency for wallet, missing \'%s\'",delimiter.c_str());
 			exit(-1);
 		}
 
-		std::string quant_str = str.substr(d_pos+1,str.find(delimiter,d_pos+1));
+		//Create currency object to be added to wallet
+		std::string c(1,CURRENCY_SIGIL);
+		std::string currency_str = str.substr(str.find(c),str.find("}")+1-str.find(c));
+		int c_str_ln = currency_str.length();
+		currency = Currency(currency_str);
 
+		//If we're at the end of the constructor
+		int next_delimiter = str.find(delimiter,c_str_ln+1);
+		if(next_delimiter == std::string::npos)
+			delimiter = "}";
+
+		//Parse quantity string
+		std::string quantity_str = str.substr(c_str_ln+1,next_delimiter-c_str_ln-1);
+		int q_str_ln = quantity_str.length();
+
+		//Try to add money to the wallet
 		try
 		{
-			//TODO: Parse currency name and check that it starts with a scope sigil
-			Money[currencynames[cur_str]] += std::stoi(quant_str);
+			Money[currency] += std::stoi(quantity_str);
 		}
 		catch(...)
 		{
-			output(Error,"Unable to add the currency \"%s\" in the quantity \"%s\" to the wallet.",cur_str.c_str(),quant_str.c_str());
+			output(Error,"Unable to add the currency \"%s\" in the quantity \"%s\" to the wallet.",currency.Name.c_str(),quantity_str.c_str());
+			exit(-1);
 		}
 
 		//Remove what we just worked on
+		int end_of_last_c = c_str_ln+q_str_ln+2;
 		if(delimiter != "}")
-			str = str.substr(str.find(delimiter,d_pos+1)+1,str.length()-str.find(delimiter,d_pos+1));
+			str = str.substr(end_of_last_c,str_ln-c_str_ln);
 		else
 			break;
 	}
