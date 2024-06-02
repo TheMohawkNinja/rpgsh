@@ -1,4 +1,5 @@
 #include "../headers/define.h"
+#include "../headers/text.h"
 #include <unistd.h>//getlogin()
 
 //Locations of files to get random data from for things like 'roll'
@@ -19,3 +20,11 @@ std::string prefix =				"rpgsh-";
 
 //Data separator string. Name shortened for brevity in the code.
 std::string DS = "::";
+
+//Universal formatted string for user discrimination between empty string and whitespace-only string
+std::string empty_str = std::string(TEXT_BOLD)+
+			std::string(TEXT_ITALIC)+
+			std::string(TEXT_BG_YELLOW)+
+			std::string(TEXT_BLACK)+
+			"<EMPTY>"+
+			std::string(TEXT_NORMAL);

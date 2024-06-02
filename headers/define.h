@@ -65,6 +65,9 @@ extern std::string prefix;
 //Data separator string. Name shortened for brevity in the code.
 extern std::string DS;
 
+//Universal formatted string for user discrimination between empty string and whitespace-only string
+extern std::string empty_str;
+
 //typedef for handing the various std::string key'd maps that are used
 template <typename T>
 using datamap = std::map<std::string, T>;
