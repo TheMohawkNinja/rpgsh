@@ -38,7 +38,7 @@ void print_data(Scope scope)
 
 		fprintf(stdout,"%s%sCurrencySystem%s",TEXT_BOLD,CURRENCYSYSTEM_COLOR,TEXT_NORMAL);
 		print_spaces(0,COLUMN_PADDING);
-		fprintf(stdout,"%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,k.c_str(),TEXT_NORMAL);
+		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		fprintf(stdout,"%sName:              %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.Name.c_str());
 		fprintf(stdout,"\n");
 	}
@@ -50,7 +50,7 @@ void print_data(Scope scope)
 
 		fprintf(stdout,"%s%sCurrency%s",TEXT_BOLD,CURRENCY_COLOR,TEXT_NORMAL);
 		print_spaces(0,2*COLUMN_PADDING);
-		fprintf(stdout,"%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,k.c_str(),TEXT_NORMAL);
+		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		fprintf(stdout,"%sSystem:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.System->Name.c_str());
 		fprintf(stdout,"%sName:             %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.Name.c_str());
 		fprintf(stdout,"%sSmallerAmount:    %s%d\n",TEXT_ITALIC,TEXT_NORMAL,v.SmallerAmount);
@@ -66,7 +66,7 @@ void print_data(Scope scope)
 
 		fprintf(stdout,"%s%sDice%s",TEXT_BOLD,DICE_COLOR,TEXT_NORMAL);
 		print_spaces(0,2*COLUMN_PADDING);
-		fprintf(stdout,"%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,k.c_str(),TEXT_NORMAL);
+		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		if(v.List != "")
 		{
 			fprintf(stdout,"%sList:         %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.List.c_str());
@@ -87,7 +87,7 @@ void print_data(Scope scope)
 
 		fprintf(stdout,"%s%sVar%s",TEXT_BOLD,VAR_COLOR,TEXT_NORMAL);
 		print_spaces(0,COLUMN_PADDING);
-		fprintf(stdout,"%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,k.c_str(),TEXT_NORMAL);
+		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		fprintf(stdout,"%sValue:  %s%s\n",TEXT_ITALIC,TEXT_NORMAL,v.c_str());
 		fprintf(stdout,"\n");
 	}
@@ -107,7 +107,7 @@ void print_data(Scope scope)
 
 		fprintf(stdout,"%s%sWallet%s",TEXT_BOLD,WALLET_COLOR,TEXT_NORMAL);
 		print_spaces(0,longest_cur+COLUMN_PADDING-5);//6 = length of "Wallet" + ':' in printed values below
-		fprintf(stdout,"%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,k.c_str(),TEXT_NORMAL);
+		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 
 		//Print values
 		for(auto& [c,q] : v)
