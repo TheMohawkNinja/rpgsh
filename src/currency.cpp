@@ -673,16 +673,14 @@ Wallet& Wallet::operator -- (int)
 
 Wallet::operator std::string() const
 {
-	//@w/MyWallet = {<currency_1> <quantity_1>,<currency_2> <quantity_2>,...,<currency_n> <quantity_n>}
+	//@w/MyWallet = {<currency_1>,<quantity_1>,<currency_2>,<quantity_2>,...,<currency_n>,<quantity_n>}
 
 	std::string ret = std::string(1,WALLET_SIGIL)+"{";
-	for(const auto& [k,v] : Money)
-		ret += k.Name + " " + std::to_string(v) + ",";
+	for(const auto& [c,q] : Money)
+		ret += std::string(c) + "," + std::to_string(q) + ",";
 
-	//Cut final ','
-	ret = ret.substr(0,ret.length()-1);
-
-	ret += "}";
+	//Cut final ',' and add terminating '}'
+	ret = ret.substr(0,ret.length()-1) + "}";
 
 	return ret;
 }
