@@ -105,35 +105,6 @@ void padding()
 	}
 }
 
-std::string replaceVariableWithValue(std::string arg, Scope scope, std::sregex_iterator i)
-{
-	std::string replace_str = "";
-	std::string key = arg.substr(arg.find("/"),arg.length()-arg.find("/"));
-	switch(arg[1])
-	{
-		case CURRENCY_SIGIL:
-			replace_str = scope.getStr<Currency>(key);
-			break;
-		case CURRENCYSYSTEM_SIGIL:
-			replace_str = scope.getStr<CurrencySystem>(key);
-			break;
-		case DICE_SIGIL:
-			replace_str = scope.getStr<Dice>(key);
-			break;
-		case VAR_SIGIL:
-		case '/':
-			replace_str = scope.getStr<Var>(key);
-			break;
-		case WALLET_SIGIL:
-			replace_str = scope.getStr<Wallet>(key);
-			break;
-		default:
-			output(Error,"Unknown type specifier \'%c\' in \"%s\"",arg[1],arg.c_str());
-			return "";
-	}
-
-	return std::regex_replace(key,std::regex(key),replace_str);
-}
 void run_rpgsh_prog(std::string args, bool redirect_output)
 {
 	Character c = Character(false);
@@ -178,20 +149,10 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 		switch(arg[0])
 		{
 			case CHARACTER_SIGIL:
-			{
-				arg = replaceVariableWithValue(arg,c,args_it);
-				break;
-			}
 			case CAMPAIGN_SIGIL:
-			{
-				arg = replaceVariableWithValue(arg,m,args_it);
-				break;
-			}
 			case SHELL_SIGIL:
-			{
-				arg = replaceVariableWithValue(arg,s,args_it);
+				arg = get_prog_output(arg)[0];
 				break;
-			}
 		}
 
 		//Don't try to run a program if the data type sigil was invalid
@@ -208,6 +169,7 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 	}
 
 	//Combine args wrapped in quotes
+	//TODO There really has to be a more elegant way to do this
 	for(int i=0; i<vars.size(); i++)
 	{
 		if(vars[i].find("\"") != std::string::npos &&
