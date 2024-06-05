@@ -172,13 +172,13 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 	//TODO There really has to be a more elegant way to do this
 	for(int i=0; i<vars.size(); i++)
 	{
-		if(vars[i].find("\"") != std::string::npos &&
-		   vars[i].find("\"",vars[i].find("\"")+1) != std::string::npos)//Quote-wrapped arg doesn't contain a space
+		int quote_begin = vars[i].find("\"");
+		int quote_end = vars[i].find("\"",quote_begin+1);
+		if(quote_begin != std::string::npos && quote_end != std::string::npos)//Quote-wrapped arg doesn't contain a space
 		{
-			vars[i] = vars[i].substr(vars[i].find("\""),
-						(vars[i].find("\"",vars[i].find("\"")+1)+1)-vars[i].find("\""));
+			vars[i] = vars[i].substr(quote_begin,(quote_end+1)-quote_begin);
 		}
-		else if(vars[i].find("\"") != std::string::npos)//Quote-wrapped arg with space
+		else if(quote_begin != std::string::npos)//Quote-wrapped arg with space
 		{
 			if(i == vars.size())
 			{
@@ -186,14 +186,14 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 				exit(-1);
 			}
 
-			vars[i] = vars[i].substr(vars[i].find("\""),
-						 vars[i].length()-vars[i].find("\""));
+			vars[i] = vars[i].substr(quote_begin,vars[i].length()-quote_begin);
 
 			for(int j=i+1; j<vars.size(); j++)
 			{
-				if(vars[j].find("\"") != std::string::npos)
+				quote_end = vars[j].find("\"");
+				if(quote_end != std::string::npos)
 				{
-					vars[i] += " " + vars[j].substr(0,vars[j].find("\"")+1);
+					vars[i] += " " + vars[j].substr(0,quote_end+1);
 					vars.erase(vars.begin()+j);
 					break;
 				}
