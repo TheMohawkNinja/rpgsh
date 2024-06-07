@@ -40,9 +40,12 @@ void check_key(Scope scope, std::string key)
 		else
 			chk_str = key.substr(1,key.rfind(".")-1);
 
-		if(chk_str == k)
+		if(!stringcasecmp(chk_str,k))
 		{
-			print_requested_data<T>(scope,key);
+			chk_str = "/"+k;
+			if(period > slash)
+				chk_str+=key.substr(period,key.length()-period);
+			print_requested_data<T>(scope,chk_str);
 			exit(0);
 		}
 	}
