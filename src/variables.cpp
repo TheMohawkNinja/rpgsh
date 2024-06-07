@@ -83,14 +83,50 @@ std::string load_external_reference(std::string arg, Scope* p_scope)
 				      arg.find(']')-(arg.find('[')+1));
 
 	//Current campaign character directory
-	std::string current_m_char_dir = campaigns_dir + get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR) + "characters/";
+	std::string cur_camp_char_dir = campaigns_dir + get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR) + "characters/";
+
+	//Actually load the xref into the scope
+	std::vector<std::string> dir_list;
+	std::string file = "";
+	std::string xref_path = "";
 	switch(arg[0])
 	{
 		case CHARACTER_SIGIL:
-			p_scope->load(current_m_char_dir+xref+".char");
+			dir_list = getDirectoryListing(cur_camp_char_dir);
+			for(int i=0; i<dir_list.size(); i++)
+			{
+				file = dir_list[i].substr(0,dir_list[i].rfind("."));
+				xref_path = cur_camp_char_dir+dir_list[i];
+				if(!stringcasecmp(file,xref) &&
+				   std::filesystem::is_regular_file(xref_path))
+				{
+					p_scope->load(xref_path);
+					break;
+				}
+				else if(i == dir_list.size()-1)
+				{
+					output(Error,"Invalid xref \"%s\".",xref.c_str());
+					exit(-1);
+				}
+			}
 			break;
 		case CAMPAIGN_SIGIL:
-			p_scope->load(campaigns_dir+xref+"/.vars");
+			dir_list = getDirectoryListing(campaigns_dir);
+			for(int i=0; i<dir_list.size(); i++)
+			{
+				xref_path = campaigns_dir+dir_list[i];
+				if(!stringcasecmp(dir_list[i],xref) &&
+				   std::filesystem::is_directory(xref_path))
+				{
+					p_scope->load(xref_path+"/.vars");
+					break;
+				}
+				else if(i == dir_list.size()-1)
+				{
+					output(Error,"Invalid xref \"%s\".",xref.c_str());
+					exit(-1);
+				}
+			}
 			break;
 		case SHELL_SIGIL:
 			output(Error,"Cannot use an external reference with shell scope sigil.");
@@ -108,9 +144,9 @@ int main(int argc, char** argv)
 {
 	check_print_app_description(argv,"Not meant for direct call by user. Implicitly called when modifying variables.");
 
-	if(std::string(argv[1]).length() == 1)//If the user only enters the scope sigil
+	if(std::string(argv[1]).find("/") == std::string::npos)//If the user only enters the scope sigil
 	{
-		output(Error,"No variable type specified.");
+		output(Error,"Expected at least one '/' delimiter.");
 		exit(-1);
 	}
 
