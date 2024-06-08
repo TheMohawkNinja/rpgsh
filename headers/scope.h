@@ -36,6 +36,9 @@ class Scope
 		void load(std::string path);
 		void save();
 
+		//Get datasource
+		std::string getDatasource();
+
 		//Get single variable
 		template <typename T>
 		T get(std::string key);

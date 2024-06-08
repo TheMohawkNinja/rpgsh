@@ -170,6 +170,12 @@ void Scope::save()
 	ofs.close();
 }
 
+//Get datasource
+std::string Scope::getDatasource()
+{
+	return datasource;
+}
+
 //Get single variable
 template<>
 Currency Scope::get<Currency>(std::string key)
@@ -381,8 +387,7 @@ Character::Character(bool backup)
 }
 Character::Character(std::string path)
 {
-	datasource = path;
-	load();
+	load(path);
 }
 
 std::string Character::getCurrentCharacterFilePath()
@@ -420,8 +425,7 @@ Campaign::Campaign()
 }
 Campaign::Campaign(std::string path)
 {
-	datasource = path;
-	load();
+	load(path);
 }
 
 //			//
@@ -431,6 +435,5 @@ Campaign::Campaign(std::string path)
 Shell::Shell()
 {
 	confirmShellVariablesFile();
-	datasource = shell_variables_path;
-	load();
+	load(shell_variables_path);
 }
