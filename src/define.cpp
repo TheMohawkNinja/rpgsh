@@ -3,18 +3,22 @@
 #include <unistd.h>//getlogin()
 
 //Internal file/directory paths
+//dir = Directory
+//file = File name
+//path = Directory + file name
 const char* random_seed_path = 			"/dev/random";
 const char* backup_random_seed_path = 		"/dev/urandom";
+const char* rpgsh_programs_cache_path =		"/tmp/rpgsh_proglist";
+const char* rpgsh_output_redirect_path =	"/tmp/rpgsh";
 std::string variable_file_name =		".variables";
 std::string user = 				getlogin();
 std::string root_dir =				"/home/" + user + "/.rpgsh/";
-std::string shell_variables_file =		root_dir + variable_file_name;
-std::string rpgsh_env_variables_file =		root_dir + ".rpgsh_variables";
-std::string config_file = 			root_dir + "config";
+std::string shell_variables_path =		root_dir + variable_file_name;
+std::string rpgsh_env_variables_path =		root_dir + ".rpgsh_variables";
+std::string config_path = 			root_dir + "config";
 std::string campaigns_dir = 			root_dir + "campaigns/";
 std::string templates_dir = 			root_dir + "templates/";
 std::string dice_lists_dir = 			root_dir + "dice-lists/";
-std::string rpgsh_output_redirect_file =	"/tmp/rpgsh";
 std::string prefix =				"rpgsh-";
 
 //Data separator string. Name shortened for brevity in the code.

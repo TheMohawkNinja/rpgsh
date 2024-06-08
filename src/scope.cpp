@@ -431,6 +431,6 @@ Campaign::Campaign(std::string path)
 Shell::Shell()
 {
 	confirmShellVariablesFile();
-	datasource = shell_variables_file;
+	datasource = shell_variables_path;
 	load();
 }

@@ -56,10 +56,10 @@ Config::Config()
 	setting[HIDE_TIPS]	=	"false";
 
 	// Create default config file if one does not exist
-	if(!std::filesystem::exists(config_file.c_str()))
+	if(!std::filesystem::exists(config_path.c_str()))
 	{
-		output(Info,"Config file not found, creating default at \'%s\'.",config_file.c_str());
-		std::ofstream fs(config_file.c_str());
+		output(Info,"Config file not found, creating default at \'%s\'.",config_path.c_str());
+		std::ofstream fs(config_path.c_str());
 		fs<<COMMENT<<" Places a newline character before and after command output.\n";
 		fs<<COMMENT<<" Default: "<<setting[PADDING]<<"\n";
 		fs<<PADDING<<"="<<setting[PADDING]<<"\n";
@@ -74,7 +74,7 @@ Config::Config()
 		fs<<HIDE_TIPS<<"="<<setting[HIDE_TIPS]<<"\n";
 		fs.close();
 	}
-	std::ifstream fs(config_file.c_str());
+	std::ifstream fs(config_path.c_str());
 	while(!fs.eof())
 	{
 		std::string data;

@@ -47,18 +47,22 @@
 #define WALLET_COLOR			TEXT_MAGENTA
 
 //Internal file/directory paths
+//dir = Directory
+//file = File name
+//path = Directory + file name
 extern const char* random_seed_path;
 extern const char* backup_random_seed_path;
+extern const char* rpgsh_programs_cache_path;
+extern const char* rpgsh_output_redirect_path;
 extern std::string variable_file_name;
 extern std::string user;
 extern std::string root_dir;
-extern std::string shell_variables_file;
-extern std::string rpgsh_env_variables_file;
-extern std::string config_file;
+extern std::string shell_variables_path;
+extern std::string rpgsh_env_variables_path;
+extern std::string config_path;
 extern std::string campaigns_dir;
 extern std::string templates_dir;
 extern std::string dice_lists_dir;
-extern std::string rpgsh_output_redirect_file;
 extern std::string prefix;
 
 //Data separator string. Name shortened for brevity in the code.

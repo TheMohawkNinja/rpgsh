@@ -34,10 +34,10 @@ int stringcasecmp(std::string a, std::string b)
 
 void confirmEnvVariablesFile()
 {
-	if(!std::filesystem::exists(rpgsh_env_variables_file.c_str()))
+	if(!std::filesystem::exists(rpgsh_env_variables_path.c_str()))
 	{
-		output(Info,"Environment variables file not found, creating file at \"%s\".",rpgsh_env_variables_file.c_str());
-		std::ofstream ofs(rpgsh_env_variables_file.c_str());
+		output(Info,"Environment variables file not found, creating file at \"%s\".",rpgsh_env_variables_path.c_str());
+		std::ofstream ofs(rpgsh_env_variables_path.c_str());
 		ofs.close();
 
 		//Set default values for built-in env variables
@@ -50,10 +50,10 @@ void confirmEnvVariablesFile()
 
 void confirmShellVariablesFile()
 {
-	if(!std::filesystem::exists(shell_variables_file.c_str()))
+	if(!std::filesystem::exists(shell_variables_path.c_str()))
 	{
-		output(Info,"Shell variables file not found, creating file at \"%s\".",shell_variables_file.c_str());
-		std::ofstream ofs(shell_variables_file.c_str());
+		output(Info,"Shell variables file not found, creating file at \"%s\".",shell_variables_path.c_str());
+		std::ofstream ofs(shell_variables_path.c_str());
 		ofs.close();
 	}
 }
@@ -224,7 +224,7 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 		if(posix_spawn_file_actions_init(&fa))
 			output(Error,"Error code %d during posix_spawn_file_actions_init(): %s",status,strerror(status));
 
-		if(posix_spawn_file_actions_addopen(&fa, 1, rpgsh_output_redirect_file.c_str(), O_CREAT | O_TRUNC | O_WRONLY, 0644))
+		if(posix_spawn_file_actions_addopen(&fa, 1, rpgsh_output_redirect_path, O_CREAT | O_TRUNC | O_WRONLY, 0644))
 			output(Error,"Error code %d during posix_spawn_file_actions_addopen(): %s",status,strerror(status));
 
 		if(posix_spawn_file_actions_adddup2(&fa, 1, 2))
@@ -268,7 +268,7 @@ std::vector<std::string> get_prog_output(std::string prog)
 
 	run_rpgsh_prog(prog,true);
 
-	std::ifstream ifs(rpgsh_output_redirect_file.c_str());
+	std::ifstream ifs(rpgsh_output_redirect_path);
 	while(!ifs.eof())
 	{
 		std::string data = "";
@@ -293,7 +293,7 @@ std::string get_env_variable(std::string v)
 {
 	confirmEnvVariablesFile();
 
-	std::ifstream ifs(rpgsh_env_variables_file.c_str());
+	std::ifstream ifs(rpgsh_env_variables_path.c_str());
 	while(!ifs.eof())
 	{
 		std::string data = "";
@@ -312,9 +312,9 @@ void set_env_variable(std::string v,std::string value)
 {
 	confirmEnvVariablesFile();
 
-	std::ifstream ifs(rpgsh_env_variables_file.c_str());
-	std::filesystem::remove((rpgsh_env_variables_file+".bak").c_str());
-	std::ofstream ofs((rpgsh_env_variables_file+".bak").c_str());
+	std::ifstream ifs(rpgsh_env_variables_path.c_str());
+	std::filesystem::remove((rpgsh_env_variables_path+".bak").c_str());
+	std::ofstream ofs((rpgsh_env_variables_path+".bak").c_str());
 	bool ReplacedValue = false;
 
 	while(!ifs.eof())
@@ -340,8 +340,8 @@ void set_env_variable(std::string v,std::string value)
 	}
 	ifs.close();
 	ofs.close();
-	std::filesystem::remove(rpgsh_env_variables_file.c_str());
-	std::filesystem::rename((rpgsh_env_variables_file+".bak").c_str(),rpgsh_env_variables_file.c_str());
+	std::filesystem::remove(rpgsh_env_variables_path.c_str());
+	std::filesystem::rename((rpgsh_env_variables_path+".bak").c_str(),rpgsh_env_variables_path.c_str());
 }
 
 template <typename T>

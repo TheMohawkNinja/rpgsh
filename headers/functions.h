@@ -109,16 +109,16 @@ datamap<T> getDatamapFromAllScopes(char var_id)
 	std::string character = get_env_variable(CURRENT_CHAR_SHELL_VAR);
 	std::string campaign = get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR);
 	std::string current_campaign_dir = campaigns_dir+campaign;
-	std::string current_campaign_file = current_campaign_dir+variable_file_name;
-	std::string current_character_file = current_campaign_dir+"characters/"+character+".char";
+	std::string current_campaign_path = current_campaign_dir+variable_file_name;
+	std::string current_character_path = current_campaign_dir+"characters/"+character+".char";
 
-	for(const auto& [k,v] : load_obj_from_file<T>(current_character_file,var_id))
+	for(const auto& [k,v] : load_obj_from_file<T>(current_character_path,var_id))
 		ret[k] = v;
 
-	for(const auto& [k,v] : load_obj_from_file<T>(current_campaign_file,var_id))
+	for(const auto& [k,v] : load_obj_from_file<T>(current_campaign_path,var_id))
 		ret[k] = v;
 
-	for(const auto& [k,v] : load_obj_from_file<T>(shell_variables_file,var_id))
+	for(const auto& [k,v] : load_obj_from_file<T>(shell_variables_path,var_id))
 		ret[k] = v;
 
 	return ret;
