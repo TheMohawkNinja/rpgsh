@@ -46,14 +46,13 @@
 #define VAR_COLOR			TEXT_CYAN
 #define WALLET_COLOR			TEXT_MAGENTA
 
-//Locations of files to get random data from for things like 'roll'
+//Internal file/directory paths
 extern const char* random_seed_path;
 extern const char* backup_random_seed_path;
-
-//Internal file/directory paths
+extern std::string variable_file_name;
 extern std::string user;
 extern std::string root_dir;
-extern std::string shell_vars_file;
+extern std::string shell_variables_file;
 extern std::string rpgsh_env_variables_file;
 extern std::string config_file;
 extern std::string campaigns_dir;

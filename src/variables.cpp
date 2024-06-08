@@ -118,7 +118,7 @@ std::string load_external_reference(std::string arg, Scope* p_scope)
 				if(!stringcasecmp(dir_list[i],xref) &&
 				   std::filesystem::is_directory(xref_path))
 				{
-					p_scope->load(xref_path+"/.vars");
+					p_scope->load(xref_path+"/"+variable_file_name);
 					break;
 				}
 				else if(i == dir_list.size()-1)

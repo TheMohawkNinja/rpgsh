@@ -48,25 +48,25 @@ void confirmEnvVariablesFile()
 	}
 }
 
-void confirmShellVarsFile()
+void confirmShellVariablesFile()
 {
-	if(!std::filesystem::exists(shell_vars_file.c_str()))
+	if(!std::filesystem::exists(shell_variables_file.c_str()))
 	{
-		output(Info,"Shell variables file not found, creating file at \"%s\".",shell_vars_file.c_str());
-		std::ofstream ofs(shell_vars_file.c_str());
+		output(Info,"Shell variables file not found, creating file at \"%s\".",shell_variables_file.c_str());
+		std::ofstream ofs(shell_variables_file.c_str());
 		ofs.close();
 	}
 }
 
-void confirmCampaignVarsFile()
+void confirmCampaignVariablesFile()
 {
-	std::string campaign_vars_file = campaigns_dir +
-					get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR) +
-					".vars";
-	if(!std::filesystem::exists(campaign_vars_file.c_str()))
+	std::string campaign_variables_file = campaigns_dir +
+					      get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR) +
+					      variable_file_name;
+	if(!std::filesystem::exists(campaign_variables_file.c_str()))
 	{
-		output(Info,"Campaign variables file not found, creating file at \'%s\'.",campaign_vars_file.c_str());
-		std::ofstream ofs(campaign_vars_file.c_str());
+		output(Info,"Campaign variables file not found, creating file at \'%s\'.",campaign_variables_file.c_str());
+		std::ofstream ofs(campaign_variables_file.c_str());
 		ofs.close();
 	}
 }
@@ -105,46 +105,46 @@ void padding()
 	}
 }
 
-void run_rpgsh_prog(std::string args, bool redirect_output)
+void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 {
 	Character c = Character(false);
 	Campaign m = Campaign();
 	Shell s = Shell();
 
-	std::vector<std::string> vars;
+	std::vector<std::string> args;
 	extern char** environ;
 	pid_t pid;
 
 	if(!redirect_output)
 		padding();
 
-	if(args[0] == CHARACTER_SIGIL ||
-	args[0] == CAMPAIGN_SIGIL ||
-	args[0] == SHELL_SIGIL) //Check if user is operating on a variable
+	if(arg_str[0] == CHARACTER_SIGIL ||
+	arg_str[0] == CAMPAIGN_SIGIL ||
+	arg_str[0] == SHELL_SIGIL) //Check if user is operating on a variable
 	{
-		args = "variables " + args;
+		arg_str = "variables " + arg_str;
 	}
 
 	std::string path = "/bin/";
 	std::regex arg_pattern("[\\@\\#\\$\\[\\]\\/a-zA-Z0-9\\=\\+\\-\\*\\.\\_\\\"]{1,}");
 
-	std::sregex_iterator args_it(args.begin(), args.end(), arg_pattern);
-	std::sregex_iterator args_end;
+	std::sregex_iterator arg_str_it(arg_str.begin(), arg_str.end(), arg_pattern);
+	std::sregex_iterator arg_str_end;
 
 	//Replaces all instances of variables with their respective value
 	//Except for the first arg if it is a variable
-	vars.push_back(path+prefix+args_it->str());
-	args_it++;
+	args.push_back(path+prefix+arg_str_it->str());
+	arg_str_it++;
 
-	if(args.substr(0,9) == "variables")
+	if(arg_str.substr(0,9) == "variables")
 	{
-		vars.push_back(args_it->str());
-		args_it++;
+		args.push_back(arg_str_it->str());
+		arg_str_it++;
 	}
 
-	while(args_it != args_end)
+	while(arg_str_it != arg_str_end)
 	{
-		std::string arg = args_it->str();
+		std::string arg = arg_str_it->str();
 
 		switch(arg[0])
 		{
@@ -164,43 +164,43 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 			return;
 		}
 
-		vars.push_back(arg);
-		args_it++;
+		args.push_back(arg);
+		arg_str_it++;
 	}
 
-	//Combine args wrapped in quotes
+	//Combine arg_str wrapped in quotes
 	//TODO There really has to be a more elegant way to do this
-	for(int i=0; i<vars.size(); i++)
+	for(int i=0; i<args.size(); i++)
 	{
-		int quote_begin = vars[i].find("\"");
-		int quote_end = vars[i].find("\"",quote_begin+1);
+		int quote_begin = args[i].find("\"");
+		int quote_end = args[i].find("\"",quote_begin+1);
 		if(quote_begin != std::string::npos && quote_end != std::string::npos)//Quote-wrapped arg doesn't contain a space
 		{
-			vars[i] = vars[i].substr(quote_begin,(quote_end+1)-quote_begin);
+			args[i] = args[i].substr(quote_begin,(quote_end+1)-quote_begin);
 		}
 		else if(quote_begin != std::string::npos)//Quote-wrapped arg with space
 		{
-			if(i == vars.size())
+			if(i == args.size())
 			{
 				output(Error,"Missing terminating quotation mark.");
 				exit(-1);
 			}
 
-			vars[i] = vars[i].substr(quote_begin,vars[i].length()-quote_begin);
+			args[i] = args[i].substr(quote_begin,args[i].length()-quote_begin);
 
-			for(int j=i+1; j<vars.size(); j++)
+			for(int j=i+1; j<args.size(); j++)
 			{
-				quote_end = vars[j].find("\"");
+				quote_end = args[j].find("\"");
 				if(quote_end != std::string::npos)
 				{
-					vars[i] += " " + vars[j].substr(0,quote_end+1);
-					vars.erase(vars.begin()+j);
+					args[i] += " " + args[j].substr(0,quote_end+1);
+					args.erase(args.begin()+j);
 					break;
 				}
 				else
 				{
-					vars[i] += " " + vars[j];
-					vars.erase(vars.begin()+j);
+					args[i] += " " + args[j];
+					args.erase(args.begin()+j);
 					j--;
 				}
 			}
@@ -208,12 +208,12 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 	}
 
 	//Convert vector to char*[]
-	char* argv[vars.size()+1];
-	for(int i=0; i<vars.size(); i++)
-		argv[i] = (char*)vars[i].c_str();
+	char* argv[args.size()+1];
+	for(int i=0; i<args.size(); i++)
+		argv[i] = (char*)args[i].c_str();
 
 	//Add a NULL because posix_spawn() needs that for some reason
-	argv[vars.size()] = NULL;
+	argv[args.size()] = NULL;
 
 	int status = 0;
 	posix_spawn_file_actions_t fa;
@@ -248,7 +248,7 @@ void run_rpgsh_prog(std::string args, bool redirect_output)
 	else
 	{
 		std::string displayed_command = std::string(argv[0]).substr(prefix.length()+path.length(),
-									std::string(argv[0]).length()-prefix.length()-path.length());
+							    std::string(argv[0]).length()-prefix.length()-path.length());
 		if(status == 2)//File not found
 			output(Error,"Error code %d while attempting to run \"%s\": Not a valid rpgsh command.",status,displayed_command.c_str());
 		else

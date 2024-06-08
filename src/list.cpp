@@ -134,16 +134,16 @@ void print_player_attrs()
 	print_header("("+sigil+") "+c.getName());
 	print_data(c);
 }
-void print_campaign_vars()
+void print_campaign_variables()
 {
-	confirmCampaignVarsFile();
+	confirmCampaignVariablesFile();
 	Campaign m = Campaign();
 	std::string sigil(1,CAMPAIGN_SIGIL);
 	std::string m_name = get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR);
 	print_header("("+sigil+") "+m_name.substr(0,m_name.length()-1));// Omit trailing '/'
 	print_data(m);
 }
-void print_shell_vars()
+void print_shell_variables()
 {
 	Shell s = Shell();
 	std::string sigil(1,SHELL_SIGIL);
@@ -159,9 +159,9 @@ int main(int argc, char** argv)
 
 	if(argc == 1 || !strcmp(argv[1],"--all"))// Print everything
 	{
-		print_shell_vars();
+		print_shell_variables();
 		fprintf(stdout,"\n");
-		print_campaign_vars();
+		print_campaign_variables();
 		fprintf(stdout,"\n");
 		print_player_attrs();
 	}
@@ -171,11 +171,11 @@ int main(int argc, char** argv)
 	}
 	else if(!strcmp(argv[1],"-m") || !strcmp(argv[1],"--campaign"))
 	{
-		print_campaign_vars();
+		print_campaign_variables();
 	}
 	else if(!strcmp(argv[1],"-s") || !strcmp(argv[1],"--shell"))
 	{
-		print_shell_vars();
+		print_shell_variables();
 	}
 	else if(!strcmp(argv[1],"-?") || !strcmp(argv[1],"--help"))
 	{

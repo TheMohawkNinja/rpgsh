@@ -413,7 +413,9 @@ void Character::setDatasource(std::string path)
 
 Campaign::Campaign()
 {
-	datasource = campaigns_dir + get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR) + ".vars";
+	datasource = campaigns_dir+
+		     get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
+		     variable_file_name;
 	load();
 }
 Campaign::Campaign(std::string path)
@@ -428,7 +430,7 @@ Campaign::Campaign(std::string path)
 
 Shell::Shell()
 {
-	confirmShellVarsFile();
-	datasource = shell_vars_file;
+	confirmShellVariablesFile();
+	datasource = shell_variables_file;
 	load();
 }
