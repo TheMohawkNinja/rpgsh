@@ -33,8 +33,6 @@ void check_print_app_description(char** _argv, std::string description);
 std::string get_env_variable(std::string v);
 void set_env_variable(std::string v, std::string value);
 
-std::map<std::string,std::string> load_vars_from_file(std::string path);
-
 template <typename T>
 void save_obj_to_file(std::string path, T obj, char obj_id)
 {

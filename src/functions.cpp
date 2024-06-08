@@ -344,38 +344,6 @@ void set_env_variable(std::string v,std::string value)
 	std::filesystem::rename((rpgsh_env_variables_file+".bak").c_str(),rpgsh_env_variables_file.c_str());
 }
 
-std::map<std::string,std::string> load_vars_from_file(std::string path)
-{
-	std::map<std::string,std::string> vars;
-
-	if(!std::filesystem::exists(path))
-	{
-		output(Error,"File not found at \"%s\"",path.c_str());
-		exit(-1);
-	}
-
-	std::ifstream ifs(path);
-	if(!ifs.good())
-	{
-		output(Error,"Unable to open \"%s\" for reading",path.c_str());
-		exit(-1);
-	}
-	while(!ifs.eof())
-	{
-		std::string data = "";
-		std::getline(ifs,data);
-		if(data == "")
-			break;
-		std::string var_name = data.substr(0,data.find(DS));
-		std::string var_value = data.substr(var_name.length()+DS.length(),
-						data.length()-(var_name.length()+DS.length()));
-		vars[var_name] = var_value;
-	}
-	ifs.close();
-
-	return vars;
-}
-
 template <typename T>
 void save_obj_to_file(std::string path, datamap<Dice> obj, char obj_id);
 void save_obj_to_file(std::string path, datamap<Var> obj, char obj_id);
