@@ -79,25 +79,31 @@ std::string load_external_reference(std::string arg, Scope* p_scope)
 	}
 
 	//Get string between the square brackets
-	std::string xref = arg.substr(arg.find('[')+1,
-				      arg.find(']')-(arg.find('[')+1));
-
-	//Current campaign character directory
-	std::string cur_camp_char_dir = campaigns_dir + get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR) + "characters/";
+	std::string xref = arg.substr(arg.find('[')+1,arg.find(']')-(arg.find('[')+1));
 
 	//Actually load the xref into the scope
 	std::vector<std::string> dir_list;
-	std::string file = "";
+	std::string xref_camp_char_dir = campaigns_dir+get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+"characters/";
+	std::string xref_char = xref;
 	std::string xref_path = "";
+	std::string campaign = "";
+	std::string file = "";
 	switch(arg[0])
 	{
 		case CHARACTER_SIGIL:
-			dir_list = getDirectoryListing(cur_camp_char_dir);
+			if(xref.find("/") != std::string::npos)//Attempting to get a character from another campaign
+			{
+				campaign = xref.substr(0,xref.find("/")+1);
+				xref_camp_char_dir = campaigns_dir+campaign+"characters/";
+				xref_char = xref.substr(xref.find("/")+1,xref.length()-(xref.find("/")+1));
+			}
+
+			dir_list = getDirectoryListing(xref_camp_char_dir);
 			for(int i=0; i<dir_list.size(); i++)
 			{
 				file = dir_list[i].substr(0,dir_list[i].rfind("."));
-				xref_path = cur_camp_char_dir+dir_list[i];
-				if(!stringcasecmp(file,xref) &&
+				xref_path = xref_camp_char_dir+dir_list[i];
+				if(!stringcasecmp(file,xref_char) &&
 				   std::filesystem::is_regular_file(xref_path))
 				{
 					p_scope->load(xref_path);
@@ -150,9 +156,13 @@ int main(int argc, char** argv)
 		exit(-1);
 	}
 
-	std::string arg(argv[1]);
-	std::string key = arg.substr(arg.find("/"),arg.length()-(arg.find("/")));
 	Scope scope;
+	std::string arg(argv[1]);
+	std::string key = "";
+	if(arg.find("]") > arg.find("/"))//User is requesting a character xref from a different campaign
+		key = arg.substr(arg.find("]")+1,arg.length()-(arg.find("]")+1));
+	else
+		key = arg.substr(arg.find("/"),arg.length()-(arg.find("/")));
 
 	//Check scope sigil
 	switch(argv[1][0])

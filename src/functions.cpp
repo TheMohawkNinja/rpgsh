@@ -73,6 +73,11 @@ void confirmCampaignVariablesFile()
 
 std::vector<std::string> getDirectoryListing(std::string path)
 {
+	if(!std::filesystem::exists(path) || !std::filesystem::is_directory(path))
+	{
+		output(Error,"Invalid directory \"%s\".",path.c_str());
+		exit(-1);
+	}
 	std::vector<std::string> entries;
 	for(const auto& entry : std::filesystem::directory_iterator(path))
 		entries.push_back(entry.path().filename().string());
@@ -100,7 +105,7 @@ void padding()
 	}
 	catch(...)
 	{
-		output(Error,"Invalid value \'%s\' for \'%s\'.",config.setting[PADDING].c_str(),PADDING);
+		output(Error,"Invalid value \"%s\" for \"%s\".",config.setting[PADDING].c_str(),PADDING);
 		exit(-1);
 	}
 }
