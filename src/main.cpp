@@ -214,6 +214,20 @@ int prompt()
 }
 int main()
 {
+	//Generate cache of valid rpgsh programs to speed up "help" program
+	//It takes a noticable amount of time to search through all of /bin even on an i7-4700k
+	fprintf(stdout,"Generating rpgsh program list...");
+	std::vector<std::string> applications = getDirectoryListing("/bin");
+	std::filesystem::remove(rpgsh_programs_cache_path);
+	std::ofstream ofs(rpgsh_programs_cache_path);
+	for(const auto& app : applications)
+	{
+		if(!app.find(prefix))
+			ofs<<app<<"\n";
+	}
+	ofs.close();
+	fprintf(stdout,"\e[2K");//Delete entire line
+
 	//Generate default character if needed
 	if(!c.confirmDatasource())
 	{
