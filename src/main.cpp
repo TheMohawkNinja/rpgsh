@@ -49,7 +49,7 @@ std::string input_handler()
 				input.insert(input.begin()+cur_pos,k);
 			}
 
-			fprintf(stdout,"\e[K");
+			fprintf(stdout,CLEAR_LINE);
 
 			for(int i=cur_pos; i<input.size(); i++)
 				fprintf(stdout,"%c",input[i]);
@@ -61,7 +61,7 @@ std::string input_handler()
 		}
 		else if(k == KB_BACKSPACE && cur_pos > 0)
 		{
-			fprintf(stdout,"\b\e[K");// \b backs up one character and \e[K deletes everything to EOL
+			fprintf(stdout,"\b%s",CLEAR_LINE);
 			cur_pos--;
 			input.erase(input.begin()+cur_pos);
 			for(int i=cur_pos; i<input.size(); i++)
@@ -77,14 +77,14 @@ std::string input_handler()
 				case 'C':	//Right
 					if(cur_pos < input.size())
 					{
-						fprintf(stdout,"\e[C");
+						fprintf(stdout,CURSOR_RIGHT);
 						cur_pos++;
 					}
 					break;
 				case 'D':	//Left
 					if(cur_pos > 0)
 					{
-						fprintf(stdout,"\e[D");
+						fprintf(stdout,CURSOR_LEFT);
 						cur_pos--;
 					}
 					break;
@@ -116,16 +116,14 @@ std::string input_handler()
 						cur_pos = input.size();
 					}
 					break;
-				case '2':
-					if(getchar() == '~')	//Insert
-					{
+				case '2':	//Insert
+					if(getchar() == '~')
 						insert_mode = !insert_mode;
-					}
 					break;
-				case '3':
-					if(getchar() == '~' && cur_pos < input.size())	// Delete
+				case '3':	//Delete
+					if(getchar() == '~' && cur_pos < input.size())
 					{
-						fprintf(stdout,"\e[K");// \b backs up one character and \e[K deletes everything to EOL
+						fprintf(stdout,CLEAR_LINE);
 						input.erase(input.begin()+cur_pos);
 
 						for(int i=cur_pos; i<input.size(); i++)
