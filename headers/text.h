@@ -1,6 +1,7 @@
 //https://en.wikipedia.org/wiki/ANSI_escape_code
 
-#define TEXT_NORMAL			"\e[0m"
+//Text formatting
+#define TEXT_NORMAL			"\e[0m"		//Resets all other text formatting
 #define TEXT_BOLD			"\e[1m"
 #define TEXT_DIM			"\e[2m"
 #define TEXT_ITALIC			"\e[3m"
@@ -83,3 +84,19 @@
 #define TEXT_BG_LIGHTMAGENTA		"\e[105m"
 #define TEXT_BG_LIGHTCYAN		"\e[106m"
 #define TEXT_BG_WHITE			"\e[107m"
+
+//Cursor movement
+#define CURSOR_UP			"\e[A"		//
+#define CURSOR_DOWN			"\e[B"		//
+#define CURSOR_RIGHT			"\e[C"		// A-F can have their letters prefixed with a number
+#define CURSOR_LEFT			"\e[D"		// This number will repeat the effect that many times
+#define CURSOR_DOWN_HOME		"\e[E"		//
+#define CURSOR_UP_HOME			"\e[F"		//
+//There is a G for "moves cursor to column n", but it's basically just "home" without a number, so there's no point in a macro
+#define CLEAR_TO_SCREEN_END		"\e[J"		//Clears to screen end
+#define CLEAR_TO_SCREEN_START		"\e[1J"		//Clears from cursor to start of screen
+#define CLEAR_SCREEN			"\e[2J"		//Clears entire screen (like a "clear" command in bash)
+#define CLEAR_LINE			"\e[K"		//Clears current line
+#define CLEAR_TO_LINE_END		"\e[0K"		//Clears from cursor to end of line
+#define CLEAR_TO_LINE_START		"\e[1K"		//Clears from cursor to beginning of line
+#define CLEAR_ENTIRE_LINE		"\e[2K"		//Clears entire line, seems to behave identical to K
