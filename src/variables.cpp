@@ -83,6 +83,7 @@ std::string load_external_reference(std::string arg, Scope* p_scope)
 
 	//Actually load the xref into the scope
 	std::vector<std::string> dir_list;
+	std::vector<std::string> campaigns;
 	std::string xref_camp_char_dir = campaigns_dir+get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+"characters/";
 	std::string xref_char = xref;
 	std::string xref_path = "";
@@ -93,9 +94,24 @@ std::string load_external_reference(std::string arg, Scope* p_scope)
 		case CHARACTER_SIGIL:
 			if(xref.find("/") != std::string::npos)//Attempting to get a character from another campaign
 			{
-				campaign = xref.substr(0,xref.find("/")+1);
-				xref_camp_char_dir = campaigns_dir+campaign+"characters/";
+				campaign = xref.substr(0,xref.find("/"));
 				xref_char = xref.substr(xref.find("/")+1,xref.length()-(xref.find("/")+1));
+
+				campaigns = getDirectoryListing(campaigns_dir);
+				for(int i=0; i<campaigns.size(); i++)
+				{
+					if(!stringcasecmp(campaigns[i],campaign) &&
+					   std::filesystem::is_directory(campaigns_dir+campaigns[i]))
+					{
+						xref_camp_char_dir = campaigns_dir+campaigns[i]+"/characters/";
+						break;
+					}
+					else if(i == campaigns.size()-1)
+					{
+						output(Error,"Invalid xref \"%s\".",xref.c_str());
+						exit(-1);
+					}
+				}
 			}
 
 			dir_list = getDirectoryListing(xref_camp_char_dir);
