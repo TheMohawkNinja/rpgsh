@@ -95,7 +95,7 @@ std::string load_external_reference(std::string arg, Scope* p_scope)
 	//Ending square bracket not found
 	if(arg.find(']') == std::string::npos)
 	{
-		output(Error,"No terminating \']\' found for external reference.");
+		output(Error,"No terminating \']\' found for xref.");
 		exit(-1);
 	}
 
@@ -132,7 +132,7 @@ std::string load_external_reference(std::string arg, Scope* p_scope)
 				      variable_file_name);
 			break;
 		case SHELL_SIGIL:
-			output(Error,"Cannot use an external reference with shell scope sigil.");
+			output(Error,"Cannot use xref with shell scope.");
 			exit(-1);
 	}
 
