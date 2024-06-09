@@ -69,6 +69,27 @@ void append_output(std::map<std::string,std::string> map, std::string key, std::
 			p_output->append(k + DS + v + DS);
 	}
 }
+std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir,std::string mXref)
+{
+	std::vector<std::string> dir_contents = getDirectoryListing(chk_dir);
+	for(int i=0; i<dir_contents.size(); i++)
+	{
+		if(is_dir)
+		{
+			if(!stringcasecmp(dir_contents[i],chk_file) &&
+			   std::filesystem::is_directory(campaigns_dir+dir_contents[i]))
+				return dir_contents[i];
+		}
+		else
+		{
+			if(!stringcasecmp(dir_contents[i],chk_file) &&
+			   std::filesystem::is_regular_file(chk_dir+dir_contents[i]))
+				return dir_contents[i];
+		}
+	}
+	output(Error,"Invalid xref \"%s\".",mXref.c_str());
+	exit(-1);
+}
 std::string load_external_reference(std::string arg, Scope* p_scope)
 {
 	//Ending square bracket not found
@@ -82,13 +103,13 @@ std::string load_external_reference(std::string arg, Scope* p_scope)
 	std::string xref = arg.substr(arg.find('[')+1,arg.find(']')-(arg.find('[')+1));
 
 	//Actually load the xref into the scope
-	std::vector<std::string> dir_list;
 	std::vector<std::string> campaigns;
-	std::string xref_camp_char_dir = campaigns_dir+get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+"characters/";
+	std::string xref_camp_char_dir = campaigns_dir+
+					 get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
+					 "characters/";
 	std::string xref_char = xref;
 	std::string xref_path = "";
 	std::string campaign = "";
-	std::string file = "";
 	switch(arg[0])
 	{
 		case CHARACTER_SIGIL:
@@ -96,59 +117,19 @@ std::string load_external_reference(std::string arg, Scope* p_scope)
 			{
 				campaign = xref.substr(0,xref.find("/"));
 				xref_char = xref.substr(xref.find("/")+1,xref.length()-(xref.find("/")+1));
-
-				campaigns = getDirectoryListing(campaigns_dir);
-				for(int i=0; i<campaigns.size(); i++)
-				{
-					if(!stringcasecmp(campaigns[i],campaign) &&
-					   std::filesystem::is_directory(campaigns_dir+campaigns[i]))
-					{
-						xref_camp_char_dir = campaigns_dir+campaigns[i]+"/characters/";
-						break;
-					}
-					else if(i == campaigns.size()-1)
-					{
-						output(Error,"Invalid xref \"%s\".",xref.c_str());
-						exit(-1);
-					}
-				}
+				xref_camp_char_dir = campaigns_dir+
+						     getLikeFileName(campaign,campaigns_dir,true,xref)+
+						     "/characters/";
 			}
 
-			dir_list = getDirectoryListing(xref_camp_char_dir);
-			for(int i=0; i<dir_list.size(); i++)
-			{
-				file = dir_list[i].substr(0,dir_list[i].rfind("."));
-				xref_path = xref_camp_char_dir+dir_list[i];
-				if(!stringcasecmp(file,xref_char) &&
-				   std::filesystem::is_regular_file(xref_path))
-				{
-					p_scope->load(xref_path);
-					break;
-				}
-				else if(i == dir_list.size()-1)
-				{
-					output(Error,"Invalid xref \"%s\".",xref.c_str());
-					exit(-1);
-				}
-			}
+			p_scope->load(xref_camp_char_dir+
+				      getLikeFileName(xref_char+".char",xref_camp_char_dir,false,xref));
 			break;
 		case CAMPAIGN_SIGIL:
-			dir_list = getDirectoryListing(campaigns_dir);
-			for(int i=0; i<dir_list.size(); i++)
-			{
-				xref_path = campaigns_dir+dir_list[i];
-				if(!stringcasecmp(dir_list[i],xref) &&
-				   std::filesystem::is_directory(xref_path))
-				{
-					p_scope->load(xref_path+"/"+variable_file_name);
-					break;
-				}
-				else if(i == dir_list.size()-1)
-				{
-					output(Error,"Invalid xref \"%s\".",xref.c_str());
-					exit(-1);
-				}
-			}
+			p_scope->load(campaigns_dir+
+				      getLikeFileName(xref,campaigns_dir,true,xref)+
+				      "/"+
+				      variable_file_name);
 			break;
 		case SHELL_SIGIL:
 			output(Error,"Cannot use an external reference with shell scope sigil.");
