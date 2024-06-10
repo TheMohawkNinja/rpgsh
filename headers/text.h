@@ -1,6 +1,5 @@
-//https://en.wikipedia.org/wiki/ANSI_escape_code
-
 //Text formatting
+//https://en.wikipedia.org/wiki/ANSI_escape_code
 #define TEXT_NORMAL			"\e[0m"		//Resets all other text formatting
 #define TEXT_BOLD			"\e[1m"
 #define TEXT_DIM			"\e[2m"
@@ -86,13 +85,33 @@
 #define TEXT_BG_WHITE			"\e[107m"
 
 //Cursor movement
-#define CURSOR_UP			"\e[A"		//
-#define CURSOR_DOWN			"\e[B"		//
-#define CURSOR_RIGHT			"\e[C"		// A-F can have their letters prefixed with a number
-#define CURSOR_LEFT			"\e[D"		// This number will repeat the effect that many times
-#define CURSOR_DOWN_HOME		"\e[E"		//
-#define CURSOR_UP_HOME			"\e[F"		//
-//There is a G for "moves cursor to column n", but it's basically just "home" without a number, so there's no point in a macro
+//https://github.com/fabricio-p/c-ansi-sequences/blob/main/cursor.h
+#define _CURSOR_SET(l,c)		"\e["#l";"#c"H"
+#define CURSOR_SET			_CURSOR_SET(%d,%d)
+#define CURSOR_UP			"\e[A"
+#define _CURSOR_UP_N(n)			"\e["#n"A"
+#define CURSOR_UP_N			_CURSOR_UP_N(%d)
+#define CURSOR_DOWN			"\e[B"
+#define _CURSOR_DOWN_N(n)		"\e["#n"B"
+#define CURSOR_DOWN_N			_CURSOR_DOWN_N(%d)
+#define CURSOR_RIGHT			"\e[C"
+#define _CURSOR_RIGHT_N(n)		"\e["#n"C"
+#define CURSOR_RIGHT_N			_CURSOR_RIGHT_N(%d)
+#define CURSOR_LEFT			"\e[D"
+#define _CURSOR_LEFT_N(n)		"\e["#n"D"
+#define CURSOR_LEFT_N			_CURSOR_LEFT_N(%d)
+#define CURSOR_DOWN_HOME		"\e[E"
+#define _CURSOR_DOWN_HOME_N(n)		"\e["#n"E"
+#define CURSOR_DOWN_HOME_N		_CURSOR_DOWN_HOME_N(%d)
+#define CURSOR_UP_HOME			"\e[F"
+#define _CURSOR_UP_HOME_N(n)		"\e["#n"F"
+#define CURSOR_UP_HOME_N		_CURSOR_UP_HOME_N(%d)
+#define CURSOR_HOME			"\e[G"
+#define _CURSOR_SET_COL_N(n)		"\e["#n"G"
+#define CURSOR_SET_COL_N		_CURSOR_SET_COL_N(%d)
+#define CURSOR_SET_HOME			"\e[H"
+
+//Screen and line clearing
 #define CLEAR_TO_SCREEN_END		"\e[J"		//Clears to screen end
 #define CLEAR_TO_SCREEN_START		"\e[1J"		//Clears from cursor to start of screen
 #define CLEAR_SCREEN			"\e[2J"		//Clears entire screen (like a "clear" command in bash)
