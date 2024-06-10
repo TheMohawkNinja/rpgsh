@@ -35,7 +35,7 @@ std::string input_handler()
 	{
 		k = getchar();
 
-		if(isprint(k))
+		if(isprint(k))//Printable characters
 		{
 			if(insert_mode)	//If the "Insert" key is toggled
 			{
@@ -53,13 +53,12 @@ std::string input_handler()
 
 			for(int i=cur_pos; i<input.size(); i++)
 				fprintf(stdout,"%c",input[i]);
-
 			if(cur_pos < input.size()-1)
-				fprintf(stdout,"\e[%dD",input.size()-1-cur_pos);
+				fprintf(stdout,CURSOR_LEFT_N,input.size()-1-cur_pos);
 
 			cur_pos++;
 		}
-		else if(k == KB_BACKSPACE && cur_pos > 0)
+		else if(k == KB_BACKSPACE && cur_pos > 0)//Backspace
 		{
 			fprintf(stdout,"\b%s",CLEAR_LINE);
 			cur_pos--;
@@ -67,7 +66,14 @@ std::string input_handler()
 			for(int i=cur_pos; i<input.size(); i++)
 				fprintf(stdout,"%c",input[i]);
 			if(cur_pos < input.size())
-				fprintf(stdout,"\e[%dD",input.size()-cur_pos);
+				fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
+		}
+		else if(k == '\t')//Tab
+		{
+			if(input.size())
+			{
+				//TODO: Tab completion
+			}
 		}
 		else if(k == ESC_SEQ)//Escape sequences
 		{
@@ -91,28 +97,28 @@ std::string input_handler()
 				case 'H':	//Home
 					if(cur_pos > 0)
 					{
-						fprintf(stdout,"\e[%dD",cur_pos);
+						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
 						cur_pos = 0;
 					}
 					break;
 				case '7':	//Home
 					if(getchar() == '~' && cur_pos > 0)
 					{
-						fprintf(stdout,"\e[%dD",cur_pos);
+						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
 						cur_pos = 0;
 					}
 					break;
 				case 'F':	//End
 					if(cur_pos < input.size())
 					{
-						fprintf(stdout,"\e[%dC",input.size()-cur_pos);
+						fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
 						cur_pos = input.size();
 					}
 					break;
 				case '8':	//End
 					if(getchar() == '~' && cur_pos < input.size())
 					{
-						fprintf(stdout,"\e[%dC",input.size()-cur_pos);
+						fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
 						cur_pos = input.size();
 					}
 					break;
@@ -128,9 +134,8 @@ std::string input_handler()
 
 						for(int i=cur_pos; i<input.size(); i++)
 							fprintf(stdout,"%c",input[i]);
-
 						if(cur_pos < input.size())
-							fprintf(stdout,"\e[%dD",input.size()-cur_pos);
+							fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
 					}
 					break;
 			}
