@@ -60,19 +60,55 @@ std::string input_handler()
 		}
 		else if(k == KB_BACKSPACE && cur_pos > 0)//Backspace
 		{
-			fprintf(stdout,"\b%s",CLEAR_LINE);
+			fprintf(stdout,"\b%s",CLEAR_TO_LINE_END);
+
 			cur_pos--;
 			input.erase(input.begin()+cur_pos);
+
 			for(int i=cur_pos; i<input.size(); i++)
 				fprintf(stdout,"%c",input[i]);
 			if(cur_pos < input.size())
 				fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
 		}
-		else if(k == '\t')//Tab
+		else if(k == '\t' && input.size())//Tab (completion)
 		{
-			if(input.size())
+			//TODO: Tab completion
+			//Create the string which is to be completed
+			std::string chk_str = "";
+			for(int i=cur_pos-1; i>=0&&input[i]!=' '; i--)
+				chk_str.insert(0,std::string(1,input[i]));
+
+			if(isalpha(chk_str[0]))//Applications
 			{
-				//TODO: Tab completion
+				//Find first match TODO: Will need to check for subsequent matches
+				std::string match = "";
+				std::string app = "";
+				std::ifstream ifs(rpgsh_programs_cache_path);
+				while(!ifs.eof())
+				{
+					getline(ifs,app);
+					if(app.length() > prefix.length() &&
+					   app.substr(prefix.length(),chk_str.length()) == chk_str)
+					{
+						match = app.substr(prefix.length(),
+								   match.length()-prefix.length());
+						break;
+					}
+				}
+				ifs.close();
+
+				if(match == "") continue;
+
+				//Insert match into input
+				for(int i=0; i<match.length()-chk_str.length(); i++)
+					input.insert(input.begin()+cur_pos+i,match[i+chk_str.length()]);
+
+				//Reprint input
+				fprintf(stdout,CLEAR_TO_LINE_END);
+				for(int i=cur_pos; i<input.size(); i++)
+					fprintf(stdout,"%c",input[i]);
+				if(cur_pos < input.size())
+					fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
 			}
 		}
 		else if(k == ESC_SEQ)//Escape sequences
