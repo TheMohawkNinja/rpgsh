@@ -38,7 +38,10 @@
 #define TEXT_MAGENTA			"\e[35m"
 #define TEXT_CYAN			"\e[36m"
 #define TEXT_LIGHTGRAY			"\e[37m"
-#define TEXT_COLOR			"\e[38m"	//Next arguments are 5;n or 2;r;g;b
+#define _TEXT_COLOR_4BIT(n)		"\e[38;5;"#n"m"	//0-15, 0-7 low intensity, 8-15 high intensity
+#define TEXT_COLOR_4BIT			_TEXT_COLOR_4_BIT(%n)
+#define _TEXT_COLOR_8BIT(r,g,b)		"\e[38;2;"#r";"#g";"#b"m"
+#define TEXT_COLOR_8BIT			_TEXT_COLOR_8_BIT(%r,%g,%b)
 #define TEXT_DEFAULTCOLOR		"\e[39m"	//Implementation-specific
 #define TEXT_BG_BLACK			"\e[40m"
 #define TEXT_BG_RED			"\e[41m"
@@ -48,7 +51,10 @@
 #define TEXT_BG_MAGENTA			"\e[45m"
 #define TEXT_BG_CYAN			"\e[46m"
 #define TEXT_BG_LIGHTGRAY		"\e[47m"
-#define TEXT_BG_COLOR			"\e[48m"	//Next arguments are 5;n or 2;r;g;b
+#define _TEXT_BG_COLOR_4BIT(n)		"\e[48;5;"#n"m"	//0-15, 0-7 low intensity, 8-15 high intensity
+#define TEXT_BG_COLOR_4BIT		_TEXT_BG_COLOR_4_BIT(%n)
+#define _TEXT_BG_COLOR_8BIT(r,g,b)	"\e[48;2;"#r";"#g";"#b"m"
+#define TEXT_BG_COLOR_8BIT		_TEXT_BG_COLOR_8_BIT(%r,%g,%b)
 #define TEXT_BG_DEFAULTCOLOR		"\e[49m"
 #define TEXT_NOPROPSPACING		"\e[50m"
 #define TEXT_FRAME			"\e[51m"	//Implemented as "emoji variation selector" in mintty
@@ -56,7 +62,10 @@
 #define TEXT_OVERLINE			"\e[53m"
 #define TEXT_NOFRAME_NOENCIRCLE		"\e[54m"	//Resets 52 and 53
 #define TEXT_NOOVERLINE			"\e[55m"
-#define TEXT_UNDERLINECOLOR		"\e[58m"	//Next arguments are 5;n or 2;r;g;b
+#define _TEXT_UNDERLINECOLOR_4BIT(n)	"\e[58;5;"#n"m"//0-15, 0-7 low intensity, 8-15 high intensity
+#define TEXT_UNDERLINECOLOR_4BIT	_TEXT_UNDERLINECOLOR_4_BIT(%n)
+#define _TEXT_UNDERLINECOLOR_8BIT(r,g,b)"\e[58;2;"#r";"#g";"#b"m"
+#define TEXT_UNDERLINECOLOR_8BIT	_TEXT_UNDERLINECOLOR_8_BIT(%r,%g,%b)
 #define TEXT_DEFAULTUNDERLINECOLOR	"\e[59m"
 #define TEXT_IDEO_UNDER			"\e[60m"	//Ideogram underline or right side line
 #define TEXT_IDEO_DOUBLEUNDER		"\e[61m"	//Ideogram double underline or double right side line
