@@ -257,15 +257,35 @@ int main()
 	//It takes a noticable amount of time to search through all of /bin even on an i7-4700k
 	fprintf(stdout,"Generating rpgsh program list...");
 	std::vector<std::string> applications = getDirectoryListing("/bin");
+	std::vector<std::string> rpgsh_apps;
 	std::filesystem::remove(rpgsh_programs_cache_path);
-	std::ofstream ofs(rpgsh_programs_cache_path);
 	for(const auto& app : applications)
 	{
 		if(!app.find(prefix))
-			ofs<<app<<"\n";
+			rpgsh_apps.push_back(app);
 	}
+
+	//Basic alphabetical sort, important for tab completion
+	for(int i=0; i<rpgsh_apps.size()-1; i++)
+	{
+		for(int j=i+1; j<rpgsh_apps.size(); j++)
+		{
+			if(rpgsh_apps[j] < rpgsh_apps[i])
+			{
+				std::string tmp = rpgsh_apps[i];
+				rpgsh_apps[i]=rpgsh_apps[j];
+				rpgsh_apps[j]=tmp;
+			}
+		}
+	}
+
+	//Write alphabetized list to file
+	std::ofstream ofs(rpgsh_programs_cache_path);
+	for(const auto& app : rpgsh_apps)
+		ofs<<app<<"\n";
 	ofs.close();
-	fprintf(stdout,"\e[2K");//Delete entire line
+
+	fprintf(stdout,"\e[2K");//Delete "Generating..." line from start of main()
 
 	//Generate default character if needed
 	if(!c.confirmDatasource())
