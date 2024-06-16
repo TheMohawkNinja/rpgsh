@@ -69,25 +69,20 @@ void append_output(std::map<std::string,std::string> map, std::string key, std::
 			p_output->append(k + DS + v + DS);
 	}
 }
-std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir,std::string mXref)
+std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir,std::string xref)
 {
-	std::vector<std::string> dir_contents = getDirectoryListing(chk_dir);
-	for(int i=0; i<dir_contents.size(); i++)
+	for(const auto& entry : getDirectoryListing(chk_dir))
 	{
-		if(is_dir)
-		{
-			if(!stringcasecmp(dir_contents[i],chk_file) &&
-			   std::filesystem::is_directory(campaigns_dir+dir_contents[i]))
-				return dir_contents[i];
-		}
-		else
-		{
-			if(!stringcasecmp(dir_contents[i],chk_file) &&
-			   std::filesystem::is_regular_file(chk_dir+dir_contents[i]))
-				return dir_contents[i];
-		}
+		if(is_dir &&
+		   !stringcasecmp(entry,chk_file) &&
+		   std::filesystem::is_directory(campaigns_dir+entry))
+			return entry;
+		else if(!is_dir &&
+			!stringcasecmp(entry,chk_file) &&
+			std::filesystem::is_regular_file(chk_dir+entry))
+			return entry;
 	}
-	output(Error,"Invalid xref \"%s\".",mXref.c_str());
+	output(Error,"Invalid xref \"%s\".",xref.c_str());
 	exit(-1);
 }
 std::string load_external_reference(std::string arg, Scope* p_scope)
