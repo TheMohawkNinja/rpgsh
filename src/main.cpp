@@ -104,11 +104,9 @@ std::string input_handler()
 
 					std::string app_chk_str = app.substr(prefix.length(),
 									     chk_str.length());
-					if(app.length() > prefix.length() && app_chk_str == chk_str)
-					{
-						matches.push_back(app.substr(prefix.length(),
-									     match.length()-prefix.length()));
-					}
+					int app_ln = right(app,prefix.length()).length();
+					if(app_chk_str == chk_str && app_ln > chk_str.length())
+						matches.push_back(right(app,prefix.length()));
 				}
 				ifs.close();
 			}
@@ -120,12 +118,23 @@ std::string input_handler()
 				if(chk_str.length() == 1)
 				{
 					matches.push_back(std::string(1,CHARACTER_SIGIL)+"/");
+					matches.push_back(std::string(1,CHARACTER_SIGIL)+"[");
 				}
-				else if(chk_str.length() == 2 && chk_str[1] == '[')
+				else if(chk_str.length() >= 2 &&
+					chk_str[1] == '[' &&
+					chk_str.find(']') == std::string::npos)//Complete xref
 				{
-					matches = getDirectoryListing(xref_path);
-					for(auto& m : matches)
-						m = "  "+left(m,m.find(".char"));
+					for(auto& c : getDirectoryListing(xref_path))
+					{
+						if(c.find(".char") == std::string::npos)
+							continue;
+
+						std::string char_name = left(c,c.find(".char"));
+						if(chk_str.length() == 2 ||
+						   (right(chk_str,2) == left(char_name,chk_str.length()-2) &&
+						   char_name.length() > right(chk_str,2).length()))
+							matches.push_back("  "+char_name);//Two spaces are sacrificial for formatting
+					}
 				}
 			}
 
