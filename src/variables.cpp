@@ -12,8 +12,8 @@ template<typename T>
 void print_requested_data(Scope scope, std::string key)
 {
 	//Directly evaulating the methods doesn't work for some reason, so we have to use interim variables, weird...
-	int period = key.find(".");
-	int slash = key.rfind("/");
+	int period = key.find('.');
+	int slash = key.rfind('/');
 	if(period < slash)//If any periods are before the last '/', print the explicit constructor
 	{
 		key = key.substr(1,key.length()-1);
@@ -21,24 +21,24 @@ void print_requested_data(Scope scope, std::string key)
 	}
 	else//Otherwise, print the requested property
 	{
-		std::string property = key.substr(key.rfind(".")+1,
-						  key.length()-(key.rfind(".")+1));
-		key = key.substr(1,key.rfind(".")-1);
+		std::string property = key.substr(key.rfind('.')+1,
+						  key.length()-(key.rfind('.')+1));
+		key = key.substr(1,key.rfind('.')-1);
 		fprintf(stdout,"%s\n",scope.getProperty<T>(key,property).c_str());
 	}
 }
 template<typename T>
 void check_key(Scope scope, std::string key)
 {
-	int period = key.find(".");
-	int slash = key.rfind("/");
+	int period = key.find('.');
+	int slash = key.rfind('/');
 	for(const auto& [k,v] : scope.getDatamap<T>())
 	{
 		std::string chk_str = "";
 		if(period < slash)
 			chk_str = key.substr(1,key.length()-1);
 		else
-			chk_str = key.substr(1,key.rfind(".")-1);
+			chk_str = key.substr(1,key.rfind('.')-1);
 
 		if(!stringcasecmp(chk_str,k))
 		{
@@ -112,10 +112,10 @@ std::string load_external_reference(std::string arg, Scope* p_scope)
 	switch(arg[0])
 	{
 		case CHARACTER_SIGIL:
-			if(xref.find("/") != std::string::npos)//Attempting to get a character from another campaign
+			if(xref.find('/') != std::string::npos)//Attempting to get a character from another campaign
 			{
-				campaign = xref.substr(0,xref.find("/"));
-				xref_char = xref.substr(xref.find("/")+1,xref.length()-(xref.find("/")+1));
+				campaign = xref.substr(0,xref.find('/'));
+				xref_char = xref.substr(xref.find('/')+1,xref.length()-(xref.find('/')+1));
 				xref_dir = campaigns_dir+
 					   getLikeFileName(campaign,campaigns_dir,true,xref)+
 					   "/characters/";
@@ -146,7 +146,7 @@ int main(int argc, char** argv)
 {
 	check_print_app_description(argv,"Not meant for direct call by user. Implicitly called when modifying variables.");
 
-	if(std::string(argv[1]).find("/") == std::string::npos)//If the user only enters the scope sigil
+	if(std::string(argv[1]).find('/') == std::string::npos)//If the user only enters the scope sigil
 	{
 		output(Error,"Expected at least one '/' delimiter.");
 		exit(-1);
@@ -157,12 +157,12 @@ int main(int argc, char** argv)
 	std::string key = "";
 
 	//Check if user is requesting a character xref from a different campaign. Directly evaluating the find() methods results in nonsensical behavior (e.g. -1>1=true)
-	int rsqbrkt = arg.find("]");
-	int slash = arg.find(")");
+	int rsqbrkt = arg.find(']');
+	int slash = arg.find(')');
 	if(rsqbrkt > slash)
-		key = arg.substr(arg.find("]")+1,arg.length()-(arg.find("]")+1));
+		key = arg.substr(arg.find(']')+1,arg.length()-(arg.find(']')+1));
 	else
-		key = arg.substr(arg.find("/"),arg.length()-(arg.find("/")));
+		key = arg.substr(arg.find('/'),arg.length()-(arg.find('/')));
 
 	//Check scope sigil
 	switch(argv[1][0])
