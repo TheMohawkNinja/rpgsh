@@ -104,11 +104,10 @@ std::string load_external_reference(std::string arg, Scope* p_scope)
 
 	//Actually load the xref into the scope
 	std::vector<std::string> campaigns;
-	std::string xref_camp_char_dir = campaigns_dir+
-					 get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
-					 "characters/";
+	std::string xref_dir = campaigns_dir+
+			       get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
+			       "characters/";
 	std::string xref_char = xref;
-	std::string xref_path = "";
 	std::string campaign = "";
 	switch(arg[0])
 	{
@@ -117,13 +116,13 @@ std::string load_external_reference(std::string arg, Scope* p_scope)
 			{
 				campaign = xref.substr(0,xref.find("/"));
 				xref_char = xref.substr(xref.find("/")+1,xref.length()-(xref.find("/")+1));
-				xref_camp_char_dir = campaigns_dir+
-						     getLikeFileName(campaign,campaigns_dir,true,xref)+
-						     "/characters/";
+				xref_dir = campaigns_dir+
+					   getLikeFileName(campaign,campaigns_dir,true,xref)+
+					   "/characters/";
 			}
 
-			p_scope->load(xref_camp_char_dir+
-				      getLikeFileName(xref_char+".char",xref_camp_char_dir,false,xref));
+			p_scope->load(xref_dir+
+				      getLikeFileName(xref_char+".char",xref_dir,false,xref));
 			break;
 		case CAMPAIGN_SIGIL:
 			p_scope->load(campaigns_dir+
@@ -156,7 +155,11 @@ int main(int argc, char** argv)
 	Scope scope;
 	std::string arg(argv[1]);
 	std::string key = "";
-	if(arg.find("]") > arg.find("/"))//User is requesting a character xref from a different campaign
+
+	//Check if user is requesting a character xref from a different campaign. Directly evaluating the find() methods results in nonsensical behavior (e.g. -1>1=true)
+	int rsqbrkt = arg.find("]");
+	int slash = arg.find(")");
+	if(rsqbrkt > slash)
 		key = arg.substr(arg.find("]")+1,arg.length()-(arg.find("]")+1));
 	else
 		key = arg.substr(arg.find("/"),arg.length()-(arg.find("/")));
