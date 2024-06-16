@@ -61,11 +61,11 @@ void append_output(std::map<std::string,std::string> map, std::string key, std::
 	for(const auto& [k,v] : map)
 	{
 		//Get root variable if it exists
-		if(("/"+k.substr(0,key.length()-1)+"/") == key)
+		if(("/"+left(k,key.length()-1)+"/") == key)
 			p_output->append(k + DS + v + DS);
 
 		//Get all subkeys
-		if("/"+k.substr(0,key.length()-1) == key)
+		if("/"+left(k,key.length()-1) == key)
 			p_output->append(k + DS + v + DS);
 	}
 }
@@ -114,8 +114,8 @@ std::string load_external_reference(std::string arg, Scope* p_scope)
 		case CHARACTER_SIGIL:
 			if(xref.find('/') != std::string::npos)//Attempting to get a character from another campaign
 			{
-				campaign = xref.substr(0,xref.find('/'));
-				xref_char = xref.substr(xref.find('/')+1,xref.length()-(xref.find('/')+1));
+				campaign = left(xref,xref.find('/'));
+				xref_char = right(xref,xref.find('/')+1);
 				xref_dir = campaigns_dir+
 					   getLikeFileName(campaign,campaigns_dir,true,xref)+
 					   "/characters/";
@@ -136,9 +136,7 @@ std::string load_external_reference(std::string arg, Scope* p_scope)
 	}
 
 	//Remove external reference string so we can continue to use the current arg under the new context
-	arg = arg[0]+
-	      arg.substr(0,arg.find('[')-1)+
-	      arg.substr(arg.find(']')+1,arg.length()-(arg.find(']')+1));
+	arg = arg[0]+left(arg,arg.find('[')-1)+right(arg,arg.find(']')+1);
 	return arg;
 }
 
@@ -160,9 +158,9 @@ int main(int argc, char** argv)
 	int rsqbrkt = arg.find(']');
 	int slash = arg.find(')');
 	if(rsqbrkt > slash)
-		key = arg.substr(arg.find(']')+1,arg.length()-(arg.find(']')+1));
+		key = right(arg,arg.find(']')+1);
 	else
-		key = arg.substr(arg.find('/'),arg.length()-(arg.find('/')));
+		key = right(arg,arg.find('/'));
 
 	//Check scope sigil
 	switch(argv[1][0])
@@ -276,7 +274,7 @@ int main(int argc, char** argv)
 			append_output(w_map,key,&output);
 
 			//Cut off the extraneous DS
-			output = output.substr(0,output.length()-DS.length());
+			output = left(output,output.length()-DS.length());
 			fprintf(stdout,"%s\n",output.c_str());
 		}
 	}

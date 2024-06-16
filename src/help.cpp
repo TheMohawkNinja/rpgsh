@@ -26,8 +26,7 @@ int main(int argc, char** argv)
 		std::string app = applications[i];
 		if(app.substr(0,prefix.length()) == prefix)
 		{
-			appname = app.substr(prefix.length(),
-					     app.length()-prefix.length());
+			appname = right(app,prefix.length());
 			if(appname.length() > longestNameLength)
 				longestNameLength = appname.length();
 		}
@@ -41,8 +40,7 @@ int main(int argc, char** argv)
 	//Print results
 	for(const auto& app : applications)
 	{
-		appname = app.substr(prefix.length(),
-				     app.length()-prefix.length());
+		appname = right(app,prefix.length());
 		appdescription = get_prog_output(appname+" "+FLAG_APPDESCRIPTION);
 
 		//Not sure why %*s doesn't work here

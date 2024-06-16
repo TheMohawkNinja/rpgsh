@@ -140,7 +140,7 @@ void print_campaign_variables()
 	Campaign m = Campaign();
 	std::string sigil(1,CAMPAIGN_SIGIL);
 	std::string m_name = get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR);
-	print_header("("+sigil+") "+m_name.substr(0,m_name.length()-1));// Omit trailing '/'
+	print_header("("+sigil+") "+left(m_name,m_name.length()-1));// Omit trailing '/'
 	print_data(m);
 }
 void print_shell_variables()

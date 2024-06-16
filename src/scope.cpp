@@ -80,7 +80,7 @@ void Scope::load()
 		*/
 		if(data.find(DS) > 1)
 		{
-			output(Warning,"Multi-character type specifier \"%s\" at \"%s:%d\", skipping line...",data.substr(0,data.find(DS)).c_str(),datasource.c_str(),linenum);
+			output(Warning,"Multi-character type specifier \"%s\" at \"%s:%d\", skipping line...",left(data,data.find(DS)).c_str(),datasource.c_str(),linenum);
 			continue;
 		}
 
@@ -89,8 +89,7 @@ void Scope::load()
 			type = data[0];
 			try
 			{
-				key = data.substr(1+DS.length(),
-						 (data.rfind(DS)-(1+DS.length())));
+				key = data.substr(1+DS.length(),(data.rfind(DS)-(1+DS.length())));
 			}
 			catch(...)
 			{
@@ -100,8 +99,7 @@ void Scope::load()
 
 			try
 			{
-				value = data.substr(data.rfind(DS)+DS.length(),
-						   (data.length()-data.rfind(DS)+DS.length()));
+				value = right(data,data.rfind(DS)+DS.length());
 			}
 			catch(...)
 			{
@@ -150,8 +148,7 @@ std::string Scope::formatLine(char type, std::string k, std::string v)
 void Scope::save()
 {
 	//Make backup first
-	if(std::filesystem::exists(datasource.c_str()) &&
-	datasource.substr(datasource.length()-4,4) != ".bak")
+	if(std::filesystem::exists(datasource.c_str()) && right(datasource,4) != ".bak")
 		 std::filesystem::rename(datasource.c_str(),(datasource+".bak").c_str());
 
 	std::ofstream ofs = tryCreateFileStream<std::ofstream>(datasource);

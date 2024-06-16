@@ -15,7 +15,7 @@ Character c = Character(false);
 
 std::string input_handler()
 {
-	#define ESC_SEQ		'\033'
+	#define KB_TAB		9
 	#define KB_ENTER	10
 	#define KB_BACKSPACE	127
 
@@ -26,14 +26,23 @@ std::string input_handler()
 	t_new.c_lflag &= ~(ICANON | ECHO);
 	tcsetattr(fileno(stdin), TCSANOW, &t_new);
 
-	std::vector<char> input;
+	bool insert_mode = false;
 	char k = 0;
 	int cur_pos = 0;
-	bool insert_mode = false;
+	int tab_ctr = 0;
+	std::string last_match = "";
+	std::vector<char> input;
 
 	while(k != KB_ENTER)
 	{
 		k = getchar();
+
+		//Reset tab completion variables
+		if(k != KB_TAB)
+		{
+			tab_ctr = 0;
+			last_match = "";
+		}
 
 		if(isprint(k))//Printable characters
 		{
@@ -70,8 +79,13 @@ std::string input_handler()
 			if(cur_pos < input.size())
 				fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
 		}
-		else if(k == '\t' && input.size())//Tab (completion)
+		else if(k == KB_TAB && input.size())//Tab (completion)
 		{
+			tab_ctr++;
+
+			std::string match = "";
+			std::vector<std::string> matches;
+
 			//TODO: Tab completion
 			//Create the string which is to be completed
 			std::string chk_str = "";
@@ -80,36 +94,64 @@ std::string input_handler()
 
 			if(isalpha(chk_str[0]))//Applications
 			{
-				//Find first match TODO: Will need to check for subsequent matches
-				std::string match = "";
+				//Get matches
 				std::string app = "";
 				std::ifstream ifs(rpgsh_programs_cache_path);
 				while(!ifs.eof())
 				{
 					getline(ifs,app);
-					if(app.length() > prefix.length() &&
-					   app.substr(prefix.length(),chk_str.length()) == chk_str)
+					if(app == "") break;
+
+					std::string app_chk_str = app.substr(prefix.length(),
+									     chk_str.length());
+					if(app.length() > prefix.length() && app_chk_str == chk_str)
 					{
-						match = app.substr(prefix.length(),
-								   match.length()-prefix.length());
-						break;
+						matches.push_back(app.substr(prefix.length(),
+									     match.length()-prefix.length()));
 					}
 				}
 				ifs.close();
-
-				if(match == "") continue;
-
-				//Insert match into input
-				for(int i=0; i<match.length()-chk_str.length(); i++)
-					input.insert(input.begin()+cur_pos+i,match[i+chk_str.length()]);
-
-				//Reprint input
-				fprintf(stdout,CLEAR_TO_LINE_END);
-				for(int i=cur_pos; i<input.size(); i++)
-					fprintf(stdout,"%c",input[i]);
-				if(cur_pos < input.size())
-					fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
 			}
+			else if(chk_str[0] == CHARACTER_SIGIL)//Character variables
+			{
+				std::string xref_path = campaigns_dir+
+							get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
+							"characters/";
+				if(chk_str.length() == 1)
+				{
+					matches.push_back(std::string(1,CHARACTER_SIGIL)+"/");
+				}
+				else if(chk_str.length() == 2 && chk_str[1] == '[')
+				{
+					matches = getDirectoryListing(xref_path);
+					for(auto& m : matches)
+						m = "  "+left(m,m.find(".char"));
+				}
+			}
+
+			if(!matches.size()) continue;
+
+			match = matches[(tab_ctr-1)%matches.size()];
+
+			//Erase any previous match
+			if(last_match != "")
+			{
+				for(int i=0; i<last_match.length()-chk_str.length(); i++)
+					input.erase(input.begin()+cur_pos);
+			}
+
+			//Insert match into input
+			for(int i=0; i<match.length()-chk_str.length(); i++)
+				input.insert(input.begin()+cur_pos+i,match[i+chk_str.length()]);
+
+			//Reprint input
+			fprintf(stdout,CLEAR_TO_LINE_END);
+			for(int i=cur_pos; i<input.size(); i++)
+				fprintf(stdout,"%c",input[i]);
+
+			fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
+
+			last_match = match;
 		}
 		else if(k == ESC_SEQ)//Escape sequences
 		{

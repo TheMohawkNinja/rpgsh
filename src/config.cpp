@@ -11,7 +11,7 @@ std::string Config::get_config_item(std::string s)
 {
 	if(s.find("=")!=std::string::npos)
 	{
-		return s.substr(0,s.find("="));
+		return left(s,s.find('='));
 	}
 	else//No '='
 	{
@@ -39,7 +39,7 @@ std::string Config::get_config_value(std::string s)
 		}
 		else//Found value
 		{
-			return s.substr(s.find("=")+1,s.length()-(s.find("=")+1));
+			return right(s,s.find("=")+1);
 		}
 	}
 	else//No '='
