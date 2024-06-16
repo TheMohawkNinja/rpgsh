@@ -13,23 +13,28 @@
 bool stob(std::string s)
 {
 	if(!stringcasecmp(s,"true"))
-	{
 		return true;
-	}
 	else if(!stringcasecmp(s,"false"))
-	{
 		return false;
-	}
 	else
-	{
-		throw std::invalid_argument("Parameter for stob() was not \'true\' or \'false\'.");
-		return false;
-	}
+		throw;
+
+	return false;
 }
 
 int stringcasecmp(std::string a, std::string b)
 {
 	return strcasecmp(a.c_str(),b.c_str());
+}
+
+std::string left(std::string str, int n)
+{
+	return str.substr(0,n);
+}
+
+std::string right(std::string str, int n)
+{
+	return str.substr(n,str.length()-n);
 }
 
 void confirmEnvVariablesFile()
@@ -304,11 +309,8 @@ std::string get_env_variable(std::string v)
 		std::string data = "";
 		std::getline(ifs,data);
 
-		if(data.substr(0,data.find(DS)) == v)
-		{
-			return data.substr(data.find(DS)+DS.length(),
-			       data.length()-(data.find(DS)+DS.length()));
-		}
+		if(left(data,data.find(DS)) == v)
+			return right(data,data.find(DS)+DS.length());
 	}
 	ifs.close();
 	return "";
@@ -328,7 +330,7 @@ void set_env_variable(std::string v,std::string value)
 		std::getline(ifs,data);
 		if(data == "" || data == "\n")// Prevents writing blank lines back to file
 			continue;
-		if(data.substr(0,data.find(DS)) == v)
+		if(left(data,data.find(DS)) == v)
 		{
 			ofs<<v + DS + value + "\n";
 			ReplacedValue = true;

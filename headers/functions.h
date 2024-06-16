@@ -12,6 +12,10 @@ bool stob(std::string s);
 
 int stringcasecmp(std::string a, std::string b);
 
+std::string left(std::string str, int n);
+
+std::string right(std::string str, int n);
+
 void confirmEnvVariablesFile();
 
 void confirmShellVariablesFile();
