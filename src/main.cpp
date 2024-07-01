@@ -126,14 +126,14 @@ std::string input_handler()
 				{
 					for(auto& c : getDirectoryListing(xref_path))
 					{
-						if(c.find(".char") == std::string::npos)
+						if(right(c,c.length()-5) != ".char")
 							continue;
 
 						std::string char_name = left(c,c.find(".char"));
 						if(chk_str.length() == 2 ||
 						   (right(chk_str,2) == left(char_name,chk_str.length()-2) &&
 						   char_name.length() > right(chk_str,2).length()))
-							matches.push_back("  "+char_name);//Two spaces are sacrificial for formatting
+							matches.push_back("  "+char_name+"]");//Two spaces are sacrificial for formatting
 					}
 				}
 			}
