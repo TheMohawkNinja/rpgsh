@@ -125,21 +125,54 @@ std::string input_handler()
 				}
 				else if(chk_str.length() >= 2 &&
 					chk_str[1] == '[' &&
-					chk_str.find(']') == std::string::npos)//Complete xref
+					chk_str.find(']') == std::string::npos &&
+					chk_str.find('/') == std::string::npos)//Complete xref (same campaign)
 				{
 					for(auto& c : getDirectoryListing(xref_path))
 					{
 						if(right(c,c.length()-5) != ".char")//Don't include backup files or non-character files
 							continue;
 
-						//TODO: xref with '/'
-						std::string char_name = left(c,c.find(".char"));
-						std::string xref = right(chk_str,2);
+						std::string xref = left(c,c.find(".char"));
+						std::string chk_str_xref = right(chk_str,2);
 						if(chk_str.length() == 2 ||
-						   (xref == left(char_name,chk_str.length()-2) && char_name.length() > xref.length()))
+						   (chk_str_xref == left(xref,chk_str.length()-2) && xref.length() > chk_str_xref.length()))
 						{
-							matches.push_back("  "+char_name+"]");//Two spaces are sacrificial for formatting
-							tab_comp_c.load(xref_path+char_name+".char");
+							matches.push_back("  "+xref+"]");//Two spaces are sacrificial for formatting
+							tab_comp_c.load(xref_path+xref+".char");
+						}
+					}
+				}
+				else if(chk_str.length() >= 2 &&
+					chk_str[1] == '[' &&
+					chk_str.find(']') == std::string::npos)//Complete xref (different campaign)
+				{
+					//Get campaign name
+					std::string campaign = right(chk_str,chk_str.find('[')+1);
+					campaign = left(campaign,campaign.find('/'));
+
+					std::string xref_path = campaigns_dir+
+								campaign+"/"+
+								"characters/";
+
+					if(!std::filesystem::exists(xref_path) || !std::filesystem::is_directory(xref_path))
+						continue;
+
+					for(auto& c : getDirectoryListing(xref_path))
+					{
+						if(right(c,c.length()-5) != ".char")//Don't include backup files or non-character files
+							continue;
+
+						std::string xref = left(c,c.find(".char"));
+						std::string chk_str_xref = right(chk_str,chk_str.find('/')+1);
+						if(chk_str_xref == left(xref,chk_str.length()-chk_str.find('/')-1) &&
+						   xref.length() > chk_str_xref.length())
+						{
+							std::string padding = "";
+							for(int i=0; i<chk_str.length()-(chk_str.length()-chk_str.find('/'))+1; i++)
+								padding += " ";
+							matches.push_back(padding+xref+"]");//Padding is sacrificial for formatting
+							tab_comp_c.load(xref_path+xref+".char");
 						}
 					}
 				}
@@ -147,6 +180,7 @@ std::string input_handler()
 
 			if(!matches.size()) continue;
 
+			//Choose match
 			match = matches[(tab_ctr-1)%matches.size()];
 
 			//Erase any previous match
