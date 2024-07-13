@@ -40,6 +40,8 @@ std::string input_handler()
 		//Reset tab completion variables
 		if(k != KB_TAB)
 		{
+			if(tab_ctr > 0)
+				cur_pos += (input.size()-cur_pos);
 			tab_ctr = 0;
 			last_match = "";
 		}
@@ -112,6 +114,7 @@ std::string input_handler()
 			}
 			else if(chk_str[0] == CHARACTER_SIGIL)//Character variables
 			{
+				Character tab_comp_c = Character(false);
 				std::string xref_path = campaigns_dir+
 							get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
 							"characters/";
@@ -126,14 +129,18 @@ std::string input_handler()
 				{
 					for(auto& c : getDirectoryListing(xref_path))
 					{
-						if(right(c,c.length()-5) != ".char")
+						if(right(c,c.length()-5) != ".char")//Don't include backup files or non-character files
 							continue;
 
+						//TODO: xref with '/'
 						std::string char_name = left(c,c.find(".char"));
+						std::string xref = right(chk_str,2);
 						if(chk_str.length() == 2 ||
-						   (right(chk_str,2) == left(char_name,chk_str.length()-2) &&
-						   char_name.length() > right(chk_str,2).length()))
+						   (xref == left(char_name,chk_str.length()-2) && char_name.length() > xref.length()))
+						{
 							matches.push_back("  "+char_name+"]");//Two spaces are sacrificial for formatting
+							tab_comp_c.load(xref_path+char_name+".char");
+						}
 					}
 				}
 			}
@@ -154,11 +161,13 @@ std::string input_handler()
 				input.insert(input.begin()+cur_pos+i,match[i+chk_str.length()]);
 
 			//Reprint input
-			fprintf(stdout,CLEAR_TO_LINE_END);
+			if(tab_ctr > 1)
+			{
+				fprintf(stdout,CURSOR_LEFT_N,last_match.length()-cur_pos);
+				fprintf(stdout,CLEAR_TO_LINE_END);
+			}
 			for(int i=cur_pos; i<input.size(); i++)
 				fprintf(stdout,"%c",input[i]);
-
-			fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
 
 			last_match = match;
 		}
