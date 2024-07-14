@@ -37,6 +37,14 @@ std::string right(std::string str, int n)
 	return str.substr(n,str.length()-n);
 }
 
+std::string addSpaces(int n)
+{
+	std::string ret = "";
+	for(int i=0; i<n; i++)
+		ret += " ";
+	return ret;
+}
+
 void confirmEnvVariablesFile()
 {
 	if(!std::filesystem::exists(rpgsh_env_variables_path.c_str()))
