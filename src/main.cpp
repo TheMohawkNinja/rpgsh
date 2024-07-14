@@ -13,6 +13,16 @@
 Config config = Config();
 Character c = Character(false);
 
+bool containsNonSpaceChar(std::string str)
+{
+	for(const auto& character : str)
+	{
+		if(character != ' ')
+			return true;
+	}
+
+	return false;
+}
 void addKeysToMatches(std::vector<std::string>* pMatches, Scope scope, std::string chk_str, std::string key, char type)
 {
 	switch(type)
@@ -89,7 +99,7 @@ std::string input_handler()
 		//Reset tab completion variables
 		if(k != KB_TAB && esc_char != 'Z')//Z for shift+tab
 		{
-			if(tab_ctr > 0)
+			if(containsNonSpaceChar(last_match))
 				cur_pos += (input.size()-cur_pos);
 			tab_ctr = 0;
 			last_match = "";
@@ -130,7 +140,8 @@ std::string input_handler()
 			if(cur_pos < input.size())
 				fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
 		}
-		else if((k == KB_TAB || esc_char == 'Z') && input.size())//Tab (completion)
+		else if((k == KB_TAB || esc_char == 'Z') && input.size() &&
+			(cur_pos == input.size() || last_match != ""))//Tab (completion)
 		{
 			if(k == KB_TAB)
 				tab_ctr++;
@@ -303,11 +314,12 @@ std::string input_handler()
 				input.insert(input.begin()+cur_pos+i,match[i+chk_str.length()]);
 
 			//Reprint input
-			if(last_match != "")
+			if(last_match != "" && containsNonSpaceChar(match))
 			{
 				fprintf(stdout,CURSOR_LEFT_N,last_match.length()-cur_pos);
 				fprintf(stdout,CLEAR_TO_LINE_END);
 			}
+
 			for(int i=cur_pos; i<input.size(); i++)
 				fprintf(stdout,"%c",input[i]);
 
