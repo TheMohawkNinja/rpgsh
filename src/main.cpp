@@ -199,8 +199,17 @@ std::string input_handler()
 						std::string xref = left(c,c.find(".char"));
 						std::string chk_str_xref = right(chk_str,2);
 						if(chk_str.length() == 2 ||
-						   (chk_str_xref == left(xref,chk_str.length()-2) && xref.length() > chk_str_xref.length()))
+						   (!stringcasecmp(chk_str_xref,left(xref,chk_str.length()-2)) &&
+						   xref.length() > chk_str_xref.length()))
 							matches.push_back("  "+xref+"]");//Two spaces are sacrificial for formatting
+					}
+					for(auto& m : getDirectoryListing(campaigns_dir))
+					{
+						std::string chk_str_xref = right(chk_str,2);
+						if(chk_str.length() == 2 ||
+						   (!stringcasecmp(chk_str_xref,left(m,chk_str.length()-2)) &&
+						   m.length() > chk_str_xref.length()))
+							matches.push_back("  "+m+"/");//Two spaces are sacrificial for formatting
 					}
 				}
 				else if(chk_str[1] == '[' &&
@@ -209,6 +218,15 @@ std::string input_handler()
 					//Get campaign name
 					std::string campaign = right(chk_str,chk_str.find('[')+1);
 					campaign = left(campaign,campaign.find('/'));
+
+					for(auto& m : getDirectoryListing(campaigns_dir))
+					{
+						if(!stringcasecmp(campaign,m))
+						{
+							campaign = m;
+							break;
+						}
+					}
 
 					std::string xref_path = campaigns_dir+
 								campaign+"/"+
@@ -224,7 +242,7 @@ std::string input_handler()
 
 						std::string xref = left(c,c.find(".char"));
 						std::string chk_str_xref = right(chk_str,chk_str.find('/')+1);
-						if(chk_str_xref == left(xref,chk_str.length()-chk_str.find('/')-1) &&
+						if(!stringcasecmp(chk_str_xref,left(xref,chk_str.length()-chk_str.find('/')-1)) &&
 						   xref.length() > chk_str_xref.length())
 						{
 							matches.push_back(addSpaces(chk_str.length()-(chk_str.length()-chk_str.find('/'))+1)+
