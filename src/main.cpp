@@ -13,6 +13,47 @@
 Config config = Config();
 Character c = Character(false);
 
+void addKeysToMatches(std::vector<std::string>* pMatches, Scope scope, std::string chk_str, std::string key, char type)
+{
+	switch(type)
+	{
+		case CURRENCY_SIGIL:
+			for(auto& [k,v] : scope.getDatamap<Currency>())
+			{
+				if(!stringcasecmp(left(k,key.length()),key) && k[0] != '.')
+					pMatches->push_back(addSpaces(chk_str.length())+right(k,key.length()));
+			}
+			break;
+		case CURRENCYSYSTEM_SIGIL:
+			for(auto& [k,v] : scope.getDatamap<CurrencySystem>())
+			{
+				if(!stringcasecmp(left(k,key.length()),key) && k[0] != '.')
+					pMatches->push_back(addSpaces(chk_str.length())+right(k,key.length()));
+			}
+			break;
+		case DICE_SIGIL:
+			for(auto& [k,v] : scope.getDatamap<Dice>())
+			{
+				if(!stringcasecmp(left(k,key.length()),key) && k[0] != '.')
+					pMatches->push_back(addSpaces(chk_str.length())+right(k,key.length()));
+			}
+			break;
+		case VAR_SIGIL:
+			for(auto& [k,v] : scope.getDatamap<Var>())
+			{
+				if(!stringcasecmp(left(k,key.length()),key) && k[0] != '.')
+					pMatches->push_back(addSpaces(chk_str.length())+right(k,key.length()));
+			}
+			break;
+		case WALLET_SIGIL:
+			for(auto& [k,v] : scope.getDatamap<Wallet>())
+			{
+				if(!stringcasecmp(left(k,key.length()),key) && k[0] != '.')
+					pMatches->push_back(addSpaces(chk_str.length())+right(k,key.length()));
+			}
+			break;
+	}
+}
 std::string input_handler()
 {
 	#define KB_TAB		9
@@ -28,6 +69,7 @@ std::string input_handler()
 
 	bool insert_mode = false;
 	char k = 0;
+	char esc_char = 0;
 	int cur_pos = 0;
 	int tab_ctr = 0;
 	std::string last_match = "";
@@ -35,10 +77,17 @@ std::string input_handler()
 
 	while(k != KB_ENTER)
 	{
+		esc_char = 0;
 		k = getchar();
 
+		if(k == ESC_SEQ)
+		{
+			getchar();//Consume '['
+			esc_char = getchar();
+		}
+
 		//Reset tab completion variables
-		if(k != KB_TAB)
+		if(k != KB_TAB && esc_char != 'Z')//Z for shift+tab
 		{
 			if(tab_ctr > 0)
 				cur_pos += (input.size()-cur_pos);
@@ -81,9 +130,12 @@ std::string input_handler()
 			if(cur_pos < input.size())
 				fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
 		}
-		else if(k == KB_TAB && input.size())//Tab (completion)
+		else if((k == KB_TAB || esc_char == 'Z') && input.size())//Tab (completion)
 		{
-			tab_ctr++;
+			if(k == KB_TAB)
+				tab_ctr++;
+			else
+				tab_ctr--;
 
 			std::string match = "";
 			std::vector<std::string> matches;
@@ -118,13 +170,13 @@ std::string input_handler()
 				std::string xref_path = campaigns_dir+
 							get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
 							"characters/";
-				if(chk_str.length() == 1)
+
+				if(chk_str.length() == 1)//Just the character sigil
 				{
 					matches.push_back(std::string(1,CHARACTER_SIGIL)+"/");
 					matches.push_back(std::string(1,CHARACTER_SIGIL)+"[");
 				}
-				else if(chk_str.length() >= 2 &&
-					chk_str[1] == '[' &&
+				else if(chk_str[1] == '[' &&
 					chk_str.find(']') == std::string::npos &&
 					chk_str.find('/') == std::string::npos)//Complete xref (same campaign)
 				{
@@ -137,14 +189,10 @@ std::string input_handler()
 						std::string chk_str_xref = right(chk_str,2);
 						if(chk_str.length() == 2 ||
 						   (chk_str_xref == left(xref,chk_str.length()-2) && xref.length() > chk_str_xref.length()))
-						{
 							matches.push_back("  "+xref+"]");//Two spaces are sacrificial for formatting
-							tab_comp_c.load(xref_path+xref+".char");
-						}
 					}
 				}
-				else if(chk_str.length() >= 2 &&
-					chk_str[1] == '[' &&
+				else if(chk_str[1] == '[' &&
 					chk_str.find(']') == std::string::npos)//Complete xref (different campaign)
 				{
 					//Get campaign name
@@ -168,12 +216,72 @@ std::string input_handler()
 						if(chk_str_xref == left(xref,chk_str.length()-chk_str.find('/')-1) &&
 						   xref.length() > chk_str_xref.length())
 						{
-							std::string padding = "";
-							for(int i=0; i<chk_str.length()-(chk_str.length()-chk_str.find('/'))+1; i++)
-								padding += " ";
-							matches.push_back(padding+xref+"]");//Padding is sacrificial for formatting
-							tab_comp_c.load(xref_path+xref+".char");
+							matches.push_back(addSpaces(chk_str.length()-(chk_str.length()-chk_str.find('/'))+1)+
+									  xref+"]");//Padding is sacrificial for formatting
 						}
+					}
+				}
+				else if(chk_str[1] == '[' &&
+					chk_str.find(']') != std::string::npos)//Load xref
+				{
+					if(chk_str.find('/') != std::string::npos &&
+					   chk_str.find('/') > chk_str.find(']'))//Same campaign
+					{
+						std::string xref_path = campaigns_dir+
+									get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
+									"characters/"+
+									right(left(chk_str,chk_str.find(']')),chk_str.find('[')+1)+
+									".char";
+
+						if(std::filesystem::exists(xref_path) && !std::filesystem::is_directory(xref_path))
+							tab_comp_c.load(xref_path);
+
+					}
+					else if(chk_str.find('/') != std::string::npos &&
+					   chk_str.find('/') < chk_str.find(']'))//Different campaign
+					{
+						std::string xref_path = campaigns_dir+
+									right(left(chk_str,chk_str.find('/')+1),chk_str.find('[')+1)+
+									"characters/"+
+									right(left(chk_str,chk_str.find(']')),chk_str.find('/')+1)+
+									".char";
+
+						if(std::filesystem::exists(xref_path) && !std::filesystem::is_directory(xref_path))
+							tab_comp_c.load(xref_path);
+					}
+				}
+
+				//Create key and check it against existing keys
+				std::string key = right(chk_str,chk_str.find('/',chk_str.find(']')+1)+1);
+				int slash = chk_str.find('/',chk_str.find(']')+1);
+				int rsqbrkt = chk_str.find(']');
+				if(slash > rsqbrkt)
+				{
+					switch(chk_str[chk_str.find('/',chk_str.find(']')+1)-1])
+					{
+						case CURRENCY_SIGIL:
+							addKeysToMatches(&matches,tab_comp_c,chk_str,key,CURRENCY_SIGIL);
+							break;
+						case CURRENCYSYSTEM_SIGIL:
+							addKeysToMatches(&matches,tab_comp_c,chk_str,key,CURRENCYSYSTEM_SIGIL);
+							break;
+						case DICE_SIGIL:
+							addKeysToMatches(&matches,tab_comp_c,chk_str,key,DICE_SIGIL);
+							break;
+						case VAR_SIGIL:
+							addKeysToMatches(&matches,tab_comp_c,chk_str,key,VAR_SIGIL);
+							break;
+						case WALLET_SIGIL:
+							addKeysToMatches(&matches,tab_comp_c,chk_str,key,WALLET_SIGIL);
+							break;
+						case CHARACTER_SIGIL:
+						case ']':
+							addKeysToMatches(&matches,tab_comp_c,chk_str,key,CURRENCY_SIGIL);
+							addKeysToMatches(&matches,tab_comp_c,chk_str,key,CURRENCYSYSTEM_SIGIL);
+							addKeysToMatches(&matches,tab_comp_c,chk_str,key,DICE_SIGIL);
+							addKeysToMatches(&matches,tab_comp_c,chk_str,key,VAR_SIGIL);
+							addKeysToMatches(&matches,tab_comp_c,chk_str,key,WALLET_SIGIL);
+							break;
 					}
 				}
 			}
@@ -195,7 +303,7 @@ std::string input_handler()
 				input.insert(input.begin()+cur_pos+i,match[i+chk_str.length()]);
 
 			//Reprint input
-			if(tab_ctr > 1)
+			if(last_match != "")
 			{
 				fprintf(stdout,CURSOR_LEFT_N,last_match.length()-cur_pos);
 				fprintf(stdout,CLEAR_TO_LINE_END);
@@ -207,8 +315,7 @@ std::string input_handler()
 		}
 		else if(k == ESC_SEQ)//Escape sequences
 		{
-			getchar();//skip '['
-			switch(getchar())
+			switch(esc_char)
 			{
 				case 'C':	//Right
 					if(cur_pos < input.size())
@@ -288,7 +395,7 @@ int prompt()
 
 	try
 	{
-		fprintf(stdout,"%s┌─%s[%s%s%s%s%s%s%s]%s─%s(%s%s/%s%s %s(%s)%s%s%s)%s%s\n",TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_ITALIC,TEXT_RED,c.getName().c_str(),TEXT_NOITALIC,TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_BOLD,TEXT_GREEN,c.getProperty<Var>("HP/Current","Value").c_str(),c.getProperty<Var>("HP/Max","Value").c_str(),TEXT_NOBOLD,TEXT_ITALIC,c.getProperty<Var>("HP/Temp","Value").c_str(),TEXT_NOITALIC,TEXT_BOLD,TEXT_WHITE,TEXT_NOBOLD,TEXT_NORMAL);
+		fprintf(stdout,"%s┌─%s[%s%s%s%s%s%s%s]%s─%s(%s%s/%s%s %s(%s)%s%s%s)%s%s\n",TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_ITALIC,TEXT_RED,c.getName().c_str(),TEXT_NOITALIC,TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_BOLD,TEXT_GREEN,c.getProperty<Var>("HitPoints/Current","Value").c_str(),c.getProperty<Var>("HitPoints/Maximum","Value").c_str(),TEXT_NOBOLD,TEXT_ITALIC,c.getProperty<Var>("HitPoints/Temporary","Value").c_str(),TEXT_NOITALIC,TEXT_BOLD,TEXT_WHITE,TEXT_NOBOLD,TEXT_NORMAL);
 		fprintf(stdout,"%s└─%s$%s ",TEXT_WHITE,TEXT_CYAN,TEXT_NORMAL);
 
 		if(backup)
