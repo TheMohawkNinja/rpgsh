@@ -44,9 +44,7 @@ int main(int argc, char** argv)
 		appdescription = get_prog_output(appname+" "+FLAG_APPDESCRIPTION);
 
 		//Not sure why %*s doesn't work here
-		fprintf(stdout,"%s%s%s%s",TEXT_BOLD,TEXT_GREEN,appname.c_str(),TEXT_NORMAL);
-		for(int i=0; i<(longestNameLength-appname.length()+COLUMN_PADDING); i++)
-			fprintf(stdout," ");
+		fprintf(stdout,"%s%s%s%s%s",TEXT_BOLD,TEXT_GREEN,appname.c_str(),TEXT_NORMAL,addSpaces(longestNameLength-appname.length()+COLUMN_PADDING).c_str());
 
 		//Description should really be just one line, so just print the first line
 		if(appdescription[0] != "")

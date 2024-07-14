@@ -3,8 +3,6 @@
 #include "../headers/scope.h"
 #include "../headers/text.h"
 
-//TODO print functions should include all datatypes
-
 void print_header(std::string s)
 {
 	fprintf(stdout,"%s%s %s %s\n",TEXT_GREEN,TEXT_BOLD,s.c_str(),TEXT_NORMAL);
@@ -23,11 +21,6 @@ void get_longest_key_from_datamap(datamap<T> m, unsigned int* p_current_longest_
 			(*p_current_longest_len) = k.length();
 	}
 }
-void print_spaces(unsigned int end)
-{
-	for(int i=0; i<end; i++)
-		fprintf(stdout," ");
-}
 const char* print_value(std::string value)
 {
 	if(value != "")
@@ -43,8 +36,7 @@ void print_data(Scope scope)
 		if(k[0] == '.')
 			continue;
 
-		fprintf(stdout,"%s%sCurrencySystem%s",TEXT_BOLD,CURRENCYSYSTEM_COLOR,TEXT_NORMAL);
-		print_spaces(COLUMN_PADDING);
+		fprintf(stdout,"%s%sCurrencySystem%s%s",TEXT_BOLD,CURRENCYSYSTEM_COLOR,TEXT_NORMAL,addSpaces(COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		fprintf(stdout,"%sName:              %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Name));
 		fprintf(stdout,"\n");
@@ -55,8 +47,7 @@ void print_data(Scope scope)
 		if(k[0] == '.')
 			continue;
 
-		fprintf(stdout,"%s%sCurrency%s",TEXT_BOLD,CURRENCY_COLOR,TEXT_NORMAL);
-		print_spaces(2*COLUMN_PADDING);
+		fprintf(stdout,"%s%sCurrency%s%s",TEXT_BOLD,CURRENCY_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		fprintf(stdout,"%sSystem:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.System->Name));
 		fprintf(stdout,"%sName:             %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Name));
@@ -71,8 +62,7 @@ void print_data(Scope scope)
 		if(k[0] == '.')
 			continue;
 
-		fprintf(stdout,"%s%sDice%s",TEXT_BOLD,DICE_COLOR,TEXT_NORMAL);
-		print_spaces(2*COLUMN_PADDING);
+		fprintf(stdout,"%s%sDice%s%s",TEXT_BOLD,DICE_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		if(v.List != "")
 		{
@@ -92,8 +82,7 @@ void print_data(Scope scope)
 		if(k[0] == '.')
 			continue;
 
-		fprintf(stdout,"%s%sVar%s",TEXT_BOLD,VAR_COLOR,TEXT_NORMAL);
-		print_spaces(COLUMN_PADDING);
+		fprintf(stdout,"%s%sVar%s%s",TEXT_BOLD,VAR_COLOR,TEXT_NORMAL,addSpaces(COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		fprintf(stdout,"%sValue:  %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Value));
 		fprintf(stdout,"\n");
@@ -112,15 +101,13 @@ void print_data(Scope scope)
 				longest_cur = c.Name.length();
 		}
 
-		fprintf(stdout,"%s%sWallet%s",TEXT_BOLD,WALLET_COLOR,TEXT_NORMAL);
-		print_spaces(longest_cur+COLUMN_PADDING-5);//6 = length of "Wallet" + ':' in printed values below
+		fprintf(stdout,"%s%sWallet%s%s",TEXT_BOLD,WALLET_COLOR,TEXT_NORMAL,addSpaces(longest_cur+COLUMN_PADDING-5).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 
 		//Print values
 		for(auto& [c,q] : v)
 		{
-			fprintf(stdout,"%s%s:%s",TEXT_ITALIC,c.Name.c_str(),TEXT_NORMAL);
-			print_spaces(longest_cur-c.Name.length()+COLUMN_PADDING);
+			fprintf(stdout,"%s%s:%s%s",TEXT_ITALIC,c.Name.c_str(),TEXT_NORMAL,addSpaces(longest_cur-c.Name.length()+COLUMN_PADDING).c_str());
 			fprintf(stdout,"%s\n",print_value(std::to_string(q)));
 		}
 
