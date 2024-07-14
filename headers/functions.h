@@ -16,6 +16,8 @@ std::string left(std::string str, int n);
 
 std::string right(std::string str, int n);
 
+std::string addSpaces(int n);
+
 void confirmEnvVariablesFile();
 
 void confirmShellVariablesFile();
