@@ -182,14 +182,9 @@ std::string input_handler()
 							get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
 							"characters/";
 
-				if(chk_str.length() == 1)//Just the character sigil
-				{
-					matches.push_back(std::string(1,CHARACTER_SIGIL)+"/");
-					matches.push_back(std::string(1,CHARACTER_SIGIL)+"[");
-				}
-				else if(chk_str[1] == '[' &&
-					chk_str.find(']') == std::string::npos &&
-					chk_str.find('/') == std::string::npos)//Complete xref (same campaign)
+				if(chk_str[1] == '[' &&
+				   chk_str.find(']') == std::string::npos &&
+				   chk_str.find('/') == std::string::npos)//Complete xref (same campaign)
 				{
 					for(auto& c : getDirectoryListing(xref_path))
 					{
@@ -317,7 +312,8 @@ std::string input_handler()
 
 			if(!matches.size()) continue;
 
-			//Choose match
+			//Sort and choose match
+			sort<std::string>(&matches);
 			match = matches[(tab_ctr-1)%matches.size()];
 
 			//Erase any previous match
@@ -497,18 +493,7 @@ int main()
 	}
 
 	//Basic alphabetical sort, important for tab completion
-	for(int i=0; i<rpgsh_apps.size()-1; i++)
-	{
-		for(int j=i+1; j<rpgsh_apps.size(); j++)
-		{
-			if(rpgsh_apps[j] < rpgsh_apps[i])
-			{
-				std::string tmp = rpgsh_apps[i];
-				rpgsh_apps[i]=rpgsh_apps[j];
-				rpgsh_apps[j]=tmp;
-			}
-		}
-	}
+	sort<std::string>(&rpgsh_apps);
 
 	//Write alphabetized list to file
 	std::ofstream ofs(rpgsh_programs_cache_path);
