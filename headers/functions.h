@@ -40,6 +40,23 @@ std::string get_env_variable(std::string v);
 void set_env_variable(std::string v, std::string value);
 
 template <typename T>
+void sort(std::vector<T>* v)
+{
+	for(int i=0; i<v->size()-1; i++)
+	{
+		for(int j=i+1; j<v->size(); j++)
+		{
+			if((*v)[j] < (*v)[i])
+			{
+				std::string tmp = (*v)[i];
+				(*v)[i]=(*v)[j];
+				(*v)[j]=tmp;
+			}
+		}
+	}
+}
+
+template <typename T>
 void save_obj_to_file(std::string path, T obj, char obj_id)
 {
 	std::ofstream fs(path, std::ios::app);

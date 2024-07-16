@@ -360,6 +360,9 @@ void set_env_variable(std::string v,std::string value)
 }
 
 template <typename T>
+void sort(std::vector<std::string>* v);
+
+template <typename T>
 void save_obj_to_file(std::string path, datamap<Dice> obj, char obj_id);
 void save_obj_to_file(std::string path, datamap<Var> obj, char obj_id);
 
