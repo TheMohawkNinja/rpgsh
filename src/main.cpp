@@ -173,10 +173,10 @@ std::string input_handler()
 			else
 				tab_ctr--;
 
+			Scope tab_comp_scope;
 			std::string match = "";
 			std::vector<std::string> matches;
 
-			//TODO: Tab completion
 			//Create the string which is to be completed
 			std::string chk_str = "";
 			for(int i=cur_pos-1; i>=0&&input[i]!=' '; i--)
@@ -202,7 +202,7 @@ std::string input_handler()
 			}
 			else if(chk_str[0] == CHARACTER_SIGIL)//Character variables
 			{
-				Character tab_comp_c = Character(false);
+				tab_comp_scope = Character(false);
 				std::string xref_path = campaigns_dir+
 							get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
 							"characters/";
@@ -283,7 +283,7 @@ std::string input_handler()
 									".char";
 
 						if(std::filesystem::exists(xref_path) && !std::filesystem::is_directory(xref_path))
-							tab_comp_c.load(xref_path);
+							tab_comp_scope.load(xref_path);
 
 					}
 					else if(chk_str.find('/') != std::string::npos &&
@@ -296,74 +296,92 @@ std::string input_handler()
 									".char";
 
 						if(std::filesystem::exists(xref_path) && !std::filesystem::is_directory(xref_path))
-							tab_comp_c.load(xref_path);
+							tab_comp_scope.load(xref_path);
 					}
 				}
+			}
+			else if(chk_str[0] == CAMPAIGN_SIGIL)//Campaign variables
+			{
+				tab_comp_scope = Campaign();
+				std::string xref_path = campaigns_dir;
 
-				int slash = chk_str.find('/',chk_str.find(']')+1);
-				int rsqbrkt = chk_str.find(']');
-				int period = chk_str.rfind('.');
-				char type_sigil = chk_str[chk_str.find('/',chk_str.find(']')+1)-1];
-				std::string key = right(chk_str,chk_str.find('/',chk_str.find(']')+1)+1);
-				if(slash > rsqbrkt && period < slash)//Keys
+				if(chk_str[1] == '[' &&
+				   chk_str.find(']') == std::string::npos)//Complete xref
 				{
-					if(type_sigil == CURRENCY_SIGIL ||
-					   type_sigil == CURRENCYSYSTEM_SIGIL ||
-					   type_sigil == DICE_SIGIL ||
-					   type_sigil == VAR_SIGIL ||
-					   type_sigil == WALLET_SIGIL)
+					for(auto& m : getDirectoryListing(campaigns_dir))
 					{
-						addKeysToMatches(&matches,tab_comp_c,chk_str,key,type_sigil);
-					}
-					else if(type_sigil == CHARACTER_SIGIL ||
-						type_sigil == ']')
-					{
-						addKeysToMatches(&matches,tab_comp_c,chk_str,key,CURRENCY_SIGIL);
-						addKeysToMatches(&matches,tab_comp_c,chk_str,key,CURRENCYSYSTEM_SIGIL);
-						addKeysToMatches(&matches,tab_comp_c,chk_str,key,DICE_SIGIL);
-						addKeysToMatches(&matches,tab_comp_c,chk_str,key,VAR_SIGIL);
-						addKeysToMatches(&matches,tab_comp_c,chk_str,key,WALLET_SIGIL);
+						std::string chk_str_xref = right(chk_str,2);
+						if(chk_str.length() == 2 ||
+						   (!stringcasecmp(chk_str_xref,left(m,chk_str.length()-2)) &&
+						   m.length() > chk_str_xref.length()))
+							matches.push_back("  "+m+"]");//Two spaces are sacrificial for formatting
 					}
 				}
-				else if(slash > rsqbrkt)//Properties TODO
+				else if(chk_str[1] == '[' &&
+					chk_str.find(']') != std::string::npos)//Load xref
 				{
-					std::string property = right(chk_str,chk_str.find('.')+1);
-					if(type_sigil == CURRENCY_SIGIL ||
-					   type_sigil == CURRENCYSYSTEM_SIGIL ||
-					   type_sigil == DICE_SIGIL ||
-					   type_sigil == VAR_SIGIL ||
-					   type_sigil == WALLET_SIGIL)
+					std::string xref_path = campaigns_dir+
+								right(left(chk_str,chk_str.find(']')),chk_str.find('[')+1)+
+								".variables";
+
+					if(std::filesystem::exists(xref_path) && !std::filesystem::is_directory(xref_path))
+						tab_comp_scope.load(xref_path);
+				}
+			}
+
+			int slash = chk_str.find('/',chk_str.find(']')+1);
+			int rsqbrkt = chk_str.find(']');
+			int period = chk_str.rfind('.');
+			char type_sigil = chk_str[chk_str.find('/',chk_str.find(']')+1)-1];
+			std::string key = right(chk_str,chk_str.find('/',chk_str.find(']')+1)+1);
+			if(slash > rsqbrkt && period < slash)//Keys
+			{
+				if(isTypeSigil(type_sigil))
+				{
+					addKeysToMatches(&matches,tab_comp_scope,chk_str,key,type_sigil);
+				}
+				else if(isScopeSigil(type_sigil) || type_sigil == ']')
+				{
+					addKeysToMatches(&matches,tab_comp_scope,chk_str,key,CURRENCY_SIGIL);
+					addKeysToMatches(&matches,tab_comp_scope,chk_str,key,CURRENCYSYSTEM_SIGIL);
+					addKeysToMatches(&matches,tab_comp_scope,chk_str,key,DICE_SIGIL);
+					addKeysToMatches(&matches,tab_comp_scope,chk_str,key,VAR_SIGIL);
+					addKeysToMatches(&matches,tab_comp_scope,chk_str,key,WALLET_SIGIL);
+				}
+			}
+			else if(slash > rsqbrkt)//Properties
+			{
+				std::string property = right(chk_str,chk_str.find('.')+1);
+				if(isTypeSigil(type_sigil))
+				{
+					addPropertiesToMatches(&matches,tab_comp_scope,chk_str,key,property,type_sigil);
+				}
+				else if(isScopeSigil(type_sigil) || type_sigil == ']')
+				{
+					for(const auto& [k,v] : tab_comp_scope.getDatamap<Var>())
 					{
-						addPropertiesToMatches(&matches,tab_comp_c,chk_str,key,property,type_sigil);
+						if(!stringcasecmp(k+".",key))
+							addPropertiesToMatches(&matches,tab_comp_scope,chk_str,key,property,VAR_SIGIL);
 					}
-					else if(type_sigil == CHARACTER_SIGIL ||
-						type_sigil == ']')
+					for(const auto& [k,v] : tab_comp_scope.getDatamap<Dice>())
 					{
-						for(const auto& [k,v] : tab_comp_c.getDatamap<Var>())
-						{
-							if(!stringcasecmp(k+".",key))
-								addPropertiesToMatches(&matches,tab_comp_c,chk_str,key,property,VAR_SIGIL);
-						}
-						for(const auto& [k,v] : tab_comp_c.getDatamap<Dice>())
-						{
-							if(!stringcasecmp(k+".",key))
-								addPropertiesToMatches(&matches,tab_comp_c,chk_str,key,property,DICE_SIGIL);
-						}
-						for(const auto& [k,v] : tab_comp_c.getDatamap<Wallet>())
-						{
-							if(!stringcasecmp(k+".",key))
-								addPropertiesToMatches(&matches,tab_comp_c,chk_str,key,property,WALLET_SIGIL);
-						}
-						for(const auto& [k,v] : tab_comp_c.getDatamap<Currency>())
-						{
-							if(!stringcasecmp(k+".",key))
-								addPropertiesToMatches(&matches,tab_comp_c,chk_str,key,property,CURRENCY_SIGIL);
-						}
-						for(const auto& [k,v] : tab_comp_c.getDatamap<CurrencySystem>())
-						{
-							if(!stringcasecmp(k+".",key))
-								addPropertiesToMatches(&matches,tab_comp_c,chk_str,key,property,CURRENCYSYSTEM_SIGIL);
-						}
+						if(!stringcasecmp(k+".",key))
+							addPropertiesToMatches(&matches,tab_comp_scope,chk_str,key,property,DICE_SIGIL);
+					}
+					for(const auto& [k,v] : tab_comp_scope.getDatamap<Wallet>())
+					{
+						if(!stringcasecmp(k+".",key))
+							addPropertiesToMatches(&matches,tab_comp_scope,chk_str,key,property,WALLET_SIGIL);
+					}
+					for(const auto& [k,v] : tab_comp_scope.getDatamap<Currency>())
+					{
+						if(!stringcasecmp(k+".",key))
+							addPropertiesToMatches(&matches,tab_comp_scope,chk_str,key,property,CURRENCY_SIGIL);
+					}
+					for(const auto& [k,v] : tab_comp_scope.getDatamap<CurrencySystem>())
+					{
+						if(!stringcasecmp(k+".",key))
+							addPropertiesToMatches(&matches,tab_comp_scope,chk_str,key,property,CURRENCYSYSTEM_SIGIL);
 					}
 				}
 			}
