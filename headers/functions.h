@@ -10,6 +10,10 @@
 
 bool stob(std::string s);
 
+bool isScopeSigil(char c);
+
+bool isTypeSigil(char c);
+
 int stringcasecmp(std::string a, std::string b);
 
 std::string left(std::string str, int n);

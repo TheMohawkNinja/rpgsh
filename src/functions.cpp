@@ -22,6 +22,22 @@ bool stob(std::string s)
 	return false;
 }
 
+bool isScopeSigil(char c)
+{
+	return (c == CHARACTER_SIGIL ||
+		c == CAMPAIGN_SIGIL ||
+		c == SHELL_SIGIL);
+}
+
+bool isTypeSigil(char c)
+{
+	return (c == CURRENCY_SIGIL ||
+		c == CURRENCYSYSTEM_SIGIL ||
+		c == DICE_SIGIL ||
+		c == VAR_SIGIL ||
+		c == WALLET_SIGIL);
+}
+
 int stringcasecmp(std::string a, std::string b)
 {
 	return strcasecmp(a.c_str(),b.c_str());
