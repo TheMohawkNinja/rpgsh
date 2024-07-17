@@ -410,7 +410,7 @@ std::string input_handler()
 			//Reprint input
 			if(last_match != "" && containsNonSpaceChar(match))
 			{
-				fprintf(stdout,CURSOR_LEFT_N,last_match.length()-cur_pos);
+				fprintf(stdout,CURSOR_LEFT_N,last_match.length()-chk_str.length());
 				fprintf(stdout,CLEAR_TO_LINE_END);
 			}
 
