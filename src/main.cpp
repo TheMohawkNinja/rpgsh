@@ -61,8 +61,10 @@ void addPropertyToMatches(std::vector<std::string>** ppMatches, std::string chk_
 		(**ppMatches).push_back(addSpaces(chk_str.length())+right(property_str,property.length()));
 }
 void addPropertiesToMatches(std::vector<std::string>* pMatches, Scope scope, std::string chk_str,
-			    std::string key, std::string property, char type)
+			    std::string k, std::string key, std::string property, char type)
 {
+	if(stringcasecmp(k,key)) return;
+
 	switch(type)
 	{
 		case CURRENCY_SIGIL:
@@ -355,38 +357,24 @@ std::string input_handler()
 			}
 			else if(slash > rsqbrkt)//Properties
 			{
+				key = left(key,key.rfind("."));
 				std::string property = right(chk_str,chk_str.find('.')+1);
 				if(isTypeSigil(type_sigil))
 				{
-					addPropertiesToMatches(&matches,tab_comp_scope,chk_str,key,property,type_sigil);
+					addPropertiesToMatches(&matches,tab_comp_scope,chk_str,key,key,property,type_sigil);
 				}
 				else if(isScopeSigil(type_sigil) || type_sigil == ']')
 				{
 					for(const auto& [k,v] : tab_comp_scope.getDatamap<Var>())
-					{
-						if(!stringcasecmp(k+".",key))
-							addPropertiesToMatches(&matches,tab_comp_scope,chk_str,key,property,VAR_SIGIL);
-					}
+						addPropertiesToMatches(&matches,tab_comp_scope,chk_str,k,key,property,VAR_SIGIL);
 					for(const auto& [k,v] : tab_comp_scope.getDatamap<Dice>())
-					{
-						if(!stringcasecmp(k+".",key))
-							addPropertiesToMatches(&matches,tab_comp_scope,chk_str,key,property,DICE_SIGIL);
-					}
+						addPropertiesToMatches(&matches,tab_comp_scope,chk_str,k,key,property,DICE_SIGIL);
 					for(const auto& [k,v] : tab_comp_scope.getDatamap<Wallet>())
-					{
-						if(!stringcasecmp(k+".",key))
-							addPropertiesToMatches(&matches,tab_comp_scope,chk_str,key,property,WALLET_SIGIL);
-					}
+						addPropertiesToMatches(&matches,tab_comp_scope,chk_str,k,key,property,WALLET_SIGIL);
 					for(const auto& [k,v] : tab_comp_scope.getDatamap<Currency>())
-					{
-						if(!stringcasecmp(k+".",key))
-							addPropertiesToMatches(&matches,tab_comp_scope,chk_str,key,property,CURRENCY_SIGIL);
-					}
+						addPropertiesToMatches(&matches,tab_comp_scope,chk_str,k,key,property,CURRENCY_SIGIL);
 					for(const auto& [k,v] : tab_comp_scope.getDatamap<CurrencySystem>())
-					{
-						if(!stringcasecmp(k+".",key))
-							addPropertiesToMatches(&matches,tab_comp_scope,chk_str,key,property,CURRENCYSYSTEM_SIGIL);
-					}
+						addPropertiesToMatches(&matches,tab_comp_scope,chk_str,k,key,property,CURRENCYSYSTEM_SIGIL);
 				}
 			}
 
