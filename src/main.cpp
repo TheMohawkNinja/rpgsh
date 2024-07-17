@@ -328,6 +328,10 @@ std::string input_handler()
 						tab_comp_scope.load(xref_path);
 				}
 			}
+			else if(chk_str[0] == SHELL_SIGIL)//Shell variables
+			{
+				tab_comp_scope = Shell();
+			}
 
 			int slash = chk_str.find('/',chk_str.find(']')+1);
 			int rsqbrkt = chk_str.find(']');
