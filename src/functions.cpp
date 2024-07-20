@@ -204,10 +204,10 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 
 	//Combine arg_str wrapped in quotes
 	//TODO There really has to be a more elegant way to do this
-	for(int i=0; i<args.size(); i++)
+	for(long unsigned int i=0; i<args.size(); i++)
 	{
-		int quote_begin = args[i].find("\"");
-		int quote_end = args[i].find("\"",quote_begin+1);
+		long unsigned int quote_begin = args[i].find("\"");
+		long unsigned int quote_end = args[i].find("\"",quote_begin+1);
 		if(quote_begin != std::string::npos && quote_end != std::string::npos)//Quote-wrapped arg doesn't contain a space
 		{
 			args[i] = args[i].substr(quote_begin,(quote_end+1)-quote_begin);
@@ -222,7 +222,7 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 
 			args[i] = args[i].substr(quote_begin,args[i].length()-quote_begin);
 
-			for(int j=i+1; j<args.size(); j++)
+			for(long unsigned int j=i+1; j<args.size(); j++)
 			{
 				quote_end = args[j].find("\"");
 				if(quote_end != std::string::npos)
@@ -241,10 +241,10 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 		}
 	}
 
-	//Convert vector to char*[]
-	char* argv[args.size()+1];
-	for(int i=0; i<args.size(); i++)
-		argv[i] = (char*)args[i].c_str();
+	//Convert string vector to char* vector for posix_spawn
+	std::vector<char*> argv;
+	for(auto& arg : args)
+		argv.push_back((char*)arg.c_str());
 
 	//Add a NULL because posix_spawn() needs that for some reason
 	argv[args.size()] = NULL;
@@ -264,11 +264,11 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 		if(posix_spawn_file_actions_adddup2(&fa, 1, 2))
 			output(Error,"Error code %d during posix_spawn_file_actions_adddup2(): %s",status,strerror(status));
 
-		status = posix_spawn(&pid, argv[0], &fa, NULL, (char* const*)argv, environ);
+		status = posix_spawn(&pid, argv[0], &fa, NULL, &argv[0], environ);
 	}
 	else
 	{
-		status = posix_spawn(&pid, argv[0], NULL, NULL, (char* const*)argv, environ);
+		status = posix_spawn(&pid, argv[0], NULL, NULL, &argv[0], environ);
 	}
 
 	if(status == 0)
