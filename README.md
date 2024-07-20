@@ -8,7 +8,7 @@
 
 Features include:
 - Tab completion
-<img src="tab_completion.gif" width="160" height="120" border="10"/>
+<img src="tab_completion.gif" width="320" height="240" border="10"/>
 - Get/set/modify variables of differing data types
 - Variable substitution
 - Dice rolling program
