@@ -122,5 +122,4 @@ class Wallet
 	Wallet& operator -- (int);
 
 	explicit operator std::string() const;
-	bool operator != (const std::string b);//TODO: May need to revisit this for a possible Wallet(std::string) constructor
 };
