@@ -15,18 +15,32 @@ Character c = Character(false);
 
 bool containsNonSpaceChar(std::string str)
 {
-	for(const auto& character : str)
-	{
-		if(character != ' ')
-			return true;
-	}
+	for(const auto& ch : str)
+		if(ch != ' ') return true;
 
 	return false;
 }
 void addKeyToMatches(std::vector<std::string>** ppMatches, std::string k, std::string chk_str, std::string key)
 {
+	//Limit keys to one level past current
 	if(!stringcasecmp(left(k,key.length()),key) && k[0] != '.')
-		(**ppMatches).push_back(addSpaces(chk_str.length())+right(k,key.length()));
+	{
+		int key_last_slash = (int)key.rfind('/');
+		int k_next_slash = (int)k.find('/',key_last_slash+1);
+		if(k_next_slash < (int)key.length())
+		{
+			(**ppMatches).push_back(addSpaces(chk_str.length())+right(k,key.length()));
+		}
+		else if(k_next_slash > (int)key.length())
+		{
+			std::string potential_match = left(right(k,key.length()),(k_next_slash-key.length()));
+			potential_match = addSpaces(chk_str.length())+potential_match;
+			for(const auto& match : (**ppMatches))//Ensure match list is unique
+				if(match == potential_match) return;
+
+			(**ppMatches).push_back(potential_match);
+		}
+	}
 }
 void addKeysToMatches(std::vector<std::string>* pMatches, Scope scope, std::string chk_str, std::string key, char type)
 {
@@ -107,7 +121,7 @@ std::string input_handler()
 	bool insert_mode = false;
 	char k = 0;
 	char esc_char = 0;
-	int cur_pos = 0;
+	long unsigned int cur_pos = 0;
 	int tab_ctr = 0;
 	std::string last_match = "";
 	std::vector<char> input;
@@ -148,7 +162,7 @@ std::string input_handler()
 
 			fprintf(stdout,CLEAR_LINE);
 
-			for(int i=cur_pos; i<input.size(); i++)
+			for(long unsigned int i=cur_pos; i<input.size(); i++)
 				fprintf(stdout,"%c",input[i]);
 			if(cur_pos < input.size()-1)
 				fprintf(stdout,CURSOR_LEFT_N,input.size()-1-cur_pos);
@@ -162,7 +176,7 @@ std::string input_handler()
 			cur_pos--;
 			input.erase(input.begin()+cur_pos);
 
-			for(int i=cur_pos; i<input.size(); i++)
+			for(long unsigned int i=cur_pos; i<input.size(); i++)
 				fprintf(stdout,"%c",input[i]);
 			if(cur_pos < input.size())
 				fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
@@ -196,7 +210,7 @@ std::string input_handler()
 
 					std::string app_chk_str = app.substr(prefix.length(),
 									     chk_str.length());
-					int app_ln = right(app,prefix.length()).length();
+					long unsigned int app_ln = right(app,prefix.length()).length();
 					if(app_chk_str == chk_str && app_ln > chk_str.length())
 						matches.push_back(right(app,prefix.length()));
 				}
@@ -387,22 +401,22 @@ std::string input_handler()
 			//Erase any previous match
 			if(last_match != "")
 			{
-				for(int i=0; i<last_match.length()-chk_str.length(); i++)
+				for(long unsigned int i=0; i<last_match.length()-chk_str.length(); i++)
 					input.erase(input.begin()+cur_pos);
 			}
 
 			//Insert match into input
-			for(int i=0; i<match.length()-chk_str.length(); i++)
+			for(long unsigned int i=0; i<match.length()-chk_str.length(); i++)
 				input.insert(input.begin()+cur_pos+i,match[i+chk_str.length()]);
 
 			//Reprint input
-			if(last_match != "" && containsNonSpaceChar(match))
+			if(last_match != "" && match != "" && containsNonSpaceChar(match))
 			{
 				fprintf(stdout,CURSOR_LEFT_N,last_match.length()-chk_str.length());
 				fprintf(stdout,CLEAR_TO_LINE_END);
 			}
 
-			for(int i=cur_pos; i<input.size(); i++)
+			for(long unsigned int i=cur_pos; i<input.size(); i++)
 				fprintf(stdout,"%c",input[i]);
 
 			last_match = match;
@@ -463,7 +477,7 @@ std::string input_handler()
 						fprintf(stdout,CLEAR_LINE);
 						input.erase(input.begin()+cur_pos);
 
-						for(int i=cur_pos; i<input.size(); i++)
+						for(long unsigned int i=cur_pos; i<input.size(); i++)
 							fprintf(stdout,"%c",input[i]);
 						if(cur_pos < input.size())
 							fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
@@ -569,7 +583,7 @@ int main()
 		ofs<<app<<"\n";
 	ofs.close();
 
-	fprintf(stdout,"\e[2K");//Delete "Generating..." line from start of main()
+	fprintf(stdout,"\033[2K");//Delete "Generating..." line from start of main()
 
 	//Generate default character if needed
 	if(!c.confirmDatasource())
