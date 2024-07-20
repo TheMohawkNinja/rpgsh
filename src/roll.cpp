@@ -114,7 +114,7 @@ int main(int argc, char** argv)
 				{
 					try
 					{
-						for(int i=count_expr.length(); i<std::string(argv[arg+1]).length(); i++)
+						for(long unsigned int i=count_expr.length(); i<std::string(argv[arg+1]).length(); i++)
 						{
 							count_str += std::string(argv[arg+1]).substr(i,1);
 							if(!std::isdigit(count_str[count_str.length()-1]))
@@ -145,7 +145,7 @@ int main(int argc, char** argv)
 			{
 				fprintf(stdout,"A simple dice rolling program.\n\n");
 				fprintf(stdout,"USAGE:\n");
-				fprintf(stdout,"\troll [%sc%s]d%sf%s[+%sm%s|-%sm%s] [-r %sn%s] [--only-rolls|--only-total]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+				fprintf(stdout,"\troll [%sc%s]d%sf%s[+%sm%s|-%sm%s] [-r %sn%s] [--only-rolls|--only-total]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 				fprintf(stdout,"\troll [-l|--list] %slist%s [-r %sn%s] [--only-rolls|--only-total]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 				fprintf(stdout,"\troll [-L|--lists]\n");
 				fprintf(stdout,"\troll [-t|--test]\n");
@@ -197,14 +197,14 @@ int main(int argc, char** argv)
 
 	if(is_list)
 	{
-		for(int i=0; i<repeat; i++)
+		for(unsigned int i=0; i<repeat; i++)
 		{
 			fprintf(stdout,"%s",(repeat > 1 && i > 0) ? "\n" : "");
 			dice.roll();
 		}
 	}
 
-	for(int i=0; i<repeat && dice.Quantity>0; i++)
+	for(unsigned int i=0; i<repeat && dice.Quantity>0; i++)
 	{
 		fprintf(stdout,"%s",(repeat > 1 && i > 0) ? "\n" : "");
 		dice.roll();
