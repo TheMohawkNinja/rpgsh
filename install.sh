@@ -19,29 +19,29 @@ if [[ $EUID -eq 0 ]]; then
 
 	echo "Compiling shared library objects:"
 	echo -e "\tsrc/config.cpp\t\t->\t$bold_white$lib_dir""libconfig.so"$normal
-	g++ $debug $fs -c -fPIC src/config.cpp -o "$lib_dir""config.o"
-	g++ -shared "$lib_dir""config.o" -o "$lib_dir""libconfig.so"
+	g++ -Wall -Wextra -Wpedantic $debug $fs -c -fPIC src/config.cpp -o "$lib_dir""config.o"
+	g++ -Wall -Wextra -Wpedantic -shared "$lib_dir""config.o" -o "$lib_dir""libconfig.so"
 	echo -e "\tsrc/currency.cpp\t->\t$bold_white$lib_dir""libcurrency.so"$normal
-	g++ $debug $fs -c -fPIC src/currency.cpp -o "$lib_dir""currency.o"
-	g++ -shared "$lib_dir""currency.o" -o "$lib_dir""libcurrency.so"
+	g++ -Wall -Wextra -Wpedantic $debug $fs -c -fPIC src/currency.cpp -o "$lib_dir""currency.o"
+	g++ -Wall -Wextra -Wpedantic -shared "$lib_dir""currency.o" -o "$lib_dir""libcurrency.so"
 	echo -e "\tsrc/dice.cpp\t\t->\t$bold_white$lib_dir""libdice.so"$normal
-	g++ $debug $fs -c -fPIC src/dice.cpp -o "$lib_dir""dice.o"
-	g++ -shared "$lib_dir""dice.o" -o "$lib_dir""libdice.so"
+	g++ -Wall -Wextra -Wpedantic $debug $fs -c -fPIC src/dice.cpp -o "$lib_dir""dice.o"
+	g++ -Wall -Wextra -Wpedantic -shared "$lib_dir""dice.o" -o "$lib_dir""libdice.so"
 	echo -e "\tsrc/define.cpp\t\t->\t$bold_white$lib_dir""libdefine.so"$normal
-	g++ $debug $fs -c -fPIC src/define.cpp -o "$lib_dir""define.o"
-	g++ -shared "$lib_dir""define.o" -o "$lib_dir""libdefine.so"
+	g++ -Wall -Wextra -Wpedantic $debug $fs -c -fPIC src/define.cpp -o "$lib_dir""define.o"
+	g++ -Wall -Wextra -Wpedantic -shared "$lib_dir""define.o" -o "$lib_dir""libdefine.so"
 	echo -e "\tsrc/functions.cpp\t->\t$bold_white$lib_dir""libfunctions.so"$normal
-	g++ $debug -std=c++20 -c -fPIC src/functions.cpp -o "$lib_dir""functions.o"
-	g++ -shared "$lib_dir""functions.o" -o "$lib_dir""libfunctions.so"
+	g++ -Wall -Wextra -Wpedantic $debug -std=c++20 -c -fPIC src/functions.cpp -o "$lib_dir""functions.o"
+	g++ -Wall -Wextra -Wpedantic -shared "$lib_dir""functions.o" -o "$lib_dir""libfunctions.so"
 	echo -e "\tsrc/output.cpp\t\t->\t$bold_white$lib_dir""liboutput.so"$normal
-	g++ $debug -c -fPIC src/output.cpp -o "$lib_dir""output.o"
-	g++ -shared "$lib_dir""output.o" -o "$lib_dir""liboutput.so"
+	g++ -Wall -Wextra -Wpedantic $debug -c -fPIC src/output.cpp -o "$lib_dir""output.o"
+	g++ -Wall -Wextra -Wpedantic -shared "$lib_dir""output.o" -o "$lib_dir""liboutput.so"
 	echo -e "\tsrc/scope.cpp\t\t->\t$bold_white$lib_dir""libscope.so"$normal
-	g++ $debug $fs -c -fPIC src/scope.cpp -o "$lib_dir""scope.o"
-	g++ -shared "$lib_dir""scope.o" -o "$lib_dir""libscope.so"
+	g++ -Wall -Wextra -Wpedantic $debug $fs -c -fPIC src/scope.cpp -o "$lib_dir""scope.o"
+	g++ -Wall -Wextra -Wpedantic -shared "$lib_dir""scope.o" -o "$lib_dir""libscope.so"
 	echo -e "\tsrc/var.cpp\t\t->\t$bold_white$lib_dir""libvar.so"$normal
-	g++ $debug -c -fPIC src/var.cpp -o "$lib_dir""var.o"
-	g++ -shared "$lib_dir""var.o" -o "$lib_dir""libvar.so"
+	g++ -Wall -Wextra -Wpedantic $debug -c -fPIC src/var.cpp -o "$lib_dir""var.o"
+	g++ -Wall -Wextra -Wpedantic -shared "$lib_dir""var.o" -o "$lib_dir""libvar.so"
 
 	echo
 
@@ -52,21 +52,21 @@ if [[ $EUID -eq 0 ]]; then
 
 	echo "Compiling applications:"
 	echo -e "\tsrc/main.cpp\t\t->\t$bold_white""/bin/rpgsh"$normal
-	g++ src/main.cpp -L $lib_dir -ldefine -lscope -lvar -lfunctions -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh
+	g++ -Wall -Wextra -Wpedantic src/main.cpp -L $lib_dir -ldefine -lscope -lvar -lfunctions -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh
 	echo -e "\tsrc/setname.cpp\t\t->\t$bold_white""/bin/rpgsh-setname"$normal
-	g++ src/setname.cpp -L $lib_dir -lscope -ldefine -lvar -lfunctions -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-setname
+	g++ -Wall -Wextra -Wpedantic src/setname.cpp -L $lib_dir -lscope -ldefine -lvar -lfunctions -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-setname
 	echo -e "\tsrc/variables.cpp\t->\t$bold_white""/bin/rpgsh-variables"$normal
-	g++ src/variables.cpp -L $lib_dir -lscope -ldefine -lvar -lfunctions -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-variables
+	g++ -Wall -Wextra -Wpedantic src/variables.cpp -L $lib_dir -lscope -ldefine -lvar -lfunctions -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-variables
 	echo -e "\tsrc/version.cpp\t\t->\t$bold_white""/bin/rpgsh-version"$normal
-	g++ src/version.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-version
+	g++ -Wall -Wextra -Wpedantic src/version.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-version
 	echo -e "\tsrc/banner.cpp\t\t->\t$bold_white""/bin/rpgsh-banner"$normal
-	g++ src/banner.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-banner
+	g++ -Wall -Wextra -Wpedantic src/banner.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-banner
 	echo -e "\tsrc/roll.cpp\t\t->\t$bold_white""/bin/rpgsh-roll"$normal
-	g++ src/roll.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-roll
+	g++ -Wall -Wextra -Wpedantic src/roll.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-roll
 	echo -e "\tsrc/list.cpp\t\t->\t$bold_white""/bin/rpgsh-list"$normal
-	g++ src/list.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-list
+	g++ -Wall -Wextra -Wpedantic src/list.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-list
 	echo -e "\tsrc/help.cpp\t\t->\t$bold_white""/bin/rpgsh-help"$normal
-	g++ src/help.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-help
+	g++ -Wall -Wextra -Wpedantic src/help.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-help
 
 	echo "Done!"
 else
