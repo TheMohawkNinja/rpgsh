@@ -7,6 +7,9 @@
 
 int main(int argc, char** argv)
 {
+	if(argc > 2)
+		output(Warning,"banner only expects 0 or 1 arguments, ignoring all other arguments.");
+
 	check_print_app_description(argv,"Prints pretty banner art and the author's signature.");
 
 	fprintf(stdout,"                                         %s▟                   %s\n",TEXT_YELLOW,TEXT_NORMAL);
