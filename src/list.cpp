@@ -7,7 +7,7 @@ void print_header(std::string s)
 {
 	fprintf(stdout,"%s%s %s %s\n",TEXT_GREEN,TEXT_BOLD,s.c_str(),TEXT_NORMAL);
 	fprintf(stdout,"%s",TEXT_WHITE);
-	for(int i=0; i<s.length()+2; i++)
+	for(long unsigned int i=0; i<s.length()+2; i++)
 		fprintf(stdout,"─");
 	fprintf(stdout,"%s\n",TEXT_NORMAL);
 }
@@ -94,7 +94,7 @@ void print_data(Scope scope)
 			continue;
 
 		//Get longest currency name
-		int longest_cur = 0;
+		long unsigned int longest_cur = 0;
 		for(auto& [c,q] : v)
 		{
 			if(c.Name.length() > longest_cur)
@@ -170,11 +170,11 @@ int main(int argc, char** argv)
 		fprintf(stdout,"USAGE:\n");
 		fprintf(stdout,"\tlist %soption%s\n\n",TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"OPTIONS:\n");
-		fprintf(stdout,"\t%snone%s | --all\tPrints all variables in all Scopes.\n",TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"\t--character\tPrints all character attributes.\n",TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"\t--campaign\tPrints all current campaign variables.\n",TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"\t--shell\t\tPrints all shell variables.\n",TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"\t-? | --all\tPrints this help text.\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t--all\tPrints all variables in all Scopes, this is the default behavior.\n");
+		fprintf(stdout,"\t--character\tPrints all character attributes.\n");
+		fprintf(stdout,"\t--campaign\tPrints all current campaign variables.\n");
+		fprintf(stdout,"\t--shell\t\tPrints all shell variables.\n");
+		fprintf(stdout,"\t-? | --all\tPrints this help text.\n");
 	}
 	else
 	{
