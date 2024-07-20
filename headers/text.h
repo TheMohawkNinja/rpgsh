@@ -43,9 +43,9 @@
 #define TEXT_CYAN			"\033[36m"
 #define TEXT_LIGHTGRAY			"\033[37m"
 #define _TEXT_COLOR_4BIT(n)		"\033[38;5;"#n"m"	//0-15, 0-7 low intensity, 8-15 high intensity
-#define TEXT_COLOR_4BIT			_TEXT_COLOR_4_BIT(%n)
+#define TEXT_COLOR_4BIT			_TEXT_COLOR_4_BIT(%u)
 #define _TEXT_COLOR_8BIT(r,g,b)		"\033[38;2;"#r";"#g";"#b"m"
-#define TEXT_COLOR_8BIT			_TEXT_COLOR_8_BIT(%r,%g,%b)
+#define TEXT_COLOR_8BIT			_TEXT_COLOR_8_BIT(%u,%u,%u)
 #define TEXT_DEFAULTCOLOR		"\033[39m"		//Implementation-specific
 #define TEXT_BG_BLACK			"\033[40m"
 #define TEXT_BG_RED			"\033[41m"
@@ -56,9 +56,9 @@
 #define TEXT_BG_CYAN			"\033[46m"
 #define TEXT_BG_LIGHTGRAY		"\033[47m"
 #define _TEXT_BG_COLOR_4BIT(n)		"\033[48;5;"#n"m"	a//0-15, 0-7 low intensity, 8-15 high intensity
-#define TEXT_BG_COLOR_4BIT		_TEXT_BG_COLOR_4_BIT(%n)
+#define TEXT_BG_COLOR_4BIT		_TEXT_BG_COLOR_4_BIT(%u)
 #define _TEXT_BG_COLOR_8BIT(r,g,b)	"\033[48;2;"#r";"#g";"#b"m"
-#define TEXT_BG_COLOR_8BIT		_TEXT_BG_COLOR_8_BIT(%r,%g,%b)
+#define TEXT_BG_COLOR_8BIT		_TEXT_BG_COLOR_8_BIT(%u,%u,%u)
 #define TEXT_BG_DEFAULTCOLOR		"\033[49m"
 #define TEXT_NOPROPSPACING		"\033[50m"
 #define TEXT_FRAME			"\033[51m"		//Implemented as "emoji variation selector" in mintty
@@ -67,9 +67,9 @@
 #define TEXT_NOFRAME_NOENCIRCLE		"\033[54m"		//Resets 52 and 53
 #define TEXT_NOOVERLINE			"\033[55m"
 #define _TEXT_UNDERLINECOLOR_4BIT(n)	"\033[58;5;"#n"m"	//0-15, 0-7 low intensity, 8-15 high intensity
-#define TEXT_UNDERLINECOLOR_4BIT	_TEXT_UNDERLINECOLOR_4_BIT(%n)
+#define TEXT_UNDERLINECOLOR_4BIT	_TEXT_UNDERLINECOLOR_4_BIT(%u)
 #define _TEXT_UNDERLINECOLOR_8BIT(r,g,b)"\033[58;2;"#r";"#g";"#b"m"
-#define TEXT_UNDERLINECOLOR_8BIT	_TEXT_UNDERLINECOLOR_8_BIT(%r,%g,%b)
+#define TEXT_UNDERLINECOLOR_8BIT	_TEXT_UNDERLINECOLOR_8_BIT(%u,%u,%u)
 #define TEXT_DEFAULTUNDERLINECOLOR	"\033[59m"
 #define TEXT_IDEO_UNDER			"\033[60m"		//Ideogram underline or right side line
 #define TEXT_IDEO_DOUBLEUNDER		"\033[61m"		//Ideogram double underline or double right side line
@@ -99,28 +99,28 @@
 
 //Cursor movement
 #define _CURSOR_SET(l,c)		"\033["#l";"#c"H"
-#define CURSOR_SET			_CURSOR_SET(%d,%d)
+#define CURSOR_SET			_CURSOR_SET(%lu,%lu)
 #define CURSOR_UP			"\033[A"
 #define _CURSOR_UP_N(n)			"\033["#n"A"
-#define CURSOR_UP_N			_CURSOR_UP_N(%d)
+#define CURSOR_UP_N			_CURSOR_UP_N(%lu)
 #define CURSOR_DOWN			"\033[B"
 #define _CURSOR_DOWN_N(n)		"\033["#n"B"
-#define CURSOR_DOWN_N			_CURSOR_DOWN_N(%d)
+#define CURSOR_DOWN_N			_CURSOR_DOWN_N(%lu)
 #define CURSOR_RIGHT			"\033[C"
 #define _CURSOR_RIGHT_N(n)		"\033["#n"C"
-#define CURSOR_RIGHT_N			_CURSOR_RIGHT_N(%d)
+#define CURSOR_RIGHT_N			_CURSOR_RIGHT_N(%lu)
 #define CURSOR_LEFT			"\033[D"
 #define _CURSOR_LEFT_N(n)		"\033["#n"D"
-#define CURSOR_LEFT_N			_CURSOR_LEFT_N(%d)
+#define CURSOR_LEFT_N			_CURSOR_LEFT_N(%lu)
 #define CURSOR_DOWN_HOME		"\033[E"	//Move to next line down and go to column 0
 #define _CURSOR_DOWN_HOME_N(n)		"\033["#n"E"	//Move n lines down and go to column 0
-#define CURSOR_DOWN_HOME_N		_CURSOR_DOWN_HOME_N(%d)
+#define CURSOR_DOWN_HOME_N		_CURSOR_DOWN_HOME_N(%lu)
 #define CURSOR_UP_HOME			"\033[F"	//Move to next line up and go to column 0
 #define _CURSOR_UP_HOME_N(n)		"\033["#n"F"	//Move n lines up and go to column 0
-#define CURSOR_UP_HOME_N		_CURSOR_UP_HOME_N(%d)
+#define CURSOR_UP_HOME_N		_CURSOR_UP_HOME_N(%lu)
 #define CURSOR_HOME			"\033[G"
 #define _CURSOR_SET_COL_N(n)		"\033["#n"G"
-#define CURSOR_SET_COL_N		_CURSOR_SET_COL_N(%d)
+#define CURSOR_SET_COL_N		_CURSOR_SET_COL_N(%lu)
 #define CURSOR_SET_HOME			"\033[H"
 
 //Screen and line clearing
