@@ -399,7 +399,7 @@ Wallet::Wallet(std::string str)
 		currency = Currency(currency_str);
 
 		//If we're at the end of the constructor
-		int next_delimiter = str.find(delimiter,c_str_ln+1);
+		const long unsigned int next_delimiter = str.find(delimiter,c_str_ln+1);
 		if(next_delimiter == std::string::npos)
 			delimiter = "}";
 
@@ -570,7 +570,7 @@ Wallet& Wallet::operator *= (const money_t b)
 }
 Wallet& Wallet::operator *= (const Wallet b)
 {
-	printBadOpAndThrow("Wallet *= Wallet");
+	printBadOpAndThrow("Wallet *= "+std::string(b));
 	return *this;
 }
 Wallet& Wallet::operator *= (const Dice b)
@@ -623,7 +623,7 @@ Wallet& Wallet::operator /= (const money_t b)
 }
 Wallet& Wallet::operator /= (const Wallet b)
 {
-	printBadOpAndThrow("Wallet /= Wallet");
+	printBadOpAndThrow("Wallet /= Wallet"+std::string(b));
 	return *this;
 }
 Wallet& Wallet::operator /= (const Dice b)
@@ -684,10 +684,7 @@ Wallet::operator std::string() const
 
 	return ret;
 }
-bool Wallet::operator != (const std::string b)//TODO: May need to revisit this for a possible Wallet(std::string) constructor
-{
-	return true;
-}
+
 //Links the instance of Currency to the instance of CurrencySystem
 //Allows the instance of CurrencySystem to detect changes in the attached Currency
 //Also automatically adds the Currency to the map of Currencies within the CurrencySystem
@@ -703,7 +700,7 @@ void Currency::AttachToCurrencySystem(std::shared_ptr<CurrencySystem> _CurrencyS
 //Even if they are the only Currency in the system. Otherwise, operators don't give expected behavior
 bool Currency::operator < (const Currency& b) const
 {
-	if(!System && b.System || !b.System && System)
+	if((!System && b.System) || (!b.System && System))
 	{
 		return false;
 	}
@@ -726,31 +723,26 @@ bool Currency::operator < (const Currency& b) const
 			return true;
 		}
 	}
-	for(const auto& [key,value] : *System)
+	if(System != b.System)
 	{
-		if(System != b.System)
-		{
-			//Needs to be here, otherwise Wallet.print() doesn't work right
-			//and operations try doing cross-system exchanges that don't work.
-			//Probably due to some under-the-hood nonsense with std::map
-			continue;
-		}
-		else if(b.Larger == Name)
-		{
-			return true;
-		}
-		else if(b.Smaller == Name)
-		{
-			return false;
-		}
-		else if(b.Name == Name)
-		{
-			return false;
-		}
-		else
-		{
-			return true;
-		}
+		//May be source of some issues due to getting rid of apparently unneeded for loop
+		return false;
+	}
+	else if(b.Larger == Name)
+	{
+		return true;
+	}
+	else if(b.Smaller == Name)
+	{
+		return false;
+	}
+	else if(b.Name == Name)
+	{
+		return false;
+	}
+	else
+	{
+		return true;
 	}
 	return (Name < b.Name);
 }
