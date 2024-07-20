@@ -11,43 +11,22 @@ Shell s = Shell();
 template<typename T>
 void print_requested_data(Scope scope, std::string key)
 {
-	//Directly evaulating the methods doesn't work for some reason, so we have to use interim variables, weird...
 	int period = key.find('.');
-	int slash = key.rfind('/');
-	if(period < slash)//If any periods are before the last '/', print the explicit constructor
+	int r_period = key.rfind('.');
+	int slash = key.find('/');
+	int r_slash = key.rfind('/');
+	if(period < r_slash)//If any periods are before the last '/', print the explicit constructor
 	{
-		key = key.substr(1,key.length()-1);
+		key = right(key,slash+1);
 		fprintf(stdout,"%s\n",scope.getStr<T>(key).c_str());
+		exit(0);
 	}
 	else//Otherwise, print the requested property
 	{
-		std::string property = key.substr(key.rfind('.')+1,
-						  key.length()-(key.rfind('.')+1));
-		key = key.substr(1,key.rfind('.')-1);
+		std::string property = key.substr(r_period+1,key.length()-(r_period+1));
+		key = key.substr(slash+1,r_period-(slash+1));
 		fprintf(stdout,"%s\n",scope.getProperty<T>(key,property).c_str());
-	}
-}
-template<typename T>
-void check_key(Scope scope, std::string key)
-{
-	int period = key.find('.');
-	int slash = key.rfind('/');
-	for(const auto& [k,v] : scope.getDatamap<T>())
-	{
-		std::string chk_str = "";
-		if(period < slash)
-			chk_str = key.substr(1,key.length()-1);
-		else
-			chk_str = key.substr(1,key.rfind('.')-1);
-
-		if(!stringcasecmp(chk_str,k))
-		{
-			chk_str = "/"+k;
-			if(period > slash)
-				chk_str+=key.substr(period,key.length()-period);
-			print_requested_data<T>(scope,chk_str);
-			exit(0);
-		}
+		exit(0);
 	}
 }
 template<typename T>
@@ -56,17 +35,17 @@ void get_map(Scope scope, std::map<std::string,std::string>* p_map)
 	for(const auto& [k,v] : scope.getDatamap<T>())
 		(*p_map)[k] = scope.getStr<T>(k);
 }
-void append_output(std::map<std::string,std::string> map, std::string key, std::string* p_output)
+void append_output(std::map<std::string,std::string> map, std::string key, std::string* pOutput)
 {
 	for(const auto& [k,v] : map)
 	{
 		//Get root variable if it exists
-		if(("/"+left(k,key.length()-1)+"/") == key)
-			p_output->append(k + DS + v + DS);
+		if(!stringcasecmp(("/"+left(k,key.length()-1)+"/"),key))
+			pOutput->append(k + DS + v + DS);
 
 		//Get all subkeys
-		if("/"+left(k,key.length()-1) == key)
-			p_output->append(k + DS + v + DS);
+		if(!stringcasecmp(("/"+left(k,key.length()-1)),key))
+			pOutput->append(k + DS + v + DS);
 	}
 }
 std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir,std::string xref)
@@ -149,10 +128,8 @@ int main(int argc, char** argv)
 	std::string arg(argv[1]);
 	std::string key = "";
 
-	//Check if user is requesting a character xref from a different campaign. Directly evaluating the find() methods results in nonsensical behavior (e.g. -1>1=true)
-	int rsqbrkt = arg.find(']');
-	int slash = arg.find(')');
-	if(rsqbrkt > slash)
+	//Check if user is requesting a character xref from a different campaign.
+	if((int)arg.find(']') > (int)arg.find('/'))
 		key = right(arg,arg.find(']')+1);
 	else
 		key = right(arg,arg.find('/'));
@@ -176,8 +153,6 @@ int main(int argc, char** argv)
 
 	if(argc == 2)//If the user just submits a variable...
 	{
-		unsigned int space = 0;
-
 		if(key[key.length()-1] != '/')//...and the last character isn't a '/', just print value
 		{
 			//Check for external references
@@ -188,30 +163,28 @@ int main(int argc, char** argv)
 			{
 				case CURRENCY_SIGIL:
 					print_requested_data<Currency>(scope,key);
-					exit(0);
+					break;
 				case CURRENCYSYSTEM_SIGIL:
 					print_requested_data<CurrencySystem>(scope,key);
-					exit(0);
+					break;
 				case DICE_SIGIL:
 					print_requested_data<Dice>(scope,key);
-					exit(0);
+					break;
 				case VAR_SIGIL:
 					print_requested_data<Var>(scope,key);
-					exit(0);
+					break;
 				case WALLET_SIGIL:
 					print_requested_data<Wallet>(scope,key);
-					exit(0);
+					break;
 				case '/':
 					//If a type specifier is not specified, check for match.
 					//Specifically, check in order of what is most to least likely
-					check_key<Var>(scope,key);
-					check_key<Dice>(scope,key);
-					check_key<Wallet>(scope,key);
-					check_key<Currency>(scope,key);
-					check_key<CurrencySystem>(scope,key);
-
-					//If we get here, there was no match, so just output nothing and exit like we would for any other non-existent variable
-					exit(0);
+					print_requested_data<Var>(scope,key);
+					print_requested_data<Dice>(scope,key);
+					print_requested_data<Wallet>(scope,key);
+					print_requested_data<Currency>(scope,key);
+					print_requested_data<CurrencySystem>(scope,key);
+					break;
 				default:
 					output(Error,"Unknown type specifier \'%c\' in \"%s\"",arg[1],arg.c_str());
 					exit(-1);
@@ -219,7 +192,6 @@ int main(int argc, char** argv)
 		}
 		else//...and the last character is a '/', print a list of keys and constructors
 		{
-			int space = 0;
 			std::map<std::string,std::string> c_map;
 			std::map<std::string,std::string> cs_map;
 			std::map<std::string,std::string> d_map;
