@@ -7,6 +7,7 @@ class Var
 	public:
 		std::string Value = "";
 
+		Var(const Var& b);
 		explicit operator std::string() const;
 		explicit operator int() const;
 		Var& operator = (const Var b);
@@ -21,8 +22,8 @@ class Var
 		Var& operator *= (const int b);
 		Var& operator /= (const Var b);
 		Var& operator /= (const int b);
-		Var& operator ++ (const int b);
-		Var& operator -- (const int b);
+		Var& operator ++ ();
+		Var& operator -- ();
 		Var operator + (const Var b);
 		Var operator + (const std::string b);
 		Var operator + (const int b);
