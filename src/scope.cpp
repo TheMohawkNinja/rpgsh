@@ -177,27 +177,52 @@ std::string Scope::getDatasource()
 template<>
 Currency Scope::get<Currency>(std::string key)
 {
-	return currencies[key];
+	for(const auto& [k,v] : currencies)
+	{
+		if(!stringcasecmp(k,key))
+			return currencies[k];
+	}
+	return Currency();
 }
 template<>
 CurrencySystem Scope::get<CurrencySystem>(std::string key)
 {
-	return currencysystems[key];
+	for(const auto& [k,v] : currencysystems)
+	{
+		if(!stringcasecmp(k,key))
+			return currencysystems[k];
+	}
+	return CurrencySystem();
 }
 template<>
 Dice Scope::get<Dice>(std::string key)
 {
-	return dice[key];
+	for(const auto& [k,v] : dice)
+	{
+		if(!stringcasecmp(k,key))
+			return dice[k];
+	}
+	return Dice();
 }
 template<>
 Var Scope::get<Var>(std::string key)
 {
-	return vars[key];
+	for(const auto& [k,v] : vars)
+	{
+		if(!stringcasecmp(k,key))
+			return vars[k];
+	}
+	return Var();
 }
 template<>
 Wallet Scope::get<Wallet>(std::string key)
 {
-	return wallets[key];
+	for(const auto& [k,v] : wallets)
+	{
+		if(!stringcasecmp(k,key))
+			return wallets[k];
+	}
+	return Wallet();
 }
 
 //Get single variable, but return a std::string
@@ -232,15 +257,15 @@ template<>
 std::string Scope::getProperty<Currency>(std::string key, std::string property)
 {
 	if(!stringcasecmp(property,"CurrencySystem"))
-		return currencies[key].System->Name;
+		return get<Currency>(key).System->Name;
 	else if(!stringcasecmp(property,"Name"))
-		return currencies[key].Name;
+		return get<Currency>(key).Name;
 	else if(!stringcasecmp(property,"SmallerAmount"))
-		return std::to_string(currencies[key].SmallerAmount);
+		return std::to_string(get<Currency>(key).SmallerAmount);
 	else if(!stringcasecmp(property,"Smaller"))
-		return currencies[key].Smaller;
+		return get<Currency>(key).Smaller;
 	else if(!stringcasecmp(property,"Larger"))
-		return currencies[key].Larger;
+		return get<Currency>(key).Larger;
 
 	output(Error,"\"%s\" is not a valid currency property.",property.c_str());
 	exit(-1);
@@ -249,7 +274,7 @@ template<>
 std::string Scope::getProperty<CurrencySystem>(std::string key, std::string property)
 {
 	if(!stringcasecmp(property,"Name"))
-		return currencysystems[key].Name;
+		return get<CurrencySystem>(key).Name;
 
 	output(Error,"\"%s\" is not a valid currency system property.",property.c_str());
 	exit(-1);
@@ -258,13 +283,13 @@ template<>
 std::string Scope::getProperty<Dice>(std::string key, std::string property)
 {
 	if(!stringcasecmp(property,"Quantity"))
-		return std::to_string(dice[key].Quantity);
+		return std::to_string(get<Dice>(key).Quantity);
 	else if(!stringcasecmp(property,"Faces"))
-		return std::to_string(dice[key].Faces);
+		return std::to_string(get<Dice>(key).Faces);
 	else if(!stringcasecmp(property,"Modifier"))
-		return std::to_string(dice[key].Modifier);
+		return std::to_string(get<Dice>(key).Modifier);
 	else if(!stringcasecmp(property,"List"))
-		return dice[key].List;
+		return get<Dice>(key).List;
 
 	output(Error,"\"%s\" is not a valid dice property.",property.c_str());
 	exit(-1);
@@ -273,7 +298,7 @@ template<>
 std::string Scope::getProperty<Var>(std::string key, std::string property)
 {
 	if(!stringcasecmp(property,"Value"))
-		return vars[key].Value;
+		return get<Var>(key).Value;
 
 	output(Error,"\"%s\" is not a valid var property.",property.c_str());
 	exit(-1);
@@ -281,10 +306,10 @@ std::string Scope::getProperty<Var>(std::string key, std::string property)
 template<>
 std::string Scope::getProperty<Wallet>(std::string key, std::string property)
 {
-	for(const auto& [currency,quantity] : wallets[key])
+	for(const auto& [c,q] : get<Wallet>(key))
 	{
-		if(!stringcasecmp(property,currency.Name))
-			return std::to_string(quantity);
+		if(!stringcasecmp(property,c.Name))
+			return std::to_string(q);
 	}
 
 	output(Error,"Currency \"%s\" not found in \"%s\".",property.c_str(),key.c_str());
