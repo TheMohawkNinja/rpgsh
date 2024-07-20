@@ -7,6 +7,8 @@
 `rpgsh` is an interactive and extensible shell purpose-built for table-top RPGs like Dungeons and Dragons®, Pathfinder®, and more!
 
 Features include:
+- Tab completion
+<img src="tab_completion.gif" width="160" height="120" border="10"/>
 - Get/set/modify variables of differing data types
 - Variable substitution
 - Dice rolling program
