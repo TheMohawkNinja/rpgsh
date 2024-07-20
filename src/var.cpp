@@ -2,6 +2,10 @@
 #include "../headers/output.h"
 #include "../headers/var.h"
 
+Var::Var(const Var& b)
+{
+	Value = b.Value;
+}
 Var::operator std::string() const
 {
 	return std::string(1,VAR_SIGIL)+"{"+Value+"}";
@@ -206,7 +210,7 @@ Var& Var::operator /= (const int b)
 	}
 	return *this;
 }
-Var& Var::operator ++ (const int b)
+Var& Var::operator ++ ()
 {
 	bool a_is_num = true;
 
@@ -223,7 +227,7 @@ Var& Var::operator ++ (const int b)
 	}
 	return *this;
 }
-Var& Var::operator -- (const int b)
+Var& Var::operator -- ()
 {
 	bool a_is_num = true;
 
