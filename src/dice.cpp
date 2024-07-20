@@ -7,7 +7,7 @@
 #include "../headers/output.h"
 #include "../headers/text.h"
 
-int Dice::get_value(std::string d, std::string value, int start, std::string terminator, bool allow_sign, bool required)
+int Dice::get_value(std::string d, std::string value, long unsigned int start, std::string terminator, bool allow_sign, bool required)
 {
 	std::string value_str = "";
 	if(terminator != "")
@@ -63,7 +63,7 @@ int Dice::get_value(std::string d, std::string value, int start, std::string ter
 			}
 			return 0;
 		}
-		for(int i=start; i<d.length(); i++)
+		for(long unsigned int i=start; i<d.length(); i++)
 		{
 			try
 			{
@@ -279,7 +279,7 @@ void Dice::roll()
 	}
 	if(Quantity > 0 && Faces > 0)
 	{
-		for(int i=0; i<Faces; i++)
+		for(unsigned int i=0; i<Faces; i++)
 		{
 			result_quantity.push_back(0);
 		}
@@ -291,7 +291,7 @@ void Dice::roll()
 
 		std::ifstream fs(random_seed_path);
 		std::string data, seed;
-		int result;
+		unsigned int result;
 
 		while(seed.length() < Quantity)
 		{
@@ -302,7 +302,7 @@ void Dice::roll()
 		int total = 0;
 		std::string color;
 
-		for(int i=0; i<Quantity; i++)
+		for(unsigned int i=0; i<Quantity; i++)
 		{
 			std::srand((int)seed[i] * (int)seed[i] - i);
 			std::srand(std::rand());//Mitigates apparent roll biasing when Faces%result=0
@@ -340,12 +340,12 @@ void Dice::roll()
 			else if(!just_show_total)
 			{
 				fprintf(stdout,"Roll");
-				for(int space=std::to_string(Quantity).length(); space>=std::to_string(i+1).length(); space--)
+				for(long unsigned int space=std::to_string(Quantity).length(); space>=std::to_string(i+1).length(); space--)
 				{
 					fprintf(stdout," ");
 				}
 				fprintf(stdout,"%d:",(i+1));
-				for(int space=std::to_string(Faces).length(); space>=std::to_string(result).length(); space--)
+				for(long unsigned int space=std::to_string(Faces).length(); space>=std::to_string(result).length(); space--)
 				{
 					fprintf(stdout," ");
 				}
@@ -456,10 +456,10 @@ void Dice::test()
 	fprintf(stdout,"\t┌───────────────────────────────────────┐\n");
 	fprintf(stdout,"\t│ %s%s%sTEST RESULTS:%s                         │\n",TEXT_ITALIC,TEXT_BOLD,TEXT_YELLOW,TEXT_NORMAL);
 	fprintf(stdout,"\t│                                       │\n");
-	for(int i=0; i<Faces; i++)
+	for(unsigned int i=0; i<Faces; i++)
 	{
 		float percent = ((float)result_quantity[i]/((float)Quantity/(float)Faces))*100-100;
 		fprintf(stdout,"\t│ # of %d's: %s%d (%s%s%.2f%%%s from perfect) │\n",(i+1),(i<9)?" ":"",result_quantity[i],(percent>=0)?plus.c_str():"",TEXT_WHITE,percent,TEXT_NORMAL);
 	}
 	fprintf(stdout,"\t└───────────────────────────────────────┘\n");
-};
+}
