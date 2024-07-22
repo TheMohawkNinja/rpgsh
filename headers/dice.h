@@ -34,6 +34,11 @@ class Dice
 	Dice(std::string dice_str, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count);
 	Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count);
 
+	Dice& operator ++ (int);
+	Dice& operator -- (int);
+	bool operator == (const Dice& b) const;
+	bool operator != (const Dice& b) const;
+
 	std::string dice() const;
 	const char* c_str() const;
 	void roll();

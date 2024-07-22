@@ -245,6 +245,28 @@ Dice::Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier, bool _jus
 	count = _count;
 }
 
+Dice& Dice::operator ++ (int)
+{
+	Modifier++;
+	return *this;
+}
+Dice& Dice::operator -- (int)
+{
+	Modifier--;
+	return *this;
+}
+bool Dice::operator == (const Dice& b) const
+{
+	return (Quantity == b.Quantity &&
+		Faces == b.Faces &&
+		Modifier == b.Modifier &&
+		List == b.List);
+}
+bool Dice::operator != (const Dice& b) const
+{
+	return !(*this == b);
+}
+
 std::string Dice::dice() const
 {
 	std::string ret = "";
