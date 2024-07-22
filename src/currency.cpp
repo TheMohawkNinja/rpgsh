@@ -220,7 +220,17 @@ bool Currency::operator == (const Currency& b) const
 		SmallerAmount == b.SmallerAmount &&
 		Larger == b.Larger);
 }
-//TODO Currency < operator
+Currency& Currency::operator ++ (int)
+{
+	printBadOpAndThrow("Currency ++");
+	return *this;
+}
+Currency& Currency::operator -- (int)
+{
+	printBadOpAndThrow("Currency --");
+	return *this;
+}
+
 CurrencySystem::operator std::string() const
 {
 	return std::string(1,CURRENCYSYSTEM_SIGIL)+"{"+Name+"}";
@@ -228,6 +238,24 @@ CurrencySystem::operator std::string() const
 Currency& CurrencySystem::operator [] (const std::string b)
 {
 	return Denomination[b];
+}
+CurrencySystem& CurrencySystem::operator ++ (int)
+{
+	printBadOpAndThrow("CurrencySystem ++");
+	return *this;
+}
+CurrencySystem& CurrencySystem::operator -- (int)
+{
+	printBadOpAndThrow("CurrencySystem --");
+	return *this;
+}
+bool CurrencySystem::operator == (const CurrencySystem& b) const
+{
+	return Name == b.Name;
+}
+bool CurrencySystem::operator != (const CurrencySystem& b) const
+{
+	return !(*this == b);
 }
 
 //Beginning and end iterators.
@@ -332,6 +360,50 @@ void Wallet::FloatQuantityToIntCurrency(Currency c, float q)
 int& Wallet::operator [] (const Currency b)
 {
 	return Money[b];
+}
+bool Wallet::operator == (const Wallet& b) const
+{
+	for(const auto& [c,q] : Money)
+	{
+		bool c_found = false;
+		for(const auto& [c_b,q_b] : b.Money)
+		{
+			if(c == c_b && q == q_b)
+			{
+				c_found = true;
+				break;
+			}
+			else if(c == c_b)//Currency match, but different quantity
+			{
+				return false;
+			}
+		}
+		if(!c_found)
+			return false;//Currency wasn't found in b
+	}
+	for(const auto& [c_b,q_b] : b.Money)
+	{
+		bool c_b_found = false;
+		for(const auto& [c,q] : Money)
+		{
+			if(c == c_b && q == q_b)
+			{
+				c_b_found = true;
+				break;
+			}
+			else if(c == c_b)//Currency match, but different quantity
+			{
+				return false;
+			}
+		}
+		if(!c_b_found)
+			return false;//Currency wasn't found in b
+	}
+	return true;
+}
+bool Wallet::operator != (const Wallet& b) const
+{
+	return !(*this == b);
 }
 
 //Beginning and end iterators. This is so I can use "for(const auto& [key,val] : Wallet){}"
@@ -745,6 +817,10 @@ bool Currency::operator < (const Currency& b) const
 		return true;
 	}
 	return (Name < b.Name);
+}
+bool Currency::operator != (const Currency& b) const
+{
+	return !(*this == b);
 }
 
 void CurrencySystem::MakeChange(Currency c, Wallet* w)

@@ -40,8 +40,11 @@ class Currency
 	Currency(std::shared_ptr<CurrencySystem> _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
 
 	explicit operator std::string() const;
+	Currency& operator ++ (int);
+	Currency& operator -- (int);
 	bool operator == (const Currency& b) const;
 	bool operator < (const Currency& b) const;
+	bool operator != (const Currency& b) const;
 };
 class CurrencySystem
 {
@@ -52,6 +55,10 @@ class CurrencySystem
 
 	explicit operator std::string() const;
 	Currency& operator [] (const std::string b);
+	CurrencySystem& operator ++ (int);
+	CurrencySystem& operator -- (int);
+	bool operator == (const CurrencySystem& b) const;
+	bool operator != (const CurrencySystem& b) const;
 
 	//Iterator type for the class
 	using iterator = typename std::map<std::string, Currency>::const_iterator;
@@ -80,6 +87,8 @@ class Wallet
 	void FloatQuantityToIntCurrency(Currency c, float q);
 
 	int& operator [] (const Currency b);
+	bool operator == (const Wallet& b) const;
+	bool operator != (const Wallet& b) const;
 
 	//Iterator for the class
 	using iterator = typename std::map<Currency, int>::const_iterator;
