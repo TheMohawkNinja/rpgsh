@@ -210,7 +210,7 @@ Var& Var::operator /= (const int b)
 	}
 	return *this;
 }
-Var& Var::operator ++ ()
+Var& Var::operator ++ (int)
 {
 	bool a_is_num = true;
 
@@ -227,7 +227,7 @@ Var& Var::operator ++ ()
 	}
 	return *this;
 }
-Var& Var::operator -- ()
+Var& Var::operator -- (int)
 {
 	bool a_is_num = true;
 
