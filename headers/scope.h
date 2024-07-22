@@ -39,6 +39,14 @@ class Scope
 		//Get datasource
 		std::string getDatasource();
 
+		//Check if key exists
+		template <typename T>
+		bool keyExists(std::string key);
+
+		//Get existing case-insensitive key match (if applicable)
+		template <typename T>
+		std::string getExistingKey(std::string key);
+
 		//Get single variable
 		template <typename T>
 		T get(std::string key);

@@ -173,56 +173,115 @@ std::string Scope::getDatasource()
 	return datasource;
 }
 
+//Check if key exists
+template<>
+bool Scope::keyExists<Currency>(std::string key)
+{
+	for(const auto& [k,v] : currencies)
+		if(!stringcasecmp(k,key)) return true;
+
+	return false;
+}
+template<>
+bool Scope::keyExists<CurrencySystem>(std::string key)
+{
+	for(const auto& [k,v] : currencysystems)
+		if(!stringcasecmp(k,key)) return true;
+
+	return false;
+}
+template<>
+bool Scope::keyExists<Dice>(std::string key)
+{
+	for(const auto& [k,v] : dice)
+		if(!stringcasecmp(k,key)) return true;
+
+	return false;
+}
+template<>
+bool Scope::keyExists<Var>(std::string key)
+{
+	for(const auto& [k,v] : vars)
+		if(!stringcasecmp(k,key)) return true;
+
+	return false;
+}
+template<>
+bool Scope::keyExists<Wallet>(std::string key)
+{
+	for(const auto& [k,v] : wallets)
+		if(!stringcasecmp(k,key)) return true;
+
+	return false;
+}
+
+//Get existing case-insensitive key match (if applicable)
+template<>
+std::string Scope::getExistingKey<Currency>(std::string key)
+{
+	for(const auto& [k,v] : currencies)
+		if(!stringcasecmp(k,key)) return k;
+
+	return key;
+}
+template<>
+std::string Scope::getExistingKey<CurrencySystem>(std::string key)
+{
+	for(const auto& [k,v] : currencysystems)
+		if(!stringcasecmp(k,key)) return k;
+
+	return key;
+}
+template<>
+std::string Scope::getExistingKey<Dice>(std::string key)
+{
+	for(const auto& [k,v] : dice)
+		if(!stringcasecmp(k,key)) return k;
+
+	return key;
+}
+template<>
+std::string Scope::getExistingKey<Var>(std::string key)
+{
+	for(const auto& [k,v] : vars)
+		if(!stringcasecmp(k,key)) return k;
+
+	return key;
+}
+template<>
+std::string Scope::getExistingKey<Wallet>(std::string key)
+{
+	for(const auto& [k,v] : wallets)
+		if(!stringcasecmp(k,key)) return k;
+
+	return key;
+}
+
 //Get single variable
 template<>
 Currency Scope::get<Currency>(std::string key)
 {
-	for(const auto& [k,v] : currencies)
-	{
-		if(!stringcasecmp(k,key))
-			return currencies[k];
-	}
-	return Currency();
+	return currencies[getExistingKey<Currency>(key)];
 }
 template<>
 CurrencySystem Scope::get<CurrencySystem>(std::string key)
 {
-	for(const auto& [k,v] : currencysystems)
-	{
-		if(!stringcasecmp(k,key))
-			return currencysystems[k];
-	}
-	return CurrencySystem();
+	return currencysystems[getExistingKey<CurrencySystem>(key)];
 }
 template<>
 Dice Scope::get<Dice>(std::string key)
 {
-	for(const auto& [k,v] : dice)
-	{
-		if(!stringcasecmp(k,key))
-			return dice[k];
-	}
-	return Dice();
+	return dice[getExistingKey<Dice>(key)];
 }
 template<>
 Var Scope::get<Var>(std::string key)
 {
-	for(const auto& [k,v] : vars)
-	{
-		if(!stringcasecmp(k,key))
-			return vars[k];
-	}
-	return Var();
+	return vars[getExistingKey<Var>(key)];
 }
 template<>
 Wallet Scope::get<Wallet>(std::string key)
 {
-	for(const auto& [k,v] : wallets)
-	{
-		if(!stringcasecmp(k,key))
-			return wallets[k];
-	}
-	return Wallet();
+	return wallets[getExistingKey<Wallet>(key)];
 }
 
 //Get single variable, but return a std::string
@@ -347,27 +406,27 @@ datamap<Wallet> Scope::getDatamap<Wallet>()
 template<>
 void Scope::set<Currency>(std::string key, Currency value)
 {
-	currencies[key] = value;
+	currencies[getExistingKey<Currency>(key)] = value;
 }
 template<>
 void Scope::set<CurrencySystem>(std::string key, CurrencySystem value)
 {
-	currencysystems[key] = value;
+	currencysystems[getExistingKey<CurrencySystem>(key)] = value;
 }
 template<>
 void Scope::set<Dice>(std::string key, Dice value)
 {
-	dice[key] = value;
+	dice[getExistingKey<Dice>(key)] = value;
 }
 template<>
 void Scope::set<Var>(std::string key, Var value)
 {
-	vars[key] = value;
+	vars[getExistingKey<Var>(key)] = value;
 }
 template<>
 void Scope::set<Wallet>(std::string key, Wallet value)
 {
-	wallets[key] = value;
+	wallets[getExistingKey<Wallet>(key)] = value;
 }
 
 //Set entire datamap to another datamap
