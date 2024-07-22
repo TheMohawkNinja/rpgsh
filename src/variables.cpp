@@ -113,6 +113,60 @@ std::string load_external_reference(std::string arg, Scope* p_scope)
 	arg = arg[0]+left(arg,arg.find('[')-1)+right(arg,arg.find(']')+1);
 	return arg;
 }
+bool isUnaryOp(std::string op)
+{
+	return (op == "++" ||
+		op == "--");
+}
+bool isArithmeticOp(std::string op)
+{
+	return (op == "+" ||
+		op == "-" ||
+		op == "*" ||
+		op == "/" ||
+		op == "^" ||//TODO document
+		op == "%");//TODO document
+}
+bool isAssignmentOp(std::string op)
+{
+	return (op == "==" ||
+		op == "+=" ||
+		op == "-=" ||
+		op == "*=" ||
+		op == "/=" ||
+		op == "^=");//TODO document
+}
+bool isRelationalOp(std::string op)//TODO document
+{
+	return (op == "="  ||
+		op == "<"  ||
+		op == ">"  ||
+		op == "<=" ||
+		op == ">=" ||
+		op == "!=");
+}
+template<typename T>
+T performModOp(Scope scope, std::string key, std::string property, std::string op, std::string rhs_str)//Unary, Arithmetic, and Assignment
+{
+	T old_value = scope.get<T>(key);
+	T new_value = T();
+
+	if(op == "++")
+	{
+		new_value = old_value;
+		new_value++;
+	}
+	else if(op == "--")
+	{
+		new_value = old_value;
+		new_value--;
+	}
+
+	if(new_value != old_value)
+		output(Info,"\"%s\" has changed from \"%s\" to \"%s\"",key.c_str(),std::string(old_value).c_str(),std::string(new_value).c_str());
+
+	return new_value;
+}
 
 int main(int argc, char** argv)
 {
@@ -125,14 +179,14 @@ int main(int argc, char** argv)
 	}
 
 	Scope scope;
-	std::string arg(argv[1]);
+	std::string variable(argv[1]);
 	std::string key = "";
 
 	//Check if user is requesting a character xref from a different campaign.
-	if((int)arg.find(']') > (int)arg.find('/'))
-		key = right(arg,arg.find(']')+1);
+	if((int)variable.find(']') > (int)variable.find('/'))
+		key = right(variable,variable.find(']')+1);
 	else
-		key = right(arg,arg.find('/'));
+		key = right(variable,variable.find('/'));
 
 	//Check scope sigil
 	switch(argv[1][0])
@@ -151,15 +205,15 @@ int main(int argc, char** argv)
 			exit(-1);
 	}
 
+	//Check for external references
+	if(variable[1] == '[')
+		variable = load_external_reference(variable,&scope);
+
 	if(argc == 2)//If the user just submits a variable...
 	{
 		if(key[key.length()-1] != '/')//...and the last character isn't a '/', just print value
 		{
-			//Check for external references
-			if(arg[1] == '[')
-				arg = load_external_reference(arg,&scope);
-
-			switch(arg[1])
+			switch(variable[1])
 			{
 				case CURRENCY_SIGIL:
 					print_requested_data<Currency>(scope,key);
@@ -186,7 +240,7 @@ int main(int argc, char** argv)
 					print_requested_data<CurrencySystem>(scope,key);
 					break;
 				default:
-					output(Error,"Unknown type specifier \'%c\' in \"%s\"",arg[1],arg.c_str());
+					output(Error,"Unknown type specifier \'%c\' in \"%s\"",variable[1],variable.c_str());
 					exit(-1);
 			}
 		}
@@ -198,12 +252,8 @@ int main(int argc, char** argv)
 			std::map<std::string,std::string> v_map;
 			std::map<std::string,std::string> w_map;
 
-			//Check for external references
-			if(arg[1] == '[')
-				arg = load_external_reference(arg,&scope);
-
 			//When printing entire containers, treat type sigil as a filter
-			switch(arg[1])
+			switch(variable[1])
 			{
 				case CURRENCY_SIGIL:
 					get_map<Currency>(scope,&c_map);
@@ -228,7 +278,7 @@ int main(int argc, char** argv)
 					get_map<Wallet>(scope,&w_map);
 					break;
 				default:
-					output(Error,"Unknown type specifier \'%c\' in \"%s\"",arg[1],arg.c_str());
+					output(Error,"Unknown type specifier \'%c\' in \"%s\"",variable[1],variable.c_str());
 					exit(-1);
 			}
 
@@ -247,6 +297,54 @@ int main(int argc, char** argv)
 	}
 	else if(argc == 3)//Unary operators
 	{
+		std::string op(argv[2]);
+		std::string key = "";
+		std::string property = "";
+
+		if((int)variable.find('.') < (int)variable.rfind('/'))
+		{
+			key = right(variable,variable.find('/')+1);
+		}
+		else
+		{
+			key = right(variable,variable.find('/')+1);
+			key = left(key,key.find('.'));
+			property = right(variable,variable.find('.')+1);
+		}
+		if(isUnaryOp(op))
+		{
+			switch(variable[1])
+			{
+				case CURRENCY_SIGIL:
+					scope.set<Currency>(key,performModOp<Currency>(scope, key, property, op, ""));
+				break;
+				case CURRENCYSYSTEM_SIGIL:
+					scope.set<CurrencySystem>(key,performModOp<CurrencySystem>(scope, key, property, op, ""));
+				break;
+				case DICE_SIGIL:
+					scope.set<Dice>(key,performModOp<Dice>(scope, key, property, op, ""));
+				break;
+				case VAR_SIGIL:
+					scope.set<Var>(key,performModOp<Var>(scope, key, property, op, ""));
+				break;
+				case WALLET_SIGIL:
+					scope.set<Wallet>(key,performModOp<Wallet>(scope, key, property, op, ""));
+				break;
+				case '/':
+					if(scope.keyExists<Var>(key))
+						scope.set<Var>(key,performModOp<Var>(scope, key, property, op, ""));
+					else if(scope.keyExists<Dice>(key))
+						scope.set<Dice>(key,performModOp<Dice>(scope, key, property, op, ""));
+					else if(scope.keyExists<Wallet>(key))
+						scope.set<Wallet>(key,performModOp<Wallet>(scope, key, property, op, ""));
+					else if(scope.keyExists<Currency>(key))
+						scope.set<Currency>(key,performModOp<Currency>(scope, key, property, op, ""));
+					else if(scope.keyExists<CurrencySystem>(key))
+						scope.set<CurrencySystem>(key,performModOp<CurrencySystem>(scope, key, property, op, ""));
+				break;
+			}
+		}
+		scope.save();
 		/*if(is_operator(std::string(argv[2])))
 		{
 			if(std::string(argv[2]) == "++")
