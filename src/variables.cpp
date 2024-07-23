@@ -154,12 +154,14 @@ T performModOp(Scope scope, std::string key, std::string property, std::string o
 	if(op == "++")
 	{
 		new_value = old_value;
-		new_value++;
+		try{new_value++;}
+		catch(...){output(Error,"Invalid operation: \"%s ++\"",old_value.c_str());}
 	}
 	else if(op == "--")
 	{
 		new_value = old_value;
-		new_value--;
+		try{new_value--;}
+		catch(...){output(Error,"Invalid operation: \"%s --\"",old_value.c_str());}
 	}
 
 	if(new_value != old_value)
