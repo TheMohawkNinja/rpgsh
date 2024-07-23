@@ -212,6 +212,10 @@ Currency::operator std::string() const
 		       Smaller+","+
 		       Larger+"}";
 }
+const char* Currency::c_str() const
+{
+	return std::string(*this).c_str();
+}
 bool Currency::operator == (const Currency& b) const
 {
 	return (System == b.System &&
@@ -222,12 +226,12 @@ bool Currency::operator == (const Currency& b) const
 }
 Currency& Currency::operator ++ (int)
 {
-	printBadOpAndThrow("Currency ++");
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Currency& Currency::operator -- (int)
 {
-	printBadOpAndThrow("Currency --");
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 
@@ -235,18 +239,22 @@ CurrencySystem::operator std::string() const
 {
 	return std::string(1,CURRENCYSYSTEM_SIGIL)+"{"+Name+"}";
 }
+const char* CurrencySystem::c_str() const
+{
+	return std::string(*this).c_str();
+}
 Currency& CurrencySystem::operator [] (const std::string b)
 {
 	return Denomination[b];
 }
 CurrencySystem& CurrencySystem::operator ++ (int)
 {
-	printBadOpAndThrow("CurrencySystem ++");
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 CurrencySystem& CurrencySystem::operator -- (int)
 {
-	printBadOpAndThrow("CurrencySystem --");
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 bool CurrencySystem::operator == (const CurrencySystem& b) const
@@ -499,9 +507,27 @@ Wallet::Wallet(std::string str)
 	}
 }
 
+Wallet::operator std::string() const
+{
+	//@w/MyWallet = {<currency_1>,<quantity_1>,<currency_2>,<quantity_2>,...,<currency_n>,<quantity_n>}
+
+	std::string ret = std::string(1,WALLET_SIGIL)+"{";
+	for(const auto& [c,q] : Money)
+		ret += std::string(c) + "," + std::to_string(q) + ",";
+
+	//Cut final ',' and add terminating '}'
+	ret = left(ret,ret.length()-1) + "}";
+
+	return ret;
+}
+const char* Wallet::c_str() const
+{
+	return std::string(*this).c_str();
+}
+
 Wallet& Wallet::operator = (const unsigned int b)
 {
-	printBadOpAndThrow("Wallet = "+std::to_string(b));
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Wallet& Wallet::operator = (const money_t b)
@@ -515,17 +541,17 @@ Wallet& Wallet::operator = (const money_t b)
 }
 Wallet& Wallet::operator = (const Dice b)
 {
-	printBadOpAndThrow("Wallet = "+std::string(b));
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Wallet& Wallet::operator = (const Var b)
 {
-	printBadOpAndThrow("Wallet = "+std::string(b));
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Wallet& Wallet::operator -= (const unsigned int b)
 {
-	printBadOpAndThrow("Wallet -= "+std::to_string(b));
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Wallet& Wallet::operator -= (const money_t b)
@@ -571,17 +597,17 @@ Wallet& Wallet::operator -= (const Wallet b)
 }
 Wallet& Wallet::operator -= (const Dice b)
 {
-	printBadOpAndThrow("Wallet -= "+std::string(b));
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Wallet& Wallet::operator -= (const Var b)
 {
-	printBadOpAndThrow("Wallet -= "+std::string(b));
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Wallet& Wallet::operator += (const unsigned int b)
 {
-	printBadOpAndThrow("Wallet += "+std::to_string(b));
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Wallet& Wallet::operator += (const money_t b)
@@ -611,12 +637,12 @@ Wallet& Wallet::operator += (const Wallet b)
 }
 Wallet& Wallet::operator += (const Dice b)
 {
-	printBadOpAndThrow("Wallet += "+std::string(b));
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Wallet& Wallet::operator += (const Var b)
 {
-	printBadOpAndThrow("Wallet += "+std::string(b));
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Wallet& Wallet::operator *= (const unsigned int b)
@@ -635,24 +661,22 @@ Wallet& Wallet::operator *= (const unsigned int b)
 }
 Wallet& Wallet::operator *= (const money_t b)
 {
-	std::string c = b.first.Name;
-	std::string q = std::to_string(b.second);
-	printBadOpAndThrow("Wallet *= "+q+" "+c);
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Wallet& Wallet::operator *= (const Wallet b)
 {
-	printBadOpAndThrow("Wallet *= "+std::string(b));
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Wallet& Wallet::operator *= (const Dice b)
 {
-	printBadOpAndThrow("Wallet *= "+std::string(b));
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Wallet& Wallet::operator *= (const Var b)
 {
-	printBadOpAndThrow("Wallet *= "+std::string(b));
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Wallet& Wallet::operator /= (const unsigned int b)
@@ -688,24 +712,22 @@ Wallet& Wallet::operator /= (const unsigned int b)
 }
 Wallet& Wallet::operator /= (const money_t b)
 {
-	std::string c = b.first.Name;
-	std::string q = std::to_string(b.second);
-	printBadOpAndThrow("Wallet /= "+q+" "+c);
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Wallet& Wallet::operator /= (const Wallet b)
 {
-	printBadOpAndThrow("Wallet /= Wallet"+std::string(b));
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Wallet& Wallet::operator /= (const Dice b)
 {
-	printBadOpAndThrow("Wallet /= "+std::string(b));
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Wallet& Wallet::operator /= (const Var b)
 {
-	printBadOpAndThrow("Wallet /= "+std::string(b));
+	throw std::runtime_error("invalid_operation");
 	return *this;
 }
 Wallet& Wallet::operator ++ ()
@@ -741,20 +763,6 @@ Wallet& Wallet::operator -- ()
 Wallet& Wallet::operator -- (int)
 {
 	return --(*this);
-}
-
-Wallet::operator std::string() const
-{
-	//@w/MyWallet = {<currency_1>,<quantity_1>,<currency_2>,<quantity_2>,...,<currency_n>,<quantity_n>}
-
-	std::string ret = std::string(1,WALLET_SIGIL)+"{";
-	for(const auto& [c,q] : Money)
-		ret += std::string(c) + "," + std::to_string(q) + ",";
-
-	//Cut final ',' and add terminating '}'
-	ret = ret.substr(0,ret.length()-1) + "}";
-
-	return ret;
 }
 
 //Links the instance of Currency to the instance of CurrencySystem
