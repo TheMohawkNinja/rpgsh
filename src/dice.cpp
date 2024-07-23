@@ -105,17 +105,6 @@ int Dice::get_value(std::string d, std::string value, long unsigned int start, s
 	}
 }
 
-Dice::operator std::string() const
-{
-	if(List == "")
-		return std::string(1,DICE_SIGIL)+"{"+
-		       std::to_string(Quantity)+","+
-		       std::to_string(Faces)+","+
-		       std::to_string(Modifier)+"}";
-	else
-		return std::string(1,DICE_SIGIL)+"{"+List+"}";
-}
-
 Dice::Dice(){}
 Dice::Dice(std::string dice_str)
 {
@@ -245,6 +234,21 @@ Dice::Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier, bool _jus
 	count = _count;
 }
 
+Dice::operator std::string() const
+{
+	if(List == "")
+		return std::string(1,DICE_SIGIL)+"{"+
+		       std::to_string(Quantity)+","+
+		       std::to_string(Faces)+","+
+		       std::to_string(Modifier)+"}";
+	else
+		return std::string(1,DICE_SIGIL)+"{"+List+"}";
+}
+const char* Dice::c_str() const
+{
+	return std::string(*this).c_str();
+}
+
 Dice& Dice::operator ++ (int)
 {
 	Modifier++;
@@ -281,10 +285,6 @@ std::string Dice::dice() const
 		ret += Modifier;
 	}
 	return ret;
-}
-const char* Dice::c_str() const
-{
-	return dice().c_str();
 }
 void Dice::roll()
 {

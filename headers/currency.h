@@ -40,6 +40,8 @@ class Currency
 	Currency(std::shared_ptr<CurrencySystem> _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
 
 	explicit operator std::string() const;
+	const char* c_str() const;
+
 	Currency& operator ++ (int);
 	Currency& operator -- (int);
 	bool operator == (const Currency& b) const;
@@ -54,6 +56,8 @@ class CurrencySystem
 		Currency transaction = Currency();
 
 	explicit operator std::string() const;
+	const char* c_str() const;
+
 	Currency& operator [] (const std::string b);
 	CurrencySystem& operator ++ (int);
 	CurrencySystem& operator -- (int);
@@ -85,6 +89,9 @@ class Wallet
 	bool HasEffectivelyAtLeast(int q, Currency c);
 	void print();
 	void FloatQuantityToIntCurrency(Currency c, float q);
+
+	explicit operator std::string() const;
+	const char* c_str() const;
 
 	int& operator [] (const Currency b);
 	bool operator == (const Wallet& b) const;
@@ -129,6 +136,4 @@ class Wallet
 	Wallet& operator ++ (int);
 	Wallet& operator -- ();
 	Wallet& operator -- (int);
-
-	explicit operator std::string() const;
 };
