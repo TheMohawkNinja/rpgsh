@@ -114,12 +114,6 @@ std::vector<std::string> getDirectoryListing(std::string path)
 	return entries;
 }
 
-void printBadOpAndThrow(std::string bad_op)
-{
-	output(Error,("Invalid operation: "+bad_op).c_str());
-	throw;
-}
-
 void padding()
 {
 	Config config = Config();
