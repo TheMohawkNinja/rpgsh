@@ -14,10 +14,9 @@ void print_requested_data(Scope scope, std::string key)
 	int period = key.find('.');
 	int r_period = key.rfind('.');
 	int slash = key.find('/');
-	int r_slash = key.rfind('/');
-	if(period < r_slash)//If any periods are before the last '/', print the explicit constructor
+	if(period == (int)std::string::npos)//If any periods are before the last '/', print the explicit constructor
 	{
-		key = right(key,slash+1);
+		key = right(key,key.find('/')+1);
 		fprintf(stdout,"%s\n",scope.getStr<T>(key).c_str());
 		exit(0);
 	}
@@ -182,16 +181,16 @@ int main(int argc, char** argv)
 
 	Scope scope;
 	std::string variable(argv[1]);
-	std::string key = "";
+	std::string chk_str = "";
 
 	//Check if user is requesting a character xref from a different campaign.
 	if((int)variable.find(']') > (int)variable.find('/'))
-		key = right(variable,variable.find(']')+1);
+		chk_str = right(variable,variable.find(']')+1);
 	else
-		key = right(variable,variable.find('/'));
+		chk_str = right(variable,variable.find('/'));
 
 	//Check scope sigil
-	switch(argv[1][0])
+	switch(variable[0])
 	{
 		case CHARACTER_SIGIL:
 			scope = c;
@@ -213,33 +212,48 @@ int main(int argc, char** argv)
 
 	if(argc == 2)//If the user just submits a variable...
 	{
-		if(key[key.length()-1] != '/')//...and the last character isn't a '/', just print value
+		std::string key = "";
+		key = right(chk_str,chk_str.find('/')+1);
+		if(chk_str.find('.') != std::string::npos)
+			key = left(key,key.find('.'));
+
+		if(chk_str[chk_str.length()-1] != '/')//...and the last character isn't a '/', just print value
 		{
 			switch(variable[1])
 			{
 				case CURRENCY_SIGIL:
-					print_requested_data<Currency>(scope,key);
+					if(scope.keyExists<Currency>(key))
+						print_requested_data<Currency>(scope,chk_str);
 					break;
 				case CURRENCYSYSTEM_SIGIL:
-					print_requested_data<CurrencySystem>(scope,key);
+					if(scope.keyExists<CurrencySystem>(key))
+						print_requested_data<CurrencySystem>(scope,chk_str);
 					break;
 				case DICE_SIGIL:
-					print_requested_data<Dice>(scope,key);
+					if(scope.keyExists<Dice>(key))
+						print_requested_data<Dice>(scope,chk_str);
 					break;
 				case VAR_SIGIL:
-					print_requested_data<Var>(scope,key);
+					if(scope.keyExists<Var>(key))
+						print_requested_data<Var>(scope,chk_str);
 					break;
 				case WALLET_SIGIL:
-					print_requested_data<Wallet>(scope,key);
+					if(scope.keyExists<Wallet>(key))
+						print_requested_data<Wallet>(scope,chk_str);
 					break;
 				case '/':
 					//If a type specifier is not specified, check for match.
 					//Specifically, check in order of what is most to least likely
-					print_requested_data<Var>(scope,key);
-					print_requested_data<Dice>(scope,key);
-					print_requested_data<Wallet>(scope,key);
-					print_requested_data<Currency>(scope,key);
-					print_requested_data<CurrencySystem>(scope,key);
+					if(scope.keyExists<Var>(key))
+						print_requested_data<Var>(scope,chk_str);
+					else if(scope.keyExists<Dice>(key))
+						print_requested_data<Dice>(scope,chk_str);
+					else if(scope.keyExists<Wallet>(key))
+						print_requested_data<Wallet>(scope,chk_str);
+					else if(scope.keyExists<Currency>(key))
+						print_requested_data<Currency>(scope,chk_str);
+					else if(scope.keyExists<CurrencySystem>(key))
+						print_requested_data<CurrencySystem>(scope,chk_str);
 					break;
 				default:
 					output(Error,"Unknown type specifier \'%c\' in \"%s\"",variable[1],variable.c_str());
@@ -347,29 +361,6 @@ int main(int argc, char** argv)
 			}
 		}
 		scope.save();
-		/*if(is_operator(std::string(argv[2])))
-		{
-			if(std::string(argv[2]) == "++")
-			{
-				set_variable(key,old_value,old_value+1,argv[1][0]);
-				return 0;
-			}
-			else if(std::string(argv[2]) == "--")
-			{
-				set_variable(key,old_value,old_value-1,argv[1][0]);
-				return 0;
-			}
-			else
-			{
-				output(Error,"Expected new value after \'%s\'.",argv[argc-1]);
-				exit(-1);
-			}
-		}
-		else
-		{
-			output(Error,"Expected operator before \'%s\'.",argv[argc-1]);
-			exit(-1);
-		}*/
 	}
 	else//Binary operators
 	{
