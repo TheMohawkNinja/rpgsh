@@ -369,6 +369,42 @@ void set_env_variable(std::string v,std::string value)
 	std::filesystem::rename((rpgsh_env_variables_path+".bak").c_str(),rpgsh_env_variables_path.c_str());
 }
 
+template <>
+std::string toString<int>(int t)
+{
+	return std::to_string(t);
+}
+template <>
+std::string toString<std::string>(std::string t)
+{
+	return t;
+}
+template <>
+std::string toString<Currency>(Currency t)
+{
+	return std::string(t);
+}
+template <>
+std::string toString<CurrencySystem>(CurrencySystem t)
+{
+	return std::string(t);
+}
+template <>
+std::string toString<Dice>(Dice t)
+{
+	return std::string(t);
+}
+template <>
+std::string toString<Var>(Var t)
+{
+	return std::string(t);
+}
+template <>
+std::string toString<Wallet>(Wallet t)
+{
+	return std::string(t);
+}
+
 template <typename T>
 void sort(std::vector<std::string>* v);
 
