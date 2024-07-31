@@ -8,42 +8,31 @@ Character c = Character(false);
 Campaign m = Campaign();
 Shell s = Shell();
 
-template<typename T>
-void print_requested_data(Scope scope, std::string key)
+void parseVariable(std::string v, std::string* pKey, std::string* pProperty)//Derive key and property values from the variable string
 {
-	int period = key.find('.');
-	int r_period = key.rfind('.');
-	int slash = key.find('/');
-	if(period == (int)std::string::npos)//If any periods are before the last '/', print the explicit constructor
+	(*pKey) = right(v,v.find('/')+1);
+	if((int)v.find('.') > (int)v.rfind('/'))
 	{
-		key = right(key,key.find('/')+1);
-		fprintf(stdout,"%s\n",scope.getStr<T>(key).c_str());
-		exit(0);
-	}
-	else//Otherwise, print the requested property
-	{
-		std::string property = key.substr(r_period+1,key.length()-(r_period+1));
-		key = key.substr(slash+1,r_period-(slash+1));
-		fprintf(stdout,"%s\n",scope.getProperty<T>(key,property).c_str());
-		exit(0);
+		(*pKey) = left((*pKey),pKey->find('.'));
+		(*pProperty) = right(v,v.find('.')+1);
 	}
 }
 template<typename T>
-void get_map(Scope scope, std::map<std::string,std::string>* p_map)
+void appendMap(Scope scope, std::map<std::string,std::string>* p_map)
 {
 	for(const auto& [k,v] : scope.getDatamap<T>())
 		(*p_map)[k] = scope.getStr<T>(k);
 }
-void append_output(std::map<std::string,std::string> map, std::string key, std::string* pOutput)
+void appendOutput(std::map<std::string,std::string> map, std::string key, std::string* pOutput)
 {
 	for(const auto& [k,v] : map)
 	{
 		//Get root variable if it exists
-		if(!stringcasecmp(("/"+left(k,key.length()-1)+"/"),key))
+		if(!stringcasecmp((left(k,key.length())+"/"),key))
 			pOutput->append(k + DS + v + DS);
 
 		//Get all subkeys
-		if(!stringcasecmp(("/"+left(k,key.length()-1)),key))
+		if(!stringcasecmp((left(k,key.length())),key))
 			pOutput->append(k + DS + v + DS);
 	}
 }
@@ -63,7 +52,7 @@ std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir
 	output(Error,"Invalid xref \"%s\".",xref.c_str());
 	exit(-1);
 }
-std::string load_external_reference(std::string arg, Scope* p_scope)
+std::string loadXRef(std::string arg, Scope* p_scope)
 {
 	//Ending square bracket not found
 	if(arg.find(']') == std::string::npos)
@@ -128,7 +117,7 @@ bool isArithmeticOp(std::string op)
 }
 bool isAssignmentOp(std::string op)
 {
-	return (op == "==" ||
+	return (op == "=" ||
 		op == "+=" ||
 		op == "-=" ||
 		op == "*=" ||
@@ -137,36 +126,35 @@ bool isAssignmentOp(std::string op)
 }
 bool isRelationalOp(std::string op)//TODO document
 {
-	return (op == "="  ||
+	return (op == "=="  ||
 		op == "<"  ||
 		op == ">"  ||
 		op == "<=" ||
 		op == ">=" ||
 		op == "!=");
 }
-template<typename T>
-T performModOp(Scope scope, std::string key, std::string property, std::string op, std::string rhs_str)//Unary, Arithmetic, and Assignment
+
+template<typename TL, typename TR>
+TL performModOp(TL lhs, TR rhs, std::string op)
 {
-	T old_value = scope.get<T>(key);
-	T new_value = T();
+	(void)decltype(rhs)();//Suppress -Wunused-parameter
 
 	if(op == "++")
 	{
-		new_value = old_value;
-		try{new_value++;}
-		catch(...){output(Error,"Invalid operation: \"%s ++\"",old_value.c_str());}
+		try{lhs++;}
+		catch(...){output(Error,"Invalid operation: \"%s ++\"",toString<TL>(lhs).c_str());}
 	}
 	else if(op == "--")
 	{
-		new_value = old_value;
-		try{new_value--;}
-		catch(...){output(Error,"Invalid operation: \"%s --\"",old_value.c_str());}
+		try{lhs--;}
+		catch(...){output(Error,"Invalid operation: \"%s --\"",toString<TL>(lhs).c_str());}
+	}
+	else
+	{
+		output(Error,"Invalid operator \"%s\"",op.c_str());
 	}
 
-	if(new_value != old_value)
-		output(Info,"\"%s\" has changed from \"%s\" to \"%s\"",key.c_str(),std::string(old_value).c_str(),std::string(new_value).c_str());
-
-	return new_value;
+	return lhs;
 }
 
 int main(int argc, char** argv)
@@ -181,25 +169,22 @@ int main(int argc, char** argv)
 
 	Scope scope;
 	std::string variable(argv[1]);
-	std::string chk_str = "";
-
-	//Check if user is requesting a character xref from a different campaign.
-	if((int)variable.find(']') > (int)variable.find('/'))
-		chk_str = right(variable,variable.find(']')+1);
-	else
-		chk_str = right(variable,variable.find('/'));
+	std::string scope_type = "";
 
 	//Check scope sigil
 	switch(variable[0])
 	{
 		case CHARACTER_SIGIL:
 			scope = c;
+			scope_type = "Character";
 			break;
 		case CAMPAIGN_SIGIL:
 			scope = m;
+			scope_type = "Campaign";
 			break;
 		case SHELL_SIGIL:
 			scope = s;
+			scope_type = "Shell";
 			break;
 		default:
 			output(Error,"Unknown scope sigil \'%c\'.",argv[1][0]);
@@ -208,56 +193,67 @@ int main(int argc, char** argv)
 
 	//Check for external references
 	if(variable[1] == '[')
-		variable = load_external_reference(variable,&scope);
+		variable = loadXRef(variable,&scope);
+
+	std::string key = "";
+	std::string property = "";
+	parseVariable(variable,&key,&property);
 
 	if(argc == 2)//If the user just submits a variable...
 	{
-		std::string key = "";
-		key = right(chk_str,chk_str.find('/')+1);
-		if(chk_str.find('.') != std::string::npos)
-			key = left(key,key.find('.'));
-
-		if(chk_str[chk_str.length()-1] != '/')//...and the last character isn't a '/', just print value
+		if(variable[variable.length()-1] != '/')//...and the last character isn't a '/', just print value
 		{
-			switch(variable[1])
+			if((variable[1] == '/' || variable[1] == VAR_SIGIL) && scope.keyExists<Var>(key))
 			{
-				case CURRENCY_SIGIL:
-					if(scope.keyExists<Currency>(key))
-						print_requested_data<Currency>(scope,chk_str);
-					break;
-				case CURRENCYSYSTEM_SIGIL:
-					if(scope.keyExists<CurrencySystem>(key))
-						print_requested_data<CurrencySystem>(scope,chk_str);
-					break;
-				case DICE_SIGIL:
-					if(scope.keyExists<Dice>(key))
-						print_requested_data<Dice>(scope,chk_str);
-					break;
-				case VAR_SIGIL:
-					if(scope.keyExists<Var>(key))
-						print_requested_data<Var>(scope,chk_str);
-					break;
-				case WALLET_SIGIL:
-					if(scope.keyExists<Wallet>(key))
-						print_requested_data<Wallet>(scope,chk_str);
-					break;
-				case '/':
-					//If a type specifier is not specified, check for match.
-					//Specifically, check in order of what is most to least likely
-					if(scope.keyExists<Var>(key))
-						print_requested_data<Var>(scope,chk_str);
-					else if(scope.keyExists<Dice>(key))
-						print_requested_data<Dice>(scope,chk_str);
-					else if(scope.keyExists<Wallet>(key))
-						print_requested_data<Wallet>(scope,chk_str);
-					else if(scope.keyExists<Currency>(key))
-						print_requested_data<Currency>(scope,chk_str);
-					else if(scope.keyExists<CurrencySystem>(key))
-						print_requested_data<CurrencySystem>(scope,chk_str);
-					break;
-				default:
-					output(Error,"Unknown type specifier \'%c\' in \"%s\"",variable[1],variable.c_str());
-					exit(-1);
+				if(property == "")
+					fprintf(stdout,"%s\n",scope.getStr<Var>(key).c_str());
+				else if(!stringcasecmp(property,"Value"))
+					fprintf(stdout,"%s\n",scope.getProperty<Var>(key,property).c_str());
+			}
+			else if((variable[1] == '/' || variable[1] == DICE_SIGIL) && scope.keyExists<Dice>(key))
+			{
+				if(property == "")
+					fprintf(stdout,"%s\n",scope.getStr<Dice>(key).c_str());
+				else if((!stringcasecmp(property,"Quantity") ||
+				         !stringcasecmp(property,"Faces") ||
+				         !stringcasecmp(property,"Modifier") ||
+				         !stringcasecmp(property,"List")))
+					fprintf(stdout,"%s\n",scope.getProperty<Dice>(key,property).c_str());
+			}
+			else if((variable[1] == '/' || variable[1] == WALLET_SIGIL) && scope.keyExists<Wallet>(key))
+			{
+				if(property == "")
+					fprintf(stdout,"%s\n",scope.getStr<Wallet>(key).c_str());
+				else if(scope.get<Wallet>(key).containsCurrency(property))
+					fprintf(stdout,"%s\n",scope.getProperty<Wallet>(key,property).c_str());
+			}
+			else if((variable[1] == '/' || variable[1] == CURRENCY_SIGIL) && scope.keyExists<Currency>(key))
+			{
+				if(property == "")
+					fprintf(stdout,"%s\n",scope.getStr<Currency>(key).c_str());
+				else if((!stringcasecmp(property,"CurrencySystem") ||
+					 !stringcasecmp(property,"Name") ||
+					 !stringcasecmp(property,"SmallerAmount") ||
+					 !stringcasecmp(property,"Smaller") ||
+					 !stringcasecmp(property,"Larger")))
+					fprintf(stdout,"%s\n",scope.getProperty<Currency>(key,property).c_str());
+			}
+			else if((variable[1] == '/' || variable[1] == CURRENCYSYSTEM_SIGIL) && scope.keyExists<CurrencySystem>(key))
+			{
+				if(property == "")
+					fprintf(stdout,"%s\n",scope.getStr<CurrencySystem>(key).c_str());
+				else if(!stringcasecmp(property,"Name"))
+					fprintf(stdout,"%s\n",scope.getProperty<CurrencySystem>(key,property).c_str());
+			}
+			else if(variable[1] != '/' &&
+				variable[1] != VAR_SIGIL &&
+				variable[1] != DICE_SIGIL &&
+				variable[1] != WALLET_SIGIL &&
+				variable[1] != CURRENCY_SIGIL &&
+				variable[1] != CURRENCYSYSTEM_SIGIL)
+			{
+				output(Error,"Unknown type specifier \'%c\' in \"%s\"",variable[1],variable.c_str());
+				exit(-1);
 			}
 		}
 		else//...and the last character is a '/', print a list of keys and constructors
@@ -272,26 +268,26 @@ int main(int argc, char** argv)
 			switch(variable[1])
 			{
 				case CURRENCY_SIGIL:
-					get_map<Currency>(scope,&c_map);
+					appendMap<Currency>(scope,&c_map);
 					break;
 				case CURRENCYSYSTEM_SIGIL:
-					get_map<CurrencySystem>(scope,&cs_map);
+					appendMap<CurrencySystem>(scope,&cs_map);
 					break;
 				case DICE_SIGIL:
-					get_map<Dice>(scope,&d_map);
+					appendMap<Dice>(scope,&d_map);
 					break;
 				case VAR_SIGIL:
-					get_map<Var>(scope,&v_map);
+					appendMap<Var>(scope,&v_map);
 					break;
 				case WALLET_SIGIL:
-					get_map<Wallet>(scope,&w_map);
+					appendMap<Wallet>(scope,&w_map);
 					break;
 				case '/':
-					get_map<Currency>(scope,&c_map);
-					get_map<CurrencySystem>(scope,&cs_map);
-					get_map<Dice>(scope,&d_map);
-					get_map<Var>(scope,&v_map);
-					get_map<Wallet>(scope,&w_map);
+					appendMap<Currency>(scope,&c_map);
+					appendMap<CurrencySystem>(scope,&cs_map);
+					appendMap<Dice>(scope,&d_map);
+					appendMap<Var>(scope,&v_map);
+					appendMap<Wallet>(scope,&w_map);
 					break;
 				default:
 					output(Error,"Unknown type specifier \'%c\' in \"%s\"",variable[1],variable.c_str());
@@ -300,11 +296,11 @@ int main(int argc, char** argv)
 
 			//Create output string from map
 			std::string output = "";
-			append_output(c_map,key,&output);
-			append_output(cs_map,key,&output);
-			append_output(d_map,key,&output);
-			append_output(v_map,key,&output);
-			append_output(w_map,key,&output);
+			appendOutput(c_map,key,&output);
+			appendOutput(cs_map,key,&output);
+			appendOutput(d_map,key,&output);
+			appendOutput(v_map,key,&output);
+			appendOutput(w_map,key,&output);
 
 			//Cut off the extraneous DS
 			output = left(output,output.length()-DS.length());
@@ -314,50 +310,70 @@ int main(int argc, char** argv)
 	else if(argc == 3)//Unary operators
 	{
 		std::string op(argv[2]);
-		std::string key = "";
-		std::string property = "";
 
-		if((int)variable.find('.') < (int)variable.rfind('/'))
-		{
-			key = right(variable,variable.find('/')+1);
-		}
-		else
-		{
-			key = right(variable,variable.find('/')+1);
-			key = left(key,key.find('.'));
-			property = right(variable,variable.find('.')+1);
-		}
 		if(isUnaryOp(op))
 		{
-			switch(variable[1])
+			//TODO: May have to ensure that properties get the right evaluated data type
+			if(scope.keyExists<Var>(key) && (variable[1] == '/' || variable[1] == VAR_SIGIL))//TODO: COMPLETE OTHER DATA TYPES NOW THAT VAR IS DONE
 			{
-				case CURRENCY_SIGIL:
-					scope.set<Currency>(key,performModOp<Currency>(scope, key, property, op, ""));
-				break;
-				case CURRENCYSYSTEM_SIGIL:
-					scope.set<CurrencySystem>(key,performModOp<CurrencySystem>(scope, key, property, op, ""));
-				break;
-				case DICE_SIGIL:
-					scope.set<Dice>(key,performModOp<Dice>(scope, key, property, op, ""));
-				break;
-				case VAR_SIGIL:
-					scope.set<Var>(key,performModOp<Var>(scope, key, property, op, ""));
-				break;
-				case WALLET_SIGIL:
-					scope.set<Wallet>(key,performModOp<Wallet>(scope, key, property, op, ""));
-				break;
-				case '/':
-					if(scope.keyExists<Var>(key))
-						scope.set<Var>(key,performModOp<Var>(scope, key, property, op, ""));
-					else if(scope.keyExists<Dice>(key))
-						scope.set<Dice>(key,performModOp<Dice>(scope, key, property, op, ""));
-					else if(scope.keyExists<Wallet>(key))
-						scope.set<Wallet>(key,performModOp<Wallet>(scope, key, property, op, ""));
-					else if(scope.keyExists<Currency>(key))
-						scope.set<Currency>(key,performModOp<Currency>(scope, key, property, op, ""));
-					else if(scope.keyExists<CurrencySystem>(key))
-						scope.set<CurrencySystem>(key,performModOp<CurrencySystem>(scope, key, property, op, ""));
-				break;
+				Var old_var = scope.get<Var>(key);
+				std::string old_property = "";
+
+				if(property != "")
+				{
+					try{old_property = scope.getProperty<Var>(key,property);}
+					catch(...){output(Error,"\"%s\" is not a valid Var property.",property); exit(-1);}
+				}
+
+				if(property == "")
+					scope.set<Var>(key,performModOp<Var,int>(old_var,0,op));
+				else if(!stringcasecmp(property,"Value"))
+					scope.setProperty<Var,std::string>(key,property,performModOp<Var,int>(old_property,0,op).Value);
+
+				if(scope.get<Var>(key) != old_var)
+					output(Info,"%s Var \"%s\" has changed from \"%s\" to \"%s\"",scope_type.c_str(),key.c_str(),std::string(old_var).c_str(),scope.getStr<Var>(key).c_str());
+			}
+			else if(scope.keyExists<Dice>(key) && (variable[1] == '/' || variable[1] == DICE_SIGIL))
+			{
+				if(property == "")
+					scope.set<Dice>(key,performModOp<Dice,int>(scope.get<Dice>(key),0,op));
+				else if((!stringcasecmp(property,"Quantity") ||
+					 !stringcasecmp(property,"Faces") ||
+					 !stringcasecmp(property,"Modifier")))
+					scope.setProperty<Dice,int>(key,property,std::stoi(performModOp<Var,int>(scope.getProperty<Dice>(key,property),0,op).Value));
+				else if(!stringcasecmp(property,"List"))
+					scope.setProperty<Dice,std::string>(key,property,performModOp<Var,int>(scope.getProperty<Dice>(key,property),0,op).Value);
+			}
+			else if(scope.keyExists<Wallet>(key) && (variable[1] == '/' || variable[1] == WALLET_SIGIL))
+			{
+				if(property == "")
+					scope.set<Wallet>(key,performModOp<Wallet,int>(scope.get<Wallet>(key),0,op));
+				else if(scope.get<Wallet>(key).containsCurrency(property))
+					scope.setProperty<Wallet,int>(key,property,std::stoi(performModOp<Var,int>(scope.getProperty<Wallet>(key,property),0,op).Value));
+			}
+			else if(scope.keyExists<Currency>(key) && (variable[1] == '/' || variable[1] == CURRENCY_SIGIL))
+			{
+				if(property == "")
+					scope.set<Currency>(key,performModOp<Currency,int>(scope.get<Currency>(key),0,op));
+				else if(!stringcasecmp(property,"CurrencySystem"))
+					scope.setProperty<Currency,std::shared_ptr<CurrencySystem>>(key,property,std::make_shared<CurrencySystem>(CurrencySystem(performModOp<Var,int>(scope.getProperty<Currency>(key,property),0,op).Value)));
+				else if(!stringcasecmp(property,"SmallerAmount"))
+					scope.setProperty<Currency,int>(key,property,std::stoi(performModOp<Var,int>(scope.getProperty<Currency>(key,property),0,op).Value));
+				else if(!stringcasecmp(property,"Smaller") ||
+					!stringcasecmp(property,"Larger"))
+					scope.setProperty<Currency,std::string>(key,property,performModOp<Var,int>(scope.getProperty<Currency>(key,property),0,op).Value);
+			}
+			else if(scope.keyExists<CurrencySystem>(key) && (variable[1] == '/' || variable[1] == CURRENCYSYSTEM_SIGIL))
+			{
+				if(property == "")
+					scope.set<CurrencySystem>(key,performModOp<CurrencySystem,int>(scope.get<CurrencySystem>(key),0,op));
+				else if(!stringcasecmp(property,"Name"))
+					scope.setProperty<CurrencySystem,std::string>(key,property,performModOp<Var,int>(scope.getProperty<CurrencySystem>(key,property),0,op).Value);
+			}
+			else if(variable[1] != '/')
+			{
+				output(Error,"Unknown type specifier \'%c\' in \"%s\"",variable[1],variable.c_str());
+				exit(-1);
 			}
 		}
 		scope.save();
