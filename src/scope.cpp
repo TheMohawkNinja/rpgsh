@@ -317,17 +317,16 @@ std::string Scope::getProperty<Currency>(std::string key, std::string property)
 {
 	if(!stringcasecmp(property,"CurrencySystem"))
 		return get<Currency>(key).System->Name;
-	else if(!stringcasecmp(property,"Name"))
-		return get<Currency>(key).Name;
 	else if(!stringcasecmp(property,"SmallerAmount"))
 		return std::to_string(get<Currency>(key).SmallerAmount);
+	else if(!stringcasecmp(property,"Name"))
+		return get<Currency>(key).Name;
 	else if(!stringcasecmp(property,"Smaller"))
 		return get<Currency>(key).Smaller;
 	else if(!stringcasecmp(property,"Larger"))
 		return get<Currency>(key).Larger;
 
-	output(Error,"\"%s\" is not a valid currency property.",property.c_str());
-	exit(-1);
+	throw std::runtime_error("invalid_property");
 }
 template<>
 std::string Scope::getProperty<CurrencySystem>(std::string key, std::string property)
@@ -335,8 +334,7 @@ std::string Scope::getProperty<CurrencySystem>(std::string key, std::string prop
 	if(!stringcasecmp(property,"Name"))
 		return get<CurrencySystem>(key).Name;
 
-	output(Error,"\"%s\" is not a valid currency system property.",property.c_str());
-	exit(-1);
+	throw std::runtime_error("invalid_property");
 }
 template<>
 std::string Scope::getProperty<Dice>(std::string key, std::string property)
@@ -350,8 +348,7 @@ std::string Scope::getProperty<Dice>(std::string key, std::string property)
 	else if(!stringcasecmp(property,"List"))
 		return get<Dice>(key).List;
 
-	output(Error,"\"%s\" is not a valid dice property.",property.c_str());
-	exit(-1);
+	throw std::runtime_error("invalid_property");
 }
 template<>
 std::string Scope::getProperty<Var>(std::string key, std::string property)
@@ -359,8 +356,7 @@ std::string Scope::getProperty<Var>(std::string key, std::string property)
 	if(!stringcasecmp(property,"Value"))
 		return get<Var>(key).Value;
 
-	output(Error,"\"%s\" is not a valid var property.",property.c_str());
-	exit(-1);
+	throw std::runtime_error("invalid_property");
 }
 template<>
 std::string Scope::getProperty<Wallet>(std::string key, std::string property)
@@ -371,8 +367,7 @@ std::string Scope::getProperty<Wallet>(std::string key, std::string property)
 			return std::to_string(q);
 	}
 
-	output(Error,"Currency \"%s\" not found in \"%s\".",property.c_str(),key.c_str());
-	exit(-1);
+	throw std::runtime_error("invalid_property");
 }
 
 //Get all variables of a specific datatype
@@ -427,6 +422,80 @@ template<>
 void Scope::set<Wallet>(std::string key, Wallet value)
 {
 	wallets[getExistingKey<Wallet>(key)] = value;
+}
+
+//Set a property
+template<>
+void Scope::setProperty<Currency,std::shared_ptr<CurrencySystem>>(std::string key, std::string property, std::shared_ptr<CurrencySystem> value)
+{
+	if(!stringcasecmp(property,"CurrencySystem"))
+		currencies[getExistingKey<Currency>(key)].System = value;
+	else
+		throw std::runtime_error("invald_property");
+}
+template<>
+void Scope::setProperty<Currency,int>(std::string key, std::string property, int value)
+{
+	if(!stringcasecmp(property,"SmallerAmount"))
+		currencies[getExistingKey<Currency>(key)].SmallerAmount = value;
+	else
+		throw std::runtime_error("invald_property");
+}
+template<>
+void Scope::setProperty<Currency,std::string>(std::string key, std::string property, std::string value)
+{
+	if(!stringcasecmp(property,"Name"))
+		currencies[getExistingKey<Currency>(key)].Name = value;
+	else if(!stringcasecmp(property,"Smaller"))
+		currencies[getExistingKey<Currency>(key)].Smaller = value;
+	else if(!stringcasecmp(property,"Larger"))
+		currencies[getExistingKey<Currency>(key)].Larger = value;
+	else
+		throw std::runtime_error("invald_property");
+}
+template<>
+void Scope::setProperty<CurrencySystem,std::string>(std::string key, std::string property, std::string value)
+{
+	if(!stringcasecmp(property,"Name"))
+		currencysystems[getExistingKey<CurrencySystem>(key)].Name = value;
+	else
+		throw std::runtime_error("invald_property");
+}
+template<>
+void Scope::setProperty<Dice,int>(std::string key, std::string property, int value)
+{
+	if(!stringcasecmp(property,"Quantity"))
+		dice[getExistingKey<Dice>(key)].Quantity = value;
+	else if(!stringcasecmp(property,"Faces"))
+		dice[getExistingKey<Dice>(key)].Faces = value;
+	else if(!stringcasecmp(property,"Modifier"))
+		dice[getExistingKey<Dice>(key)].Modifier = value;
+	else
+		throw std::runtime_error("invald_property");
+}
+template<>
+void Scope::setProperty<Dice,std::string>(std::string key, std::string property, std::string value)
+{
+	if(!stringcasecmp(property,"List"))
+		dice[getExistingKey<Dice>(key)].List = value;
+	else
+		throw std::runtime_error("invald_property");
+}
+template<>
+void Scope::setProperty<Var,std::string>(std::string key, std::string property, std::string value)
+{
+	if(!stringcasecmp(property,"Value"))
+		vars[getExistingKey<Var>(key)].Value = value;
+	else
+		throw std::runtime_error("invald_property");
+}
+template<>
+void Scope::setProperty<Wallet,int>(std::string key, std::string property, int value)
+{
+	if(get<Wallet>(key).containsCurrency(property))
+		wallets[getExistingKey<Wallet>(key)].Money[wallets[getExistingKey<Wallet>(key)].getExistingCurrency(property)] = value;
+	else
+		throw std::runtime_error("invald_property");
 }
 
 //Set entire datamap to another datamap
