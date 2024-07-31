@@ -10,6 +10,10 @@ Var::operator std::string() const
 {
 	return std::string(1,VAR_SIGIL)+"{"+Value+"}";
 }
+const char* Var::c_str() const
+{
+	return std::string(*this).c_str();
+}
 Var::operator int() const
 {
 	return std::stoi(Value);
@@ -324,11 +328,6 @@ Var::Var(std::string str)
 Var::Var(int _value)
 {
 	Value = std::to_string(_value);
-}
-
-const char* Var::c_str() const
-{
-	return Value.c_str();
 }
 
 // Comparison operators
