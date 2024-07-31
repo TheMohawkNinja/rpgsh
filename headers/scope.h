@@ -64,13 +64,12 @@ class Scope
 		datamap<T> getDatamap();
 
 		//Set single variable
-		/*
-		May need to check key[1] as the type of 'T'
-		may not necessarily be the same as the type of the map that "value"
-		is being applied to.
-		*/
 		template <typename T>
 		void set(std::string key, T value);
+
+		//Set a property
+		template<typename TK, typename TP>
+		void setProperty(std::string key, std::string property, TP value);
 
 		//Set entire datamap to another datamap
 		template <typename T>
@@ -94,7 +93,6 @@ class Character: public Scope
 
 		//Set datasource to save, mainly to ensure new characters don't save back to template file
 		void setDatasource(std::string path);
-
 };
 
 class Campaign: public Scope
