@@ -44,6 +44,9 @@ std::string get_env_variable(std::string v);
 void set_env_variable(std::string v, std::string value);
 
 template <typename T>
+std::string toString(T t);
+
+template <typename T>
 void sort(std::vector<T>* v)
 {
 	for(long unsigned int i=0; i<v->size()-1; i++)
