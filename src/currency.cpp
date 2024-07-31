@@ -1,5 +1,4 @@
 #include <cmath>//floor()
-#include <strings.h>//strcasecmp()
 #include "../headers/currency.h"
 #include "../headers/dice.h"
 #include "../headers/functions.h"
@@ -227,12 +226,10 @@ bool Currency::operator == (const Currency& b) const
 Currency& Currency::operator ++ (int)
 {
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 Currency& Currency::operator -- (int)
 {
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 
 CurrencySystem::operator std::string() const
@@ -363,6 +360,30 @@ void Wallet::FloatQuantityToIntCurrency(Currency c, float q)
 	}
 
 	*this += money_t(c,(int)(q*totalFactor));
+}
+bool Wallet::containsCurrency(std::string currency_str)
+{
+	for(const auto& [c,q] : *this)
+	{
+		if(!stringcasecmp(currency_str,c.Name))
+		{
+			return true;
+			break;
+		}
+	}
+	return false;
+}
+Currency Wallet::getExistingCurrency(std::string currency_str)
+{
+	for(const auto& [c,q] : *this)
+	{
+		if(!stringcasecmp(currency_str,c.Name))
+		{
+			return c;
+			break;
+		}
+	}
+	return Currency();
 }
 
 int& Wallet::operator [] (const Currency b)
@@ -529,7 +550,6 @@ Wallet& Wallet::operator = (const unsigned int b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
-	//return *this;
 }
 Wallet& Wallet::operator = (const money_t b)
 {
@@ -544,19 +564,16 @@ Wallet& Wallet::operator = (const Dice b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 Wallet& Wallet::operator = (const Var b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 Wallet& Wallet::operator -= (const unsigned int b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 Wallet& Wallet::operator -= (const money_t b)
 {
@@ -603,19 +620,16 @@ Wallet& Wallet::operator -= (const Dice b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 Wallet& Wallet::operator -= (const Var b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 Wallet& Wallet::operator += (const unsigned int b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 Wallet& Wallet::operator += (const money_t b)
 {
@@ -646,13 +660,11 @@ Wallet& Wallet::operator += (const Dice b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 Wallet& Wallet::operator += (const Var b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 Wallet& Wallet::operator *= (const unsigned int b)
 {
@@ -672,25 +684,21 @@ Wallet& Wallet::operator *= (const money_t b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 Wallet& Wallet::operator *= (const Wallet b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 Wallet& Wallet::operator *= (const Dice b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 Wallet& Wallet::operator *= (const Var b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 Wallet& Wallet::operator /= (const unsigned int b)
 {
@@ -727,25 +735,21 @@ Wallet& Wallet::operator /= (const money_t b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 Wallet& Wallet::operator /= (const Wallet b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 Wallet& Wallet::operator /= (const Dice b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 Wallet& Wallet::operator /= (const Var b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
-	return *this;
 }
 Wallet& Wallet::operator ++ ()
 {
