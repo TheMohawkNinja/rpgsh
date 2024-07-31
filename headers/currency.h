@@ -89,6 +89,8 @@ class Wallet
 	bool HasEffectivelyAtLeast(int q, Currency c);
 	void print();
 	void FloatQuantityToIntCurrency(Currency c, float q);
+	bool containsCurrency(std::string currency_str);
+	Currency getExistingCurrency(std::string currency_str);
 
 	explicit operator std::string() const;
 	const char* c_str() const;
