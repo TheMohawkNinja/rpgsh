@@ -135,7 +135,7 @@ bool isRelationalOp(std::string op)//TODO document
 }
 
 template<typename TL, typename TR>
-TL performModOp(TL lhs, TR rhs, std::string op)
+TL doModOp(TL lhs, TR rhs, std::string op)
 {
 	(void)decltype(rhs)();//Suppress -Wunused-parameter
 
@@ -169,22 +169,22 @@ int main(int argc, char** argv)
 
 	Scope scope;
 	std::string variable(argv[1]);
-	std::string scope_type = "";
+	std::string scope_str = "";
 
 	//Check scope sigil
 	switch(variable[0])
 	{
 		case CHARACTER_SIGIL:
 			scope = c;
-			scope_type = "Character";
+			scope_str = "Character";
 			break;
 		case CAMPAIGN_SIGIL:
 			scope = m;
-			scope_type = "Campaign";
+			scope_str = "Campaign";
 			break;
 		case SHELL_SIGIL:
 			scope = s;
-			scope_type = "Shell";
+			scope_str = "Shell";
 			break;
 		default:
 			output(Error,"Unknown scope sigil \'%c\'.",argv[1][0]);
@@ -310,71 +310,131 @@ int main(int argc, char** argv)
 	else if(argc == 3)//Unary operators
 	{
 		std::string op(argv[2]);
+		std::string type_str = "";
+		std::string old_value = "";
+		std::string new_value = "";
 
 		if(isUnaryOp(op))
 		{
 			//TODO: May have to ensure that properties get the right evaluated data type
-			if(scope.keyExists<Var>(key) && (variable[1] == '/' || variable[1] == VAR_SIGIL))//TODO: COMPLETE OTHER DATA TYPES NOW THAT VAR IS DONE
+			std::string old_property = "";
+
+			if(scope.keyExists<Var>(key) && (variable[1] == '/' || variable[1] == VAR_SIGIL))
 			{
 				Var old_var = scope.get<Var>(key);
-				std::string old_property = "";
+				old_value = std::string(old_var);
+				type_str = "Var";
 
 				if(property != "")
 				{
 					try{old_property = scope.getProperty<Var>(key,property);}
-					catch(...){output(Error,"\"%s\" is not a valid Var property.",property); exit(-1);}
+					catch(...){output(Error,"\"%s\" is not a valid Var property.",property.c_str()); exit(-1);}
 				}
 
 				if(property == "")
-					scope.set<Var>(key,performModOp<Var,int>(old_var,0,op));
+					scope.set<Var>(key,doModOp<Var,int>(old_var,0,op));
 				else if(!stringcasecmp(property,"Value"))
-					scope.setProperty<Var,std::string>(key,property,performModOp<Var,int>(old_property,0,op).Value);
+					scope.setProperty<Var,std::string>(key,property,doModOp<Var,int>(old_property,0,op).Value);
 
-				if(scope.get<Var>(key) != old_var)
-					output(Info,"%s Var \"%s\" has changed from \"%s\" to \"%s\"",scope_type.c_str(),key.c_str(),std::string(old_var).c_str(),scope.getStr<Var>(key).c_str());
+				new_value = scope.getStr<Var>(key);
 			}
 			else if(scope.keyExists<Dice>(key) && (variable[1] == '/' || variable[1] == DICE_SIGIL))
 			{
+				Dice old_dice = scope.get<Dice>(key);
+				old_value = std::string(old_dice);
+				type_str = "Dice";
+
+				if(property != "")
+				{
+					try{old_property = scope.getProperty<Dice>(key,property);}
+					catch(...){output(Error,"\"%s\" is not a valid Dice property.",property.c_str()); exit(-1);}
+				}
+
 				if(property == "")
-					scope.set<Dice>(key,performModOp<Dice,int>(scope.get<Dice>(key),0,op));
+					scope.set<Dice>(key,doModOp<Dice,int>(old_dice,0,op));
 				else if((!stringcasecmp(property,"Quantity") ||
 					 !stringcasecmp(property,"Faces") ||
 					 !stringcasecmp(property,"Modifier")))
-					scope.setProperty<Dice,int>(key,property,std::stoi(performModOp<Var,int>(scope.getProperty<Dice>(key,property),0,op).Value));
+					scope.setProperty<Dice,int>(key,property,std::stoi(doModOp<Var,int>(old_property,0,op).Value));
 				else if(!stringcasecmp(property,"List"))
-					scope.setProperty<Dice,std::string>(key,property,performModOp<Var,int>(scope.getProperty<Dice>(key,property),0,op).Value);
+					scope.setProperty<Dice,std::string>(key,property,doModOp<Var,int>(old_property,0,op).Value);
+
+				new_value = scope.getStr<Dice>(key);
 			}
 			else if(scope.keyExists<Wallet>(key) && (variable[1] == '/' || variable[1] == WALLET_SIGIL))
 			{
+				Wallet old_wallet = scope.get<Wallet>(key);
+				old_value = std::string(old_wallet);
+				type_str = "Wallet";
+
+				if(property != "")
+				{
+					try{old_property = scope.getProperty<Wallet>(key,property);}
+					catch(...){output(Error,"\"%s\" does not contain Currency \"%s\".",key.c_str(),property.c_str()); exit(-1);}
+				}
+
 				if(property == "")
-					scope.set<Wallet>(key,performModOp<Wallet,int>(scope.get<Wallet>(key),0,op));
+					scope.set<Wallet>(key,doModOp<Wallet,int>(old_wallet,0,op));
 				else if(scope.get<Wallet>(key).containsCurrency(property))
-					scope.setProperty<Wallet,int>(key,property,std::stoi(performModOp<Var,int>(scope.getProperty<Wallet>(key,property),0,op).Value));
+					scope.setProperty<Wallet,int>(key,property,std::stoi(doModOp<Var,int>(old_property,0,op).Value));
+
+				new_value = scope.getStr<Wallet>(key);
 			}
 			else if(scope.keyExists<Currency>(key) && (variable[1] == '/' || variable[1] == CURRENCY_SIGIL))
 			{
+				Currency old_currency = scope.get<Currency>(key);
+				old_value = std::string(old_currency);
+				type_str = "Currency";
+
+				if(property != "")
+				{
+					try{old_property = scope.getProperty<Currency>(key,property);}
+					catch(...){output(Error,"\"%s\" is not a valid Currency property.",property.c_str()); exit(-1);}
+				}
+
 				if(property == "")
-					scope.set<Currency>(key,performModOp<Currency,int>(scope.get<Currency>(key),0,op));
+					scope.set<Currency>(key,doModOp<Currency,int>(old_currency,0,op));
 				else if(!stringcasecmp(property,"CurrencySystem"))
-					scope.setProperty<Currency,std::shared_ptr<CurrencySystem>>(key,property,std::make_shared<CurrencySystem>(CurrencySystem(performModOp<Var,int>(scope.getProperty<Currency>(key,property),0,op).Value)));
+					scope.setProperty<Currency,std::shared_ptr<CurrencySystem>>(key,property,std::make_shared<CurrencySystem>(CurrencySystem(doModOp<Var,int>(old_property,0,op).Value)));
 				else if(!stringcasecmp(property,"SmallerAmount"))
-					scope.setProperty<Currency,int>(key,property,std::stoi(performModOp<Var,int>(scope.getProperty<Currency>(key,property),0,op).Value));
+					scope.setProperty<Currency,int>(key,property,std::stoi(doModOp<Var,int>(old_property,0,op).Value));
 				else if(!stringcasecmp(property,"Smaller") ||
 					!stringcasecmp(property,"Larger"))
-					scope.setProperty<Currency,std::string>(key,property,performModOp<Var,int>(scope.getProperty<Currency>(key,property),0,op).Value);
+					scope.setProperty<Currency,std::string>(key,property,doModOp<Var,int>(old_property,0,op).Value);
+
+				new_value = scope.getStr<Currency>(key);
 			}
 			else if(scope.keyExists<CurrencySystem>(key) && (variable[1] == '/' || variable[1] == CURRENCYSYSTEM_SIGIL))
 			{
+				CurrencySystem old_currencysystem = scope.get<CurrencySystem>(key);
+				old_value = std::string(old_currencysystem);
+				type_str = "CurrencySystem";
+
+				if(property != "")
+				{
+					try{old_property = scope.getProperty<Currency>(key,property);}
+					catch(...){output(Error,"\"%s\" is not a valid Currency property.",property.c_str()); exit(-1);}
+				}
+
 				if(property == "")
-					scope.set<CurrencySystem>(key,performModOp<CurrencySystem,int>(scope.get<CurrencySystem>(key),0,op));
+					scope.set<CurrencySystem>(key,doModOp<CurrencySystem,int>(old_currencysystem,0,op));
 				else if(!stringcasecmp(property,"Name"))
-					scope.setProperty<CurrencySystem,std::string>(key,property,performModOp<Var,int>(scope.getProperty<CurrencySystem>(key,property),0,op).Value);
+					scope.setProperty<CurrencySystem,std::string>(key,property,doModOp<Var,int>(old_property,0,op).Value);
+
+				new_value = scope.getStr<CurrencySystem>(key);
 			}
 			else if(variable[1] != '/')
 			{
 				output(Error,"Unknown type specifier \'%c\' in \"%s\"",variable[1],variable.c_str());
 				exit(-1);
 			}
+
+			if(new_value != old_value)
+				output(Info,"%s %s \"%s\" has changed from \"%s\" to \"%s\"",scope_str.c_str(),
+											     type_str.c_str(),
+											     key.c_str(),
+											     old_value.c_str(),
+											     new_value.c_str());
 		}
 		scope.save();
 	}
