@@ -101,6 +101,22 @@ std::string loadXRef(std::string arg, Scope* p_scope)
 	arg = arg[0]+left(arg,arg.find('[')-1)+right(arg,arg.find(']')+1);
 	return arg;
 }
+template <typename T>
+void tryGetProperty(Scope scope, std::string type_str, std::string key, std::string property, std::string* pOld_property)
+{
+	if(property == "")
+		return;
+
+	try
+	{
+		(*pOld_property) = scope.getProperty<T>(key,property);
+	}
+	catch(...)
+	{
+		output(Error,"\"%s\" is not a valid %s property.",property.c_str(),type_str.c_str());
+		exit(-1);
+	}
+}
 bool isUnaryOp(std::string op)
 {
 	return (op == "++" ||
@@ -148,10 +164,6 @@ TL doModOp(TL lhs, TR rhs, std::string op)
 	{
 		try{lhs--;}
 		catch(...){output(Error,"Invalid operation: \"%s --\"",toString<TL>(lhs).c_str());}
-	}
-	else
-	{
-		output(Error,"Invalid operator \"%s\"",op.c_str());
 	}
 
 	return lhs;
@@ -325,11 +337,7 @@ int main(int argc, char** argv)
 				old_value = std::string(old_var);
 				type_str = "Var";
 
-				if(property != "")
-				{
-					try{old_property = scope.getProperty<Var>(key,property);}
-					catch(...){output(Error,"\"%s\" is not a valid Var property.",property.c_str()); exit(-1);}
-				}
+				tryGetProperty<Var>(scope, type_str, key, property, &old_property);
 
 				if(property == "")
 					scope.set<Var>(key,doModOp<Var,int>(old_var,0,op));
@@ -344,11 +352,7 @@ int main(int argc, char** argv)
 				old_value = std::string(old_dice);
 				type_str = "Dice";
 
-				if(property != "")
-				{
-					try{old_property = scope.getProperty<Dice>(key,property);}
-					catch(...){output(Error,"\"%s\" is not a valid Dice property.",property.c_str()); exit(-1);}
-				}
+				tryGetProperty<Dice>(scope, type_str, key, property, &old_property);
 
 				if(property == "")
 					scope.set<Dice>(key,doModOp<Dice,int>(old_dice,0,op));
@@ -367,11 +371,7 @@ int main(int argc, char** argv)
 				old_value = std::string(old_wallet);
 				type_str = "Wallet";
 
-				if(property != "")
-				{
-					try{old_property = scope.getProperty<Wallet>(key,property);}
-					catch(...){output(Error,"\"%s\" does not contain Currency \"%s\".",key.c_str(),property.c_str()); exit(-1);}
-				}
+				tryGetProperty<Wallet>(scope, type_str, key, property, &old_property);
 
 				if(property == "")
 					scope.set<Wallet>(key,doModOp<Wallet,int>(old_wallet,0,op));
@@ -386,11 +386,7 @@ int main(int argc, char** argv)
 				old_value = std::string(old_currency);
 				type_str = "Currency";
 
-				if(property != "")
-				{
-					try{old_property = scope.getProperty<Currency>(key,property);}
-					catch(...){output(Error,"\"%s\" is not a valid Currency property.",property.c_str()); exit(-1);}
-				}
+				tryGetProperty<Currency>(scope, type_str, key, property, &old_property);
 
 				if(property == "")
 					scope.set<Currency>(key,doModOp<Currency,int>(old_currency,0,op));
@@ -410,11 +406,7 @@ int main(int argc, char** argv)
 				old_value = std::string(old_currencysystem);
 				type_str = "CurrencySystem";
 
-				if(property != "")
-				{
-					try{old_property = scope.getProperty<Currency>(key,property);}
-					catch(...){output(Error,"\"%s\" is not a valid Currency property.",property.c_str()); exit(-1);}
-				}
+				tryGetProperty<CurrencySystem>(scope, type_str, key, property, &old_property);
 
 				if(property == "")
 					scope.set<CurrencySystem>(key,doModOp<CurrencySystem,int>(old_currencysystem,0,op));
@@ -436,6 +428,11 @@ int main(int argc, char** argv)
 											     old_value.c_str(),
 											     new_value.c_str());
 		}
+		else
+		{
+			output(Error,"Invalid unary operator \"%s\"",op.c_str());
+		}
+
 		scope.save();
 	}
 	else//Binary operators
