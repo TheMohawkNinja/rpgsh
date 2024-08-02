@@ -69,7 +69,7 @@ void addKeysToMatches(std::vector<std::string>* pMatches, Scope scope, std::stri
 	}
 }
 void addPropertyToMatches(std::vector<std::string>** ppMatches, std::string chk_str, std::string property,
-			     std::string property_str)
+			  std::string property_str)
 {
 	if(!stringcasecmp(property,left(property_str,property.length())))
 		(**ppMatches).push_back(addSpaces(chk_str.length())+right(property_str,property.length()));
@@ -79,30 +79,32 @@ void addPropertiesToMatches(std::vector<std::string>* pMatches, Scope scope, std
 {
 	if(stringcasecmp(k,key)) return;
 
-	switch(type)
+	if(type == VAR_SIGIL && scope.keyExists<Var>(key))
 	{
-		case CURRENCY_SIGIL:
-			addPropertyToMatches(&pMatches,chk_str,property,"CurrencySystem");
-			addPropertyToMatches(&pMatches,chk_str,property,"Name");
-			addPropertyToMatches(&pMatches,chk_str,property,"SmallerAmount");
-			addPropertyToMatches(&pMatches,chk_str,property,"Smaller");
-			addPropertyToMatches(&pMatches,chk_str,property,"Larger");
-			break;
-		case CURRENCYSYSTEM_SIGIL:
-			addPropertyToMatches(&pMatches,chk_str,property,"Name");
-			break;
-		case DICE_SIGIL:
-			addPropertyToMatches(&pMatches,chk_str,property,"Quantity");
-			addPropertyToMatches(&pMatches,chk_str,property,"Faces");
-			addPropertyToMatches(&pMatches,chk_str,property,"Modifier");
-			break;
-		case VAR_SIGIL:
-			addPropertyToMatches(&pMatches,chk_str,property,"Value");
-			break;
-		case WALLET_SIGIL:
-			for(auto& [c,q] : scope.get<Wallet>(key))
-				addPropertyToMatches(&pMatches,chk_str,property,std::string(c));
-			break;
+		addPropertyToMatches(&pMatches,chk_str,property,"Value");
+	}
+	else if(type == DICE_SIGIL && scope.keyExists<Dice>(key))
+	{
+		addPropertyToMatches(&pMatches,chk_str,property,"Quantity");
+		addPropertyToMatches(&pMatches,chk_str,property,"Faces");
+		addPropertyToMatches(&pMatches,chk_str,property,"Modifier");
+	}
+	else if(type == WALLET_SIGIL && scope.keyExists<Wallet>(key))
+	{
+		for(auto& [c,q] : scope.get<Wallet>(key))
+			addPropertyToMatches(&pMatches,chk_str,property,std::string(c));
+	}
+	else if(type == CURRENCY_SIGIL && scope.keyExists<Currency>(key))
+	{
+		addPropertyToMatches(&pMatches,chk_str,property,"CurrencySystem");
+		addPropertyToMatches(&pMatches,chk_str,property,"Name");
+		addPropertyToMatches(&pMatches,chk_str,property,"SmallerAmount");
+		addPropertyToMatches(&pMatches,chk_str,property,"Smaller");
+		addPropertyToMatches(&pMatches,chk_str,property,"Larger");
+	}
+	else if(type == CURRENCYSYSTEM_SIGIL && scope.keyExists<CurrencySystem>(key))
+	{
+		addPropertyToMatches(&pMatches,chk_str,property,"Name");
 	}
 }
 std::string input_handler()
