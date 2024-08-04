@@ -13,6 +13,7 @@ class Var
 		Var& operator = (const Var b);
 		Var& operator = (const std::string b);
 		Var& operator = (const int b);
+		Var& operator ^= (const Var b);
 		Var& operator += (const Var b);
 		Var& operator += (const std::string b);
 		Var& operator += (const int b);
@@ -24,6 +25,7 @@ class Var
 		Var& operator /= (const int b);
 		Var& operator ++ (int);
 		Var& operator -- (int);
+		Var operator ^ (const Var b);
 		Var operator + (const Var b);
 		Var operator + (const std::string b);
 		Var operator + (const int b);

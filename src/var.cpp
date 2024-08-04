@@ -1,3 +1,4 @@
+#include <stdexcept>
 #include "../headers/define.h"
 #include "../headers/output.h"
 #include "../headers/var.h"
@@ -33,6 +34,22 @@ Var& Var::operator = (const int b)
 	Value = std::to_string(b);
 	return *this;
 }
+Var& Var::operator ^= (const Var b)
+{
+	try
+	{
+		std::stoi(Value);
+		std::stoi(b.Value);
+	}
+	catch(...)
+	{
+		throw std::runtime_error("invalid_operation");
+	}
+
+	Value = std::to_string(std::stoi(Value) ^ std::stoi(b.Value));
+
+	return *this;
+}
 Var& Var::operator += (const Var b)
 {
 	bool a_is_num = true;
@@ -44,92 +61,48 @@ Var& Var::operator += (const Var b)
 	catch(...){b_is_num = false;}
 
 	if(a_is_num && b_is_num)
-	{
-		Value = std::to_string((std::stoi(Value) + std::stoi(b.Value)));
-	}
+		Value = std::to_string(std::stoi(Value) + std::stoi(b.Value));
 	else if(!a_is_num && !b_is_num)
-	{
 		Value = Value + b.Value;
-	}
 	else
-	{
-		output(Error,"Ambiguous operation between numerical and non-numerical values.");
-	}
+		throw std::runtime_error("invalid_operation");
+
 	return *this;
 }
 Var& Var::operator += (const std::string b)
 {
-	bool a_is_num = true;
+	try{std::stoi(Value); throw std::runtime_error("invalid_operation");}
+	catch(...){Value = Value + b;}
 
-	try{std::stoi(Value);}
-	catch(...){a_is_num = false;}
-
-	if(!a_is_num)
-	{
-		Value = Value + b;
-	}
-	else
-	{
-		output(Error,"Ambiguous operation between numerical and non-numerical values.");
-	}
 	return *this;
 }
 Var& Var::operator += (const int b)
 {
-	bool a_is_num = true;
+	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) + b);}
+	catch(...){throw std::runtime_error("invalid_operation");}
 
-	try{std::stoi(Value);}
-	catch(...){a_is_num = false;}
-
-	if(a_is_num)
-	{
-		Value = std::to_string((std::stoi(Value) + b));
-	}
-	else
-	{
-		output(Error,"Ambiguous operation between numerical and non-numerical values.");
-	}
 	return *this;
 }
 Var& Var::operator -= (const Var b)
 {
-	bool a_is_num = true;
-	bool b_is_num = true;
+	try
+	{
+		std::stoi(Value);
+		std::stoi(b.Value);
+		Value = std::to_string(std::stoi(Value) - std::stoi(b.Value));
+	}
+	catch(...)
+	{
+		throw std::runtime_error("invalid_operation");
+	}
 
-	try{std::stoi(Value);}
-	catch(...){a_is_num = false;}
-	try{std::stoi(b.Value);}
-	catch(...){b_is_num = false;}
-
-	if(a_is_num && b_is_num)
-	{
-		Value = std::to_string((std::stoi(Value) - std::stoi(b.Value)));
-	}
-	else if(!a_is_num && !b_is_num)
-	{
-		output(Error,"Cannot subtract two non-numerical values from each other.");
-	}
-	else
-	{
-		output(Error,"Ambiguous operation between numerical and non-numerical values.");
-	}
 	return *this;
 }
 Var& Var::operator -= (const int b)
 {
-	bool a_is_num = true;
+	try{std::stoi(Value); Value = std::to_string((std::stoi(Value) - b));}
+	catch(...){throw std::runtime_error("invalid_operation");}
 
-	try{std::stoi(Value);}
-	catch(...){a_is_num = false;}
-
-	if(a_is_num)
-	{
-		Value = std::to_string((std::stoi(Value) - b));
-	}
-	else
-	{
-		output(Error,"Ambiguous operation between numerical and non-numerical values.");
-	}
 	return *this;
 }
 Var& Var::operator *= (const Var b)
@@ -143,110 +116,75 @@ Var& Var::operator *= (const Var b)
 	catch(...){b_is_num = false;}
 
 	if(a_is_num && b_is_num)
-	{
-		Value = std::to_string((std::stoi(Value) * std::stoi(b.Value)));
-	}
-	else if(!a_is_num && !b_is_num)
-	{
-		output(Error,"Cannot multiply two non-numerical values from each other.");
-	}
+		Value = std::to_string(std::stoi(Value) * std::stoi(b.Value));
+	else if(!a_is_num && b_is_num && std::stoi(b.Value) == 0)
+		Value = "";
+	else if(!a_is_num && b_is_num && std::stoi(b.Value) > 0)
+		for(int i=1; i<std::stoi(b.Value); i++){Value += Value;}
 	else
-	{
-		output(Error,"Ambiguous operation between numerical and non-numerical values.");
-	}
+		throw std::runtime_error("invalid_operation");
+
 	return *this;
 }
 Var& Var::operator *= (const int b)
 {
-	bool a_is_num = true;
-
-	try{std::stoi(Value);}
-	catch(...){a_is_num = false;}
-
-	if(a_is_num)
+	try
 	{
-		Value = std::to_string((std::stoi(Value) * b));
+		std::stoi(Value);
+		Value = std::to_string(std::stoi(Value) * b);
 	}
-	else
+	catch(...)
 	{
-		output(Error,"Ambiguous operation between numerical and non-numerical values.");
+		if(b < 0)
+			throw std::runtime_error("invalid_operation");
+		else if(b == 0)
+			Value = "";
+		else
+			for(int i=1; i<b; i++){Value += Value;}
 	}
+
 	return *this;
 }
 Var& Var::operator /= (const Var b)
 {
-	bool a_is_num = true;
-	bool b_is_num = true;
+	try
+	{
+		std::stoi(Value);
+		std::stoi(b.Value);
+		Value = std::to_string(std::stoi(Value) / std::stoi(b.Value));
+	}
+	catch(...)
+	{
+		throw std::runtime_error("invalid_operation");
+	}
 
-	try{std::stoi(Value);}
-	catch(...){a_is_num = false;}
-	try{std::stoi(b.Value);}
-	catch(...){b_is_num = false;}
-
-	if(a_is_num && b_is_num)
-	{
-		Value = std::to_string((std::stoi(Value) / std::stoi(b.Value)));
-	}
-	else if(!a_is_num && !b_is_num)
-	{
-		output(Error,"Cannot divide two non-numerical values from each other.");
-	}
-	else
-	{
-		output(Error,"Ambiguous operation between numerical and non-numerical values.");
-	}
 	return *this;
 }
 Var& Var::operator /= (const int b)
 {
-	bool a_is_num = true;
+	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) / b);}
+	catch(...){throw std::runtime_error("invalid_operation");}
 
-	try{std::stoi(Value);}
-	catch(...){a_is_num = false;}
-
-	if(a_is_num)
-	{
-		Value = std::to_string((std::stoi(Value) / b));
-	}
-	else
-	{
-		output(Error,"Ambiguous operation between numerical and non-numerical values.");
-	}
 	return *this;
 }
 Var& Var::operator ++ (int)
 {
-	bool a_is_num = true;
+	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) + 1);}
+	catch(...){throw std::runtime_error("invalid_operation");}
 
-	try{std::stoi(Value);}
-	catch(...){a_is_num = false;}
-
-	if(a_is_num)
-	{
-		Value = std::to_string((std::stoi(Value) + 1));
-	}
-	else
-	{
-		output(Error,"Cannot increment non-numerical value.");
-	}
 	return *this;
 }
 Var& Var::operator -- (int)
 {
-	bool a_is_num = true;
+	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) - 1);}
+	catch(...){throw std::runtime_error("invalid_operation");}
 
-	try{std::stoi(Value);}
-	catch(...){a_is_num = false;}
-
-	if(a_is_num)
-	{
-		Value = std::to_string((std::stoi(Value) - 1));
-	}
-	else
-	{
-		output(Error,"Cannot decrement non-numerical value.");
-	}
 	return *this;
+}
+Var Var::operator ^ (const Var b)
+{
+	Var lhs = *this;
+	return (lhs ^= b);
 }
 Var Var::operator + (const Var b)
 {
