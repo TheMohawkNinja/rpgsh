@@ -8,6 +8,8 @@
 #include "define.h"
 #include "var.h"
 
+std::string btos(bool b);
+
 bool stob(std::string s);
 
 bool isScopeSigil(char c);

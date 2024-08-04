@@ -22,6 +22,12 @@ bool stob(std::string s)
 	return false;
 }
 
+std::string btos(bool b)
+{
+	if(b) return "True";
+	return "False";
+}
+
 bool isScopeSigil(char c)
 {
 	return (c == CHARACTER_SIGIL ||
@@ -154,7 +160,7 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	}
 
 	std::string path = "/bin/";
-	std::regex arg_pattern("[\\@\\#\\$\\[\\]\\/a-zA-Z0-9\\=\\+\\-\\*\\.\\_\\\"]{1,}");
+	std::regex arg_pattern("[\\@\\#\\$\\[\\]\\/a-zA-Z0-9\\=\\+\\-\\*\\.\\_\\\"\\(\\)]{1,}");
 
 	std::sregex_iterator arg_str_it(arg_str.begin(), arg_str.end(), arg_pattern);
 	std::sregex_iterator arg_str_end;
@@ -174,14 +180,10 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	{
 		std::string arg = arg_str_it->str();
 
-		switch(arg[0])
-		{
-			case CHARACTER_SIGIL:
-			case CAMPAIGN_SIGIL:
-			case SHELL_SIGIL:
-				arg = get_prog_output(arg)[0];
-				break;
-		}
+		if(arg[0] == CHARACTER_SIGIL ||
+		   arg[0] == CAMPAIGN_SIGIL  ||
+		   arg[0] == SHELL_SIGIL)
+			arg = get_prog_output(arg)[0];
 
 		//Don't try to run a program if the data type sigil was invalid
 		if(arg == "")
