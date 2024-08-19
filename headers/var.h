@@ -41,6 +41,11 @@ class Var
 		Var& operator *= (const std::string b);
 		Var& operator *= (const int b);
 		Var& operator /= (const Var b);
+		Var& operator /= (const Dice b);
+		Var& operator /= (const Wallet b);
+		Var& operator /= (const Currency b);
+		Var& operator /= (const CurrencySystem b);
+		Var& operator /= (const std::string b);
 		Var& operator /= (const int b);
 		Var& operator ^= (const Var b);
 		Var& operator ^= (const Dice b);
@@ -49,6 +54,13 @@ class Var
 		Var& operator ^= (const CurrencySystem b);
 		Var& operator ^= (const std::string b);
 		Var& operator ^= (const int b);
+		Var& operator %= (const Var b);
+		Var& operator %= (const Dice b);
+		Var& operator %= (const Wallet b);
+		Var& operator %= (const Currency b);
+		Var& operator %= (const CurrencySystem b);
+		Var& operator %= (const std::string b);
+		Var& operator %= (const int b);
 		Var operator + (const Var b);
 		Var operator + (const Dice b);
 		Var operator + (const Wallet b);
@@ -64,8 +76,18 @@ class Var
 		Var operator - (const std::string b);
 		Var operator - (const int b);
 		Var operator * (const Var b);
+		Var operator * (const Dice b);
+		Var operator * (const Wallet b);
+		Var operator * (const Currency b);
+		Var operator * (const CurrencySystem b);
+		Var operator * (const std::string b);
 		Var operator * (const int b);
 		Var operator / (const Var b);
+		Var operator / (const Dice b);
+		Var operator / (const Wallet b);
+		Var operator / (const Currency b);
+		Var operator / (const CurrencySystem b);
+		Var operator / (const std::string b);
 		Var operator / (const int b);
 		Var operator ^ (const Var b);
 		Var operator ^ (const Dice b);
@@ -74,10 +96,22 @@ class Var
 		Var operator ^ (const CurrencySystem b);
 		Var operator ^ (const std::string b);
 		Var operator ^ (const int b);
+		Var operator % (const Var b);
+		Var operator % (const Dice b);
+		Var operator % (const Wallet b);
+		Var operator % (const Currency b);
+		Var operator % (const CurrencySystem b);
+		Var operator % (const std::string b);
+		Var operator % (const int b);
 		Var& operator ++ (int);
 		Var& operator -- (int);
 
 		// Comparison operators
+		bool operator == (const Var b);
+		bool operator < (const Var b);
+		bool operator > (const Var b);
+		bool operator <= (const Var b);
+		bool operator >= (const Var b);
 		bool operator != (const Var b);
 
 	Var();
