@@ -18,6 +18,8 @@ bool isTypeSigil(char c);
 
 int stringcasecmp(std::string a, std::string b);
 
+int findInStrVect(std::vector<std::string> v, std::string str);
+
 std::string left(std::string str, int n);
 
 std::string right(std::string str, int n);
@@ -44,6 +46,9 @@ void check_print_app_description(char** _argv, std::string description);
 
 std::string get_env_variable(std::string v);
 void set_env_variable(std::string v, std::string value);
+
+template <typename TL, typename TR>
+bool approxEquals(TL lhs, TR rhs);
 
 template <typename T>
 std::string toString(T t);

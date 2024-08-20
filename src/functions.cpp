@@ -49,6 +49,14 @@ int stringcasecmp(std::string a, std::string b)
 	return strcasecmp(a.c_str(),b.c_str());
 }
 
+int findInStrVect(std::vector<std::string> v, std::string str)
+{
+	for(long unsigned int i=0; i<v.size(); i++)
+		if(v[i] == str) return i;
+
+	return -1;
+}
+
 std::string left(std::string str, int n)
 {
 	return str.substr(0,n);
@@ -369,6 +377,211 @@ void set_env_variable(std::string v,std::string value)
 	ofs.close();
 	std::filesystem::remove(rpgsh_env_variables_path.c_str());
 	std::filesystem::rename((rpgsh_env_variables_path+".bak").c_str(),rpgsh_env_variables_path.c_str());
+}
+
+template<>
+bool approxEquals<Var,int>(Var lhs, int rhs)
+{
+	return lhs == rhs;
+}
+template<>
+bool approxEquals<Var,std::string>(Var lhs, std::string rhs)
+{
+	bool lhs_is_int = false;
+	bool rhs_is_int = false;
+	try{std::stoi(lhs.Value); lhs_is_int = true;}
+	catch(...){}
+	try{std::stoi(rhs.Value); rhs_is_int = true;}
+	catch(...){}
+
+	if(lhs_is_int && rhs_is_int)
+		return std::stoi(lhs.Value) == std::stoi(rhs.Value);
+	else if(lhs_is_int && !rhs_is_int || !lhs_is_int && rhs_is_int)
+		return false;
+	else
+		return stringcasecmp(lhs.Value,rhs.Value);
+}
+template<>
+bool approxEquals<Var,Var>(Var lhs, Var rhs)
+{
+	return approxEquals<Var,std::string>(lhs,rhs.Value);
+}
+template<>
+bool approxEquals<Var,Dice>(Var lhs, Dice rhs)
+{
+	try{return approxEquals<Dice,Dice>(Dice(lhs.Value),rhs);}//TODO: Dice constructor (and really all constructors) need to call "throw"
+	catch(...){return false;}
+}
+template<>
+bool approxEquals<Var,Currency>(Var lhs, Currency rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<Var,CurrencySystem>(Var lhs, CurrencySystem rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<Var,Wallet>(Var lhs, Wallet rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<Dice,int>(Dice lhs, int rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<Dice,std::string>(Dice lhs, std::string rhs)
+{
+	try{return approxEquals<Dice,Dice>(lhs,Dice(rhs));}
+	catch(...){return false;}
+}
+template<>
+bool approxEquals<Dice,Var>(Dice lhs, Var rhs)
+{
+	try{return approxEquals<Dice,Dice>(lhs,Dice(rhs.Value));}
+	catch(...){return false;}
+}
+template<>
+bool approxEquals<Dice,Dice>(Dice lhs, Dice rhs)
+{
+	if(lhs.List != "" && rhs.List != "")
+		return lhs.List == rhs.List;
+	else
+		return lhs.Faces == rhs.Faces;
+}
+template<>
+bool approxEquals<Dice,Currency>(Dice lhs, Currency rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<Dice,CurrencySystem>(Dice lhs, CurrencySystem rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<Dice,Wallet>(Dice lhs, Wallet rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<Currency,int>(Currency lhs, int rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<Currency,std::string>(Currency lhs, std::string rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<Currency,Var>(Currency lhs, Var rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<Currency,Dice>(Currency lhs, Dice rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<Currency,Currency>(Currency lhs, Currency rhs)
+{
+	return lhs.System == rhs.System;
+}
+template<>
+bool approxEquals<Currency,CurrencySystem>(Currency lhs, CurrencySystem rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<Currency,Wallet>(Currency lhs, Wallet rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<CurrencySystem,int>(CurrencySystem lhs, int rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<CurrencySystem,std::string>(CurrencySystem lhs, std::string rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<CurrencySystem,Var>(CurrencySystem lhs, Var rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<CurrencySystem,Dice>(CurrencySystem lhs, Dice rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<CurrencySystem,Currency>(CurrencySystem lhs, Currency rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<CurrencySystem,CurrencySystem>(CurrencySystem lhs, CurrencySystem rhs)
+{
+	return lhs == rhs;
+}
+template<>
+bool approxEquals<CurrencySystem,Wallet>(CurrencySystem lhs, Wallet rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<Wallet,int>(Wallet lhs, int rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<Wallet,std::string>(Wallet lhs, std::string rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<Wallet,Var>(Wallet lhs, Var rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<Wallet,Dice>(Wallet lhs, Dice rhs)
+{
+	return false;
+}
+template<>
+bool approxEquals<Wallet,Currency>(Wallet lhs, Currency rhs)
+{
+	for(const auto& [c,q] : lhs)
+	{
+		if(c == rhs)
+			return true;
+	}
+	return false;
+}
+template<>
+bool approxEquals<Wallet,CurrencySystem>(Wallet lhs, CurrencySystem rhs)
+{
+	for(const auto& [c,q] : lhs)
+	{
+		if(c.System == rhs)
+			return true;
+	}
+	return lhs == rhs;
+}
+template<>
+bool approxEquals<Wallet,Wallet>(Wallet lhs, Wallet rhs)
+{
+	//TODO
+	return false;
 }
 
 template <>
