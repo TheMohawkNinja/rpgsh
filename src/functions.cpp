@@ -580,8 +580,32 @@ bool approxEquals<Wallet,CurrencySystem>(Wallet lhs, CurrencySystem rhs)
 template<>
 bool approxEquals<Wallet,Wallet>(Wallet lhs, Wallet rhs)
 {
-	//TODO
-	return false;
+	unsigned int lhsValue = 0;
+	unsigned int rhsValue = 0;
+
+	std::vector<std::string> systems;
+
+	for(const auto& [c,q] : lhs.Money)
+	{
+		if(findInStringVect(systems,c.System) != -1)
+		{
+			systems.push_back(c.System->Name);
+			lhsValue += lhs.getEquivalentValueInLowestDenomination(c.System);
+		}
+	}
+
+	systems.clear();
+
+	for(const auto& [c,q] : rhs.Money)
+	{
+		if(findInStringVect(systems,c.System) != -1)
+		{
+			systems.push_back(c.System->Name);
+			rhsValue += rhs.getEquivalentValueInLowestDenomination(c.System);
+		}
+	}
+
+	return lhsValue == rhsValue;
 }
 
 template <>
@@ -632,4 +656,4 @@ datamap<Dice> load_obj_from_file(std::string path, char var_id);
 datamap<Var> load_obj_from_file(std::string path, char var_id);
 
 template <typename T>
-datamap<Currency> loadDatamapFromAllScopes(char var_id);
+datamap<Currency> loadDatamapFromAllScopes(char type);

@@ -138,7 +138,7 @@ datamap<T> load_obj_from_file(std::string path, char var_id)
 }
 
 template <typename T>
-datamap<T> getDatamapFromAllScopes(char var_id)
+datamap<T> getDatamapFromAllScopes(char type)//TODO: Remove "type", infer from T
 {
 	confirmEnvVariablesFile();
 	datamap<T> ret;
@@ -149,13 +149,13 @@ datamap<T> getDatamapFromAllScopes(char var_id)
 	std::string current_campaign_path = current_campaign_dir+variable_file_name;
 	std::string current_character_path = current_campaign_dir+"characters/"+character+".char";
 
-	for(const auto& [k,v] : load_obj_from_file<T>(current_character_path,var_id))
+	for(const auto& [k,v] : load_obj_from_file<T>(current_character_path,type))
 		ret[k] = v;
 
-	for(const auto& [k,v] : load_obj_from_file<T>(current_campaign_path,var_id))
+	for(const auto& [k,v] : load_obj_from_file<T>(current_campaign_path,type))
 		ret[k] = v;
 
-	for(const auto& [k,v] : load_obj_from_file<T>(shell_variables_path,var_id))
+	for(const auto& [k,v] : load_obj_from_file<T>(shell_variables_path,type))
 		ret[k] = v;
 
 	return ret;
