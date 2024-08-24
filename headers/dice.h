@@ -35,8 +35,20 @@ class Dice
 	operator std::string() const;
 	const char* c_str() const;
 
+	Dice& operator ^= (const Var b);
+	Dice& operator ^= (const Dice b);
+	Dice& operator ^= (const Wallet b);
+	Dice& operator ^= (const Currency b);
+	Dice& operator ^= (const CurrencySystem b);
+	Dice& operator ^= (const std::string b);
 	Dice& operator ++ (int);
 	Dice& operator -- (int);
+	Dice operator ^ (const Var b);
+	Dice operator ^ (const Dice b);
+	Dice operator ^ (const Wallet b);
+	Dice operator ^ (const Currency b);
+	Dice operator ^ (const CurrencySystem b);
+	Dice operator ^ (const std::string b);
 	bool operator == (const Dice& b) const;
 	bool operator != (const Dice& b) const;
 
