@@ -19,6 +19,16 @@ Var::operator int() const
 {
 	return std::stoi(Value);
 }
+Var& Var::operator = (const int b)
+{
+	Value = std::to_string(b);
+	return *this;
+}
+Var& Var::operator = (const std::string b)
+{
+	Value = b;
+	return *this;
+}
 Var& Var::operator = (const Var b)
 {
 	Value = b.Value;
@@ -44,32 +54,24 @@ Var& Var::operator = (const CurrencySystem b)
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Var& Var::operator = (const std::string b)
+Var& Var::operator += (const int b)
 {
-	Value = b;
+	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) + b);}
+	catch(...){throw std::runtime_error("invalid_operation");}
+
 	return *this;
 }
-Var& Var::operator = (const int b)
+Var& Var::operator += (const std::string b)
 {
-	Value = std::to_string(b);
+	try{std::stoi(Value); throw std::runtime_error("invalid_operation");}
+	catch(...){Value = Value + b;}
+
 	return *this;
 }
 Var& Var::operator += (const Var b)
 {
-	bool a_is_num = true;
-	bool b_is_num = true;
-
-	try{std::stoi(Value);}
-	catch(...){a_is_num = false;}
-	try{std::stoi(b.Value);}
-	catch(...){b_is_num = false;}
-
-	if(a_is_num && b_is_num)
-		Value = std::to_string(std::stoi(Value) + std::stoi(b.Value));
-	else if(!a_is_num && !b_is_num)
-		Value = Value + b.Value;
-	else
-		throw std::runtime_error("invalid_operation");
+	try{Value += std::stoi(b.Value);}
+	catch(...){Value += b.Value;}
 
 	return *this;
 }
@@ -93,32 +95,22 @@ Var& Var::operator += (const CurrencySystem b)
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Var& Var::operator += (const std::string b)
+Var& Var::operator -= (const int b)
 {
-	try{std::stoi(Value); throw std::runtime_error("invalid_operation");}
-	catch(...){Value = Value + b;}
-
-	return *this;
-}
-Var& Var::operator += (const int b)
-{
-	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) + b);}
+	try{std::stoi(Value); Value = std::to_string((std::stoi(Value) - b));}
 	catch(...){throw std::runtime_error("invalid_operation");}
 
 	return *this;
 }
+Var& Var::operator -= (const std::string b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
 Var& Var::operator -= (const Var b)
 {
-	try
-	{
-		std::stoi(Value);
-		std::stoi(b.Value);
-		Value = std::to_string(std::stoi(Value) - std::stoi(b.Value));
-	}
-	catch(...)
-	{
-		throw std::runtime_error("invalid_operation");
-	}
+	try{Value -= std::stoi(b.Value);}
+	catch(...){Value -= b.Value;}
 
 	return *this;
 }
@@ -142,36 +134,33 @@ Var& Var::operator -= (const CurrencySystem b)
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Var& Var::operator -= (const std::string b)
+Var& Var::operator *= (const int b)
+{
+	try
+	{
+		Value = std::to_string(std::stoi(Value) * b);
+	}
+	catch(...)
+	{
+		if(b < 0)
+			throw std::runtime_error("invalid_operation");
+		else if(b == 0)
+			Value = "";
+		else
+			for(int i=1; i<b; i++){Value += Value;}
+	}
+
+	return *this;
+}
+Var& Var::operator *= (const std::string b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Var& Var::operator -= (const int b)
-{
-	try{std::stoi(Value); Value = std::to_string((std::stoi(Value) - b));}
-	catch(...){throw std::runtime_error("invalid_operation");}
-
-	return *this;
-}
 Var& Var::operator *= (const Var b)
 {
-	bool a_is_num = true;
-	bool b_is_num = true;
-
-	try{std::stoi(Value);}
-	catch(...){a_is_num = false;}
-	try{std::stoi(b.Value);}
-	catch(...){b_is_num = false;}
-
-	if(a_is_num && b_is_num)
-		Value = std::to_string(std::stoi(Value) * std::stoi(b.Value));
-	else if(!a_is_num && b_is_num && std::stoi(b.Value) == 0)
-		Value = "";
-	else if(!a_is_num && b_is_num && std::stoi(b.Value) > 0)
-		for(int i=1; i<std::stoi(b.Value); i++){Value += Value;}
-	else
-		throw std::runtime_error("invalid_operation");
+	try{Value *= std::stoi(b.Value);}
+	catch(...){Value *= b.Value;}
 
 	return *this;
 }
@@ -195,42 +184,22 @@ Var& Var::operator *= (const CurrencySystem b)
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Var& Var::operator *= (const std::string b)
+Var& Var::operator /= (const int b)
+{
+	try{Value = std::to_string(std::stoi(Value) / b);}
+	catch(...){throw std::runtime_error("invalid_operation");}
+
+	return *this;
+}
+Var& Var::operator /= (const std::string b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Var& Var::operator *= (const int b)
-{
-	try
-	{
-		std::stoi(Value);
-		Value = std::to_string(std::stoi(Value) * b);
-	}
-	catch(...)
-	{
-		if(b < 0)
-			throw std::runtime_error("invalid_operation");
-		else if(b == 0)
-			Value = "";
-		else
-			for(int i=1; i<b; i++){Value += Value;}
-	}
-
-	return *this;
-}
 Var& Var::operator /= (const Var b)
 {
-	try
-	{
-		std::stoi(Value);
-		std::stoi(b.Value);
-		Value = std::to_string(std::stoi(Value) / std::stoi(b.Value));
-	}
-	catch(...)
-	{
-		throw std::runtime_error("invalid_operation");
-	}
+	try{Value /= std::stoi(b.Value);}
+	catch(...){Value /= b.Value;}
 
 	return *this;
 }
@@ -254,31 +223,22 @@ Var& Var::operator /= (const CurrencySystem b)
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Var& Var::operator /= (const std::string b)
+Var& Var::operator ^= (const int b)
 {
-	(void)decltype(b)();
-	throw std::runtime_error("invalid_operation");
-}
-Var& Var::operator /= (const int b)
-{
-	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) / b);}
+	try{std::stoi(Value) ^= b;}
 	catch(...){throw std::runtime_error("invalid_operation");}
 
 	return *this;
 }
+Var& Var::operator ^= (const std::string b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
 Var& Var::operator ^= (const Var b)
 {
-	try
-	{
-		std::stoi(Value);
-		std::stoi(b.Value);
-	}
-	catch(...)
-	{
-		throw std::runtime_error("invalid_operation");
-	}
-
-	Value = std::to_string(std::stoi(Value) ^ std::stoi(b.Value));
+	try{Value ^= std::stoi(b.Value);}
+	catch(...){Value ^= b.Value;}
 
 	return *this;
 }
@@ -302,30 +262,22 @@ Var& Var::operator ^= (const CurrencySystem b)
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Var& Var::operator ^= (const std::string b)
+Var& Var::operator %= (const std::string b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Var& Var::operator ^= (const int b)
+Var& Var::operator %= (const int b)
 {
-	try{std::stoi(Value); Value ^= b;}
+	try{Value = std::to_string(std::stoi(Value) % b);}
 	catch(...){throw std::runtime_error("invalid_operation");}
 
 	return *this;
 }
 Var& Var::operator %= (const Var b)
 {
-	try
-	{
-		std::stoi(Value);
-		std::stoi(b.Value);
-		Value = std::to_string(std::stoi(Value) % std::stoi(b.Value));
-	}
-	catch(...)
-	{
-		throw std::runtime_error("invalid_operation");
-	}
+	try{Value %= std::stoi(b.Value);}
+	catch(...){Value %= b.Value;}
 
 	return *this;
 }
@@ -349,17 +301,15 @@ Var& Var::operator %= (const CurrencySystem b)
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Var& Var::operator %= (const std::string b)
+Var Var::operator + (const int b)
 {
-	(void)decltype(b)();
-	throw std::runtime_error("invalid_operation");
+	Var lhs = *this;
+	return (lhs += b);
 }
-Var& Var::operator %= (const int b)
+Var Var::operator + (const std::string b)
 {
-	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) % b);}
-	catch(...){throw std::runtime_error("invalid_operation");}
-
-	return *this;
+	Var lhs = *this;
+	return (lhs += b);
 }
 Var Var::operator + (const Var b)
 {
@@ -386,15 +336,15 @@ Var Var::operator + (const CurrencySystem b)
 	Var lhs = *this;
 	return (lhs += b);
 }
-Var Var::operator + (const std::string b)
+Var Var::operator - (const int b)
 {
 	Var lhs = *this;
-	return (lhs += b);
+	return (lhs -= b);
 }
-Var Var::operator + (const int b)
+Var Var::operator - (const std::string b)
 {
 	Var lhs = *this;
-	return (lhs += b);
+	return (lhs -= b);
 }
 Var Var::operator - (const Var b)
 {
@@ -421,15 +371,15 @@ Var Var::operator - (const CurrencySystem b)
 	Var lhs = *this;
 	return (lhs -= b);
 }
-Var Var::operator - (const std::string b)
+Var Var::operator * (const int b)
 {
 	Var lhs = *this;
-	return (lhs -= b);
+	return (lhs *= b);
 }
-Var Var::operator - (const int b)
+Var Var::operator * (const std::string b)
 {
 	Var lhs = *this;
-	return (lhs -= b);
+	return (lhs *= b);
 }
 Var Var::operator * (const Var b)
 {
@@ -456,15 +406,15 @@ Var Var::operator * (const CurrencySystem b)
 	Var lhs = *this;
 	return (lhs *= b);
 }
-Var Var::operator * (const std::string b)
+Var Var::operator / (const int b)
 {
 	Var lhs = *this;
-	return (lhs *= b);
+	return (lhs /= b);
 }
-Var Var::operator * (const int b)
+Var Var::operator / (const std::string b)
 {
 	Var lhs = *this;
-	return (lhs *= b);
+	return (lhs /= b);
 }
 Var Var::operator / (const Var b)
 {
@@ -491,15 +441,15 @@ Var Var::operator / (const CurrencySystem b)
 	Var lhs = *this;
 	return (lhs /= b);
 }
-Var Var::operator / (const std::string b)
+Var Var::operator ^ (const int b)
 {
 	Var lhs = *this;
-	return (lhs /= b);
+	return (lhs ^= b);
 }
-Var Var::operator / (const int b)
+Var Var::operator ^ (const std::string b)
 {
 	Var lhs = *this;
-	return (lhs /= b);
+	return (lhs ^= b);
 }
 Var Var::operator ^ (const Var b)
 {
@@ -526,15 +476,15 @@ Var Var::operator ^ (const CurrencySystem b)
 	Var lhs = *this;
 	return (lhs ^= b);
 }
-Var Var::operator ^ (const std::string b)
+Var Var::operator % (const int b)
 {
 	Var lhs = *this;
-	return (lhs ^= b);
+	return (lhs %= b);
 }
-Var Var::operator ^ (const int b)
+Var Var::operator % (const std::string b)
 {
 	Var lhs = *this;
-	return (lhs ^= b);
+	return (lhs %= b);
 }
 Var Var::operator % (const Var b)
 {
@@ -561,16 +511,6 @@ Var Var::operator % (const CurrencySystem b)
 	Var lhs = *this;
 	return (lhs %= b);
 }
-Var Var::operator % (const std::string b)
-{
-	Var lhs = *this;
-	return (lhs %= b);
-}
-Var Var::operator % (const int b)
-{
-	Var lhs = *this;
-	return (lhs %= b);
-}
 Var& Var::operator ++ (int)
 {
 	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) + 1);}
@@ -586,7 +526,7 @@ Var& Var::operator -- (int)
 	return *this;
 }
 
-// Comparison operators TODO: Continue work. Make Var RHS below int and string so we can reference them
+// Comparison operators
 bool Var::operator == (const int b)
 {
 	try{return std::stoi(Value) == b;}
