@@ -42,8 +42,20 @@ class Currency
 	explicit operator std::string() const;
 	const char* c_str() const;
 
+	Currency& operator ^= (const Var b);
+	Currency& operator ^= (const Dice b);
+	Currency& operator ^= (const Wallet b);
+	Currency& operator ^= (const Currency b);
+	Currency& operator ^= (const CurrencySystem b);
+	Currency& operator ^= (const std::string b);
 	Currency& operator ++ (int);
 	Currency& operator -- (int);
+	Currency operator ^ (const Var b);
+	Currency operator ^ (const Dice b);
+	Currency operator ^ (const Wallet b);
+	Currency operator ^ (const Currency b);
+	Currency operator ^ (const CurrencySystem b);
+	Currency operator ^ (const std::string b);
 	bool operator == (const Currency& b) const;
 	bool operator < (const Currency& b) const;
 	bool operator != (const Currency& b) const;
@@ -52,15 +64,27 @@ class CurrencySystem
 {
 	public:
 		std::string Name = "";
-		std::map<std::string, Currency> Denomination;
+		datamap<Currency> Denomination;
 		Currency transaction = Currency();
 
 	explicit operator std::string() const;
 	const char* c_str() const;
 
 	Currency& operator [] (const std::string b);
+	CurrencySystem& operator ^= (const Var b);
+	CurrencySystem& operator ^= (const Dice b);
+	CurrencySystem& operator ^= (const Wallet b);
+	CurrencySystem& operator ^= (const Currency b);
+	CurrencySystem& operator ^= (const CurrencySystem b);
+	CurrencySystem& operator ^= (const std::string b);
 	CurrencySystem& operator ++ (int);
 	CurrencySystem& operator -- (int);
+	CurrencySystem operator ^ (const Var b);
+	CurrencySystem operator ^ (const Dice b);
+	CurrencySystem operator ^ (const Wallet b);
+	CurrencySystem operator ^ (const Currency b);
+	CurrencySystem operator ^ (const CurrencySystem b);
+	CurrencySystem operator ^ (const std::string b);
 	bool operator == (const CurrencySystem& b) const;
 	bool operator != (const CurrencySystem& b) const;
 
@@ -87,6 +111,7 @@ class Wallet
 		std::pair<Currency,int> transaction;
 
 	bool HasEffectivelyAtLeast(int q, Currency c);
+	unsigned int getEquivalentValueInLowestDenomination(CurrencySystem s);
 	void print();
 	void FloatQuantityToIntCurrency(Currency c, float q);
 	bool containsCurrency(std::string currency_str);
@@ -134,8 +159,20 @@ class Wallet
 	Wallet& operator /= (const Wallet b);
 	Wallet& operator /= (const Dice b);
 	Wallet& operator /= (const Var b);
+	Wallet& operator ^= (const Var b);
+	Wallet& operator ^= (const Dice b);
+	Wallet& operator ^= (const Wallet b);
+	Wallet& operator ^= (const Currency b);
+	Wallet& operator ^= (const CurrencySystem b);
+	Wallet& operator ^= (const std::string b);
 	Wallet& operator ++ ();
 	Wallet& operator ++ (int);
 	Wallet& operator -- ();
 	Wallet& operator -- (int);
+	Wallet operator ^ (const Var b);
+	Wallet operator ^ (const Dice b);
+	Wallet operator ^ (const Wallet b);
+	Wallet operator ^ (const Currency b);
+	Wallet operator ^ (const CurrencySystem b);
+	Wallet operator ^ (const std::string b);
 };

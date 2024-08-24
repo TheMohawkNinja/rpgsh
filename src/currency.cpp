@@ -215,13 +215,35 @@ const char* Currency::c_str() const
 {
 	return std::string(*this).c_str();
 }
-bool Currency::operator == (const Currency& b) const
+Currency& Currency::operator ^= (const Var b)
 {
-	return (System == b.System &&
-		Name == b.Name &&
-		Smaller == b.Smaller &&
-		SmallerAmount == b.SmallerAmount &&
-		Larger == b.Larger);
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Currency& Currency::operator ^= (const Dice b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Currency& Currency::operator ^= (const Wallet b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Currency& Currency::operator ^= (const Currency b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Currency& Currency::operator ^= (const CurrencySystem b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Currency& Currency::operator ^= (const std::string b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
 }
 Currency& Currency::operator ++ (int)
 {
@@ -230,6 +252,44 @@ Currency& Currency::operator ++ (int)
 Currency& Currency::operator -- (int)
 {
 	throw std::runtime_error("invalid_operation");
+}
+Currency Currency::operator ^ (const Var b)
+{
+	Currency lhs = *this;
+	return (lhs ^= b);
+}
+Currency Currency::operator ^ (const Dice b)
+{
+	Currency lhs = *this;
+	return (lhs ^= b);
+}
+Currency Currency::operator ^ (const Wallet b)
+{
+	Currency lhs = *this;
+	return (lhs ^= b);
+}
+Currency Currency::operator ^ (const Currency b)
+{
+	Currency lhs = *this;
+	return (lhs ^= b);
+}
+Currency Currency::operator ^ (const CurrencySystem b)
+{
+	Currency lhs = *this;
+	return (lhs ^= b);
+}
+Currency Currency::operator ^ (const std::string b)
+{
+	Currency lhs = *this;
+	return (lhs ^= b);
+}
+bool Currency::operator == (const Currency& b) const
+{
+	return (System == b.System &&
+		Name == b.Name &&
+		Smaller == b.Smaller &&
+		SmallerAmount == b.SmallerAmount &&
+		Larger == b.Larger);
 }
 
 CurrencySystem::operator std::string() const
@@ -244,6 +304,36 @@ Currency& CurrencySystem::operator [] (const std::string b)
 {
 	return Denomination[b];
 }
+CurrencySystem& CurrencySystem::operator ^= (const Var b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+CurrencySystem& CurrencySystem::operator ^= (const Dice b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+CurrencySystem& CurrencySystem::operator ^= (const Wallet b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+CurrencySystem& CurrencySystem::operator ^= (const Currency b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+CurrencySystem& CurrencySystem::operator ^= (const CurrencySystem b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+CurrencySystem& CurrencySystem::operator ^= (const std::string b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
 CurrencySystem& CurrencySystem::operator ++ (int)
 {
 	throw std::runtime_error("invalid_operation");
@@ -253,6 +343,36 @@ CurrencySystem& CurrencySystem::operator -- (int)
 {
 	throw std::runtime_error("invalid_operation");
 	return *this;
+}
+CurrencySystem CurrencySystem::operator ^ (const Var b)
+{
+	CurrencySystem lhs = *this;
+	return (lhs ^= b);
+}
+CurrencySystem CurrencySystem::operator ^ (const Dice b)
+{
+	CurrencySystem lhs = *this;
+	return (lhs ^= b);
+}
+CurrencySystem CurrencySystem::operator ^ (const Wallet b)
+{
+	CurrencySystem lhs = *this;
+	return (lhs ^= b);
+}
+CurrencySystem CurrencySystem::operator ^ (const Currency b)
+{
+	CurrencySystem lhs = *this;
+	return (lhs ^= b);
+}
+CurrencySystem CurrencySystem::operator ^ (const CurrencySystem b)
+{
+	CurrencySystem lhs = *this;
+	return (lhs ^= b);
+}
+CurrencySystem CurrencySystem::operator ^ (const std::string b)
+{
+	CurrencySystem lhs = *this;
+	return (lhs ^= b);
 }
 bool CurrencySystem::operator == (const CurrencySystem& b) const
 {
@@ -320,6 +440,35 @@ bool Wallet::HasEffectivelyAtLeast(int q, Currency c)
 	}
 
 	return total >= q;
+}
+unsigned int Wallet::getEquivalentValueInLowestDenomination(CurrencySystem system)
+{
+	Currency smallest = Currency();
+	unsigned int total = 0;
+	unsigned int totalFactor = 1;
+
+	//Get smallest Currency
+	for(const auto& c : system.Denomination)
+	{
+		if(c.Smaller == "")
+		{
+			smallest = c;
+			break;
+		}
+	}
+
+	//Get total
+	while(c.Larger != "")
+	{
+		c = c.system.Denomination[c.Larger];
+
+		totalFactor *= c.SmallerAmount;
+
+		if(Money[c])
+			total += Money[c] * totalFactor;
+	}
+
+	return total;
 }
 void Wallet::print()
 {
@@ -751,6 +900,36 @@ Wallet& Wallet::operator /= (const Var b)
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
+Wallet& Wallet::operator ^= (const Var b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Wallet& Wallet::operator ^= (const Dice b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Wallet& Wallet::operator ^= (const Wallet b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Wallet& Wallet::operator ^= (const Currency b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Wallet& Wallet::operator ^= (const CurrencySystem b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Wallet& Wallet::operator ^= (const std::string b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
 Wallet& Wallet::operator ++ ()
 {
 	//Add 1 of the smallest currency
@@ -784,6 +963,36 @@ Wallet& Wallet::operator -- ()
 Wallet& Wallet::operator -- (int)
 {
 	return --(*this);
+}
+Wallet Wallet::operator ^ (const Var b)
+{
+	Wallet lhs = *this;
+	return (lhs ^= b);
+}
+Wallet Wallet::operator ^ (const Dice b)
+{
+	Wallet lhs = *this;
+	return (lhs ^= b);
+}
+Wallet Wallet::operator ^ (const Wallet b)
+{
+	Wallet lhs = *this;
+	return (lhs ^= b);
+}
+Wallet Wallet::operator ^ (const Currency b)
+{
+	Wallet lhs = *this;
+	return (lhs ^= b);
+}
+Wallet Wallet::operator ^ (const CurrencySystem b)
+{
+	Wallet lhs = *this;
+	return (lhs ^= b);
+}
+Wallet Wallet::operator ^ (const std::string b)
+{
+	Wallet lhs = *this;
+	return (lhs ^= b);
 }
 
 //Links the instance of Currency to the instance of CurrencySystem
