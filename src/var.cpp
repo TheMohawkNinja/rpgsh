@@ -587,24 +587,54 @@ Var& Var::operator -- (int)
 }
 
 // Comparison operators TODO: Continue work. Make Var RHS below int and string so we can reference them
-bool Var::operator == (const Var b)
+bool Var::operator == (const int b)
+{
+	try{return std::stoi(Value) == b;}
+	catch(...){return false;}
+}
+bool Var::operator == (const std::string b)
 {
 	return (Value == b.Value);
 }
-bool operator < (const Var b)
+bool Var::operator == (const Var b)
+{
+	try{return *this == std::stoi(b.Value);}
+	catch(...){return *this == b.Value;}
+}
+bool Var::operator < (const int b)
+{
+	try{return std::stoi(Value) < b;}
+	catch(...){return false;}
+}
+bool Var::operator < (const std::string b)
 {
 	return (Value < b.Value);
 }
-bool operator > (const Var b)
+bool Var::operator < (const Var b)
+{
+	try{return *this < std::stoi(b.Value);}
+	catch(...){return *this < b.Value;}
+}
+bool Var::operator > (const int b)
+{
+	try{return std::stoi(Value) > b;}
+	catch(...){return false;}
+}
+bool Var::operator > (const std::string b)
 {
 	return (Value > b.Value);
 }
-bool operator <= (const Var b)
+bool Var::operator > (const Var b)
+{
+	try{return *this > std::stoi(b.Value);}
+	catch(...){return *this > b.Value;}
+}
+bool Var::operator <= (const Var b)
 {
 	Var lhs = *this;
 	return (lhs < b || lhs == b);
 }
-bool operator >= (const Var b)
+bool Var::operator >= (const Var b)
 {
 	Var lhs = *this;
 	return (lhs > b || lhs == b);

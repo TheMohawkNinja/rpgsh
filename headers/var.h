@@ -107,8 +107,14 @@ class Var
 		Var& operator -- (int);
 
 		// Comparison operators
+		bool operator == (const int b);
+		bool operator == (const std::string b);
 		bool operator == (const Var b);
+		bool operator < (const int b);
+		bool operator < (const std::string b);
 		bool operator < (const Var b);
+		bool operator > (const int b);
+		bool operator > (const std::string b);
 		bool operator > (const Var b);
 		bool operator <= (const Var b);
 		bool operator >= (const Var b);
