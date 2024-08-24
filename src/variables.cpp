@@ -8,6 +8,11 @@ Character c = Character(false);
 Campaign m = Campaign();
 Shell s = Shell();
 
+std::vector<std::string> unaryOps = {"++","--"};
+std::vector<std::string> arithOps = {"^","*","/","%","+","-"};
+std::vector<std::string> assignOps = {"=","^=","*=","/=","%=","+=","-="};
+std::vector<std::string> relationOps = {"==","~=","<",">","<=",">=","!="};
+
 void parseVariable(std::string v, std::string* pKey, std::string* pProperty)//Derive key and property values from the variable string
 {
 	(*pKey) = right(v,v.find('/')+1);
@@ -104,8 +109,7 @@ std::string loadXRef(std::string arg, Scope* p_scope)
 template <typename T>
 void tryGetProperty(Scope scope, std::string type_str, std::string key, std::string property, std::string* pOld_property)
 {
-	if(property == "")
-		return;
+	if(property == "") return;
 
 	try
 	{
@@ -117,56 +121,225 @@ void tryGetProperty(Scope scope, std::string type_str, std::string key, std::str
 		exit(-1);
 	}
 }
-bool isUnaryOp(std::string op)
-{
-	return (op == "++" ||
-		op == "--");
-}
-bool isArithmeticOp(std::string op)
-{
-	return (op == "+" ||
-		op == "-" ||
-		op == "*" ||
-		op == "/" ||
-		op == "^" ||//TODO document
-		op == "%");//TODO document
-}
-bool isAssignmentOp(std::string op)
-{
-	return (op == "=" ||
-		op == "+=" ||
-		op == "-=" ||
-		op == "*=" ||
-		op == "/=" ||
-		op == "^=");//TODO document
-}
-bool isRelationalOp(std::string op)//TODO document
-{
-	return (op == "=="  ||
-		op == "<"  ||
-		op == ">"  ||
-		op == "<=" ||
-		op == ">=" ||
-		op == "!=");
-}
-
 template<typename TL, typename TR>
-TL doModOp(TL lhs, TR rhs, std::string op)
+TL doModOp(TL lhs, std::string op, TR rhs)
 {
 	(void)decltype(rhs)();//Suppress -Wunused-parameter
 
-	if(op == "++")
+	if(op == "^")
+	{
+		try{lhs = lhs^rhs;}
+		catch(...){output(Error,"Invalid operation: \"%s %s %s\"",toString<TL>(lhs).c_str(),op.c_str(),toString<TR>(rhs).c_str());}
+	}
+	else if(op == "++")
 	{
 		try{lhs++;}
-		catch(...){output(Error,"Invalid operation: \"%s ++\"",toString<TL>(lhs).c_str());}
+		catch(...){output(Error,"Invalid operation: \"%s %s\"",toString<TL>(lhs).c_str(),op.c_str());}
 	}
 	else if(op == "--")
 	{
 		try{lhs--;}
-		catch(...){output(Error,"Invalid operation: \"%s --\"",toString<TL>(lhs).c_str());}
+		catch(...){output(Error,"Invalid operation: \"%s %s\"",toString<TL>(lhs).c_str(),op.c_str());}
 	}
 
 	return lhs;
+}
+template<typename TL, typename TR>
+std::string getResult(std::string lhs, std::string op, std::string rhs)
+{
+	//TODO: Handle other operators (and incorrect ones)?
+	if(findInStrVect(arithOps,op) > -1)
+		return std::string(doModOp<TL,TR>(TL(lhs),op,TR(rhs)));
+	/*else if(findInStrVect(relationOps,op) > -1)
+		return btos(doRelOp<TL,TR>(TL(lhs),op,TR(rhs)));*/
+
+	return ""; //Suppress -Wreturn-type
+}
+void parseOperandsAndDoOp(std::vector<std::string>* v, unsigned int lhs_pos, unsigned int op_pos, unsigned int rhs_pos)
+{
+	//TODO Handle quote-wrapped strings to force string interpretation
+
+	std::string result = "";
+
+	if(left((*v)[lhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
+	{
+		if(left((*v)[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
+			result = getResult<Var,Var>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
+			result = getResult<Var,Dice>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
+			result = getResult<Var,Wallet>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
+			result = getResult<Var,Currency>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
+			result = getResult<Var,CurrencySystem>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else
+		{
+			try
+			{
+				int v_rhs = std::stoi((*v)[rhs_pos]);
+				if(findInStrVect(arithOps,(*v)[op_pos]) > -1)
+					result = std::string(doModOp<Var,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
+				/*else if(isRelationalOp((*v)[op_pos]))
+					result = btos(doRelOp<Var,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
+			}
+			catch(...)
+			{
+				result = getResult<Var,std::string>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+			}
+		}
+	}
+	else if(left((*v)[lhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
+	{
+		if(left((*v)[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
+			result = getResult<Dice,Var>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
+			result = getResult<Dice,Dice>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
+			result = getResult<Dice,Wallet>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
+			result = getResult<Dice,Currency>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
+			result = getResult<Dice,CurrencySystem>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else
+		{
+			try
+			{
+				int v_rhs = std::stoi((*v)[rhs_pos]);
+				if(findInStrVect(arithOps,(*v)[op_pos]) > -1)
+					result = std::string(doModOp<Dice,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
+				/*else if(isRelationalOp((*v)[op_pos]))
+					result = btos(doRelOp<Dice,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
+			}
+			catch(...)
+			{
+				result = getResult<Dice,std::string>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+			}
+		}
+	}
+	else if(left((*v)[lhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
+	{
+		if(left((*v)[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
+			result = getResult<Wallet,Var>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
+			result = getResult<Wallet,Dice>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
+			result = getResult<Wallet,Wallet>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
+			result = getResult<Wallet,Currency>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
+			result = getResult<Wallet,CurrencySystem>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else
+		{
+			try
+			{
+				int v_rhs = std::stoi((*v)[rhs_pos]);
+				if(findInStrVect(arithOps,(*v)[op_pos]) > -1)
+					result = std::string(doModOp<Wallet,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
+				/*else if(isRelationalOp((*v)[op_pos]))
+					result = btos(doRelOp<Wallet,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
+			}
+			catch(...)
+			{
+				result = getResult<Wallet,std::string>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+			}
+		}
+	}
+	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
+	{
+		if(left((*v)[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
+			result = getResult<Currency,Var>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
+			result = getResult<Currency,Dice>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
+			result = getResult<Currency,Wallet>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
+			result = getResult<Currency,Currency>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
+			result = getResult<Currency,CurrencySystem>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else
+		{
+			try
+			{
+				int v_rhs = std::stoi((*v)[rhs_pos]);
+				if(findInStrVect(arithOps,(*v)[op_pos]) > -1)
+					result = std::string(doModOp<Currency,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
+				/*else if(isRelationalOp((*v)[op_pos]))
+					result = btos(doRelOp<Currency,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
+			}
+			catch(...)
+			{
+				result = getResult<Currency,std::string>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+			}
+		}
+	}
+	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
+	{
+		if(left((*v)[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
+			result = getResult<CurrencySystem,Var>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
+			result = getResult<CurrencySystem,Dice>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
+			result = getResult<CurrencySystem,Wallet>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
+			result = getResult<CurrencySystem,Currency>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
+			result = getResult<CurrencySystem,CurrencySystem>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else
+		{
+			try
+			{
+				int v_rhs = std::stoi((*v)[rhs_pos]);
+				if(findInStrVect(arithOps,(*v)[op_pos]) > -1)
+					result = std::string(doModOp<CurrencySystem,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
+				/*else if(isRelationalOp((*v)[op_pos]))
+					result = btos(doRelOp<CurrencySystem,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
+			}
+			catch(...)
+			{
+				result = getResult<CurrencySystem,std::string>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+			}
+		}
+	}
+	else//Treat non-explicit constructors as Var
+	{
+		if(left((*v)[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
+			result = getResult<Var,Var>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
+			result = getResult<Var,Dice>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
+			result = getResult<Var,Wallet>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
+			result = getResult<Var,Currency>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
+			result = getResult<Var,CurrencySystem>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+		else
+		{
+			try
+			{
+				int v_rhs = std::stoi((*v)[rhs_pos]);
+				if(findInStrVect(arithOps,(*v)[op_pos]) > -1)
+					result = std::string(doModOp<Var,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
+				/*else if(isRelationalOp((*v)[op_pos]))
+					result = btos(doRelOp<Var,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
+			}
+			catch(...)
+			{
+				result = getResult<Var,std::string>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
+			}
+		}
+	}
+
+	fprintf(stdout,"Result: \"%s\"\n",result.c_str());
+
+	//Replace operators and operands with result
+	v->erase(v->begin()+rhs_pos);
+	v->erase(v->begin()+op_pos);
+	v->erase(v->begin()+lhs_pos);
+	v->insert(v->begin()+lhs_pos,result);
+
+	for(const auto& s : (*v))
+		fprintf(stdout,"\ts: \"%s\"\n",s.c_str());
 }
 
 int main(int argc, char** argv)
@@ -326,7 +499,7 @@ int main(int argc, char** argv)
 		std::string old_value = "";
 		std::string new_value = "";
 
-		if(isUnaryOp(op))
+		if(findInStrVect(unaryOps,op) > -1)
 		{
 			//TODO: May have to ensure that properties get the right evaluated data type
 			std::string old_property = "";
@@ -340,9 +513,9 @@ int main(int argc, char** argv)
 				tryGetProperty<Var>(scope, type_str, key, property, &old_property);
 
 				if(property == "")
-					scope.set<Var>(key,doModOp<Var,int>(old_var,0,op));
+					scope.set<Var>(key,doModOp<Var,int>(old_var,op,0));
 				else if(!stringcasecmp(property,"Value"))
-					scope.setProperty<Var,std::string>(key,property,doModOp<Var,int>(old_property,0,op).Value);
+					scope.setProperty<Var,std::string>(key,property,doModOp<Var,int>(old_property,op,0).Value);
 
 				new_value = scope.getStr<Var>(key);
 			}
@@ -355,13 +528,13 @@ int main(int argc, char** argv)
 				tryGetProperty<Dice>(scope, type_str, key, property, &old_property);
 
 				if(property == "")
-					scope.set<Dice>(key,doModOp<Dice,int>(old_dice,0,op));
+					scope.set<Dice>(key,doModOp<Dice,int>(old_dice,op,0));
 				else if((!stringcasecmp(property,"Quantity") ||
 					 !stringcasecmp(property,"Faces") ||
 					 !stringcasecmp(property,"Modifier")))
-					scope.setProperty<Dice,int>(key,property,std::stoi(doModOp<Var,int>(old_property,0,op).Value));
+					scope.setProperty<Dice,int>(key,property,std::stoi(doModOp<Var,int>(old_property,op,0).Value));
 				else if(!stringcasecmp(property,"List"))
-					scope.setProperty<Dice,std::string>(key,property,doModOp<Var,int>(old_property,0,op).Value);
+					scope.setProperty<Dice,std::string>(key,property,doModOp<Var,int>(old_property,op,0).Value);
 
 				new_value = scope.getStr<Dice>(key);
 			}
@@ -374,9 +547,9 @@ int main(int argc, char** argv)
 				tryGetProperty<Wallet>(scope, type_str, key, property, &old_property);
 
 				if(property == "")
-					scope.set<Wallet>(key,doModOp<Wallet,int>(old_wallet,0,op));
+					scope.set<Wallet>(key,doModOp<Wallet,int>(old_wallet,op,0));
 				else if(scope.get<Wallet>(key).containsCurrency(property))
-					scope.setProperty<Wallet,int>(key,property,std::stoi(doModOp<Var,int>(old_property,0,op).Value));
+					scope.setProperty<Wallet,int>(key,property,std::stoi(doModOp<Var,int>(old_property,op,0).Value));
 
 				new_value = scope.getStr<Wallet>(key);
 			}
@@ -389,14 +562,14 @@ int main(int argc, char** argv)
 				tryGetProperty<Currency>(scope, type_str, key, property, &old_property);
 
 				if(property == "")
-					scope.set<Currency>(key,doModOp<Currency,int>(old_currency,0,op));
+					scope.set<Currency>(key,doModOp<Currency,int>(old_currency,op,0));
 				else if(!stringcasecmp(property,"CurrencySystem"))
-					scope.setProperty<Currency,std::shared_ptr<CurrencySystem>>(key,property,std::make_shared<CurrencySystem>(CurrencySystem(doModOp<Var,int>(old_property,0,op).Value)));
+					scope.setProperty<Currency,std::shared_ptr<CurrencySystem>>(key,property,std::make_shared<CurrencySystem>(CurrencySystem(doModOp<Var,int>(old_property,op,0).Value)));
 				else if(!stringcasecmp(property,"SmallerAmount"))
-					scope.setProperty<Currency,int>(key,property,std::stoi(doModOp<Var,int>(old_property,0,op).Value));
+					scope.setProperty<Currency,int>(key,property,std::stoi(doModOp<Var,int>(old_property,op,0).Value));
 				else if(!stringcasecmp(property,"Smaller") ||
 					!stringcasecmp(property,"Larger"))
-					scope.setProperty<Currency,std::string>(key,property,doModOp<Var,int>(old_property,0,op).Value);
+					scope.setProperty<Currency,std::string>(key,property,doModOp<Var,int>(old_property,op,0).Value);
 
 				new_value = scope.getStr<Currency>(key);
 			}
@@ -409,9 +582,9 @@ int main(int argc, char** argv)
 				tryGetProperty<CurrencySystem>(scope, type_str, key, property, &old_property);
 
 				if(property == "")
-					scope.set<CurrencySystem>(key,doModOp<CurrencySystem,int>(old_currencysystem,0,op));
+					scope.set<CurrencySystem>(key,doModOp<CurrencySystem,int>(old_currencysystem,op,0));
 				else if(!stringcasecmp(property,"Name"))
-					scope.setProperty<CurrencySystem,std::string>(key,property,doModOp<Var,int>(old_property,0,op).Value);
+					scope.setProperty<CurrencySystem,std::string>(key,property,doModOp<Var,int>(old_property,op,0).Value);
 
 				new_value = scope.getStr<CurrencySystem>(key);
 			}
@@ -437,76 +610,85 @@ int main(int argc, char** argv)
 	}
 	else//Binary operators
 	{
-		/*Var new_value = std::string(argv[3]);
-		for(int i=4; i<argc; i++)
+		std::vector<std::string> args;
+		unsigned int open_paren_ctr = 0;
+		unsigned int close_paren_ctr = 0;
+		for(int i=1; i<argc; i++)
 		{
-			if(i%2 == 1 && is_operator(argv[i]))
-			{
-				output(Error,"Expected non-operator new value at \'%s\'.",argv[i]);
-				exit(-1);
-			}
-			else if(i%2 == 0 && !is_operator(argv[i]))
-			{
-				output(Error,"Expected operator at \'%s\'.",argv[i]);
-				exit(-1);
-			}
-			else if(i%2 == 0)
-			{
-				Var current_operand = std::string(argv[i+1]);
-				if(!strcmp(argv[i],"+"))
-				{
-					new_value += current_operand;
-				}
-				else if(!strcmp(argv[i],"-"))
-				{
-					new_value -= current_operand;
-				}
-				else if(!strcmp(argv[i],"*"))
-				{
-					new_value *= current_operand;
-				}
-				else if(!strcmp(argv[i],"/"))
-				{
-					new_value /= current_operand;
-				}
-				else
-				{
-					output(Error,"Invalid operator \'%s\'.",argv[i]);
-					exit(-1);
-				}
-			}
+			args.push_back(std::string(argv[i]));
+			if(args[i-1][0] == '(')
+				open_paren_ctr++;
+			if(args[i-1][args[i-1].length()-1] == ')')
+				close_paren_ctr++;
 		}
 
-		if(!strcmp(argv[2],"="))
+		if(open_paren_ctr > close_paren_ctr)
 		{
-			set_variable(key,old_value,new_value,argv[1][0]);
-			return 0;
-		}
-		else if(!strcmp(argv[2],"+="))
-		{
-			set_variable(key,old_value,std::string(old_value+new_value),argv[1][0]);
-			return 0;
-		}
-		else if(!strcmp(argv[2],"-="))
-		{
-			set_variable(key,old_value,std::string(old_value-new_value),argv[1][0]);
-			return 0;
-		}
-		else if(!strcmp(argv[2],"*="))
-		{
-			set_variable(key,old_value,std::string(old_value*new_value),argv[1][0]);
-			return 0;
-		}
-		else if(!strcmp(argv[2],"/="))
-		{
-			set_variable(key,old_value,std::string(old_value/new_value),argv[1][0]);
-			return 0;
-		}
-		else
-		{
-			output(Error,"Invalid operator \'%s\'.",argv[2]);
+			output(Error,"Missing close parenthesis to match open parenthesis.");
 			exit(-1);
-		}*/
+		}
+		if(open_paren_ctr < close_paren_ctr)
+		{
+			output(Error,"Missing open parenthesis to match close parenthesis.");
+			exit(-1);
+		}
+
+		//Wrap everything in parenthesis just to make below code simpler
+		args[0] = "("+args[0];
+		args[args.size()-1] = args[args.size()-1]+")";
+
+		//PEMDAS
+		unsigned int open_paren_pos = 0;
+		for(long unsigned int start=1; start<args.size()-1; start++)
+		{
+			fprintf(stdout,"Checking args[%lu]: %s\n",start,args[start].c_str());
+			if(args[start][0] == '(')
+			{
+				open_paren_pos = start;
+				for(long unsigned int end=start; end<args.size()-1; end++)
+				{
+					fprintf(stdout,"\tChecking args[%lu]: %s\n",end,args[end].c_str());
+					if(args[end][args[end].length()-1] == ')')
+					{
+						//Strip parenthesis off args to ensure good parsing
+						args[start] = right(args[start],1);
+						args[end] = left(args[end],args[end].length()-1);
+
+						fprintf(stdout,"Operation: ");
+						for(long unsigned int k=start+1; k<=end; k+=2)//Offset by 1 and increment 2 since we are just checking operators
+						{
+							//Vector is in order of operator precedence
+							for(const auto& op : arithOps)
+							{
+								if(findInStrVect(args,op) > start && findInStrVect(args,op) < end)
+									parseOperandsAndDoOp(&args,k-1,k,k+1);
+							}
+						}
+						fprintf(stdout,"\n");
+
+						start = 1;
+					}
+					else if(args[end][0] == '(' && end>start)//Nested '('
+					{
+						start = end-1;
+						break;
+					}
+				}
+			}
+
+			//Check if parenthesis still exist. If so, restart loop to go back through PEMDAS
+			if(start == args.size()-1)
+			{
+				for(const auto& arg : args)
+				{
+					if(arg[0] == '(')
+					{
+						start = 1;
+						break;
+					}
+				}
+			}
+		}
 	}
 	return 0;
 }
