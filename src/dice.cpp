@@ -248,12 +248,12 @@ const char* Dice::c_str() const
 {
 	return std::string(*this).c_str();
 }
-Dice& operator = (const int b)
+Dice& Dice::operator = (const int b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Dice& operator = (const std::string b)
+Dice& Dice::operator = (const std::string b)
 {
 	try
 	{
@@ -270,12 +270,12 @@ Dice& operator = (const std::string b)
 
 	return *this;
 }
-Dice& operator = (const Var b)
+Dice& Dice::operator = (const Var b)
 {
 	Dice rhs = b.Value;
 	return *this;
 }
-Dice& operator = (const Dice b)
+Dice& Dice::operator = (const Dice b)
 {
 	Quantity = b.Quantity;
 	Faces = b.Faces;
@@ -284,27 +284,27 @@ Dice& operator = (const Dice b)
 
 	return *this;
 }
-Dice& operator = (const Wallet b)
+Dice& Dice::operator = (const Wallet b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Dice& operator = (const Currency b)
+Dice& Dice::operator = (const Currency b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Dice& operator = (const CurrencySystem b)
+Dice& Dice::operator = (const CurrencySystem b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Dice& operator += (const int b)
+Dice& Dice::operator += (const int b)
 {
 	Modifier += b;
 	return *this;
 }
-Dice& operator += (const std::string b)
+Dice& Dice::operator += (const std::string b)
 {
 	Dice lhs = *this;
 
@@ -313,7 +313,7 @@ Dice& operator += (const std::string b)
 
 	return lhs;
 }
-Dice& operator += (const Var b)
+Dice& Dice::operator += (const Var b)
 {
 	Dice lhs = *this;
 
@@ -322,7 +322,7 @@ Dice& operator += (const Var b)
 
 	return lhs;
 }
-Dice& operator += (const Dice b)
+Dice& Dice::operator += (const Dice b)
 {
 	if(Faces == rhs.Faces)
 		Quantity += rhs.Quantity;
@@ -331,17 +331,144 @@ Dice& operator += (const Dice b)
 
 	return *this;
 }
-Dice& operator += (const Wallet b)
+Dice& Dice::operator += (const Wallet b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Dice& operator += (const Currency b)
+Dice& Dice::operator += (const Currency b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Dice& operator += (const CurrencySystem b)
+Dice& Dice::operator += (const CurrencySystem b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator -= (const int b)
+{
+	Modifier -= b;
+	return *this;
+}
+Dice& Dice::operator -= (const std::string b)
+{
+	Dice lhs = *this;
+
+	try{lhs -= Dice(b);}
+	catch(...){throw std::runtime_error("invalid_operation");}
+
+	return lhs;
+}
+Dice& Dice::operator -= (const Var b)
+{
+	Dice lhs = *this;
+
+	try{lhs -= std::stoi(b.Value);}
+	catch(...){lhs -= b.Value;}
+
+	return lhs;
+}
+Dice& Dice::operator -= (const Dice b)
+{
+	if(Faces == rhs.Faces)
+		Quantity -= rhs.Quantity;
+	else
+		throw std::runtime_error("invalid_operation");
+
+	return *this;
+}
+Dice& Dice::operator -= (const Wallet b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator -= (const Currency b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator -= (const CurrencySystem b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator *= (const int b)
+{
+	Quantity *= b;
+	return *this;
+}
+Dice& Dice::operator *= (const std::string b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator *= (const Var b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator *= (const Dice b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator *= (const Wallet b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator *= (const Currency b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator *= (const CurrencySystem b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator /= (const int b)
+{
+	Quantity /= b;
+	return *this;
+}
+Dice& Dice::operator /= (const std::string b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator /= (const Var b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator /= (const Dice b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator /= (const Wallet b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator /= (const Currency b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator /= (const CurrencySystem b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator ^= (const int b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator ^= (const std::string b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
@@ -371,7 +498,37 @@ Dice& Dice::operator ^= (const CurrencySystem b)
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Dice& Dice::operator ^= (const std::string b)
+Dice& Dice::operator %= (const int b)
+{
+	Quantity %= b;
+	return *this;
+}
+Dice& Dice::operator %= (const std::string b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator %= (const Var b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator %= (const Dice b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator %= (const Wallet b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator %= (const Currency b)
+{
+	(void)decltype(b)();
+	throw std::runtime_error("invalid_operation");
+}
+Dice& Dice::operator %= (const CurrencySystem b)
 {
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
@@ -421,6 +578,121 @@ Dice Dice::operator + (const CurrencySystem b)
 	Dice lhs = *this;
 	return (lhs += b);
 }
+Dice Dice::operator - (const int b)
+{
+	Dice lhs = *this;
+	return (lhs -= b);
+}
+Dice Dice::operator - (const std::string b)
+{
+	Dice lhs = *this;
+	return (lhs -= b);
+}
+Dice Dice::operator - (const Var b)
+{
+	Dice lhs = *this;
+	return (lhs -= b);
+}
+Dice Dice::operator - (const Dice b)
+{
+	Dice lhs = *this;
+	return (lhs -= b);
+}
+Dice Dice::operator - (const Wallet b)
+{
+	Dice lhs = *this;
+	return (lhs -= b);
+}
+Dice Dice::operator - (const Currency b)
+{
+	Dice lhs = *this;
+	return (lhs -= b);
+}
+Dice Dice::operator - (const CurrencySystem b)
+{
+	Dice lhs = *this;
+	return (lhs -= b);
+}
+Dice Dice::operator * (const int b)
+{
+	Dice lhs = *this;
+	return (lhs *= b);
+}
+Dice Dice::operator * (const std::string b)
+{
+	Dice lhs = *this;
+	return (lhs *= b);
+}
+Dice Dice::operator * (const Var b)
+{
+	Dice lhs = *this;
+	return (lhs *= b);
+}
+Dice Dice::operator * (const Dice b)
+{
+	Dice lhs = *this;
+	return (lhs *= b);
+}
+Dice Dice::operator * (const Wallet b)
+{
+	Dice lhs = *this;
+	return (lhs *= b);
+}
+Dice Dice::operator * (const Currency b)
+{
+	Dice lhs = *this;
+	return (lhs *= b);
+}
+Dice Dice::operator * (const CurrencySystem b)
+{
+	Dice lhs = *this;
+	return (lhs *= b);
+}
+Dice Dice::operator / (const int b)
+{
+	Dice lhs = /this;
+	return (lhs /= b);
+}
+Dice Dice::operator / (const std::string b)
+{
+	Dice lhs = /this;
+	return (lhs /= b);
+}
+Dice Dice::operator / (const Var b)
+{
+	Dice lhs = /this;
+	return (lhs /= b);
+}
+Dice Dice::operator / (const Dice b)
+{
+	Dice lhs = /this;
+	return (lhs /= b);
+}
+Dice Dice::operator / (const Wallet b)
+{
+	Dice lhs = /this;
+	return (lhs /= b);
+}
+Dice Dice::operator / (const Currency b)
+{
+	Dice lhs = /this;
+	return (lhs /= b);
+}
+Dice Dice::operator / (const CurrencySystem b)
+{
+	Dice lhs = /this;
+	return (lhs /= b);
+}
+Dice Dice::operator ^ (const int b)
+{
+	Dice lhs = *this;
+	return (lhs ^= b);
+}
+Dice Dice::operator ^ (const std::string b)
+{
+	Dice lhs = *this;
+	return (lhs ^= b);
+}
 Dice Dice::operator ^ (const Var b)
 {
 	Dice lhs = *this;
@@ -446,10 +718,54 @@ Dice Dice::operator ^ (const CurrencySystem b)
 	Dice lhs = *this;
 	return (lhs ^= b);
 }
-Dice Dice::operator ^ (const std::string b)
+Dice Dice::operator % (const int b)
 {
 	Dice lhs = *this;
-	return (lhs ^= b);
+	return (lhs %= b);
+}
+Dice Dice::operator % (const std::string b)
+{
+	Dice lhs = *this;
+	return (lhs %= b);
+}
+Dice Dice::operator % (const Var b)
+{
+	Dice lhs = *this;
+	return (lhs %= b);
+}
+Dice Dice::operator % (const Dice b)
+{
+	Dice lhs = *this;
+	return (lhs %= b);
+}
+Dice Dice::operator % (const Wallet b)
+{
+	Dice lhs = *this;
+	return (lhs %= b);
+}
+Dice Dice::operator % (const Currency b)
+{
+	Dice lhs = *this;
+	return (lhs %= b);
+}
+Dice Dice::operator % (const CurrencySystem b)
+{
+	Dice lhs = *this;
+	return (lhs %= b);
+}
+bool Dice::operator == (const int& b) const
+{
+	return false;
+}
+bool Dice::operator == (const std::string& b) const
+{
+	try{return Dice(b);}
+	catch(...){return false;}
+}
+bool Dice::operator == (const Var& b) const
+{
+	try{return *this == b.Value;}
+	catch(...){return false;}
 }
 bool Dice::operator == (const Dice& b) const
 {
@@ -458,7 +774,43 @@ bool Dice::operator == (const Dice& b) const
 		Modifier == b.Modifier &&
 		List == b.List);
 }
+bool Dice::operator == (const Wallet& b) const
+{
+	return false;
+}
+bool Dice::operator == (const Currency& b) const
+{
+	return false;
+}
+bool Dice::operator == (const CurrencySystem& b) const
+{
+	return false;
+}
+bool Dice::operator != (const int& b) const
+{
+	return !(*this == b);
+}
+bool Dice::operator != (const std::string& b) const
+{
+	return !(*this == b);
+}
+bool Dice::operator != (const Var& b) const
+{
+	return !(*this == b);
+}
 bool Dice::operator != (const Dice& b) const
+{
+	return !(*this == b);
+}
+bool Dice::operator != (const Wallet& b) const
+{
+	return !(*this == b);
+}
+bool Dice::operator != (const Currency& b) const
+{
+	return !(*this == b);
+}
+bool Dice::operator != (const CurrencySystem& b) const
 {
 	return !(*this == b);
 }
