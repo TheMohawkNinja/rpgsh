@@ -759,7 +759,7 @@ bool Dice::operator == (const int& b) const
 }
 bool Dice::operator == (const std::string& b) const
 {
-	try{return Dice(b);}
+	try{return *this == Dice(b);}
 	catch(...){return false;}
 }
 bool Dice::operator == (const Var& b) const
@@ -783,6 +783,126 @@ bool Dice::operator == (const Currency& b) const
 	return false;
 }
 bool Dice::operator == (const CurrencySystem& b) const
+{
+	return false;
+}
+bool Dice::operator < (const int& b) const
+{
+	return false;
+}
+bool Dice::operator < (const std::string& b) const
+{
+	try{return *this < Dice(b);}
+	catch(...){return false;}
+}
+bool Dice::operator < (const Var& b) const
+{
+	try{return *this < b.Value;}
+	catch(...){return false;}
+}
+bool Dice::operator < (const Dice& b) const
+{
+	return Quantity < b.Quantity;
+}
+bool Dice::operator < (const Wallet& b) const
+{
+	return false;
+}
+bool Dice::operator < (const Currency& b) const
+{
+	return false;
+}
+bool Dice::operator < (const CurrencySystem& b) const
+{
+	return false;
+}
+bool Dice::operator > (const int& b) const
+{
+	return false;
+}
+bool Dice::operator > (const std::string& b) const
+{
+	try{return *this > Dice(b);}
+	catch(...){return false;}
+}
+bool Dice::operator > (const Var& b) const
+{
+	try{return *this > b.Value;}
+	catch(...){return false;}
+}
+bool Dice::operator > (const Dice& b) const
+{
+	return Quantity > b.Quantity;
+}
+bool Dice::operator > (const Wallet& b) const
+{
+	return false;
+}
+bool Dice::operator > (const Currency& b) const
+{
+	return false;
+}
+bool Dice::operator > (const CurrencySystem& b) const
+{
+	return false;
+}
+bool Dice::operator <= (const int& b) const
+{
+	return false;
+}
+bool Dice::operator <= (const std::string& b) const
+{
+	try{return *this <= Dice(b);}
+	catch(...){return false;}
+}
+bool Dice::operator <= (const Var& b) const
+{
+	try{return *this <= b.Value;}
+	catch(...){return false;}
+}
+bool Dice::operator <= (const Dice& b) const
+{
+	return Quantity <= b.Quantity;
+}
+bool Dice::operator <= (const Wallet& b) const
+{
+	return false;
+}
+bool Dice::operator <= (const Currency& b) const
+{
+	return false;
+}
+bool Dice::operator <= (const CurrencySystem& b) const
+{
+	return false;
+}
+bool Dice::operator >= (const int& b) const
+{
+	return false;
+}
+bool Dice::operator >= (const std::string& b) const
+{
+	try{return *this >= Dice(b);}
+	catch(...){return false;}
+}
+bool Dice::operator >= (const Var& b) const
+{
+	try{return *this >= b.Value;}
+	catch(...){return false;}
+}
+bool Dice::operator >= (const Dice& b) const
+{
+	return Quantity >= b.Quantity;
+}
+bool Dice::operator >= (const Wallet& b) const
+{
+	return false;
+}
+bool Dice::operator >= (const Currency& b) const
+{
+	return false;
+}
+bool Dice::operator >= (const CurrencySystem& b) const
 {
 	return false;
 }
