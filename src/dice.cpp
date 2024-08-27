@@ -533,16 +533,6 @@ Dice& Dice::operator %= (const CurrencySystem b)
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Dice& Dice::operator ++ (int)
-{
-	Modifier++;
-	return *this;
-}
-Dice& Dice::operator -- (int)
-{
-	Modifier--;
-	return *this;
-}
 Dice Dice::operator + (const int b)
 {
 	Dice lhs = *this;
@@ -933,6 +923,16 @@ bool Dice::operator != (const Currency& b) const
 bool Dice::operator != (const CurrencySystem& b) const
 {
 	return !(*this == b);
+}
+Dice& Dice::operator ++ (int)
+{
+	Modifier++;
+	return *this;
+}
+Dice& Dice::operator -- (int)
+{
+	Modifier--;
+	return *this;
 }
 
 std::string Dice::dice() const
