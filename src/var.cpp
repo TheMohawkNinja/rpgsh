@@ -511,22 +511,6 @@ Var Var::operator % (const CurrencySystem b)
 	Var lhs = *this;
 	return (lhs %= b);
 }
-Var& Var::operator ++ (int)
-{
-	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) + 1);}
-	catch(...){throw std::runtime_error("invalid_operation");}
-
-	return *this;
-}
-Var& Var::operator -- (int)
-{
-	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) - 1);}
-	catch(...){throw std::runtime_error("invalid_operation");}
-
-	return *this;
-}
-
-// Comparison operators
 bool Var::operator == (const int b)
 {
 	try{return std::stoi(Value) == b;}
@@ -583,6 +567,20 @@ bool Var::operator != (const Var b)
 {
 	Var lhs = *this;
 	return !(lhs == b);
+}
+Var& Var::operator ++ (int)
+{
+	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) + 1);}
+	catch(...){throw std::runtime_error("invalid_operation");}
+
+	return *this;
+}
+Var& Var::operator -- (int)
+{
+	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) - 1);}
+	catch(...){throw std::runtime_error("invalid_operation");}
+
+	return *this;
 }
 
 Var::Var(){}

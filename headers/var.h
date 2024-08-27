@@ -103,10 +103,6 @@ class Var
 		Var operator % (const Wallet b);
 		Var operator % (const Currency b);
 		Var operator % (const CurrencySystem b);
-		Var& operator ++ (int);
-		Var& operator -- (int);
-
-		// Comparison operators
 		bool operator == (const int b);
 		bool operator == (const std::string b);
 		bool operator == (const Var b);
@@ -119,6 +115,9 @@ class Var
 		bool operator <= (const Var b);
 		bool operator >= (const Var b);
 		bool operator != (const Var b);
+		Var& operator ++ (int);
+		Var& operator -- (int);
+
 
 	Var();
 	Var(std::string _value);
