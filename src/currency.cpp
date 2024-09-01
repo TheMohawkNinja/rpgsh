@@ -772,9 +772,169 @@ CurrencySystem CurrencySystem::operator % (const CurrencySystem b)
 	CurrencySystem lhs = *this;
 	return (lhs %= b);
 }
+bool CurrencySystem::operator == (const int& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator == (const std::string& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator == (const Var& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator == (const Dice& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator == (const Wallet& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator == (const Currency& b) const
+{
+	return false;
+}
 bool CurrencySystem::operator == (const CurrencySystem& b) const
 {
 	return Name == b.Name;
+}
+bool CurrencySystem::operator < (const int& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator < (const std::string& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator < (const Var& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator < (const Dice& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator < (const Wallet& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator < (const Currency& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator < (const CurrencySystem& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator > (const int& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator > (const std::string& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator > (const Var& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator > (const Dice& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator > (const Wallet& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator > (const Currency& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator > (const CurrencySystem& b) const
+{
+	return false;
+}
+bool CurrencySystem::operator <= (const int& b) const
+{
+	return (*this < b || *this == b);
+}
+bool CurrencySystem::operator <= (const std::string& b) const
+{
+	return (*this < b || *this == b);
+}
+bool CurrencySystem::operator <= (const Var& b) const
+{
+	return (*this < b || *this == b);
+}
+bool CurrencySystem::operator <= (const Dice& b) const
+{
+	return (*this < b || *this == b);
+}
+bool CurrencySystem::operator <= (const Wallet& b) const
+{
+	return (*this < b || *this == b);
+}
+bool CurrencySystem::operator <= (const Currency& b) const
+{
+	return (*this < b || *this == b);
+}
+bool CurrencySystem::operator <= (const CurrencySystem& b) const
+{
+	return (*this < b || *this == b);
+}
+bool CurrencySystem::operator >= (const int& b) const
+{
+	return (*this > b || *this == b);
+}
+bool CurrencySystem::operator >= (const std::string& b) const
+{
+	return (*this > b || *this == b);
+}
+bool CurrencySystem::operator >= (const Var& b) const
+{
+	return (*this > b || *this == b);
+}
+bool CurrencySystem::operator >= (const Dice& b) const
+{
+	return (*this > b || *this == b);
+}
+bool CurrencySystem::operator >= (const Wallet& b) const
+{
+	return (*this > b || *this == b);
+}
+bool CurrencySystem::operator >= (const Currency& b) const
+{
+	return (*this > b || *this == b);
+}
+bool CurrencySystem::operator >= (const CurrencySystem& b) const
+{
+	return (*this < b || *this == b);
+}
+bool CurrencySystem::operator != (const int& b) const
+{
+	return !(*this == b);
+}
+bool CurrencySystem::operator != (const std::string& b) const
+{
+	return !(*this == b);
+}
+bool CurrencySystem::operator != (const Var& b) const
+{
+	return !(*this == b);
+}
+bool CurrencySystem::operator != (const Dice& b) const
+{
+	return !(*this == b);
+}
+bool CurrencySystem::operator != (const Wallet& b) const
+{
+	return !(*this == b);
+}
+bool CurrencySystem::operator != (const Currency& b) const
+{
+	return !(*this == b);
 }
 bool CurrencySystem::operator != (const CurrencySystem& b) const
 {
