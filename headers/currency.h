@@ -42,23 +42,32 @@ class Currency
 	explicit operator std::string() const;
 	const char* c_str() const;
 
+	Currency& operator = (const int b);
+	Currency& operator = (const std::string b);
+	Currency& operator = (const Var b);
+	Currency& operator = (const Dice b);
+	Currency& operator = (const Wallet b);
+	Currency& operator = (const Currency b);
+	Currency& operator = (const CurrencySystem b);
+	Currency& operator ^= (const int b);
+	Currency& operator ^= (const std::string b);
 	Currency& operator ^= (const Var b);
 	Currency& operator ^= (const Dice b);
 	Currency& operator ^= (const Wallet b);
 	Currency& operator ^= (const Currency b);
 	Currency& operator ^= (const CurrencySystem b);
-	Currency& operator ^= (const std::string b);
-	Currency& operator ++ (int);
-	Currency& operator -- (int);
+	Currency operator ^ (const int b);
+	Currency operator ^ (const std::string b);
 	Currency operator ^ (const Var b);
 	Currency operator ^ (const Dice b);
 	Currency operator ^ (const Wallet b);
 	Currency operator ^ (const Currency b);
 	Currency operator ^ (const CurrencySystem b);
-	Currency operator ^ (const std::string b);
 	bool operator == (const Currency& b) const;
 	bool operator < (const Currency& b) const;
 	bool operator != (const Currency& b) const;
+	Currency& operator ++ (int);
+	Currency& operator -- (int);
 };
 class CurrencySystem
 {
