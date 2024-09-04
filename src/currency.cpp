@@ -270,15 +270,14 @@ Currency& Currency::operator += (const Dice b)
 	(void)decltype(b)();
 	throw std::runtime_error("invalid_operation");
 }
-Currency& Currency::operator += (const Wallet b)
+Wallet& Currency::operator += (const Wallet b)
 {
-	(void)decltype(b)();
-	throw std::runtime_error("invalid_operation");
+	b += *this;
+	return b;
 }
-Currency& Currency::operator += (const Currency b)
+Wallet& Currency::operator += (const Currency b)
 {
-	(void)decltype(b)();
-	throw std::runtime_error("invalid_operation");
+	return Wallet("w{"+std::string(*this)+","+"1"+","+std::string(b)+",1}");
 }
 Currency& Currency::operator += (const CurrencySystem b)
 {
@@ -479,12 +478,12 @@ Currency Currency::operator + (const Dice b)
 	Currency lhs = *this;
 	return (lhs += b);
 }
-Currency Currency::operator + (const Wallet b)
+Wallet Currency::operator + (const Wallet b)
 {
 	Currency lhs = *this;
 	return (lhs += b);
 }
-Currency Currency::operator + (const Currency b)
+Wallet Currency::operator + (const Currency b)
 {
 	Currency lhs = *this;
 	return (lhs += b);
@@ -669,6 +668,28 @@ Currency Currency::operator % (const CurrencySystem b)
 	Currency lhs = *this;
 	return (lhs %= b);
 }
+bool Currency::operator == (const int& b) const
+{
+	return false;
+}
+bool Currency::operator == (const std::string& b) const
+{
+	return false;
+}
+bool Currency::operator == (const Var& b) const
+{
+	Currency lhs = *this;
+	try{return lhs == std::stoi(b.Value);}
+	catch(...){return lhs == b.Value;}
+}
+bool Currency::operator == (const Dice& b) const
+{
+	return false;
+}
+bool Currency::operator == (const Walle& b) const
+{
+	return false;
+}
 bool Currency::operator == (const Currency& b) const
 {
 	return (System == b.System &&
@@ -676,6 +697,202 @@ bool Currency::operator == (const Currency& b) const
 		Smaller == b.Smaller &&
 		SmallerAmount == b.SmallerAmount &&
 		Larger == b.Larger);
+}
+bool Currency::operator == (const CurrencySystem& b) const
+{
+	return false;
+}
+bool Currency::operator < (const int& b) const
+{
+	return false;
+}
+bool Currency::operator < (const std::string& b) const
+{
+	return false;
+}
+bool Currency::operator < (const Var& b) const
+{
+	Currency lhs = *this;
+	try{return lhs < std::stoi(b.Value);}
+	catch(...){return lhs < b.Value;}
+}
+bool Currency::operator < (const Dice& b) const
+{
+	return false;
+}
+bool Currency::operator < (const Walle& b) const
+{
+	return false;
+}
+bool Currency::operator < (const Currency& b) const//Orders std::map with Currency key
+{
+	if((!System && b.System) || (!b.System && System))
+		return false;
+	if(!System && !b.System)
+	{
+		if(b.Larger == Name)
+			return true;
+		else if(b.Smaller == Name)
+			return false;
+		else if(b.Name == Name)
+			return false;
+		else
+			return true;
+	}
+	if(System != b.System)//May be source of some issues due to getting rid of apparently unneeded for loop
+		return false;
+	else if(b.Larger == Name)
+		return true;
+	else if(b.Smaller == Name)
+		return false;
+	else if(b.Name == Name)
+		return false;
+	else
+		return true;
+
+	return (Name < b.Name);
+}
+bool Currency::operator < (const CurrencySystem& b) const
+{
+	return false;
+}
+bool Currency::operator > (const int& b) const
+{
+	return false;
+}
+bool Currency::operator > (const std::string& b) const
+{
+	return false;
+}
+bool Currency::operator > (const Var& b) const
+{
+	Currency lhs = *this;
+	try{return lhs > std::stoi(b.Value);}
+	catch(...){return lhs > b.Value;}
+}
+bool Currency::operator > (const Dice& b) const
+{
+	return false;
+}
+bool Currency::operator > (const Walle& b) const
+{
+	return false;
+}
+bool Currency::operator > (const Currency& b) const
+{
+	if((!System && b.System) || (!b.System && System))
+		return false;
+	if(!System && !b.System)
+	{
+		if(b.Larger == Name)
+			return false;
+		else if(b.Smaller == Name)
+			return true;
+		else if(b.Name == Name)
+			return false;
+		else
+			return true;
+	}
+	if(System != b.System)//May be source of some issues due to getting rid of apparently unneeded for loop
+		return false;
+	else if(b.Larger == Name)
+		return false;
+	else if(b.Smaller == Name)
+		return true;
+	else if(b.Name == Name)
+		return false;
+	else
+		return true;
+
+	return (Name > b.Name);
+}
+bool Currency::operator > (const CurrencySystem& b) const
+{
+	return false;
+}
+bool Currency::operator <= (const int& b) const
+{
+	return (*this < b || *this == b);
+}
+bool Currency::operator <= (const std::string& b) const
+{
+	return (*this < b || *this == b);
+}
+bool Currency::operator <= (const Var& b) const
+{
+	return (*this < b || *this == b);
+}
+bool Currency::operator <= (const Dice& b) const
+{
+	return (*this < b || *this == b);
+}
+bool Currency::operator <= (const Walle& b) const
+{
+	return (*this < b || *this == b);
+}
+bool Currency::operator <= (const Currency& b) const//Orders std::map with Currency key
+{
+	return (*this < b || *this == b);
+}
+bool Currency::operator <= (const CurrencySystem& b) const
+{
+	return (*this < b || *this == b);
+}
+bool Currency::operator >= (const int& b) const
+{
+	return (*this > b || *this == b);
+}
+bool Currency::operator >= (const std::string& b) const
+{
+	return (*this > b || *this == b);
+}
+bool Currency::operator >= (const Var& b) const
+{
+	return (*this > b || *this == b);
+}
+bool Currency::operator >= (const Dice& b) const
+{
+	return (*this > b || *this == b);
+}
+bool Currency::operator >= (const Walle& b) const
+{
+	return (*this > b || *this == b);
+}
+bool Currency::operator >= (const Currency& b) const//Orders std::map with Currency key
+{
+	return (*this > b || *this == b);
+}
+bool Currency::operator >= (const CurrencySystem& b) const
+{
+	return (*this > b || *this == b);
+}
+bool Currency::operator != (const int& b) const
+{
+	return !(*this == b);
+}
+bool Currency::operator != (const std::string& b) const
+{
+	return !(*this == b);
+}
+bool Currency::operator != (const Var& b) const
+{
+	return !(*this == b);
+}
+bool Currency::operator != (const Dice& b) const
+{
+	return !(*this == b);
+}
+bool Currency::operator != (const Wallet& b) const
+{
+	return !(*this == b);
+}
+bool Currency::operator != (const Currency& b) const
+{
+	return !(*this == b);
+}
+bool Currency::operator != (const CurrencySystem& b) const
+{
+	return !(*this == b);
 }
 Currency& Currency::operator ++ (int)
 {
@@ -1965,63 +2182,6 @@ void Currency::AttachToCurrencySystem(std::shared_ptr<CurrencySystem> _CurrencyS
 {
 	System = _CurrencySystem;
 	System->Denomination[Name] = *this;
-}
-
-//Required for compilation due to the use of Currency as a key for an std::map in the Wallet class
-//Orders std::map from highest to lowest denomination
-//If you use more than one Currency, you will need to declare CurrencySystem for each of them
-//Even if they are the only Currency in the system. Otherwise, operators don't give expected behavior
-bool Currency::operator < (const Currency& b) const
-{
-	if((!System && b.System) || (!b.System && System))
-	{
-		return false;
-	}
-	if(!System && !b.System)
-	{
-		if(b.Larger == Name)
-		{
-			return true;
-		}
-		else if(b.Smaller == Name)
-		{
-			return false;
-		}
-		else if(b.Name == Name)
-		{
-			return false;
-		}
-		else
-		{
-			return true;
-		}
-	}
-	if(System != b.System)
-	{
-		//May be source of some issues due to getting rid of apparently unneeded for loop
-		return false;
-	}
-	else if(b.Larger == Name)
-	{
-		return true;
-	}
-	else if(b.Smaller == Name)
-	{
-		return false;
-	}
-	else if(b.Name == Name)
-	{
-		return false;
-	}
-	else
-	{
-		return true;
-	}
-	return (Name < b.Name);
-}
-bool Currency::operator != (const Currency& b) const
-{
-	return !(*this == b);
 }
 
 void CurrencySystem::MakeChange(Currency c, Wallet* w)
