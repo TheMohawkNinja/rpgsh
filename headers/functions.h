@@ -47,6 +47,8 @@ void check_print_app_description(char** _argv, std::string description);
 std::string get_env_variable(std::string v);
 void set_env_variable(std::string v, std::string value);
 
+unsigned int getWalletValue(Wallet w);
+
 template <typename TL, typename TR>
 bool approxEquals(TL lhs, TR rhs);
 

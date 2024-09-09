@@ -379,6 +379,23 @@ void set_env_variable(std::string v,std::string value)
 	std::filesystem::rename((rpgsh_env_variables_path+".bak").c_str(),rpgsh_env_variables_path.c_str());
 }
 
+unsigned int getWalletValue(Wallet w)
+{
+	unsigned int total = 0;
+	std::vector<std::string> systems;
+
+	for(const auto& [c,q] : w.Money)
+	{
+		if(findInStringVect(systems,c.System) != -1)
+		{
+			systems.push_back(c.System->Name);
+			total += w.getEquivalentValueInLowestDenomination(c.System);
+		}
+	}
+
+	return total;
+}
+
 template<>
 bool approxEquals<Var,int>(Var lhs, int rhs)
 {
@@ -577,35 +594,11 @@ bool approxEquals<Wallet,CurrencySystem>(Wallet lhs, CurrencySystem rhs)
 	}
 	return lhs == rhs;
 }
+
 template<>
 bool approxEquals<Wallet,Wallet>(Wallet lhs, Wallet rhs)
 {
-	unsigned int lhsValue = 0;
-	unsigned int rhsValue = 0;
-
-	std::vector<std::string> systems;
-
-	for(const auto& [c,q] : lhs.Money)
-	{
-		if(findInStringVect(systems,c.System) != -1)
-		{
-			systems.push_back(c.System->Name);
-			lhsValue += lhs.getEquivalentValueInLowestDenomination(c.System);
-		}
-	}
-
-	systems.clear();
-
-	for(const auto& [c,q] : rhs.Money)
-	{
-		if(findInStringVect(systems,c.System) != -1)
-		{
-			systems.push_back(c.System->Name);
-			rhsValue += rhs.getEquivalentValueInLowestDenomination(c.System);
-		}
-	}
-
-	return lhsValue == rhsValue;
+	return getWalletValue(lhs) == getWalletValue(rhs);
 }
 
 template <>
