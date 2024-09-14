@@ -493,7 +493,7 @@ class Wallet
 	bool operator <= (const Dice& b) const;
 	bool operator <= (const Wallet& b) const;
 	bool operator <= (const Currency& b) const;
-	bool operator <= ([[maybe_unused]] const CurrencySystem& b) const;
+	bool operator <= (const CurrencySystem& b) const;
 	bool operator >= (const int& b) const;
 	bool operator >= (const std::string& b) const;
 	bool operator >= (const Var& b) const;

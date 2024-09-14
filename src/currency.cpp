@@ -2430,7 +2430,7 @@ bool Wallet::operator > ([[maybe_unused]] const CurrencySystem& b) const
 }
 bool Wallet::operator <= (const int& b) const
 {
-	return false;
+	return *this < b || *this == b;
 }
 bool Wallet::operator <= (const std::string& b) const
 {
@@ -2453,7 +2453,7 @@ bool Wallet::operator <= (const Currency& b) const
 {
 	return false;
 }
-bool Wallet::operator <= ([[maybe_unused]] const CurrencySystem& b) const
+bool Wallet::operator <= (const CurrencySystem& b) const
 {
 	return false;
 }
