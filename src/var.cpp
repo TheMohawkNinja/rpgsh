@@ -525,6 +525,23 @@ bool Var::operator == (const Var b)
 	try{return *this == std::stoi(b.Value);}
 	catch(...){return *this == b.Value;}
 }
+bool Var::operator == (const Dice b)
+{
+	try{return Dice(Value) == b;}
+	catch(...){return false;}
+}
+bool Var::operator == (const Wallet b)
+{
+	return false;
+}
+bool Var::operator == (const Currency b)
+{
+	return false;
+}
+bool Var::operator == (const CurrencySystem b)
+{
+	return false;
+}
 bool Var::operator < (const int b)
 {
 	try{return std::stoi(Value) < b;}
@@ -538,6 +555,24 @@ bool Var::operator < (const Var b)
 {
 	try{return *this < std::stoi(b.Value);}
 	catch(...){return *this < b.Value;}
+
+}
+bool Var::operator < (const Dice b)
+{
+	try{return Dice(Value) < b;}
+	catch(...){return false;}
+}
+bool Var::operator < (const Wallet b)
+{
+	return false;
+}
+bool Var::operator < (const Currency b)
+{
+	return false;
+}
+bool Var::operator < (const CurrencySystem b)
+{
+	return false;
 }
 bool Var::operator > (const int b)
 {
@@ -553,17 +588,124 @@ bool Var::operator > (const Var b)
 	try{return *this > std::stoi(b.Value);}
 	catch(...){return *this > b.Value;}
 }
+bool Var::operator > (const Dice b)
+{
+	try{return Dice(Value) > b;}
+	catch(...){return false;}
+}
+bool Var::operator > (const Wallet b)
+{
+	return false;
+}
+bool Var::operator > (const Currency b)
+{
+	return false;
+}
+bool Var::operator > (const CurrencySystem b)
+{
+	return false;
+}
+bool Var::operator <= (const int b)
+{
+	Var lhs = *this;
+	return (lhs < b || lhs == b);
+}
+bool Var::operator <= (const std::string b)
+{
+	Var lhs = *this;
+	return (lhs < b || lhs == b);
+}
 bool Var::operator <= (const Var b)
 {
 	Var lhs = *this;
 	return (lhs < b || lhs == b);
+}
+bool Var::operator <= (const Dice b)
+{
+	Var lhs = *this;
+	return (lhs < b || lhs == b);
+}
+bool Var::operator <= (const Wallet b)
+{
+	Var lhs = *this;
+	return (lhs < b || lhs == b);
+}
+bool Var::operator <= (const Currency b)
+{
+	Var lhs = *this;
+	return (lhs < b || lhs == b);
+}
+bool Var::operator <= (const CurrencySystem b)
+{
+	Var lhs = *this;
+	return (lhs < b || lhs == b);
+}
+bool Var::operator >= (const int b)
+{
+	Var lhs = *this;
+	return (lhs > b || lhs == b);
+}
+bool Var::operator >= (const std::string b)
+{
+	Var lhs = *this;
+	return (lhs > b || lhs == b);
 }
 bool Var::operator >= (const Var b)
 {
 	Var lhs = *this;
 	return (lhs > b || lhs == b);
 }
+bool Var::operator >= (const Dice b)
+{
+	Var lhs = *this;
+	return (lhs > b || lhs == b);
+}
+bool Var::operator >= (const Wallet b)
+{
+	Var lhs = *this;
+	return (lhs > b || lhs == b);
+}
+bool Var::operator >= (const Currency b)
+{
+	Var lhs = *this;
+	return (lhs > b || lhs == b);
+}
+bool Var::operator >= (const CurrencySystem b)
+{
+	Var lhs = *this;
+	return (lhs > b || lhs == b);
+}
+bool Var::operator != (const int b)
+{
+	Var lhs = *this;
+	return !(lhs == b);
+}
+bool Var::operator != (const std::string b)
+{
+	Var lhs = *this;
+	return !(lhs == b);
+}
 bool Var::operator != (const Var b)
+{
+	Var lhs = *this;
+	return !(lhs == b);
+}
+bool Var::operator != (const Dice b)
+{
+	Var lhs = *this;
+	return !(lhs == b);
+}
+bool Var::operator != (const Wallet b)
+{
+	Var lhs = *this;
+	return !(lhs == b);
+}
+bool Var::operator != (const Currency b)
+{
+	Var lhs = *this;
+	return !(lhs == b);
+}
+bool Var::operator != (const CurrencySystem b)
 {
 	Var lhs = *this;
 	return !(lhs == b);
