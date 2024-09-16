@@ -124,6 +124,14 @@ void Currency::tryParseLarger(std::string* str, std::string fullstr)
 }
 
 Currency::Currency(){}
+Currency::Currency(const Currency& b)
+{
+	System = b.System;
+	Name = b.Name;
+	SmallerAmount = b.SmallerAmount;
+	Smaller = b.Smaller;
+	Larger = b.Larger;
+}
 Currency::Currency(std::string str)
 {
 	//FORMAT
@@ -238,7 +246,12 @@ Currency& Currency::operator = ([[maybe_unused]] const Wallet b)
 }
 Currency& Currency::operator = (const Currency b)
 {
-	*this = b;
+	System = b.System;
+	Name = b.Name;
+	SmallerAmount = b.SmallerAmount;
+	Smaller = b.Smaller;
+	Larger = b.Larger;
+
 	return *this;
 }
 Currency& Currency::operator = ([[maybe_unused]] const CurrencySystem b)
@@ -257,8 +270,8 @@ Currency& Currency::operator += (const std::string b)
 }
 Currency& Currency::operator += (const Var b)
 {
-	try{return *this + std::stoi(b.Value);}
-	catch(...){return *this + b.Value;}
+	try{return *this += std::stoi(b.Value);}
+	catch(...){return *this += b.Value;}
 }
 Currency& Currency::operator += ([[maybe_unused]] const Dice b)
 {
@@ -266,18 +279,20 @@ Currency& Currency::operator += ([[maybe_unused]] const Dice b)
 }
 Wallet& Currency::operator += (const Wallet b)
 {
-	b += *this;
+	Wallet lhs = *this;
+	b += lhs;
 	return b;
 }
 Wallet& Currency::operator += (const Currency b)
 {
-	return Wallet("w{"+std::string(*this)+","+"1"+","+std::string(b)+",1}");
+	Wallet lhs = *this;
+	return Wallet("w{"+std::string(lhs)+","+"1"+","+std::string(b)+",1}");
 }
 Currency& Currency::operator += ([[maybe_unused]] const CurrencySystem b)
 {
 	throw std::runtime_error("invalid_operation");
 }
-Currency& Currency::operator -= ([[maybe_unused]] const int b)
+Currency& Currency::operator -= (const int b)
 {
 	SmallerAmount -= b;
 	return *this;
@@ -288,8 +303,8 @@ Currency& Currency::operator -= ([[maybe_unused]] const std::string b)
 }
 Currency& Currency::operator -= (const Var b)
 {
-	try{return *this + std::stoi(b.Value);}
-	catch(...){return *this + b.Value;}
+	try{return *this -= std::stoi(b.Value);}
+	catch(...){return *this -= b.Value;}
 }
 Currency& Currency::operator -= ([[maybe_unused]] const Dice b)
 {
@@ -309,7 +324,8 @@ Currency& Currency::operator -= ([[maybe_unused]] const CurrencySystem b)
 }
 Wallet& Currency::operator *= (const int b)
 {
-	return Wallet("w{"+std::string(*this)+","+std::to_string(b)+"}");
+	Wallet lhs = *this;
+	return Wallet("w{"+std::string(lhs)+","+std::to_string(b)+"}");
 }
 Currency& Currency::operator *= ([[maybe_unused]] const std::string b)
 {
@@ -317,8 +333,8 @@ Currency& Currency::operator *= ([[maybe_unused]] const std::string b)
 }
 Currency& Currency::operator *= (const Var b)
 {
-	try{return *this + std::stoi(b.Value);}
-	catch(...){return *this + b.Value;}
+	try{return *this *= std::stoi(b.Value);}
+	catch(...){return *this *= b.Value;}
 }
 Currency& Currency::operator *= ([[maybe_unused]] const Dice b)
 {
@@ -346,8 +362,8 @@ Currency& Currency::operator /= ([[maybe_unused]] const std::string b)
 }
 Currency& Currency::operator /= (const Var b)
 {
-	try{return *this + std::stoi(b.Value);}
-	catch(...){return *this + b.Value;}
+	try{return *this /= std::stoi(b.Value);}
+	catch(...){return *this /= b.Value;}
 }
 Currency& Currency::operator /= ([[maybe_unused]] const Dice b)
 {
@@ -868,6 +884,44 @@ Currency& Currency::operator -- (int)
 	throw std::runtime_error("invalid_operation");
 }
 
+CurrencySystem::CurrencySystem(){}
+CurrencySystem::CurrencySystem(const CurrencySystem& b)
+{
+	Name = b.Name;
+	Denomination = b.Denomination;
+	transaction = b.transaction;
+}
+CurrencySystem::CurrencySystem(std::string str)
+{
+	std::string s(1,CURRENCYSYSTEM_SIGIL);
+
+	//If second character isn't a '{', this isn't an explicit constructor, so just treat it as a normal value
+	if(str[1] != '{')
+	{
+		Name = str;
+		exit(-1);
+	}
+
+	//Make sure first character is 's'
+	if(str[0] != CURRENCYSYSTEM_SIGIL)
+	{
+		output(Error,"Incorrect data type specifier sigil for currency system explicit constructor.");
+		exit(-1);
+	}
+
+	//Check for end of explicit constructor definition
+	if(str.find("}") == std::string::npos)
+	{
+		output(Error,"Missing terminating \'}\' for currency system explicit constructor.");
+		exit(-1);
+	}
+
+	if(str.substr(0,2) == (s+"{") && str.find("}") != std::string::npos)// Explicit constructor
+	{
+		Name = str.substr(2,str.find("}")-2);
+	}
+}
+
 CurrencySystem::operator std::string() const
 {
 	return std::string(1,CURRENCYSYSTEM_SIGIL)+"{"+Name+"}";
@@ -888,9 +942,12 @@ CurrencySystem& CurrencySystem::operator = ([[maybe_unused]] const std::string b
 {
 	throw std::runtime_error("invalid_operation");
 }
-CurrencySystem& CurrencySystem::operator = (const Var b)
+CurrencySystem& CurrencySystem::operator = (Var b)
 {
-	throw std::runtime_error("invalid_operation");
+	try{return *this = std::stoi(b.Value);}
+	catch(...){return *this = b.Value;}
+
+	return *this;
 }
 CurrencySystem& CurrencySystem::operator = ([[maybe_unused]] const Dice b)
 {
@@ -925,6 +982,8 @@ CurrencySystem& CurrencySystem::operator += (const Var b)
 {
 	try{*this += std::stoi(b.Value);}
 	catch(...){*this += b.Value;}
+
+	return *this;
 }
 CurrencySystem& CurrencySystem::operator += ([[maybe_unused]] const Dice b)
 {
@@ -997,7 +1056,10 @@ CurrencySystem& CurrencySystem::operator *= ([[maybe_unused]] const std::string 
 }
 CurrencySystem& CurrencySystem::operator *= (const Var b)
 {
-	throw std::runtime_error("invalid_operation");
+	try{return *this *= std::stoi(b.Value);}
+	catch(...){return *this *= b.Value;}
+
+	return *this;
 }
 CurrencySystem& CurrencySystem::operator *= ([[maybe_unused]] const Dice b)
 {
@@ -1025,7 +1087,10 @@ CurrencySystem& CurrencySystem::operator /= ([[maybe_unused]] const std::string 
 }
 CurrencySystem& CurrencySystem::operator /= (const Var b)
 {
-	throw std::runtime_error("invalid_operation");
+	try{return *this /= std::stoi(b.Value);}
+	catch(...){return *this /= b.Value;}
+
+	return *this;
 }
 CurrencySystem& CurrencySystem::operator /= ([[maybe_unused]] const Dice b)
 {
@@ -1053,7 +1118,10 @@ CurrencySystem& CurrencySystem::operator ^= ([[maybe_unused]] const std::string 
 }
 CurrencySystem& CurrencySystem::operator ^= (const Var b)
 {
-	throw std::runtime_error("invalid_operation");
+	try{return *this ^= std::stoi(b.Value);}
+	catch(...){return *this ^= b.Value;}
+
+	return *this;
 }
 CurrencySystem& CurrencySystem::operator ^= ([[maybe_unused]] const Dice b)
 {
@@ -1081,7 +1149,10 @@ CurrencySystem& CurrencySystem::operator %= ([[maybe_unused]] const std::string 
 }
 CurrencySystem& CurrencySystem::operator %= (const Var b)
 {
-	throw std::runtime_error("invalid_operation");
+	try{return *this %= std::stoi(b.Value);}
+	catch(...){return *this %= b.Value;}
+
+	return *this;
 }
 CurrencySystem& CurrencySystem::operator %= ([[maybe_unused]] const Dice b)
 {
@@ -1505,38 +1576,6 @@ std::map<std::string, Currency>::const_iterator CurrencySystem::end() const
 	return Denomination.end();
 }
 
-CurrencySystem::CurrencySystem(){}
-CurrencySystem::CurrencySystem(std::string str)
-{
-	std::string s(1,CURRENCYSYSTEM_SIGIL);
-
-	//If second character isn't a '{', this isn't an explicit constructor, so just treat it as a normal value
-	if(str[1] != '{')
-	{
-		Name = str;
-		exit(-1);
-	}
-
-	//Make sure first character is 's'
-	if(str[0] != CURRENCYSYSTEM_SIGIL)
-	{
-		output(Error,"Incorrect data type specifier sigil for currency system explicit constructor.");
-		exit(-1);
-	}
-
-	//Check for end of explicit constructor definition
-	if(str.find("}") == std::string::npos)
-	{
-		output(Error,"Missing terminating \'}\' for currency system explicit constructor.");
-		exit(-1);
-	}
-
-	if(str.substr(0,2) == (s+"{") && str.find("}") != std::string::npos)// Explicit constructor
-	{
-		Name = str.substr(2,str.find("}")-2);
-	}
-}
-
 bool Wallet::HasEffectivelyAtLeast(int q, Currency c)
 {
 	int total = Money[c];
@@ -1552,31 +1591,32 @@ bool Wallet::HasEffectivelyAtLeast(int q, Currency c)
 
 	return total >= q;
 }
-unsigned int Wallet::getEquivalentValueInLowestDenomination(CurrencySystem system)
+unsigned int Wallet::getEquivalentValueInLowestDenomination(CurrencySystem CS)
 {
-	Currency smallest = Currency();
+	Currency current_denomination = Currency();
 	unsigned int total = 0;
 	unsigned int totalFactor = 1;
 
 	//Get smallest Currency
-	for(const auto& c : system.Denomination)
+	for(const auto& [s,c] : CS.Denomination)
 	{
 		if(c.Smaller == "")
 		{
-			smallest = c;
+			current_denomination = c;
 			break;
 		}
 	}
 
 	//Get total
-	while(c.Larger != "")
+	while(current_denomination.Larger != "")
 	{
-		c = c.system.Denomination[c.Larger];
+		if(current_denomination.SmallerAmount > 0)
+			totalFactor *= current_denomination.SmallerAmount;
 
-		totalFactor *= c.SmallerAmount;
+		if(Money[current_denomination])
+			total += Money[current_denomination] * totalFactor;
 
-		if(Money[c])
-			total += Money[c] * totalFactor;
+		current_denomination = current_denomination.System.Denomination[current_denomination.Larger];
 	}
 
 	return total;
@@ -1662,6 +1702,11 @@ std::map<Currency, int>::const_iterator Wallet::end() const
 }
 
 Wallet::Wallet(){}
+Wallet::Wallet(const Wallet& b)
+{
+	Money = b.Money;
+	transaction = b.transaction;
+}
 Wallet::Wallet(const money_t m)
 {
 	Currency c = m.first;
@@ -1761,7 +1806,6 @@ const char* Wallet::c_str() const
 {
 	return std::string(*this).c_str();
 }
-
 Wallet& Wallet::operator = ([[maybe_unused]] const int b)
 {
 	throw std::runtime_error("invalid_operation");
@@ -1790,9 +1834,11 @@ Wallet& Wallet::operator = ([[maybe_unused]] const Dice b)
 {
 	throw std::runtime_error("invalid_operation");
 }
-Wallet& Wallet::operator = ([[maybe_unused]] const Wallet b)
+Wallet& Wallet::operator = (const Wallet b)
 {
-	*this = b;
+	Money = b.Money;
+	transaction = b.transaction;
+
 	return *this;
 }
 Wallet& Wallet::operator = (const Currency b)
@@ -1915,12 +1961,12 @@ Wallet& Wallet::operator -= (const Wallet b)
 		*this -= money_t(c,q);
 	return *this;
 }
-Wallet& Wallet::operator += (const Currency b)
+Wallet& Wallet::operator -= (const Currency b)
 {
 	if(Money[b]) Money[b]--;
 	return *this;
 }
-Wallet& Wallet::operator += ([[maybe_unused]] const CurrencySystem b)
+Wallet& Wallet::operator -= ([[maybe_unused]] const CurrencySystem b)
 {
 	throw std::runtime_error("invalid_operation");
 }
@@ -2062,7 +2108,7 @@ Wallet& Wallet::operator ^= ([[maybe_unused]] const CurrencySystem b)
 Wallet& Wallet::operator %= (const int b)
 {
 	for(auto& [c,q] : Money)
-		c %= b;
+		q %= b;
 
 	return *this;
 }
@@ -2362,7 +2408,7 @@ bool Wallet::operator == (const Wallet& b) const
 bool Wallet::operator == (const Currency& b) const
 {
 	Wallet w = Wallet(std::string(1,WALLET_SIGIL)+"{"+std::string(b)+",1}");
-	return getWalletValue(*this) == getWalletValue(b);
+	return getWalletValue(*this) == getWalletValue(w);
 }
 bool Wallet::operator == ([[maybe_unused]] const CurrencySystem& b) const
 {
@@ -2392,7 +2438,7 @@ bool Wallet::operator < (const Wallet& b) const
 bool Wallet::operator < (const Currency& b) const
 {
 	Wallet w = Wallet(std::string(1,WALLET_SIGIL)+"{"+std::string(b)+",1}");
-	return getWalletValue(*this) < getWalletValue(b);
+	return getWalletValue(*this) < getWalletValue(w);
 }
 bool Wallet::operator < ([[maybe_unused]] const CurrencySystem& b) const
 {
@@ -2422,7 +2468,7 @@ bool Wallet::operator > (const Wallet& b) const
 bool Wallet::operator > ([[maybe_unused]] const Currency& b) const
 {
 	Wallet w = Wallet(std::string(1,WALLET_SIGIL)+"{"+std::string(b)+",1}");
-	return getWalletValue(*this) > getWalletValue(b);
+	return getWalletValue(*this) > getWalletValue(w);
 }
 bool Wallet::operator > ([[maybe_unused]] const CurrencySystem& b) const
 {
@@ -2434,7 +2480,7 @@ bool Wallet::operator <= (const int& b) const
 }
 bool Wallet::operator <= (const std::string& b) const
 {
-	return false;
+	return *this < b || *this == b;
 }
 bool Wallet::operator <= (const Var& b) const
 {
@@ -2443,7 +2489,7 @@ bool Wallet::operator <= (const Var& b) const
 }
 bool Wallet::operator <= (const Dice& b) const
 {
-	return false;
+	return *this < b || *this == b;
 }
 bool Wallet::operator <= (const Wallet& b) const
 {
@@ -2451,19 +2497,19 @@ bool Wallet::operator <= (const Wallet& b) const
 }
 bool Wallet::operator <= (const Currency& b) const
 {
-	return false;
+	return *this < b || *this == b;
 }
 bool Wallet::operator <= (const CurrencySystem& b) const
 {
-	return false;
+	return *this < b || *this == b;
 }
 bool Wallet::operator >= (const int& b) const
 {
-	return false;
+	return *this < b || *this == b;
 }
 bool Wallet::operator >= (const std::string& b) const
 {
-	return false;
+	return *this < b || *this == b;
 }
 bool Wallet::operator >= (const Var& b) const
 {
@@ -2472,7 +2518,7 @@ bool Wallet::operator >= (const Var& b) const
 }
 bool Wallet::operator >= (const Dice& b) const
 {
-	return false;
+	return *this < b || *this == b;
 }
 bool Wallet::operator >= (const Wallet& b) const
 {
@@ -2480,11 +2526,11 @@ bool Wallet::operator >= (const Wallet& b) const
 }
 bool Wallet::operator >= (const Currency& b) const
 {
-	return false;
+	return *this < b || *this == b;
 }
 bool Wallet::operator >= (const CurrencySystem& b) const
 {
-	return false;
+	return *this < b || *this == b;
 }
 bool Wallet::operator != (const int& b) const
 {

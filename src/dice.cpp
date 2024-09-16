@@ -106,6 +106,13 @@ int Dice::get_value(std::string d, std::string value, long unsigned int start, s
 }
 
 Dice::Dice(){}
+Dice(const Dice& b)
+{
+	Quantity = b.Quantity;
+	Faces = b.Faces;
+	Modifier = b.Modifier;
+	List = b.List;
+}
 Dice::Dice(std::string dice_str)
 {
 	//

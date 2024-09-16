@@ -3,10 +3,6 @@
 #include "../headers/output.h"
 #include "../headers/var.h"
 
-Var::Var(const Var& b)
-{
-	Value = b.Value;
-}
 Var::operator std::string() const
 {
 	return std::string(1,VAR_SIGIL)+"{"+Value+"}";
@@ -18,6 +14,10 @@ const char* Var::c_str() const
 Var::operator int() const
 {
 	return std::stoi(Value);
+}
+Var::Var(const Var& b)
+{
+	Value = b.Value;
 }
 Var& Var::operator = (const int b)
 {

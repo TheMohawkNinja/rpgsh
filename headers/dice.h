@@ -27,6 +27,7 @@ class Dice
 		std::string	List		=	"";
 
 	Dice();
+	Dice(const Dice& b);
 	Dice(std::string dice_str);
 	Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier);
 	Dice(std::string dice_str, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count);

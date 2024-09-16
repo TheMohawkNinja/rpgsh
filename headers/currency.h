@@ -36,6 +36,7 @@ class Currency
 
 	public:
 	Currency();
+	Currency(const Currency& b);
 	Currency(std::string str);
 	Currency(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
 	Currency(std::shared_ptr<CurrencySystem> _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
@@ -185,6 +186,10 @@ class CurrencySystem
 		datamap<Currency> Denomination;
 		Currency transaction = Currency();
 
+	CurrencySystem();
+	CurrencySystem(const CurrencySystem& b);
+	CurrencySystem(std::string str);
+
 	explicit operator std::string() const;
 	const char* c_str() const;
 
@@ -333,9 +338,6 @@ class CurrencySystem
 	std::map<std::string, Currency>::const_iterator begin() const;
 	std::map<std::string, Currency>::const_iterator end() const;
 
-	CurrencySystem();
-	CurrencySystem(std::string str);
-
 	void MakeChange(Currency c, Wallet* w);
 	void TradeUp(std::shared_ptr<CurrencySystem> S, Wallet* w);
 	bool HasEquivalentTo(int Quantity, std::string Denomination);
@@ -367,16 +369,16 @@ class Wallet
 	std::map<Currency, int>::const_iterator end() const;
 
 	Wallet();
+	Wallet(const Wallet& b);
 	Wallet(const money_t m);
 	Wallet(std::string s);
-
 	Wallet& operator = ([[maybe_unused]] const int b);
 	Wallet& operator = ([[maybe_unused]] const std::string b);
 	Wallet& operator = (const money_t b);
 	Wallet& operator = (const Var b);
 	Wallet& operator = ([[maybe_unused]] const Dice b);
-	Wallet& operator = ([[maybe_unused]] const Wallet b);
-	Wallet& operator = ([[maybe_unused]] const Currency b);
+	Wallet& operator = (const Wallet b);
+	Wallet& operator = (const Currency b);
 	Wallet& operator = ([[maybe_unused]] const CurrencySystem b);
 	Wallet& operator += ([[maybe_unused]] const int b);
 	Wallet& operator += ([[maybe_unused]] const std::string b);
