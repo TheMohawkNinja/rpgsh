@@ -54,8 +54,8 @@ class Currency
 	Currency& operator += ([[maybe_unused]] const std::string b);
 	Currency& operator += (const Var b);
 	Currency& operator += ([[maybe_unused]] const Dice b);
-	Wallet& operator += (const Wallet b);
-	Wallet& operator += (const Currency b);
+	Wallet operator += (const Wallet b);
+	Wallet operator += (const Currency b);
 	Currency& operator += ([[maybe_unused]] const CurrencySystem b);
 	Currency& operator -= (const int b);
 	Currency& operator -= ([[maybe_unused]] const std::string b);
@@ -64,9 +64,9 @@ class Currency
 	Currency& operator -= ([[maybe_unused]] const Wallet b);
 	Currency& operator -= ([[maybe_unused]] const Currency b);
 	Currency& operator -= ([[maybe_unused]] const CurrencySystem b);
-	Wallet& operator *= (const int b);
-	Currency& operator *= ([[maybe_unused]] const std::string b);
-	Currency& operator *= (const Var b);
+	Wallet operator *= (const int b);
+	Wallet operator *= ([[maybe_unused]] const std::string b);
+	Wallet operator *= (const Var b);
 	Currency& operator *= ([[maybe_unused]] const Dice b);
 	Currency& operator *= ([[maybe_unused]] const Wallet b);
 	Currency& operator *= ([[maybe_unused]] const Currency b);
@@ -107,8 +107,8 @@ class Currency
 	Currency operator - (const Currency b);
 	Currency operator - (const CurrencySystem b);
 	Wallet operator * (const int b);
-	Currency operator * (const std::string b);
-	Currency operator * (const Var b);
+	Wallet operator * (const std::string b);
+	Wallet operator * (const Var b);
 	Currency operator * (const Dice b);
 	Currency operator * (const Wallet b);
 	Currency operator * (const Currency b);

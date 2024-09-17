@@ -277,15 +277,16 @@ Currency& Currency::operator += ([[maybe_unused]] const Dice b)
 {
 	throw std::runtime_error("invalid_operation");
 }
-Wallet& Currency::operator += (const Wallet b)
+Wallet Currency::operator += (const Wallet b)
 {
-	Wallet lhs = *this;
-	b += lhs;
-	return b;
+	Wallet lhs = Wallet(std::string(1,WALLET_SIGIL)+"{"+std::string(*this)+",1}");
+	Wallet rhs = b;
+
+	return (lhs + rhs);
 }
-Wallet& Currency::operator += (const Currency b)
+Wallet Currency::operator += (const Currency b)
 {
-	Wallet lhs = *this;
+	Currency lhs = *this;
 	return Wallet("w{"+std::string(lhs)+","+"1"+","+std::string(b)+",1}");
 }
 Currency& Currency::operator += ([[maybe_unused]] const CurrencySystem b)
@@ -322,16 +323,16 @@ Currency& Currency::operator -= ([[maybe_unused]] const CurrencySystem b)
 {
 	throw std::runtime_error("invalid_operation");
 }
-Wallet& Currency::operator *= (const int b)
+Wallet Currency::operator *= (const int b)
 {
-	Wallet lhs = *this;
+	Currency lhs = *this;
 	return Wallet("w{"+std::string(lhs)+","+std::to_string(b)+"}");
 }
-Currency& Currency::operator *= ([[maybe_unused]] const std::string b)
+Wallet Currency::operator *= ([[maybe_unused]] const std::string b)
 {
 	throw std::runtime_error("invalid_operation");
 }
-Currency& Currency::operator *= (const Var b)
+Wallet Currency::operator *= (const Var b)
 {
 	try{return *this *= std::stoi(b.Value);}
 	catch(...){return *this *= b.Value;}
@@ -489,37 +490,37 @@ Currency Currency::operator - (const Var b)
 	Currency lhs = *this;
 	return (lhs -= b);
 }
-Currency Currency::operator - ([[maybe_unused]] const Dice b)
+Currency Currency::operator - (const Dice b)
 {
 	Currency lhs = *this;
 	return (lhs -= b);
 }
-Currency Currency::operator - ([[maybe_unused]] const Wallet b)
+Currency Currency::operator - (const Wallet b)
 {
 	Currency lhs = *this;
 	return (lhs -= b);
 }
-Currency Currency::operator - ([[maybe_unused]] const Currency b)
+Currency Currency::operator - (const Currency b)
 {
 	Currency lhs = *this;
 	return (lhs -= b);
 }
-Currency Currency::operator - ([[maybe_unused]] const CurrencySystem b)
+Currency Currency::operator - (const CurrencySystem b)
 {
 	Currency lhs = *this;
 	return (lhs -= b);
 }
-Wallet Currency::operator * ([[maybe_unused]] const int b)
+Wallet Currency::operator * (const int b)
 {
 	Currency lhs = *this;
 	return (lhs *= b);
 }
-Currency Currency::operator * ([[maybe_unused]] const std::string b)
+Wallet Currency::operator * (const std::string b)
 {
 	Currency lhs = *this;
 	return (lhs *= b);
 }
-Currency Currency::operator * (const Var b)
+Wallet Currency::operator * (const Var b)
 {
 	Currency lhs = *this;
 	return (lhs *= b);
@@ -1616,7 +1617,7 @@ unsigned int Wallet::getEquivalentValueInLowestDenomination(CurrencySystem CS)
 		if(Money[current_denomination])
 			total += Money[current_denomination] * totalFactor;
 
-		current_denomination = current_denomination.System.Denomination[current_denomination.Larger];
+		current_denomination = current_denomination.System->Denomination[current_denomination.Larger];
 	}
 
 	return total;
