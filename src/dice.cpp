@@ -106,7 +106,7 @@ int Dice::get_value(std::string d, std::string value, long unsigned int start, s
 }
 
 Dice::Dice(){}
-Dice(const Dice& b)
+Dice::Dice(const Dice& b)
 {
 	Quantity = b.Quantity;
 	Faces = b.Faces;
@@ -309,26 +309,22 @@ Dice& Dice::operator += (const int b)
 }
 Dice& Dice::operator += (const std::string b)
 {
-	Dice lhs = *this;
+	try{*this += Dice(b);}
+	catch(...){List += b;}
 
-	try{lhs += Dice(b);}
-	catch(...){lhs.List += b;}
-
-	return lhs;
+	return *this;
 }
 Dice& Dice::operator += (const Var b)
 {
-	Dice lhs = *this;
+	try{*this += std::stoi(b.Value);}
+	catch(...){*this += b.Value;}
 
-	try{lhs += std::stoi(b.Value);}
-	catch(...){lhs += b.Value;}
-
-	return lhs;
+	return *this;
 }
 Dice& Dice::operator += (const Dice b)
 {
-	if(Faces == rhs.Faces)
-		Quantity += rhs.Quantity;
+	if(Faces == b.Faces)
+		Quantity += b.Quantity;
 	else
 		throw std::runtime_error("invalid_operation");
 
@@ -353,26 +349,22 @@ Dice& Dice::operator -= (const int b)
 }
 Dice& Dice::operator -= ([[maybe_unused]] const std::string b)
 {
-	Dice lhs = *this;
-
-	try{lhs -= Dice(b);}
+	try{*this -= Dice(b);}
 	catch(...){throw std::runtime_error("invalid_operation");}
 
-	return lhs;
+	return *this;
 }
 Dice& Dice::operator -= (const Var b)
 {
-	Dice lhs = *this;
+	try{*this -= std::stoi(b.Value);}
+	catch(...){*this -= b.Value;}
 
-	try{lhs -= std::stoi(b.Value);}
-	catch(...){lhs -= b.Value;}
-
-	return lhs;
+	return *this;
 }
 Dice& Dice::operator -= (const Dice b)
 {
-	if(Faces == rhs.Faces)
-		Quantity -= rhs.Quantity;
+	if(Faces == b.Faces)
+		Quantity -= b.Quantity;
 	else
 		throw std::runtime_error("invalid_operation");
 
@@ -401,12 +393,10 @@ Dice& Dice::operator *= ([[maybe_unused]] const std::string b)
 }
 Dice& Dice::operator *= (const Var b)
 {
-	Dice lhs = *this;
+	try{*this *= std::stoi(b.Value);}
+	catch(...){*this *= b.Value;}
 
-	try{lhs *= std::stoi(b.Value);}
-	catch(...){lhs *= b.Value;}
-
-	return lhs;
+	return *this;
 }
 Dice& Dice::operator *= ([[maybe_unused]] const Dice b)
 {
@@ -435,7 +425,10 @@ Dice& Dice::operator /= ([[maybe_unused]] const std::string b)
 }
 Dice& Dice::operator /= (const Var b)
 {
-	throw std::runtime_error("invalid_operation");
+	try{*this /= std::stoi(b.Value);}
+	catch(...){*this /= b.Value;}
+
+	return *this;
 }
 Dice& Dice::operator /= ([[maybe_unused]] const Dice b)
 {
@@ -463,7 +456,10 @@ Dice& Dice::operator ^= ([[maybe_unused]] const std::string b)
 }
 Dice& Dice::operator ^= (const Var b)
 {
-	throw std::runtime_error("invalid_operation");
+	try{*this ^= std::stoi(b.Value);}
+	catch(...){*this ^= b.Value;}
+
+	return *this;
 }
 Dice& Dice::operator ^= ([[maybe_unused]] const Dice b)
 {
@@ -492,7 +488,10 @@ Dice& Dice::operator %= ([[maybe_unused]] const std::string b)
 }
 Dice& Dice::operator %= (const Var b)
 {
-	throw std::runtime_error("invalid_operation");
+	try{*this %= std::stoi(b.Value);}
+	catch(...){*this %= b.Value;}
+
+	return *this;
 }
 Dice& Dice::operator %= ([[maybe_unused]] const Dice b)
 {
@@ -617,37 +616,37 @@ Dice Dice::operator * (const CurrencySystem b)
 }
 Dice Dice::operator / (const int b)
 {
-	Dice lhs = /this;
+	Dice lhs = *this;
 	return (lhs /= b);
 }
 Dice Dice::operator / (const std::string b)
 {
-	Dice lhs = /this;
+	Dice lhs = *this;
 	return (lhs /= b);
 }
 Dice Dice::operator / (const Var b)
 {
-	Dice lhs = /this;
+	Dice lhs = *this;
 	return (lhs /= b);
 }
 Dice Dice::operator / (const Dice b)
 {
-	Dice lhs = /this;
+	Dice lhs = *this;
 	return (lhs /= b);
 }
 Dice Dice::operator / (const Wallet b)
 {
-	Dice lhs = /this;
+	Dice lhs = *this;
 	return (lhs /= b);
 }
 Dice Dice::operator / (const Currency b)
 {
-	Dice lhs = /this;
+	Dice lhs = *this;
 	return (lhs /= b);
 }
 Dice Dice::operator / (const CurrencySystem b)
 {
-	Dice lhs = /this;
+	Dice lhs = *this;
 	return (lhs /= b);
 }
 Dice Dice::operator ^ (const int b)
