@@ -1,3 +1,4 @@
+#include <cassert>
 #include <cstdarg>
 #include <fcntl.h>
 #include <map>
@@ -386,16 +387,18 @@ unsigned int getWalletValue(Wallet w)
 
 	for(const auto& [c,q] : w.Money)
 	{
-		if(findInStringVect(systems,c.System) != -1)
+		if(findInStrVect(systems,c.System->Name) != -1)
 		{
 			systems.push_back(c.System->Name);
-			total += w.getEquivalentValueInLowestDenomination(c.System);
+			total += w.getEquivalentValueInLowestDenomination(*c.System);
 		}
 	}
 
 	return total;
 }
 
+template<>//Forward definition for <Dice,Dice> due to it being called before being defined.
+bool approxEquals<Dice,Dice>(Dice lhs, Dice rhs);
 template<>
 bool approxEquals<Var,int>(Var lhs, int rhs)
 {
@@ -408,15 +411,15 @@ bool approxEquals<Var,std::string>(Var lhs, std::string rhs)
 	bool rhs_is_int = false;
 	try{std::stoi(lhs.Value); lhs_is_int = true;}
 	catch(...){}
-	try{std::stoi(rhs.Value); rhs_is_int = true;}
+	try{std::stoi(rhs); rhs_is_int = true;}
 	catch(...){}
 
 	if(lhs_is_int && rhs_is_int)
-		return std::stoi(lhs.Value) == std::stoi(rhs.Value);
-	else if(lhs_is_int && !rhs_is_int || !lhs_is_int && rhs_is_int)
+		return std::stoi(lhs.Value) == std::stoi(rhs);
+	else if((lhs_is_int && !rhs_is_int) || (!lhs_is_int && rhs_is_int))
 		return false;
 	else
-		return stringcasecmp(lhs.Value,rhs.Value);
+		return stringcasecmp(lhs.Value,rhs);
 }
 template<>
 bool approxEquals<Var,Var>(Var lhs, Var rhs)
@@ -430,22 +433,22 @@ bool approxEquals<Var,Dice>(Var lhs, Dice rhs)
 	catch(...){return false;}
 }
 template<>
-bool approxEquals<Var,Currency>(Var lhs, Currency rhs)
+bool approxEquals<Var,Currency>([[maybe_unused]]Var lhs, [[maybe_unused]]Currency rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<Var,CurrencySystem>(Var lhs, CurrencySystem rhs)
+bool approxEquals<Var,CurrencySystem>([[maybe_unused]]Var lhs, [[maybe_unused]]CurrencySystem rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<Var,Wallet>(Var lhs, Wallet rhs)
+bool approxEquals<Var,Wallet>([[maybe_unused]]Var lhs, [[maybe_unused]]Wallet rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<Dice,int>(Dice lhs, int rhs)
+bool approxEquals<Dice,int>([[maybe_unused]]Dice lhs, [[maybe_unused]]int rhs)
 {
 	return false;
 }
@@ -470,37 +473,37 @@ bool approxEquals<Dice,Dice>(Dice lhs, Dice rhs)
 		return lhs.Faces == rhs.Faces;
 }
 template<>
-bool approxEquals<Dice,Currency>(Dice lhs, Currency rhs)
+bool approxEquals<Dice,Currency>([[maybe_unused]]Dice lhs, [[maybe_unused]]Currency rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<Dice,CurrencySystem>(Dice lhs, CurrencySystem rhs)
+bool approxEquals<Dice,CurrencySystem>([[maybe_unused]]Dice lhs, [[maybe_unused]]CurrencySystem rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<Dice,Wallet>(Dice lhs, Wallet rhs)
+bool approxEquals<Dice,Wallet>([[maybe_unused]]Dice lhs, [[maybe_unused]]Wallet rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<Currency,int>(Currency lhs, int rhs)
+bool approxEquals<Currency,int>([[maybe_unused]]Currency lhs, [[maybe_unused]]int rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<Currency,std::string>(Currency lhs, std::string rhs)
+bool approxEquals<Currency,std::string>([[maybe_unused]]Currency lhs, [[maybe_unused]]std::string rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<Currency,Var>(Currency lhs, Var rhs)
+bool approxEquals<Currency,Var>([[maybe_unused]]Currency lhs, [[maybe_unused]]Var rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<Currency,Dice>(Currency lhs, Dice rhs)
+bool approxEquals<Currency,Dice>([[maybe_unused]]Currency lhs, [[maybe_unused]]Dice rhs)
 {
 	return false;
 }
@@ -510,37 +513,37 @@ bool approxEquals<Currency,Currency>(Currency lhs, Currency rhs)
 	return lhs.System == rhs.System;
 }
 template<>
-bool approxEquals<Currency,CurrencySystem>(Currency lhs, CurrencySystem rhs)
+bool approxEquals<Currency,CurrencySystem>([[maybe_unused]]Currency lhs, [[maybe_unused]]CurrencySystem rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<Currency,Wallet>(Currency lhs, Wallet rhs)
+bool approxEquals<Currency,Wallet>([[maybe_unused]]Currency lhs, [[maybe_unused]]Wallet rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<CurrencySystem,int>(CurrencySystem lhs, int rhs)
+bool approxEquals<CurrencySystem,int>([[maybe_unused]]CurrencySystem lhs, [[maybe_unused]]int rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<CurrencySystem,std::string>(CurrencySystem lhs, std::string rhs)
+bool approxEquals<CurrencySystem,std::string>([[maybe_unused]]CurrencySystem lhs, [[maybe_unused]]std::string rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<CurrencySystem,Var>(CurrencySystem lhs, Var rhs)
+bool approxEquals<CurrencySystem,Var>([[maybe_unused]]CurrencySystem lhs, [[maybe_unused]]Var rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<CurrencySystem,Dice>(CurrencySystem lhs, Dice rhs)
+bool approxEquals<CurrencySystem,Dice>([[maybe_unused]]CurrencySystem lhs, [[maybe_unused]]Dice rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<CurrencySystem,Currency>(CurrencySystem lhs, Currency rhs)
+bool approxEquals<CurrencySystem,Currency>([[maybe_unused]]CurrencySystem lhs, [[maybe_unused]]Currency rhs)
 {
 	return false;
 }
@@ -550,27 +553,27 @@ bool approxEquals<CurrencySystem,CurrencySystem>(CurrencySystem lhs, CurrencySys
 	return lhs == rhs;
 }
 template<>
-bool approxEquals<CurrencySystem,Wallet>(CurrencySystem lhs, Wallet rhs)
+bool approxEquals<CurrencySystem,Wallet>([[maybe_unused]]CurrencySystem lhs, [[maybe_unused]]Wallet rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<Wallet,int>(Wallet lhs, int rhs)
+bool approxEquals<Wallet,int>([[maybe_unused]]Wallet lhs, [[maybe_unused]]int rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<Wallet,std::string>(Wallet lhs, std::string rhs)
+bool approxEquals<Wallet,std::string>([[maybe_unused]]Wallet lhs, [[maybe_unused]]std::string rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<Wallet,Var>(Wallet lhs, Var rhs)
+bool approxEquals<Wallet,Var>([[maybe_unused]]Wallet lhs, [[maybe_unused]]Var rhs)
 {
 	return false;
 }
 template<>
-bool approxEquals<Wallet,Dice>(Wallet lhs, Dice rhs)
+bool approxEquals<Wallet,Dice>([[maybe_unused]]Wallet lhs, [[maybe_unused]]Dice rhs)
 {
 	return false;
 }
@@ -589,7 +592,7 @@ bool approxEquals<Wallet,CurrencySystem>(Wallet lhs, CurrencySystem rhs)
 {
 	for(const auto& [c,q] : lhs)
 	{
-		if(c.System == rhs)
+		if(*c.System == rhs)
 			return true;
 	}
 	return lhs == rhs;
