@@ -66,8 +66,8 @@ Var& Var::operator += (const std::string b)
 }
 Var& Var::operator += (const Var b)
 {
-	try{Value += std::stoi(b.Value);}
-	catch(...){Value += b.Value;}
+	try{*this += std::stoi(b.Value);}
+	catch(...){*this += b.Value;}
 
 	return *this;
 }
@@ -100,8 +100,8 @@ Var& Var::operator -= ([[maybe_unused]] const std::string b)
 }
 Var& Var::operator -= (const Var b)
 {
-	try{Value -= std::stoi(b.Value);}
-	catch(...){Value -= b.Value;}
+	try{*this -= std::stoi(b.Value);}
+	catch(...){*this -= b.Value;}
 
 	return *this;
 }
@@ -145,8 +145,8 @@ Var& Var::operator *= ([[maybe_unused]] const std::string b)
 }
 Var& Var::operator *= (const Var b)
 {
-	try{Value *= std::stoi(b.Value);}
-	catch(...){Value *= b.Value;}
+	try{*this *= std::stoi(b.Value);}
+	catch(...){*this *= b.Value;}
 
 	return *this;
 }
@@ -179,8 +179,8 @@ Var& Var::operator /= ([[maybe_unused]] const std::string b)
 }
 Var& Var::operator /= (const Var b)
 {
-	try{Value /= std::stoi(b.Value);}
-	catch(...){Value /= b.Value;}
+	try{*this /= std::stoi(b.Value);}
+	catch(...){*this /= b.Value;}
 
 	return *this;
 }
@@ -202,7 +202,7 @@ Var& Var::operator /= ([[maybe_unused]] const CurrencySystem b)
 }
 Var& Var::operator ^= (const int b)
 {
-	try{std::stoi(Value) ^= b;}
+	try{Value = std::stoi(Value) ^ b;}
 	catch(...){throw std::runtime_error("invalid_operation");}
 
 	return *this;
@@ -213,8 +213,8 @@ Var& Var::operator ^= ([[maybe_unused]] const std::string b)
 }
 Var& Var::operator ^= (const Var b)
 {
-	try{Value ^= std::stoi(b.Value);}
-	catch(...){Value ^= b.Value;}
+	try{*this ^= std::stoi(b.Value);}
+	catch(...){*this ^= b.Value;}
 
 	return *this;
 }
@@ -247,8 +247,8 @@ Var& Var::operator %= ([[maybe_unused]] const std::string b)
 }
 Var& Var::operator %= (const Var b)
 {
-	try{Value %= std::stoi(b.Value);}
-	catch(...){Value %= b.Value;}
+	try{*this %= std::stoi(b.Value);}
+	catch(...){*this %= b.Value;}
 
 	return *this;
 }
@@ -485,7 +485,7 @@ bool Var::operator == (const int b)
 }
 bool Var::operator == (const std::string b)
 {
-	return (Value == b.Value);
+	return (Value == b);
 }
 bool Var::operator == (const Var b)
 {
@@ -497,15 +497,15 @@ bool Var::operator == (const Dice b)
 	try{return Dice(Value) == b;}
 	catch(...){return false;}
 }
-bool Var::operator == ([[maybe_unsed]] const Wallet b)
+bool Var::operator == ([[maybe_unused]] const Wallet b)
 {
 	return false;
 }
-bool Var::operator == ([[maybe_unsed]] const Currency b)
+bool Var::operator == ([[maybe_unused]] const Currency b)
 {
 	return false;
 }
-bool Var::operator == ([[maybe_unsed]] const CurrencySystem b)
+bool Var::operator == ([[maybe_unused]] const CurrencySystem b)
 {
 	return false;
 }
@@ -516,7 +516,7 @@ bool Var::operator < (const int b)
 }
 bool Var::operator < (const std::string b)
 {
-	return (Value < b.Value);
+	return (Value < b);
 }
 bool Var::operator < (const Var b)
 {
@@ -528,15 +528,15 @@ bool Var::operator < (const Dice b)
 	try{return Dice(Value) < b;}
 	catch(...){return false;}
 }
-bool Var::operator < ([[maybe_unsed]] const Wallet b)
+bool Var::operator < ([[maybe_unused]] const Wallet b)
 {
 	return false;
 }
-bool Var::operator < ([[maybe_unsed]] const Currency b)
+bool Var::operator < ([[maybe_unused]] const Currency b)
 {
 	return false;
 }
-bool Var::operator < ([[maybe_unsed]] const CurrencySystem b)
+bool Var::operator < ([[maybe_unused]] const CurrencySystem b)
 {
 	return false;
 }
@@ -547,7 +547,7 @@ bool Var::operator > (const int b)
 }
 bool Var::operator > (const std::string b)
 {
-	return (Value > b.Value);
+	return (Value > b);
 }
 bool Var::operator > (const Var b)
 {
@@ -559,15 +559,15 @@ bool Var::operator > (const Dice b)
 	try{return Dice(Value) > b;}
 	catch(...){return false;}
 }
-bool Var::operator > ([[maybe_unsed]] const Wallet b)
+bool Var::operator > ([[maybe_unused]] const Wallet b)
 {
 	return false;
 }
-bool Var::operator > ([[maybe_unsed]] const Currency b)
+bool Var::operator > ([[maybe_unused]] const Currency b)
 {
 	return false;
 }
-bool Var::operator > ([[maybe_unsed]] const CurrencySystem b)
+bool Var::operator > ([[maybe_unused]] const CurrencySystem b)
 {
 	return false;
 }
