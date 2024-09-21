@@ -11,7 +11,7 @@ Shell s = Shell();
 std::vector<std::string> unaryOps = {"++","--"};
 std::vector<std::string> arithOps = {"^","*","/","%","+","-"};
 std::vector<std::string> assignOps = {"=","^=","*=","/=","%=","+=","-="};
-std::vector<std::string> relationOps = {"==","~=","<",">","<=",">=","!="};
+std::vector<std::string> relationOps = {"==","~=","<",">","<=",">=","!=","~="};
 
 void parseVariable(std::string v, std::string* pKey, std::string* pProperty)//Derive key and property values from the variable string
 {
@@ -633,21 +633,20 @@ int main(int argc, char** argv)
 			exit(-1);
 		}
 
+		int args_size = args.size();
 		//Wrap everything in parenthesis just to make below code simpler
 		args[0] = "("+args[0];
-		args[args.size()-1] = args[args.size()-1]+")";
+		args[args_size-1] = args[args_size-1]+")";
 
 		//PEMDAS
-		unsigned int open_paren_pos = 0;
-		for(long unsigned int start=1; start<args.size()-1; start++)
+		for(int start=1; start<args_size-1; start++)
 		{
-			fprintf(stdout,"Checking args[%lu]: %s\n",start,args[start].c_str());
+			fprintf(stdout,"Checking args[%d]: %s\n",start,args[start].c_str());
 			if(args[start][0] == '(')
 			{
-				open_paren_pos = start;
-				for(long unsigned int end=start; end<args.size()-1; end++)
+				for(int end=start; end<args_size-1; end++)
 				{
-					fprintf(stdout,"\tChecking args[%lu]: %s\n",end,args[end].c_str());
+					fprintf(stdout,"\tChecking args[%d]: %s\n",end,args[end].c_str());
 					if(args[end][args[end].length()-1] == ')')
 					{
 						//Strip parenthesis off args to ensure good parsing
@@ -655,7 +654,7 @@ int main(int argc, char** argv)
 						args[end] = left(args[end],args[end].length()-1);
 
 						fprintf(stdout,"Operation: ");
-						for(long unsigned int k=start+1; k<=end; k+=2)//Offset by 1 and increment 2 since we are just checking operators
+						for(int k=start+1; k<=end; k+=2)//Offset by 1 and increment 2 since we are just checking operators
 						{
 							//Vector is in order of operator precedence
 							for(const auto& op : arithOps)
@@ -677,7 +676,7 @@ int main(int argc, char** argv)
 			}
 
 			//Check if parenthesis still exist. If so, restart loop to go back through PEMDAS
-			if(start == args.size()-1)
+			if(start == args_size-1)
 			{
 				for(const auto& arg : args)
 				{
