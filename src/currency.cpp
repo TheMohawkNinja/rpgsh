@@ -225,11 +225,11 @@ const char* Currency::c_str() const
 }
 Currency& Currency::operator = ([[maybe_unused]] const int b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator = ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator = (const Var b)
 {
@@ -238,11 +238,11 @@ Currency& Currency::operator = (const Var b)
 }
 Currency& Currency::operator = ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator = ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator = (const Currency b)
 {
@@ -256,7 +256,7 @@ Currency& Currency::operator = (const Currency b)
 }
 Currency& Currency::operator = ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator += (const int b)
 {
@@ -275,7 +275,7 @@ Currency& Currency::operator += (const Var b)
 }
 Currency& Currency::operator += ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet Currency::operator += (const Wallet b)
 {
@@ -291,7 +291,7 @@ Wallet Currency::operator += (const Currency b)
 }
 Currency& Currency::operator += ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator -= (const int b)
 {
@@ -300,7 +300,7 @@ Currency& Currency::operator -= (const int b)
 }
 Currency& Currency::operator -= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator -= (const Var b)
 {
@@ -309,19 +309,19 @@ Currency& Currency::operator -= (const Var b)
 }
 Currency& Currency::operator -= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator -= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator -= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator -= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet Currency::operator *= (const int b)
 {
@@ -330,7 +330,7 @@ Wallet Currency::operator *= (const int b)
 }
 Wallet Currency::operator *= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet Currency::operator *= (const Var b)
 {
@@ -339,27 +339,27 @@ Wallet Currency::operator *= (const Var b)
 }
 Currency& Currency::operator *= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator *= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator *= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator *= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator /= ([[maybe_unused]] const int b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator /= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator /= (const Var b)
 {
@@ -368,27 +368,27 @@ Currency& Currency::operator /= (const Var b)
 }
 Currency& Currency::operator /= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator /= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator /= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator /= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator ^= ([[maybe_unused]] const int b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator ^= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator ^= (const Var b)
 {
@@ -397,27 +397,27 @@ Currency& Currency::operator ^= (const Var b)
 }
 Currency& Currency::operator ^= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator ^= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator ^= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator ^= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator %= ([[maybe_unused]] const int b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator %= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator %= (const Var b)
 {
@@ -426,19 +426,19 @@ Currency& Currency::operator %= (const Var b)
 }
 Currency& Currency::operator %= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator %= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator %= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator %= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency Currency::operator + (const int b)
 {
@@ -878,11 +878,11 @@ bool Currency::operator != (const CurrencySystem& b) const
 }
 Currency& Currency::operator ++ (int)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Currency& Currency::operator -- (int)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 
 CurrencySystem::CurrencySystem(){}
@@ -937,11 +937,11 @@ Currency& CurrencySystem::operator [] (const std::string b)
 }
 CurrencySystem& CurrencySystem::operator = ([[maybe_unused]] const int b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator = ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator = (Var b)
 {
@@ -952,15 +952,15 @@ CurrencySystem& CurrencySystem::operator = (Var b)
 }
 CurrencySystem& CurrencySystem::operator = ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator = ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator = ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator = (const CurrencySystem b)
 {
@@ -972,7 +972,7 @@ CurrencySystem& CurrencySystem::operator = (const CurrencySystem b)
 }
 CurrencySystem& CurrencySystem::operator += ([[maybe_unused]] const int b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator += ([[maybe_unused]] const std::string b)
 {
@@ -988,27 +988,27 @@ CurrencySystem& CurrencySystem::operator += (const Var b)
 }
 CurrencySystem& CurrencySystem::operator += ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator += ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator += ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator += ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator -= ([[maybe_unused]] const int b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator -= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator -= (const Var b)
 {
@@ -1019,19 +1019,19 @@ CurrencySystem& CurrencySystem::operator -= (const Var b)
 }
 CurrencySystem& CurrencySystem::operator -= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator -= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator -= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator -= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator *= (const int b)
 {
@@ -1042,7 +1042,7 @@ CurrencySystem& CurrencySystem::operator *= (const int b)
 	catch(...)
 	{
 		if(b < 0)
-		throw std::runtime_error("invalid_operation");
+		throw std::runtime_error(E_INVALID_OPERATION);
 		else if(b == 0)
 			Name = "";
 		else
@@ -1053,7 +1053,7 @@ CurrencySystem& CurrencySystem::operator *= (const int b)
 }
 CurrencySystem& CurrencySystem::operator *= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator *= (const Var b)
 {
@@ -1064,27 +1064,27 @@ CurrencySystem& CurrencySystem::operator *= (const Var b)
 }
 CurrencySystem& CurrencySystem::operator *= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator *= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator *= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator *= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator /= ([[maybe_unused]] const int b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator /= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator /= (const Var b)
 {
@@ -1095,27 +1095,27 @@ CurrencySystem& CurrencySystem::operator /= (const Var b)
 }
 CurrencySystem& CurrencySystem::operator /= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator /= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator /= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator /= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator ^= ([[maybe_unused]] const int b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator ^= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator ^= (const Var b)
 {
@@ -1126,27 +1126,27 @@ CurrencySystem& CurrencySystem::operator ^= (const Var b)
 }
 CurrencySystem& CurrencySystem::operator ^= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator ^= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator ^= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator ^= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator %= ([[maybe_unused]] const int b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator %= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator %= (const Var b)
 {
@@ -1157,19 +1157,19 @@ CurrencySystem& CurrencySystem::operator %= (const Var b)
 }
 CurrencySystem& CurrencySystem::operator %= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator %= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator %= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem& CurrencySystem::operator %= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 CurrencySystem CurrencySystem::operator + (const int b)
 {
@@ -1557,12 +1557,12 @@ bool CurrencySystem::operator != (const CurrencySystem& b) const
 }
 CurrencySystem& CurrencySystem::operator ++ (int)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 	return *this;
 }
 CurrencySystem& CurrencySystem::operator -- (int)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 	return *this;
 }
 
@@ -1809,11 +1809,11 @@ const char* Wallet::c_str() const
 }
 Wallet& Wallet::operator = ([[maybe_unused]] const int b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator = ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator = (const money_t b)
 {
@@ -1833,7 +1833,7 @@ Wallet& Wallet::operator = (const Var b)
 }
 Wallet& Wallet::operator = ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator = (const Wallet b)
 {
@@ -1851,15 +1851,15 @@ Wallet& Wallet::operator = (const Currency b)
 }
 Wallet& Wallet::operator = ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator += ([[maybe_unused]] const int b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator += ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator += (const money_t b)
 {
@@ -1886,7 +1886,7 @@ Wallet& Wallet::operator += (const Var b)
 }
 Wallet& Wallet::operator += ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator += ([[maybe_unused]] const Wallet b)
 {
@@ -1903,15 +1903,15 @@ Wallet& Wallet::operator += (const Currency b)
 }
 Wallet& Wallet::operator += ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator -= ([[maybe_unused]] const int b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator -= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator -= (const money_t b)
 {
@@ -1945,7 +1945,7 @@ Wallet& Wallet::operator -= (const Var b)
 }
 Wallet& Wallet::operator -= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator -= (const Wallet b)
 {
@@ -1969,7 +1969,7 @@ Wallet& Wallet::operator -= (const Currency b)
 }
 Wallet& Wallet::operator -= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator *= (const int b)
 {
@@ -1987,15 +1987,15 @@ Wallet& Wallet::operator *= (const int b)
 }
 Wallet& Wallet::operator *= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator *= ([[maybe_unused]] const money_t b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator *= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator *= (const Var b)
 {
@@ -2005,15 +2005,15 @@ Wallet& Wallet::operator *= (const Var b)
 }
 Wallet& Wallet::operator *= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator *= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator *= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator /= (const int b)
 {
@@ -2048,11 +2048,11 @@ Wallet& Wallet::operator /= (const int b)
 }
 Wallet& Wallet::operator /= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator /= ([[maybe_unused]] const money_t b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator /= (const Var b)
 {
@@ -2062,27 +2062,27 @@ Wallet& Wallet::operator /= (const Var b)
 }
 Wallet& Wallet::operator /= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator /= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator /= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator /= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator ^= ([[maybe_unused]] const int b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator ^= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator ^= (const Var b)
 {
@@ -2092,19 +2092,19 @@ Wallet& Wallet::operator ^= (const Var b)
 }
 Wallet& Wallet::operator ^= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator ^= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator ^= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator ^= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator %= (const int b)
 {
@@ -2115,7 +2115,7 @@ Wallet& Wallet::operator %= (const int b)
 }
 Wallet& Wallet::operator %= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator %= (const Var b)
 {
@@ -2125,19 +2125,19 @@ Wallet& Wallet::operator %= (const Var b)
 }
 Wallet& Wallet::operator %= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator %= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator %= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet& Wallet::operator %= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Wallet Wallet::operator + (const int b)
 {

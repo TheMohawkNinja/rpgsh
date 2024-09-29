@@ -36,30 +36,30 @@ Var& Var::operator = (const Var b)
 }
 Var& Var::operator = ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator = ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator = ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator = ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator += (const int b)
 {
 	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) + b);}
-	catch(...){throw std::runtime_error("invalid_operation");}
+	catch(...){throw std::runtime_error(E_INVALID_OPERATION);}
 
 	return *this;
 }
 Var& Var::operator += (const std::string b)
 {
-	try{std::stoi(Value); throw std::runtime_error("invalid_operation");}
+	try{std::stoi(Value); throw std::runtime_error(E_INVALID_OPERATION);}
 	catch(...){Value = Value + b;}
 
 	return *this;
@@ -73,30 +73,30 @@ Var& Var::operator += (const Var b)
 }
 Var& Var::operator += ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator += ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator += ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator += ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator -= (const int b)
 {
 	try{std::stoi(Value); Value = std::to_string((std::stoi(Value) - b));}
-	catch(...){throw std::runtime_error("invalid_operation");}
+	catch(...){throw std::runtime_error(E_INVALID_OPERATION);}
 
 	return *this;
 }
 Var& Var::operator -= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator -= (const Var b)
 {
@@ -107,19 +107,19 @@ Var& Var::operator -= (const Var b)
 }
 Var& Var::operator -= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator -= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator -= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator -= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator *= (const int b)
 {
@@ -130,7 +130,7 @@ Var& Var::operator *= (const int b)
 	catch(...)
 	{
 		if(b < 0)
-			throw std::runtime_error("invalid_operation");
+			throw std::runtime_error(E_INVALID_OPERATION);
 		else if(b == 0)
 			Value = "";
 		else
@@ -141,7 +141,7 @@ Var& Var::operator *= (const int b)
 }
 Var& Var::operator *= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator *= (const Var b)
 {
@@ -152,30 +152,30 @@ Var& Var::operator *= (const Var b)
 }
 Var& Var::operator *= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator *= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator *= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator *= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator /= (const int b)
 {
 	try{Value = std::to_string(std::stoi(Value) / b);}
-	catch(...){throw std::runtime_error("invalid_operation");}
+	catch(...){throw std::runtime_error(E_INVALID_OPERATION);}
 
 	return *this;
 }
 Var& Var::operator /= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator /= (const Var b)
 {
@@ -186,30 +186,30 @@ Var& Var::operator /= (const Var b)
 }
 Var& Var::operator /= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator /= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator /= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator /= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator ^= (const int b)
 {
 	try{Value = std::stoi(Value) ^ b;}
-	catch(...){throw std::runtime_error("invalid_operation");}
+	catch(...){throw std::runtime_error(E_INVALID_OPERATION);}
 
 	return *this;
 }
 Var& Var::operator ^= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator ^= (const Var b)
 {
@@ -220,30 +220,30 @@ Var& Var::operator ^= (const Var b)
 }
 Var& Var::operator ^= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator ^= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator ^= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator ^= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator %= (const int b)
 {
 	try{Value = std::to_string(std::stoi(Value) % b);}
-	catch(...){throw std::runtime_error("invalid_operation");}
+	catch(...){throw std::runtime_error(E_INVALID_OPERATION);}
 
 	return *this;
 }
 Var& Var::operator %= ([[maybe_unused]] const std::string b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator %= (const Var b)
 {
@@ -254,19 +254,19 @@ Var& Var::operator %= (const Var b)
 }
 Var& Var::operator %= ([[maybe_unused]] const Dice b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator %= ([[maybe_unused]] const Wallet b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator %= ([[maybe_unused]] const Currency b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator %= ([[maybe_unused]] const CurrencySystem b)
 {
-	throw std::runtime_error("invalid_operation");
+	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var Var::operator + (const int b)
 {
@@ -679,14 +679,14 @@ bool Var::operator != (const CurrencySystem b)
 Var& Var::operator ++ (int)
 {
 	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) + 1);}
-	catch(...){throw std::runtime_error("invalid_operation");}
+	catch(...){throw std::runtime_error(E_INVALID_OPERATION);}
 
 	return *this;
 }
 Var& Var::operator -- (int)
 {
 	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) - 1);}
-	catch(...){throw std::runtime_error("invalid_operation");}
+	catch(...){throw std::runtime_error(E_INVALID_OPERATION);}
 
 	return *this;
 }
