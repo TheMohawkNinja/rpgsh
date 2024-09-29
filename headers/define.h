@@ -36,6 +36,10 @@
 //Universal flags
 #define FLAG_APPDESCRIPTION		"--appdescription"
 
+//Custom exceptions
+#define E_INVALID_OPERATION		"invalid_operation"
+#define E_UNKNOWN_OPERATION		"unknown_operation"
+
 //Column formatting
 #define COLUMN_PADDING			5
 
