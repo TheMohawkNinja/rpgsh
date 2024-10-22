@@ -706,13 +706,14 @@ int main(int argc, char** argv)
 						fprintf(stdout,"\targs[start] = %s\n",args[start].c_str());
 						fprintf(stdout,"\targs[end] = %s\n",args[end].c_str());
 
-						for(int k=start+1; k<=end; k+=2)//Offset by 1 and increment 2 since we are just checking operators
+						//Vector is in order of operator precedence
+						for(const auto& arithOp : arithOps)
 						{
-							//Vector is in order of operator precedence
-							for(const auto& op : arithOps)
+							for(int op=start+1; op<=end; op+=2)//Offset by 1 and increment 2 since we are just checking operators
 							{
-								if(findInStrVect(args,op) > start && findInStrVect(args,op) < end)
-									parseOperandsAndDoOp(&args,k-1,k,k+1);
+								int op_pos = findInStrVect(args,arithOp);
+								if(op_pos > start && op_pos < end)
+									parseOperandsAndDoOp(&args,op_pos-1,op_pos,op_pos+1);
 							}
 						}
 						fprintf(stdout,"\n");
