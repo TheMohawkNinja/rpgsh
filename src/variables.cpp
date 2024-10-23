@@ -701,6 +701,7 @@ int main(int argc, char** argv)
 						//TODO: Will need to account for operators not containing parenthesis
 						fprintf(stdout,"\targs[start] = %s\n",args[start].c_str());
 						fprintf(stdout,"\targs[end] = %s\n",args[end].c_str());
+						std::string rparens = right(args[end],args[end].find(')')+1);
 						args[start] = right(args[start],args[start].rfind('(')+1);
 						args[end] = left(args[end],args[end].find(')'));
 						fprintf(stdout,"\targs[start] = %s\n",args[start].c_str());
@@ -713,7 +714,10 @@ int main(int argc, char** argv)
 							fprintf(stdout,"\top_pos (%s) = %d\n",arithOp.c_str(),op_pos);
 
 							if(op_pos > start && op_pos < end)
+							{
 								parseOperandsAndDoOp(&args,op_pos-1,op_pos,op_pos+1);
+								args[start]+=rparens;//Maintain end parens
+							}
 						}
 						fprintf(stdout,"\n");
 
