@@ -165,7 +165,7 @@ template<typename TL, typename TR>
 std::string getResult(std::string lhs, std::string op, std::string rhs)
 {
 	//TODO: Handle other operators (and incorrect ones)?
-	if(findInStrVect(arithOps,op) > -1)
+	if(findInStrVect(arithOps,op,0) > -1)
 	{
 		try
 		{
@@ -209,7 +209,7 @@ void parseOperandsAndDoOp(std::vector<std::string>* v, unsigned int lhs_pos, uns
 			try
 			{
 				int v_rhs = std::stoi((*v)[rhs_pos]);
-				if(findInStrVect(arithOps,(*v)[op_pos]) > -1)
+				if(findInStrVect(arithOps,(*v)[op_pos],0) > -1)
 					result = std::string(doArithOps<Var,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
 				/*else if(isRelationalOp((*v)[op_pos]))
 					result = btos(doRelOp<Var,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
@@ -237,7 +237,7 @@ void parseOperandsAndDoOp(std::vector<std::string>* v, unsigned int lhs_pos, uns
 			try
 			{
 				int v_rhs = std::stoi((*v)[rhs_pos]);
-				if(findInStrVect(arithOps,(*v)[op_pos]) > -1)
+				if(findInStrVect(arithOps,(*v)[op_pos],0) > -1)
 					result = std::string(doArithOps<Dice,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
 				/*else if(isRelationalOp((*v)[op_pos]))
 					result = btos(doRelOp<Dice,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
@@ -265,7 +265,7 @@ void parseOperandsAndDoOp(std::vector<std::string>* v, unsigned int lhs_pos, uns
 			try
 			{
 				int v_rhs = std::stoi((*v)[rhs_pos]);
-				if(findInStrVect(arithOps,(*v)[op_pos]) > -1)
+				if(findInStrVect(arithOps,(*v)[op_pos],0) > -1)
 					result = std::string(doArithOps<Wallet,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
 				/*else if(isRelationalOp((*v)[op_pos]))
 					result = btos(doRelOp<Wallet,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
@@ -293,7 +293,7 @@ void parseOperandsAndDoOp(std::vector<std::string>* v, unsigned int lhs_pos, uns
 			try
 			{
 				int v_rhs = std::stoi((*v)[rhs_pos]);
-				if(findInStrVect(arithOps,(*v)[op_pos]) > -1)
+				if(findInStrVect(arithOps,(*v)[op_pos],0) > -1)
 					result = std::string(doArithOps<Currency,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
 				/*else if(isRelationalOp((*v)[op_pos]))
 					result = btos(doRelOp<Currency,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
@@ -321,7 +321,7 @@ void parseOperandsAndDoOp(std::vector<std::string>* v, unsigned int lhs_pos, uns
 			try
 			{
 				int v_rhs = std::stoi((*v)[rhs_pos]);
-				if(findInStrVect(arithOps,(*v)[op_pos]) > -1)
+				if(findInStrVect(arithOps,(*v)[op_pos],0) > -1)
 					result = std::string(doArithOps<CurrencySystem,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
 				/*else if(isRelationalOp((*v)[op_pos]))
 					result = btos(doRelOp<CurrencySystem,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
@@ -349,7 +349,7 @@ void parseOperandsAndDoOp(std::vector<std::string>* v, unsigned int lhs_pos, uns
 			try
 			{
 				int v_rhs = std::stoi((*v)[rhs_pos]);
-				if(findInStrVect(arithOps,(*v)[op_pos]) > -1)
+				if(findInStrVect(arithOps,(*v)[op_pos],0) > -1)
 					result = std::string(doArithOps<Var,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
 				/*else if(isRelationalOp((*v)[op_pos]))
 					result = btos(doRelOp<Var,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
@@ -530,7 +530,7 @@ int main(int argc, char** argv)
 		std::string old_value = "";
 		std::string new_value = "";
 
-		if(findInStrVect(unaryOps,op) > -1)
+		if(findInStrVect(unaryOps,op,0) > -1)
 		{
 			//TODO: May have to ensure that properties get the right evaluated data type
 			std::string old_property = "";
@@ -709,12 +709,11 @@ int main(int argc, char** argv)
 						//Vector is in order of operator precedence
 						for(const auto& arithOp : arithOps)
 						{
-							for(int op=start+1; op<=end; op+=2)//Offset by 1 and increment 2 since we are just checking operators
-							{
-								int op_pos = findInStrVect(args,arithOp);
-								if(op_pos > start && op_pos < end)
-									parseOperandsAndDoOp(&args,op_pos-1,op_pos,op_pos+1);
-							}
+							int op_pos = findInStrVect(args,arithOp,start);
+							fprintf(stdout,"\top_pos (%s) = %d\n",arithOp.c_str(),op_pos);
+
+							if(op_pos > start && op_pos < end)
+								parseOperandsAndDoOp(&args,op_pos-1,op_pos,op_pos+1);
 						}
 						fprintf(stdout,"\n");
 
