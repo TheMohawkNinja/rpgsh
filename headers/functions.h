@@ -18,7 +18,7 @@ bool isTypeSigil(char c);
 
 int stringcasecmp(std::string a, std::string b);
 
-int findInStrVect(std::vector<std::string> v, std::string str);
+int findInStrVect(std::vector<std::string> v, std::string str, unsigned int start);
 
 std::string left(std::string str, int n);
 

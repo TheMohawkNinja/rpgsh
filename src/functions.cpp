@@ -50,9 +50,9 @@ int stringcasecmp(std::string a, std::string b)
 	return strcasecmp(a.c_str(),b.c_str());
 }
 
-int findInStrVect(std::vector<std::string> v, std::string str)
+int findInStrVect(std::vector<std::string> v, std::string str, unsigned int start)
 {
-	for(long unsigned int i=0; i<v.size(); i++)
+	for(long unsigned int i=start; i<v.size(); i++)
 		if(v[i] == str) return i;
 
 	return -1;
@@ -387,7 +387,7 @@ unsigned int getWalletValue(Wallet w)
 
 	for(const auto& [c,q] : w.Money)
 	{
-		if(findInStrVect(systems,c.System->Name) != -1)
+		if(findInStrVect(systems,c.System->Name,0) != -1)
 		{
 			systems.push_back(c.System->Name);
 			total += w.getEquivalentValueInLowestDenomination(*c.System);
