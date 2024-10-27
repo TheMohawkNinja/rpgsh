@@ -687,7 +687,7 @@ int main(int argc, char** argv)
 		}
 
 		//PEMDAS
-		for(int start=1; start<args_size-1; start++)
+		for(int start=0; start<args_size-1; start++)
 		{
 			fprintf(stdout,"Checking args[%d]: %s\n",start,args[start].c_str());
 			if(args[start].find('(') != std::string::npos)
@@ -698,7 +698,6 @@ int main(int argc, char** argv)
 					if(args[end][args[end].length()-1] == ')')
 					{
 						//Strip parenthesis off args to ensure good parsing
-						//TODO: Will need to account for operators not containing parenthesis
 						fprintf(stdout,"\targs[start] = %s\n",args[start].c_str());
 						fprintf(stdout,"\targs[end] = %s\n",args[end].c_str());
 						std::string rparens = right(args[end],args[end].find(')')+1);
@@ -722,6 +721,7 @@ int main(int argc, char** argv)
 						fprintf(stdout,"\n");
 
 						start = 1;
+						break;
 					}
 					else if(args[end].find('(') != std::string::npos && end>start)//Nested '('
 					{
