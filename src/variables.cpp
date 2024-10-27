@@ -162,6 +162,56 @@ TL doArithOps(TL lhs, std::string op, TR rhs)
 	return lhs;
 }
 template<typename TL, typename TR>
+TL doAssignOps(TL lhs, std::string op, TR rhs)
+{
+	if(op == "^=")
+	{
+		try{lhs ^= rhs;}
+		catch(...){throw;}
+	}
+	else if(op == "*=")
+	{
+		try{lhs *= rhs;}
+		catch(...){throw;}
+	}
+	else if(op == "/=")
+	{
+		try{lhs /= rhs;}
+		catch(...){throw;}
+	}
+	else if(op == "%=")
+	{
+		try{lhs %= rhs;}
+		catch(...){throw;}
+	}
+	else if(op == "+=")
+	{
+		try{lhs += rhs;}
+		catch(...){throw;}
+	}
+	else if(op == "-=")
+	{
+		try{lhs -= rhs;}
+		catch(...){throw;}
+	}
+	else if(op == "=")
+	{
+		try{lhs = rhs;}
+		catch(...){throw;}
+	}
+	else // We should only get here if I forgot to code an operation
+	{
+		throw std::runtime_error(E_UNKNOWN_OPERATION);
+	}
+
+	return lhs;
+}
+template<typename TR>
+void doAssignOpsAndSave(std::string lhs, std::string op, TR rhs)
+{
+	
+}
+template<typename TL, typename TR>
 std::string getResult(std::string lhs, std::string op, std::string rhs)
 {
 	//TODO: Handle other operators (and incorrect ones)?
@@ -179,10 +229,57 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 				output(Error,"Unknown operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
 		}
 	}
+	if(findInStrVect(assignOps,op,0) > -1)
+	{
+		try
+		{
+			return std::string(doAssignOps<TL,TR>(TL(lhs),op,TR(rhs)));
+		}
+		catch(const std::runtime_error& e)
+		{
+			if(e.what() == std::string(E_INVALID_OPERATION))
+				output(Error,"Invalid operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
+			else if(e.what() == std::string(E_UNKNOWN_OPERATION))
+				output(Error,"Unknown operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
+		}
+	}
 	/*else if(findInStrVect(relationOps,op) > -1)
 		return btos(doRelOp<TL,TR>(TL(lhs),op,TR(rhs)));*/
 
-	return ""; //Suppress -Wreturn-type
+	return ""; //Supress -Wreturn-type
+}
+template<typename TL>
+std::string checkRHSAndDoOp(std::vector<std::string>** v, unsigned int* lhs_pos, unsigned int* op_pos, unsigned int* rhs_pos)
+{
+	if(left((**v)[*rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
+		return getResult<TL,Var>((**v)[*lhs_pos],(**v)[*op_pos],(**v)[*rhs_pos]);
+	else if(left((**v)[*rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
+		return getResult<TL,Dice>((**v)[*lhs_pos],(**v)[*op_pos],(**v)[*rhs_pos]);
+	else if(left((**v)[*rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
+		return getResult<TL,Wallet>((**v)[*lhs_pos],(**v)[*op_pos],(**v)[*rhs_pos]);
+	else if(left((**v)[*rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
+		return getResult<TL,Currency>((**v)[*lhs_pos],(**v)[*op_pos],(**v)[*rhs_pos]);
+	else if(left((**v)[*rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
+		return getResult<TL,CurrencySystem>((**v)[*lhs_pos],(**v)[*op_pos],(**v)[*rhs_pos]);
+	else
+	{
+		try
+		{
+			int v_rhs = std::stoi((**v)[*rhs_pos]);
+			if(findInStrVect(arithOps,(**v)[*op_pos],0) > -1)
+				return std::string(doArithOps<TL,int>((**v)[*lhs_pos],(**v)[*op_pos],v_rhs));
+			else if(findInStrVect(assignOps,(**v)[*op_pos],0) > -1)
+				return std::string(doAssignOps<TL,int>((**v)[*lhs_pos],(**v)[*op_pos],v_rhs));
+			/*else if(isRelationalOp((**v)[*op_pos]))
+				result = btos(doRelOp<TL,int>((**v)[*lhs_pos],(**v)[*op_pos],v_rhs));*/
+		}
+		catch(...)
+		{
+			return getResult<TL,std::string>((**v)[*lhs_pos],(**v)[*op_pos],(**v)[*rhs_pos]);
+		}
+	}
+
+	return ""; //Supress -Wreturn-type
 }
 void parseOperandsAndDoOp(std::vector<std::string>* v, unsigned int lhs_pos, unsigned int op_pos, unsigned int rhs_pos)
 {
@@ -193,173 +290,17 @@ void parseOperandsAndDoOp(std::vector<std::string>* v, unsigned int lhs_pos, uns
 	fprintf(stdout,"Performing operation: %s %s %s\n",(*v)[lhs_pos].c_str(),(*v)[op_pos].c_str(),(*v)[rhs_pos].c_str());
 
 	if(left((*v)[lhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
-	{
-		if(left((*v)[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
-			result = getResult<Var,Var>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
-			result = getResult<Var,Dice>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
-			result = getResult<Var,Wallet>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
-			result = getResult<Var,Currency>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
-			result = getResult<Var,CurrencySystem>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else
-		{
-			try
-			{
-				int v_rhs = std::stoi((*v)[rhs_pos]);
-				if(findInStrVect(arithOps,(*v)[op_pos],0) > -1)
-					result = std::string(doArithOps<Var,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
-				/*else if(isRelationalOp((*v)[op_pos]))
-					result = btos(doRelOp<Var,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
-			}
-			catch(...)
-			{
-				result = getResult<Var,std::string>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-			}
-		}
-	}
+		result = checkRHSAndDoOp<Var>(&v, &lhs_pos, &op_pos, &rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
-	{
-		if(left((*v)[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
-			result = getResult<Dice,Var>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
-			result = getResult<Dice,Dice>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
-			result = getResult<Dice,Wallet>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
-			result = getResult<Dice,Currency>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
-			result = getResult<Dice,CurrencySystem>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else
-		{
-			try
-			{
-				int v_rhs = std::stoi((*v)[rhs_pos]);
-				if(findInStrVect(arithOps,(*v)[op_pos],0) > -1)
-					result = std::string(doArithOps<Dice,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
-				/*else if(isRelationalOp((*v)[op_pos]))
-					result = btos(doRelOp<Dice,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
-			}
-			catch(...)
-			{
-				result = getResult<Dice,std::string>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-			}
-		}
-	}
+		result = checkRHSAndDoOp<Dice>(&v, &lhs_pos, &op_pos, &rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
-	{
-		if(left((*v)[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
-			result = getResult<Wallet,Var>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
-			result = getResult<Wallet,Dice>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
-			result = getResult<Wallet,Wallet>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
-			result = getResult<Wallet,Currency>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
-			result = getResult<Wallet,CurrencySystem>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else
-		{
-			try
-			{
-				int v_rhs = std::stoi((*v)[rhs_pos]);
-				if(findInStrVect(arithOps,(*v)[op_pos],0) > -1)
-					result = std::string(doArithOps<Wallet,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
-				/*else if(isRelationalOp((*v)[op_pos]))
-					result = btos(doRelOp<Wallet,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
-			}
-			catch(...)
-			{
-				result = getResult<Wallet,std::string>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-			}
-		}
-	}
+		result = checkRHSAndDoOp<Wallet>(&v, &lhs_pos, &op_pos, &rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
-	{
-		if(left((*v)[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
-			result = getResult<Currency,Var>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
-			result = getResult<Currency,Dice>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
-			result = getResult<Currency,Wallet>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
-			result = getResult<Currency,Currency>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
-			result = getResult<Currency,CurrencySystem>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else
-		{
-			try
-			{
-				int v_rhs = std::stoi((*v)[rhs_pos]);
-				if(findInStrVect(arithOps,(*v)[op_pos],0) > -1)
-					result = std::string(doArithOps<Currency,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
-				/*else if(isRelationalOp((*v)[op_pos]))
-					result = btos(doRelOp<Currency,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
-			}
-			catch(...)
-			{
-				result = getResult<Currency,std::string>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-			}
-		}
-	}
+		result = checkRHSAndDoOp<Currency>(&v, &lhs_pos, &op_pos, &rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
-	{
-		if(left((*v)[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
-			result = getResult<CurrencySystem,Var>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
-			result = getResult<CurrencySystem,Dice>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
-			result = getResult<CurrencySystem,Wallet>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
-			result = getResult<CurrencySystem,Currency>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
-			result = getResult<CurrencySystem,CurrencySystem>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else
-		{
-			try
-			{
-				int v_rhs = std::stoi((*v)[rhs_pos]);
-				if(findInStrVect(arithOps,(*v)[op_pos],0) > -1)
-					result = std::string(doArithOps<CurrencySystem,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
-				/*else if(isRelationalOp((*v)[op_pos]))
-					result = btos(doRelOp<CurrencySystem,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
-			}
-			catch(...)
-			{
-				result = getResult<CurrencySystem,std::string>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-			}
-		}
-	}
+		result = checkRHSAndDoOp<CurrencySystem>(&v, &lhs_pos, &op_pos, &rhs_pos);
 	else//Treat non-explicit constructors as Var
-	{
-		if(left((*v)[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
-			result = getResult<Var,Var>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
-			result = getResult<Var,Dice>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
-			result = getResult<Var,Wallet>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
-			result = getResult<Var,Currency>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else if(left((*v)[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
-			result = getResult<Var,CurrencySystem>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-		else
-		{
-			try
-			{
-				int v_rhs = std::stoi((*v)[rhs_pos]);
-				if(findInStrVect(arithOps,(*v)[op_pos],0) > -1)
-					result = std::string(doArithOps<Var,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));
-				/*else if(isRelationalOp((*v)[op_pos]))
-					result = btos(doRelOp<Var,int>((*v)[lhs_pos],(*v)[op_pos],v_rhs));*/
-			}
-			catch(...)
-			{
-				result = getResult<Var,std::string>((*v)[lhs_pos],(*v)[op_pos],(*v)[rhs_pos]);
-			}
-		}
-	}
+		result = checkRHSAndDoOp<Var>(&v, &lhs_pos, &op_pos, &rhs_pos);
 
 	fprintf(stdout,"Result: \"%s\"\n",result.c_str());
 
@@ -523,7 +464,7 @@ int main(int argc, char** argv)
 			fprintf(stdout,"%s\n",output.c_str());
 		}
 	}
-	else if(argc == 3)//Unary operators
+	else if(argc == 3)//Unary operators TODO: Merge this into binary operator code so it's all one unified operation
 	{
 		std::string op(argv[2]);
 		std::string type_str = "";
@@ -706,11 +647,23 @@ int main(int argc, char** argv)
 						fprintf(stdout,"\targs[start] = %s\n",args[start].c_str());
 						fprintf(stdout,"\targs[end] = %s\n",args[end].c_str());
 
-						//Vector is in order of operator precedence
+						//Vectors for each operation type are in order of operator precedence
+						//TODO: Implement all operator types
 						for(const auto& arithOp : arithOps)
 						{
 							int op_pos = findInStrVect(args,arithOp,start);
 							fprintf(stdout,"\top_pos (%s) = %d\n",arithOp.c_str(),op_pos);
+
+							if(op_pos > start && op_pos < end)
+							{
+								parseOperandsAndDoOp(&args,op_pos-1,op_pos,op_pos+1);
+								args[start]+=rparens;//Maintain end parens
+							}
+						}
+						for(const auto& assignOp : assignOps)
+						{
+							int op_pos = findInStrVect(args,assignOp,start);
+							fprintf(stdout,"\top_pos (%s) = %d\n",assignOp.c_str(),op_pos);
 
 							if(op_pos > start && op_pos < end)
 							{
