@@ -164,7 +164,12 @@ TL doArithOps(TL lhs, std::string op, TR rhs)
 template<typename TL, typename TR>
 TL doAssignOps(TL lhs, std::string op, TR rhs)
 {
-	if(op == "^=")
+	if(op == "=")
+	{
+		try{lhs = rhs;}
+		catch(...){throw;}
+	}
+	else if(op == "^=")
 	{
 		try{lhs ^= rhs;}
 		catch(...){throw;}
@@ -192,11 +197,6 @@ TL doAssignOps(TL lhs, std::string op, TR rhs)
 	else if(op == "-=")
 	{
 		try{lhs -= rhs;}
-		catch(...){throw;}
-	}
-	else if(op == "=")
-	{
-		try{lhs = rhs;}
 		catch(...){throw;}
 	}
 	else // We should only get here if I forgot to code an operation
@@ -249,7 +249,7 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 	return ""; //Supress -Wreturn-type
 }
 template<typename TL>
-std::string checkRHSAndDoOp(std::vector<std::string>** v, unsigned int* lhs_pos, unsigned int* op_pos, unsigned int* rhs_pos)
+std::string parseRHSAndDoOp(std::vector<std::string>** v, unsigned int* lhs_pos, unsigned int* op_pos, unsigned int* rhs_pos)
 {
 	if(left((**v)[*rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
 		return getResult<TL,Var>((**v)[*lhs_pos],(**v)[*op_pos],(**v)[*rhs_pos]);
@@ -281,7 +281,7 @@ std::string checkRHSAndDoOp(std::vector<std::string>** v, unsigned int* lhs_pos,
 
 	return ""; //Supress -Wreturn-type
 }
-void parseOperandsAndDoOp(std::vector<std::string>* v, unsigned int lhs_pos, unsigned int op_pos, unsigned int rhs_pos)
+void parseLHSAndDoOp(std::vector<std::string>* v, unsigned int lhs_pos, unsigned int op_pos, unsigned int rhs_pos)
 {
 	//TODO Handle quote-wrapped strings to force string interpretation
 
@@ -290,17 +290,17 @@ void parseOperandsAndDoOp(std::vector<std::string>* v, unsigned int lhs_pos, uns
 	fprintf(stdout,"Performing operation: %s %s %s\n",(*v)[lhs_pos].c_str(),(*v)[op_pos].c_str(),(*v)[rhs_pos].c_str());
 
 	if(left((*v)[lhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
-		result = checkRHSAndDoOp<Var>(&v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<Var>(&v, &lhs_pos, &op_pos, &rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
-		result = checkRHSAndDoOp<Dice>(&v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<Dice>(&v, &lhs_pos, &op_pos, &rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
-		result = checkRHSAndDoOp<Wallet>(&v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<Wallet>(&v, &lhs_pos, &op_pos, &rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
-		result = checkRHSAndDoOp<Currency>(&v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<Currency>(&v, &lhs_pos, &op_pos, &rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
-		result = checkRHSAndDoOp<CurrencySystem>(&v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<CurrencySystem>(&v, &lhs_pos, &op_pos, &rhs_pos);
 	else//Treat non-explicit constructors as Var
-		result = checkRHSAndDoOp<Var>(&v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<Var>(&v, &lhs_pos, &op_pos, &rhs_pos);
 
 	fprintf(stdout,"Result: \"%s\"\n",result.c_str());
 
@@ -656,7 +656,7 @@ int main(int argc, char** argv)
 
 							if(op_pos > start && op_pos < end)
 							{
-								parseOperandsAndDoOp(&args,op_pos-1,op_pos,op_pos+1);
+								parseLHSAndDoOp(&args,op_pos-1,op_pos,op_pos+1);
 								args[start]+=rparens;//Maintain end parens
 							}
 						}
@@ -667,7 +667,7 @@ int main(int argc, char** argv)
 
 							if(op_pos > start && op_pos < end)
 							{
-								parseOperandsAndDoOp(&args,op_pos-1,op_pos,op_pos+1);
+								parseLHSAndDoOp(&args,op_pos-1,op_pos,op_pos+1);
 								args[start]+=rparens;//Maintain end parens
 							}
 						}
