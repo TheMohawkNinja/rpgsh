@@ -23,6 +23,30 @@
 #define VAR_SIGIL			'v'
 #define WALLET_SIGIL			'w'
 
+//Operations
+#define OP_INC				"++"
+#define OP_DEC				"--"
+#define OP_MUL				"*"
+#define OP_DIV				"/"
+#define OP_EXP				"^"
+#define OP_MOD				"%"
+#define OP_ADD				"+"
+#define OP_SUB				"-"
+#define OP_LT				"<"
+#define OP_LE				"<="
+#define OP_GT				">"
+#define OP_GE				">="
+#define OP_EQ				"=="
+#define OP_NE				"!="
+#define OP_AEQ				"~="
+#define OP_ASSIGN			"="
+#define OP_ADDA				"+="
+#define OP_SUBA				"-="
+#define OP_MULA				"*="
+#define OP_DIVA				"/="
+#define OP_EXPA				"^="
+#define OP_MODA				"%="
+
 //Built-in variables
 #define CURRENT_CHAR_SHELL_VAR		".CURRENT_CHAR"
 #define CURRENT_CAMPAIGN_SHELL_VAR	".CURRENT_CAMPAIGN"
