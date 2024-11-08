@@ -8,10 +8,20 @@ Character c = Character(false);
 Campaign m = Campaign();
 Shell s = Shell();
 
-std::vector<std::string> unaryOps = {"++","--"};
-std::vector<std::string> arithOps = {"^","*","/","%","+","-"};
-std::vector<std::string> assignOps = {"=","^=","*=","/=","%=","+=","-="};
-std::vector<std::string> relationOps = {"==","~=","<",">","<=",">=","!=","~="};
+// Operator precedence, later string vectors = lower precedence
+// https://en.cppreference.com/w/cpp/language/operator_precedence
+std::vector<std::vector<std::string>> operations = {	{OP_INC,OP_DEC},
+							{OP_MUL,OP_DIV,OP_EXP,OP_MOD},
+							{OP_ADD,OP_SUB},
+							{OP_LT,OP_LE,OP_GT,OP_GE},
+							{OP_EQ,OP_NE,OP_AEQ},
+							{OP_ASSIGN,OP_ADDA,OP_SUBA,OP_MULA,OP_DIVA,OP_EXPA,OP_MODA}};
+
+// Vectors for readability
+std::vector<std::string> modOps;
+std::vector<std::string> unaryOps;
+std::vector<std::string> relOps;
+std::vector<std::string> assignOps;
 
 void parseVariable(std::string v, std::string* pKey, std::string* pProperty)//Derive key and property values from the variable string
 {
@@ -121,80 +131,95 @@ void tryGetProperty(Scope scope, std::string type_str, std::string key, std::str
 		exit(-1);
 	}
 }
-template<typename TL, typename TR>
-TL doArithOps(TL lhs, std::string op, TR rhs)
+template<typename TR>
+void doAssignOpsAndSave(std::string lhs, std::string op, TR rhs)
 {
-	if(op == "^")
-	{
-		try{lhs = lhs^rhs;}
-		catch(...){throw;}
-	}
-	else if(op == "*")
-	{
-		try{lhs = lhs*rhs;}
-		catch(...){throw;}
-	}
-	else if(op == "/")
-	{
-		try{lhs = lhs/rhs;}
-		catch(...){throw;}
-	}
-	else if(op == "%")
-	{
-		try{lhs = lhs%rhs;}
-		catch(...){throw;}
-	}
-	else if(op == "+")
-	{
-		try{lhs = lhs+rhs;}
-		catch(...){throw;}
-	}
-	else if(op == "-")
-	{
-		try{lhs = lhs-rhs;}
-		catch(...){throw;}
-	}
-	else // We should only get here if I forgot to code an operation
-	{
-		throw std::runtime_error(E_UNKNOWN_OPERATION);
-	}
+	Scope scope;
 
-	return lhs;
+	switch(lhs[0])
+	{
+		case CHARACTER_SIGIL:
+			scope = c;
+		case CAMPAIGN_SIGIL:
+			scope = m;
+		case SHELL_SIGIL:
+			scope = s;
+	}
 }
 template<typename TL, typename TR>
-TL doAssignOps(TL lhs, std::string op, TR rhs)
+TL doModOp(TL lhs, std::string op, TR rhs)
 {
-	if(op == "=")
+	if(op == OP_INC)
+	{
+		try{lhs++;}
+		catch(...){throw;}
+	}
+	else if(op == OP_DEC)
+	{
+		try{lhs--;}
+		catch(...){throw;}
+	}
+	else if(op == OP_MUL)
+	{
+		try{lhs = lhs * rhs;}
+		catch(...){throw;}
+	}
+	else if(op == OP_DIV)
+	{
+		try{lhs = lhs / rhs;}
+		catch(...){throw;}
+	}
+	else if(op == OP_EXP)
+	{
+		try{lhs = lhs ^ rhs;}
+		catch(...){throw;}
+	}
+	else if(op == OP_MOD)
+	{
+		try{lhs = lhs % rhs;}
+		catch(...){throw;}
+	}
+	else if(op == OP_ADD)
+	{
+		try{lhs = lhs + rhs;}
+		catch(...){throw;}
+	}
+	else if(op == OP_SUB)
+	{
+		try{lhs = lhs - rhs;}
+		catch(...){throw;}
+	}
+	else if(op == OP_ASSIGN)
 	{
 		try{lhs = rhs;}
 		catch(...){throw;}
 	}
-	else if(op == "^=")
-	{
-		try{lhs ^= rhs;}
-		catch(...){throw;}
-	}
-	else if(op == "*=")
+	else if(op == OP_MULA)
 	{
 		try{lhs *= rhs;}
 		catch(...){throw;}
 	}
-	else if(op == "/=")
+	else if(op == OP_DIVA)
 	{
 		try{lhs /= rhs;}
 		catch(...){throw;}
 	}
-	else if(op == "%=")
+	else if(op == OP_EXPA)
+	{
+		try{lhs ^= rhs;}
+		catch(...){throw;}
+	}
+	else if(op == OP_MODA)
 	{
 		try{lhs %= rhs;}
 		catch(...){throw;}
 	}
-	else if(op == "+=")
+	else if(op == OP_ADDA)
 	{
 		try{lhs += rhs;}
 		catch(...){throw;}
 	}
-	else if(op == "-=")
+	else if(op == OP_SUBA)
 	{
 		try{lhs -= rhs;}
 		catch(...){throw;}
@@ -206,45 +231,89 @@ TL doAssignOps(TL lhs, std::string op, TR rhs)
 
 	return lhs;
 }
-template<typename TR>
-void doAssignOpsAndSave(std::string lhs, std::string op, TR rhs)
+template<typename TL, typename TR>
+bool doRelOp(TL lhs, std::string op, TR rhs)
 {
-	
+	if(op == OP_LT)
+	{
+		try{return lhs < rhs;}
+		catch(...){throw;}
+	}
+	else if(op == OP_LE)
+	{
+		try{return lhs <= rhs;}
+		catch(...){throw;}
+	}
+	else if(op == OP_GT)
+	{
+		try{return lhs > rhs;}
+		catch(...){throw;}
+	}
+	else if(op == OP_GE)
+	{
+		try{return lhs >= rhs;}
+		catch(...){throw;}
+	}
+	else if(op == OP_EQ)
+	{
+		try{return lhs == rhs;}
+		catch(...){throw;}
+	}
+	else if(op == OP_NE)
+	{
+		try{return lhs != rhs;}
+		catch(...){throw;}
+	}
+	else if(op == OP_AEQ)
+	{
+		try{return approxEquals<TL,TR>(lhs,rhs);}
+		catch(...){throw;}
+	}
+	else // We should only get here if I forgot to code an operation
+	{
+		throw std::runtime_error(E_UNKNOWN_OPERATION);
+	}
 }
 template<typename TL, typename TR>
 std::string getResult(std::string lhs, std::string op, std::string rhs)
 {
 	//TODO: Handle other operators (and incorrect ones)?
-	if(findInStrVect(arithOps,op,0) > -1)
+	for(long unsigned int precedence=0; precedence<operations.size(); precedence++)
 	{
-		try
+		int op_match = findInStrVect(operations[precedence],op,0) > -1;
+		if(op_match > -1 && (precedence < 3 || precedence == 5))//Mod operators
 		{
-			return std::string(doArithOps<TL,TR>(TL(lhs),op,TR(rhs)));
+			try
+			{
+				return std::string(doModOp<TL,TR>(TL(lhs),op,TR(rhs)));
+			}
+			catch(const std::runtime_error& e)
+			{
+				if(e.what() == std::string(E_INVALID_OPERATION))
+					output(Error,"Invalid operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
+				else if(e.what() == std::string(E_UNKNOWN_OPERATION))
+					output(Error,"Unknown operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
+			}
 		}
-		catch(const std::runtime_error& e)
+		else if(op_match > -1 && (precedence >= 3 && precedence < 5))//Relational operators
 		{
-			if(e.what() == std::string(E_INVALID_OPERATION))
-				output(Error,"Invalid operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
-			else if(e.what() == std::string(E_UNKNOWN_OPERATION))
-				output(Error,"Unknown operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
+			try
+			{
+				return btos(doRelOp<TL,TR>(TL(lhs),op,TR(rhs)));
+			}
+			catch(const std::runtime_error& e)
+			{
+				if(e.what() == std::string(E_INVALID_OPERATION))
+					output(Error,"Invalid operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
+				else if(e.what() == std::string(E_UNKNOWN_OPERATION))
+					output(Error,"Unknown operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
+			}
+		}
+		else //We shouldn't ever get here?
+		{
+			output(Error,"Unsupported operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
 		}
 	}
-	if(findInStrVect(assignOps,op,0) > -1)
-	{
-		try
-		{
-			return std::string(doAssignOps<TL,TR>(TL(lhs),op,TR(rhs)));
-		}
-		catch(const std::runtime_error& e)
-		{
-			if(e.what() == std::string(E_INVALID_OPERATION))
-				output(Error,"Invalid operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
-			else if(e.what() == std::string(E_UNKNOWN_OPERATION))
-				output(Error,"Unknown operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
-		}
-	}
-	/*else if(findInStrVect(relationOps,op) > -1)
-		return btos(doRelOp<TL,TR>(TL(lhs),op,TR(rhs)));*/
 
 	return ""; //Supress -Wreturn-type
 }
@@ -266,12 +335,10 @@ std::string parseRHSAndDoOp(std::vector<std::string>** v, unsigned int* lhs_pos,
 		try
 		{
 			int v_rhs = std::stoi((**v)[*rhs_pos]);
-			if(findInStrVect(arithOps,(**v)[*op_pos],0) > -1)
-				return std::string(doArithOps<TL,int>((**v)[*lhs_pos],(**v)[*op_pos],v_rhs));
-			else if(findInStrVect(assignOps,(**v)[*op_pos],0) > -1)
-				return std::string(doAssignOps<TL,int>((**v)[*lhs_pos],(**v)[*op_pos],v_rhs));
-			/*else if(isRelationalOp((**v)[*op_pos]))
-				result = btos(doRelOp<TL,int>((**v)[*lhs_pos],(**v)[*op_pos],v_rhs));*/
+			if(findInStrVect(modOps,(**v)[*op_pos],0) > -1)
+				return std::string(doModOp<TL,int>((**v)[*lhs_pos],(**v)[*op_pos],v_rhs));
+			else if(findInStrVect(relOps,(**v)[*op_pos],0) > -1)
+				return btos(doRelOp<TL,int>((**v)[*lhs_pos],(**v)[*op_pos],v_rhs));
 		}
 		catch(...)
 		{
@@ -316,6 +383,16 @@ void parseLHSAndDoOp(std::vector<std::string>* v, unsigned int lhs_pos, unsigned
 
 int main(int argc, char** argv)
 {
+	//Initialize operator group vectors
+	modOps.insert(modOps.end(),operations[0].begin(),operations[0].end());
+	modOps.insert(modOps.end(),operations[1].begin(),operations[1].end());
+	modOps.insert(modOps.end(),operations[2].begin(),operations[2].end());
+	modOps.insert(modOps.end(),operations[5].begin(),operations[5].end());
+	unaryOps.insert(unaryOps.end(),operations[0].begin(),operations[0].end());
+	relOps.insert(relOps.end(),operations[3].begin(),operations[3].end());
+	relOps.insert(relOps.end(),operations[4].begin(),operations[4].end());
+	assignOps.insert(assignOps.end(),operations[5].begin(),operations[5].end());
+
 	check_print_app_description(argv,"Not meant for direct call by user. Implicitly called when modifying variables.");
 
 	if(std::string(argv[1]).find('/') == std::string::npos)//If the user only enters the scope sigil
@@ -485,9 +562,9 @@ int main(int argc, char** argv)
 				tryGetProperty<Var>(scope, type_str, key, property, &old_property);
 
 				if(property == "")
-					scope.set<Var>(key,doArithOps<Var,int>(old_var,op,0));
+					scope.set<Var>(key,doModOp<Var,int>(old_var,op,0));
 				else if(!stringcasecmp(property,"Value"))
-					scope.setProperty<Var,std::string>(key,property,doArithOps<Var,int>(old_property,op,0).Value);
+					scope.setProperty<Var,std::string>(key,property,doModOp<Var,int>(old_property,op,0).Value);
 
 				new_value = scope.getStr<Var>(key);
 			}
@@ -500,13 +577,13 @@ int main(int argc, char** argv)
 				tryGetProperty<Dice>(scope, type_str, key, property, &old_property);
 
 				if(property == "")
-					scope.set<Dice>(key,doArithOps<Dice,int>(old_dice,op,0));
+					scope.set<Dice>(key,doModOp<Dice,int>(old_dice,op,0));
 				else if((!stringcasecmp(property,"Quantity") ||
 					 !stringcasecmp(property,"Faces") ||
 					 !stringcasecmp(property,"Modifier")))
-					scope.setProperty<Dice,int>(key,property,std::stoi(doArithOps<Var,int>(old_property,op,0).Value));
+					scope.setProperty<Dice,int>(key,property,std::stoi(doModOp<Var,int>(old_property,op,0).Value));
 				else if(!stringcasecmp(property,"List"))
-					scope.setProperty<Dice,std::string>(key,property,doArithOps<Var,int>(old_property,op,0).Value);
+					scope.setProperty<Dice,std::string>(key,property,doModOp<Var,int>(old_property,op,0).Value);
 
 				new_value = scope.getStr<Dice>(key);
 			}
@@ -519,9 +596,9 @@ int main(int argc, char** argv)
 				tryGetProperty<Wallet>(scope, type_str, key, property, &old_property);
 
 				if(property == "")
-					scope.set<Wallet>(key,doArithOps<Wallet,int>(old_wallet,op,0));
+					scope.set<Wallet>(key,doModOp<Wallet,int>(old_wallet,op,0));
 				else if(scope.get<Wallet>(key).containsCurrency(property))
-					scope.setProperty<Wallet,int>(key,property,std::stoi(doArithOps<Var,int>(old_property,op,0).Value));
+					scope.setProperty<Wallet,int>(key,property,std::stoi(doModOp<Var,int>(old_property,op,0).Value));
 
 				new_value = scope.getStr<Wallet>(key);
 			}
@@ -534,14 +611,14 @@ int main(int argc, char** argv)
 				tryGetProperty<Currency>(scope, type_str, key, property, &old_property);
 
 				if(property == "")
-					scope.set<Currency>(key,doArithOps<Currency,int>(old_currency,op,0));
+					scope.set<Currency>(key,doModOp<Currency,int>(old_currency,op,0));
 				else if(!stringcasecmp(property,"CurrencySystem"))
-					scope.setProperty<Currency,std::shared_ptr<CurrencySystem>>(key,property,std::make_shared<CurrencySystem>(CurrencySystem(doArithOps<Var,int>(old_property,op,0).Value)));
+					scope.setProperty<Currency,std::shared_ptr<CurrencySystem>>(key,property,std::make_shared<CurrencySystem>(CurrencySystem(doModOp<Var,int>(old_property,op,0).Value)));
 				else if(!stringcasecmp(property,"SmallerAmount"))
-					scope.setProperty<Currency,int>(key,property,std::stoi(doArithOps<Var,int>(old_property,op,0).Value));
+					scope.setProperty<Currency,int>(key,property,std::stoi(doModOp<Var,int>(old_property,op,0).Value));
 				else if(!stringcasecmp(property,"Smaller") ||
 					!stringcasecmp(property,"Larger"))
-					scope.setProperty<Currency,std::string>(key,property,doArithOps<Var,int>(old_property,op,0).Value);
+					scope.setProperty<Currency,std::string>(key,property,doModOp<Var,int>(old_property,op,0).Value);
 
 				new_value = scope.getStr<Currency>(key);
 			}
@@ -554,9 +631,9 @@ int main(int argc, char** argv)
 				tryGetProperty<CurrencySystem>(scope, type_str, key, property, &old_property);
 
 				if(property == "")
-					scope.set<CurrencySystem>(key,doArithOps<CurrencySystem,int>(old_currencysystem,op,0));
+					scope.set<CurrencySystem>(key,doModOp<CurrencySystem,int>(old_currencysystem,op,0));
 				else if(!stringcasecmp(property,"Name"))
-					scope.setProperty<CurrencySystem,std::string>(key,property,doArithOps<Var,int>(old_property,op,0).Value);
+					scope.setProperty<CurrencySystem,std::string>(key,property,doModOp<Var,int>(old_property,op,0).Value);
 
 				new_value = scope.getStr<CurrencySystem>(key);
 			}
@@ -649,26 +726,18 @@ int main(int argc, char** argv)
 
 						//Vectors for each operation type are in order of operator precedence
 						//TODO: Implement all operator types
-						for(const auto& arithOp : arithOps)
+						for(const auto& precedence : operations)
 						{
-							int op_pos = findInStrVect(args,arithOp,start);
-							fprintf(stdout,"\top_pos (%s) = %d\n",arithOp.c_str(),op_pos);
-
-							if(op_pos > start && op_pos < end)
+							for(const auto& op : precedence)
 							{
-								parseLHSAndDoOp(&args,op_pos-1,op_pos,op_pos+1);
-								args[start]+=rparens;//Maintain end parens
-							}
-						}
-						for(const auto& assignOp : assignOps)
-						{
-							int op_pos = findInStrVect(args,assignOp,start);
-							fprintf(stdout,"\top_pos (%s) = %d\n",assignOp.c_str(),op_pos);
+								int op_pos = findInStrVect(args,op,start);
+								fprintf(stdout,"\top_pos (%s) = %d\n",op.c_str(),op_pos);
 
-							if(op_pos > start && op_pos < end)
-							{
-								parseLHSAndDoOp(&args,op_pos-1,op_pos,op_pos+1);
-								args[start]+=rparens;//Maintain end parens
+								if(op_pos > start && op_pos < end)
+								{
+									parseLHSAndDoOp(&args,op_pos-1,op_pos,op_pos+1);
+									args[start]+=rparens;//Maintain end parens
+								}
 							}
 						}
 						fprintf(stdout,"\n");
