@@ -119,8 +119,7 @@ VariableInfo parseVariable(std::string v)//Derive information about variable fro
 	}
 
 	//Check for external references
-	if(v[1] == '[')
-		v = loadXRef(v,&vi.scope);
+	if(v[1] == '[') v = loadXRef(v,&vi.scope);
 
 	vi.variable = v;
 	vi.key = right(v,v.find('/')+1);
@@ -154,22 +153,6 @@ void appendOutput(std::map<std::string,std::string> map, std::string key, std::s
 std::string readOrWriteDataOnScope(VariableInfo* p_vi, char action, std::string value)
 {
 	assert(action == 'r' || action == 'w');
-
-	switch(p_vi->variable[0])
-	{
-		case CHARACTER_SIGIL:
-			p_vi->scope = c;
-			break;
-		case CAMPAIGN_SIGIL:
-			p_vi->scope = m;
-			break;
-		case SHELL_SIGIL:
-			p_vi->scope = s;
-			break;
-		default:
-			output(Error,"Unknown scope sigil \'%c\'.",p_vi->variable[0]);
-			exit(-1);
-	}
 
 	if(p_vi->variable[p_vi->variable.length()-1] != '/')//If the last character isn't a '/', just handle value
 	{
@@ -280,6 +263,8 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, char action, std::string 
 		output = left(output,output.length()-DS.length());
 		return output;
 	}
+
+	if(action == 'w') p_vi->scope.save();
 
 	return ""; //Supress -Wreturn-type
 }
@@ -504,12 +489,9 @@ void parseLHSAndDoOp(std::vector<std::string>* v, unsigned int lhs_pos, unsigned
 	//TODO Handle quote-wrapped strings to force string interpretation
 
 	std::string result = "";
-	VariableInfo vi = parseVariable((*v)[lhs_pos]);
+	VariableInfo vi;
 
-	if(lhs_pos == 0)//TODO: Correctly handle getting of value
-	{
-		//(*v)[lhs_pos] = p_scope->get
-	}
+	if(lhs_pos == 0) vi = parseVariable((*v)[lhs_pos]);
 
 	fprintf(stdout,"Performing operation: %s %s %s\n",(*v)[lhs_pos].c_str(),(*v)[op_pos].c_str(),(*v)[rhs_pos].c_str());
 
@@ -527,7 +509,8 @@ void parseLHSAndDoOp(std::vector<std::string>* v, unsigned int lhs_pos, unsigned
 		result = parseRHSAndDoOp<Var>(&v, &lhs_pos, &op_pos, &rhs_pos);
 
 	//If the first arg is a variable and we are assigning it, we'll need to save the result
-	if(lhs_pos == 0 && findInStrVect(assignOps,(*v)[op_pos],0) > -1)
+	if(lhs_pos == 0 && isScopeSigil((*v)[lhs_pos][0]) &&
+	  ((*v)[lhs_pos][1] == '/' || (*v)[lhs_pos][1] == '[') && findInStrVect(assignOps,(*v)[op_pos],0) > -1)
 		(void)readOrWriteDataOnScope(&vi, 'w', result);
 
 	fprintf(stdout,"Result: \"%s\"\n",result.c_str());
@@ -565,6 +548,7 @@ int main(int argc, char** argv)
 	VariableInfo vi;
 	std::string variable(argv[1]);
 	std::string scope_str = "";
+	vi = parseVariable(variable);
 
 	//Check scope sigil
 	switch(variable[0])
@@ -582,8 +566,6 @@ int main(int argc, char** argv)
 			output(Error,"Unknown scope sigil \'%c\'.",argv[1][0]);
 			exit(-1);
 	}
-
-	vi = parseVariable(variable);
 
 	if(argc == 2)//If the user just submits a variable...
 	{
