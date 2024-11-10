@@ -169,7 +169,7 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	}
 
 	std::string path = "/bin/";
-	std::regex arg_pattern("[\\@\\#\\$\\[\\]\\/a-zA-Z0-9\\=\\+\\-\\*\\.\\_\\\"\\(\\)\\{\\},]{1,}");
+	std::regex arg_pattern("[\\@\\#\\$\\[\\]\\/a-zA-Z0-9\\=\\+\\-\\*\\^\\%\\<\\>\\=\\!\\~\\.\\_\\\"\\(\\)\\{\\},]{1,}");
 
 	std::sregex_iterator arg_str_it(arg_str.begin(), arg_str.end(), arg_pattern);
 	std::sregex_iterator arg_str_end;
