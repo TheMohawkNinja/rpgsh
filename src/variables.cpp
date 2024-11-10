@@ -1,9 +1,10 @@
+#include <cassert>
+#include <climits>
 #include "../headers/currency.h"
 #include "../headers/dice.h"
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 #include "../headers/var.h"
-#include <cassert>
 
 struct VariableInfo
 {
@@ -435,6 +436,11 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 					output(Error,"Unknown operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
 					exit(-1);
 				}
+				else
+				{
+					output(Error,"Error during operation: \"%s %s %s\" (%s)",lhs.c_str(),op.c_str(),rhs.c_str(),e.what());
+					exit(-1);
+				}
 			}
 		}
 		else if(op_match > -1 && (precedence >= 3 && precedence < 5))//Relational operators
@@ -455,6 +461,11 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 					output(Error,"Unknown operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
 					exit(-1);
 				}
+				else
+				{
+					output(Error,"Error during operation: \"%s %s %s\" (%s)",lhs.c_str(),op.c_str(),rhs.c_str(),e.what());
+					exit(-1);
+				}
 			}
 		}
 		else //We shouldn't ever get here?
@@ -467,8 +478,16 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 	return ""; //Supress -Wreturn-type
 }
 template<typename TL>
-std::string parseRHSAndDoOp(std::vector<std::string>** v, unsigned int* lhs_pos, unsigned int* op_pos, unsigned int* rhs_pos)
+std::string parseRHSAndDoOp(VariableInfo** vi, std::vector<std::string>** v, unsigned int* lhs_pos, unsigned int* op_pos, unsigned int* rhs_pos)
 {
+	if((*rhs_pos) == UINT_MAX) // Unary operators
+	{
+		if((*vi)->property == "")
+			return getResult<TL,Var>((*vi)->scope.getStr<TL>((*vi)->key),(**v)[*op_pos],"");
+		else
+			return getResult<TL,Var>((*vi)->scope.getProperty<TL>((*vi)->key,(*vi)->property),(**v)[*op_pos],"");
+	}
+
 	if(left((**v)[*rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
 		return getResult<TL,Var>((**v)[*lhs_pos],(**v)[*op_pos],(**v)[*rhs_pos]);
 	else if(left((**v)[*rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
@@ -484,34 +503,40 @@ std::string parseRHSAndDoOp(std::vector<std::string>** v, unsigned int* lhs_pos,
 
 	return ""; //Supress -Wreturn-type
 }
-void parseLHSAndDoOp(std::vector<std::string>* v, unsigned int lhs_pos, unsigned int op_pos, unsigned int rhs_pos)
+void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int lhs_pos, unsigned int op_pos, unsigned int rhs_pos)
 {
 	//TODO Handle quote-wrapped strings to force string interpretation
 
 	std::string result = "";
-	VariableInfo vi;
 
-	if(lhs_pos == 0) vi = parseVariable((*v)[lhs_pos]);
-
-	fprintf(stdout,"Performing operation: %s %s %s\n",(*v)[lhs_pos].c_str(),(*v)[op_pos].c_str(),(*v)[rhs_pos].c_str());
+	if(rhs_pos < v->size())
+	{
+		fprintf(stdout,"Performing operation: %s %s %s\n",(*v)[lhs_pos].c_str(),(*v)[op_pos].c_str(),(*v)[rhs_pos].c_str());
+	}
+	else
+	{
+		fprintf(stdout,"Performing operation: %s %s\n",(*v)[lhs_pos].c_str(),(*v)[op_pos].c_str());
+		rhs_pos = UINT_MAX; // Unary operators. MAX_BUFFER is way less than UINT_MAX, so this is okay
+	}
 
 	if(left((*v)[lhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
-		result = parseRHSAndDoOp<Var>(&v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<Var>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
-		result = parseRHSAndDoOp<Dice>(&v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<Dice>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
-		result = parseRHSAndDoOp<Wallet>(&v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<Wallet>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
-		result = parseRHSAndDoOp<Currency>(&v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<Currency>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
-		result = parseRHSAndDoOp<CurrencySystem>(&v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<CurrencySystem>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
 	else//Treat non-explicit constructors as Var
-		result = parseRHSAndDoOp<Var>(&v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<Var>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
 
 	//If the first arg is a variable and we are assigning it, we'll need to save the result
 	if(lhs_pos == 0 && isScopeSigil((*v)[lhs_pos][0]) &&
-	  ((*v)[lhs_pos][1] == '/' || (*v)[lhs_pos][1] == '[') && findInStrVect(assignOps,(*v)[op_pos],0) > -1)
-		(void)readOrWriteDataOnScope(&vi, 'w', result);
+	  ((*v)[lhs_pos][1] == '/' || (*v)[lhs_pos][1] == '[') &&
+	  (findInStrVect(assignOps,(*v)[op_pos],0) > -1 || findInStrVect(unaryOps,(*v)[op_pos],0) > -1))
+		(void)readOrWriteDataOnScope(vi, 'w', result);
 
 	fprintf(stdout,"Result: \"%s\"\n",result.c_str());
 
@@ -644,10 +669,10 @@ int main(int argc, char** argv)
 							for(const auto& op : precedence)
 							{
 								int op_pos = findInStrVect(args,op,start);
-								if(op_pos > start && op_pos < end)
+								if(op_pos > start && op_pos <= end)
 								{
 									fprintf(stdout,"\top_pos (%s) = %d\n",op.c_str(),op_pos);
-									parseLHSAndDoOp(&args,op_pos-1,op_pos,op_pos+1);
+									parseLHSAndDoOp(&vi,&args,op_pos-1,op_pos,op_pos+1);
 									args[start]+=rparens;//Maintain end parens
 								}
 							}
