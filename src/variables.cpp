@@ -6,6 +6,9 @@
 #include "../headers/scope.h"
 #include "../headers/var.h"
 
+#define ACTION_READ  'r'
+#define ACTION_WRITE 'w'
+
 struct VariableInfo
 {
 	Scope scope = Scope();
@@ -153,86 +156,86 @@ void appendOutput(std::map<std::string,std::string> map, std::string key, std::s
 }
 std::string readOrWriteDataOnScope(VariableInfo* p_vi, char action, std::string value)
 {
-	assert(action == 'r' || action == 'w');
+	assert(action == ACTION_READ || action == ACTION_WRITE);
 
 	if(p_vi->variable[p_vi->variable.length()-1] != '/')//If the last character isn't a '/', just handle value
 	{
 		if((p_vi->variable[1] == '/' || p_vi->variable[1] == VAR_SIGIL) && p_vi->scope.keyExists<Var>(p_vi->key))
 		{
-			if(action == 'r' && p_vi->property == "")
+			if(action == ACTION_READ && p_vi->property == "")
 				return p_vi->scope.getStr<Var>(p_vi->key);
-			else if(action == 'w' && p_vi->property == "")
+			else if(action == ACTION_WRITE && p_vi->property == "")
 				p_vi->scope.set<Var>(p_vi->key,Var(value));
-			else if(action == 'r' && !stringcasecmp(p_vi->property,"Value"))
+			else if(action == ACTION_READ && !stringcasecmp(p_vi->property,"Value"))
 				return p_vi->scope.getProperty<Var>(p_vi->key,p_vi->property);
-			else if(action == 'w' && !stringcasecmp(p_vi->property,"Value"))
+			else if(action == ACTION_WRITE && !stringcasecmp(p_vi->property,"Value"))
 				p_vi->scope.setProperty<Var,std::string>(p_vi->key,p_vi->property,Var(value).Value);
 		}
 		else if((p_vi->variable[1] == '/' || p_vi->variable[1] == DICE_SIGIL) && p_vi->scope.keyExists<Dice>(p_vi->key))
 		{
-			if(action == 'r' && p_vi->property == "")
+			if(action == ACTION_READ && p_vi->property == "")
 				return p_vi->scope.getStr<Dice>(p_vi->key);
-			else if(action == 'w' && p_vi->property == "")
+			else if(action == ACTION_WRITE && p_vi->property == "")
 				p_vi->scope.set<Dice>(p_vi->key,Dice(value));
-			else if(action == 'r' &&
+			else if(action == ACTION_READ &&
 				(!stringcasecmp(p_vi->property,"Quantity") ||
 			         !stringcasecmp(p_vi->property,"Faces") ||
 			         !stringcasecmp(p_vi->property,"Modifier") ||
 				 !stringcasecmp(p_vi->property,"List")))
 				return p_vi->scope.getProperty<Dice>(p_vi->key,p_vi->property);
-			else if(action == 'w' && !stringcasecmp(p_vi->property,"Quantity"))
+			else if(action == ACTION_WRITE && !stringcasecmp(p_vi->property,"Quantity"))
 				p_vi->scope.setProperty<Dice,int>(p_vi->key,p_vi->property,Dice(value).Quantity);
-			else if(action == 'w' && !stringcasecmp(p_vi->property,"Faces"))
+			else if(action == ACTION_WRITE && !stringcasecmp(p_vi->property,"Faces"))
 				p_vi->scope.setProperty<Dice,int>(p_vi->key,p_vi->property,Dice(value).Faces);
-			else if(action == 'w' && !stringcasecmp(p_vi->property,"Modifier"))
+			else if(action == ACTION_WRITE && !stringcasecmp(p_vi->property,"Modifier"))
 				p_vi->scope.setProperty<Dice,int>(p_vi->key,p_vi->property,Dice(value).Modifier);
-			else if(action == 'w' && !stringcasecmp(p_vi->property,"List"))
+			else if(action == ACTION_WRITE && !stringcasecmp(p_vi->property,"List"))
 				p_vi->scope.setProperty<Dice,std::string>(p_vi->key,p_vi->property,Dice(value).List);
 		}
 		else if((p_vi->variable[1] == '/' || p_vi->variable[1] == WALLET_SIGIL) && p_vi->scope.keyExists<Wallet>(p_vi->key))
 		{
-			if(action == 'r' && p_vi->property == "")
+			if(action == ACTION_READ && p_vi->property == "")
 				return p_vi->scope.getStr<Wallet>(p_vi->key);
-			else if(action == 'w' && p_vi->property == "")
+			else if(action == ACTION_WRITE && p_vi->property == "")
 				p_vi->scope.set<Wallet>(p_vi->key,Wallet(value));
-			else if(action == 'r' && p_vi->scope.get<Wallet>(p_vi->key).containsCurrency(p_vi->property))
+			else if(action == ACTION_READ && p_vi->scope.get<Wallet>(p_vi->key).containsCurrency(p_vi->property))
 				return p_vi->scope.getProperty<Wallet>(p_vi->key,p_vi->property);
-			else if(action == 'w')
+			else if(action == ACTION_WRITE)
 				p_vi->scope.setProperty<Wallet,int>(p_vi->key,p_vi->property,Wallet(value).Money[Currency(p_vi->property)]);
 		}
 		else if((p_vi->variable[1] == '/' || p_vi->variable[1] == CURRENCY_SIGIL) && p_vi->scope.keyExists<Currency>(p_vi->key))
 		{
-			if(action == 'r' && p_vi->property == "")
+			if(action == ACTION_READ && p_vi->property == "")
 				return p_vi->scope.getStr<Currency>(p_vi->key);
-			else if(action == 'w' && p_vi->property == "")
+			else if(action == ACTION_WRITE && p_vi->property == "")
 				p_vi->scope.set<Currency>(p_vi->key,Currency(value));
-			else if(action == 'r' &&
+			else if(action == ACTION_READ &&
 				(!stringcasecmp(p_vi->property,"CurrencySystem") ||
 				 !stringcasecmp(p_vi->property,"Name") ||
 				 !stringcasecmp(p_vi->property,"SmallerAmount") ||
 				 !stringcasecmp(p_vi->property,"Smaller") ||
 				 !stringcasecmp(p_vi->property,"Larger")))
 				return p_vi->scope.getProperty<Currency>(p_vi->key,p_vi->property);
-			else if(action == 'w' && !stringcasecmp(p_vi->property,"CurrencySystem"))
+			else if(action == ACTION_WRITE && !stringcasecmp(p_vi->property,"CurrencySystem"))
 				p_vi->scope.setProperty<Currency,std::shared_ptr<CurrencySystem>>(p_vi->key,p_vi->property,Currency(value).System);
-			else if(action == 'w' && !stringcasecmp(p_vi->property,"Name"))
+			else if(action == ACTION_WRITE && !stringcasecmp(p_vi->property,"Name"))
 				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,Currency(value).Name);
-			else if(action == 'w' && !stringcasecmp(p_vi->property,"Smaller"))
+			else if(action == ACTION_WRITE && !stringcasecmp(p_vi->property,"Smaller"))
 				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,Currency(value).Smaller);
-			else if(action == 'w' && !stringcasecmp(p_vi->property,"Larger"))
+			else if(action == ACTION_WRITE && !stringcasecmp(p_vi->property,"Larger"))
 				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,Currency(value).Larger);
-			else if(action == 'w' && !stringcasecmp(p_vi->property,"SmallerAmount"))
+			else if(action == ACTION_WRITE && !stringcasecmp(p_vi->property,"SmallerAmount"))
 				p_vi->scope.setProperty<Currency,int>(p_vi->key,p_vi->property,Currency(value).SmallerAmount);
 		}
 		else if((p_vi->variable[1] == '/' || p_vi->variable[1] == CURRENCYSYSTEM_SIGIL) && p_vi->scope.keyExists<CurrencySystem>(p_vi->key))
 		{
-			if(action == 'r' && p_vi->property == "")
+			if(action == ACTION_READ && p_vi->property == "")
 				return p_vi->scope.getStr<CurrencySystem>(p_vi->key);
-			else if(action == 'w' && p_vi->property == "")
+			else if(action == ACTION_WRITE && p_vi->property == "")
 				p_vi->scope.set<CurrencySystem>(p_vi->key,CurrencySystem(value));
-			else if(action == 'r' && !stringcasecmp(p_vi->property,"Name"))
+			else if(action == ACTION_READ && !stringcasecmp(p_vi->property,"Name"))
 				return p_vi->scope.getProperty<CurrencySystem>(p_vi->key,p_vi->property);
-			else if(action == 'w' && !stringcasecmp(p_vi->property,"Name"))
+			else if(action == ACTION_WRITE && !stringcasecmp(p_vi->property,"Name"))
 				p_vi->scope.setProperty<CurrencySystem,std::string>(p_vi->key,p_vi->property,CurrencySystem(value).Name);
 		}
 		else if(p_vi->variable[1] != '/' && !isTypeSigil(p_vi->variable[1]))
@@ -292,24 +295,9 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, char action, std::string 
 		return output;
 	}
 
-	if(action == 'w') p_vi->scope.save();
+	if(action == ACTION_WRITE) p_vi->scope.save();
 
 	return ""; //Supress -Wreturn-type
-}
-template <typename T>
-void tryGetProperty(Scope scope, std::string type_str, std::string key, std::string property, std::string* pOld_property)
-{
-	if(property == "") return;
-
-	try
-	{
-		(*pOld_property) = scope.getProperty<T>(key,property);
-	}
-	catch(...)
-	{
-		output(Error,"\"%s\" is not a valid %s property.",property.c_str(),type_str.c_str());
-		exit(-1);
-	}
 }
 template<typename TL, typename TR>
 TL doModOp(TL lhs, std::string op, TR rhs)
@@ -546,6 +534,7 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 		rhs_pos = UINT_MAX; // Unary operators. MAX_BUFFER is way less than UINT_MAX, so this is okay
 	}
 
+	//TODO: Handle when we are altering the base variable (lhs_pos == 0)
 	if(left((*v)[lhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
 		result = parseRHSAndDoOp<Var>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
@@ -563,7 +552,7 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 	if(lhs_pos == 0 && isScopeSigil((*v)[lhs_pos][0]) &&
 	  ((*v)[lhs_pos][1] == '/' || (*v)[lhs_pos][1] == '[') &&
 	  (findInStrVect(assignOps,(*v)[op_pos],0) > -1 || findInStrVect(unaryOps,(*v)[op_pos],0) > -1))
-		(void)readOrWriteDataOnScope(vi, 'w', result);
+		(void)readOrWriteDataOnScope(vi, ACTION_WRITE, result);
 
 	fprintf(stdout,"Result: \"%s\"\n",result.c_str());
 
@@ -621,7 +610,7 @@ int main(int argc, char** argv)
 
 	if(argc == 2)//If the user just submits a variable...
 	{
-		fprintf(stdout,"%s\n",readOrWriteDataOnScope(&vi, 'r', "").c_str());
+		fprintf(stdout,"%s\n",readOrWriteDataOnScope(&vi, ACTION_READ, "").c_str());
 	}
 	else//Binary operators
 	{
