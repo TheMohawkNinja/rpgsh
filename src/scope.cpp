@@ -326,7 +326,7 @@ std::string Scope::getProperty<Currency>(std::string key, std::string property)
 	else if(!stringcasecmp(property,"Larger"))
 		return get<Currency>(key).Larger;
 
-	throw std::runtime_error("invalid_property");
+	throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
 std::string Scope::getProperty<CurrencySystem>(std::string key, std::string property)
@@ -334,7 +334,7 @@ std::string Scope::getProperty<CurrencySystem>(std::string key, std::string prop
 	if(!stringcasecmp(property,"Name"))
 		return get<CurrencySystem>(key).Name;
 
-	throw std::runtime_error("invalid_property");
+	throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
 std::string Scope::getProperty<Dice>(std::string key, std::string property)
@@ -348,7 +348,7 @@ std::string Scope::getProperty<Dice>(std::string key, std::string property)
 	else if(!stringcasecmp(property,"List"))
 		return get<Dice>(key).List;
 
-	throw std::runtime_error("invalid_property");
+	throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
 std::string Scope::getProperty<Var>(std::string key, std::string property)
@@ -356,7 +356,7 @@ std::string Scope::getProperty<Var>(std::string key, std::string property)
 	if(!stringcasecmp(property,"Value"))
 		return get<Var>(key).Value;
 
-	throw std::runtime_error("invalid_property");
+	throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
 std::string Scope::getProperty<Wallet>(std::string key, std::string property)
@@ -367,7 +367,7 @@ std::string Scope::getProperty<Wallet>(std::string key, std::string property)
 			return std::to_string(q);
 	}
 
-	throw std::runtime_error("invalid_property");
+	throw std::runtime_error(E_INVALID_PROPERTY);
 }
 
 //Get all variables of a specific datatype

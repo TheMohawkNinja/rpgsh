@@ -61,6 +61,7 @@
 #define FLAG_APPDESCRIPTION		"--appdescription"
 
 //Custom exceptions
+#define E_INVALID_PROPERTY		"invalid_property"
 #define E_INVALID_OPERATION		"invalid_operation"
 #define E_UNKNOWN_OPERATION		"unknown_operation"
 
