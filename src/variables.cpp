@@ -549,8 +549,7 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 		result = parseRHSAndDoOp<Var>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
 
 	//If the first arg is a variable and we are assigning it, we'll need to save the result
-	if(lhs_pos == 0 && isScopeSigil((*v)[lhs_pos][0]) &&
-	  ((*v)[lhs_pos][1] == '/' || (*v)[lhs_pos][1] == '[') &&
+	if(lhs_pos == 0 && vi->key != "" &&
 	  (findInStrVect(assignOps,(*v)[op_pos],0) > -1 || findInStrVect(unaryOps,(*v)[op_pos],0) > -1))
 		(void)readOrWriteDataOnScope(vi, ACTION_WRITE, result);
 
@@ -589,30 +588,15 @@ int main(int argc, char** argv)
 	VariableInfo vi;
 	std::string variable(argv[1]);
 	std::string scope_str = "";
-	vi = parseVariable(variable);
 
-	//Check scope sigil
-	switch(variable[0])
-	{
-		case CHARACTER_SIGIL:
-			scope_str = "Character";
-			break;
-		case CAMPAIGN_SIGIL:
-			scope_str = "Campaign";
-			break;
-		case SHELL_SIGIL:
-			scope_str = "Shell";
-			break;
-		default:
-			output(Error,"Unknown scope sigil \'%c\'.",argv[1][0]);
-			exit(-1);
-	}
+	if(isScopeSigil(variable[0]) && (isTypeSigil(variable[1]) || variable[1] == '/'))
+		vi = parseVariable(variable);
 
 	if(argc == 2)//If the user just submits a variable...
 	{
 		fprintf(stdout,"%s\n",readOrWriteDataOnScope(&vi, ACTION_READ, "").c_str());
 	}
-	else//Binary operators
+	else//Perform operation
 	{
 		std::vector<std::string> args;
 		unsigned int open_paren_ctr = 0;
@@ -640,6 +624,74 @@ int main(int argc, char** argv)
 		}
 
 		int args_size = args.size();
+
+		//Replace first arg with value if it's a variable
+		if(vi.key != "" && vi.property != "")
+		{
+			switch(args[0][1])
+			{
+				case VAR_SIGIL:
+					args[0] = vi.scope.getProperty<Var>(vi.key,vi.property);
+					break;
+				case DICE_SIGIL:
+					args[0] = vi.scope.getProperty<Dice>(vi.key,vi.property);
+					break;
+				case WALLET_SIGIL:
+					args[0] = vi.scope.getProperty<Wallet>(vi.key,vi.property);
+					break;
+				case CURRENCY_SIGIL:
+					args[0] = vi.scope.getProperty<Currency>(vi.key,vi.property);
+					break;
+				case CURRENCYSYSTEM_SIGIL:
+					args[0] = vi.scope.getProperty<CurrencySystem>(vi.key,vi.property);
+					break;
+				case '/':
+					try{args[0] = vi.scope.getProperty<Var>(vi.key,vi.property);break;}
+					catch(...){}
+					try{args[0] = vi.scope.getProperty<Dice>(vi.key,vi.property);break;}
+					catch(...){}
+					try{args[0] = vi.scope.getProperty<Wallet>(vi.key,vi.property);break;}
+					catch(...){}
+					try{args[0] = vi.scope.getProperty<Currency>(vi.key,vi.property);break;}
+					catch(...){}
+					try{args[0] = vi.scope.getProperty<CurrencySystem>(vi.key,vi.property);break;}
+					catch(...){}
+					output(Error,"%s is not a valid property of %s.",vi.property.c_str(),vi.key.c_str());
+					exit(-1);
+			}
+		}
+		else if(vi.key != "")
+		{
+			switch(args[0][1])
+			{
+				case VAR_SIGIL:
+					args[0] = vi.scope.getStr<Var>(vi.key);
+					break;
+				case DICE_SIGIL:
+					args[0] = vi.scope.getStr<Dice>(vi.key);
+					break;
+				case WALLET_SIGIL:
+					args[0] = vi.scope.getStr<Wallet>(vi.key);
+					break;
+				case CURRENCY_SIGIL:
+					args[0] = vi.scope.getStr<Currency>(vi.key);
+					break;
+				case CURRENCYSYSTEM_SIGIL:
+					args[0] = vi.scope.getStr<CurrencySystem>(vi.key);
+					break;
+				case '/':
+					try{args[0] = vi.scope.getStr<Var>(vi.key);break;}
+					catch(...){}
+					try{args[0] = vi.scope.getStr<Dice>(vi.key);break;}
+					catch(...){}
+					try{args[0] = vi.scope.getStr<Wallet>(vi.key);break;}
+					catch(...){}
+					try{args[0] = vi.scope.getStr<Currency>(vi.key);break;}
+					catch(...){}
+					try{args[0] = vi.scope.getStr<CurrencySystem>(vi.key);break;}
+					catch(...){}
+			}
+		}
 
 		//Wrap everything in parenthesis just to make below code simpler
 		args[0] = '('+args[0];
@@ -689,7 +741,7 @@ int main(int argc, char** argv)
 								{
 									fprintf(stdout,"\top_pos (%s) = %d\n",op.c_str(),op_pos);
 									parseLHSAndDoOp(&vi,&args,op_pos-1,op_pos,op_pos+1);
-									args[start]+=rparens;//Maintain end parens
+									args[start] += rparens;//Maintain end parens
 								}
 							}
 						}
