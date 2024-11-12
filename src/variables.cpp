@@ -763,7 +763,11 @@ int main(int argc, char** argv)
 				}
 			}
 
-			// Check if parenthesis still exist. If so, restart loop to go back through PEMDAS
+			// Check if parenthesis still exist, and re-wrap if needed. Restart loop to go back through PEMDAS if needed
+			if(args.size() > 1 && args[0][0] != '(')
+				args[0] = '(' + args[0];
+			if(args.size() > 1 && args[args.size()-1][args[args.size()-1].length()-1] != ')')
+				args[args.size()-1] += ')';
 			if(start == args_size-1)
 			{
 				for(const auto& arg : args)
