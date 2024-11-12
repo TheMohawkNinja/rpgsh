@@ -54,17 +54,17 @@ std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir
 }
 std::string loadXRef(std::string arg, Scope* p_scope)
 {
-	//Ending square bracket not found
+	// Ending square bracket not found
 	if(arg.find(']') == std::string::npos)
 	{
 		output(Error,"No terminating \']\' found for xref.");
 		exit(-1);
 	}
 
-	//Get string between the square brackets
+	// Get string between the square brackets
 	std::string xref = arg.substr(arg.find('[')+1,arg.find(']')-(arg.find('[')+1));
 
-	//Actually load the xref into the scope
+	// Actually load the xref into the scope
 	std::vector<std::string> campaigns;
 	std::string xref_dir = campaigns_dir+
 			       get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
@@ -74,7 +74,7 @@ std::string loadXRef(std::string arg, Scope* p_scope)
 	switch(arg[0])
 	{
 		case CHARACTER_SIGIL:
-			if(xref.find('/') != std::string::npos)//Attempting to get a character from another campaign
+			if(xref.find('/') != std::string::npos)// Attempting to get a character from another campaign
 			{
 				campaign = left(xref,xref.find('/'));
 				xref_char = right(xref,xref.find('/')+1);
@@ -97,15 +97,15 @@ std::string loadXRef(std::string arg, Scope* p_scope)
 			exit(-1);
 	}
 
-	//Remove external reference string so we can continue to use the current arg under the new context
+	// Remove external reference string so we can continue to use the current arg under the new context
 	arg = arg[0]+left(arg,arg.find('[')-1)+right(arg,arg.find(']')+1);
 	return arg;
 }
-VariableInfo parseVariable(std::string v)//Derive information about variable from string
+VariableInfo parseVariable(std::string v)// Derive information about variable from string
 {
 	VariableInfo vi;
 
-	//Check scope sigil
+	// Check scope sigil
 	switch(v[0])
 	{
 		case CHARACTER_SIGIL:
@@ -122,7 +122,7 @@ VariableInfo parseVariable(std::string v)//Derive information about variable fro
 			exit(-1);
 	}
 
-	//Check for external references
+	// Check for external references
 	if(v[1] == '[') v = loadXRef(v,&vi.scope);
 
 	vi.variable = v;
@@ -145,11 +145,11 @@ void appendOutput(std::map<std::string,std::string> map, std::string key, std::s
 {
 	for(const auto& [k,v] : map)
 	{
-		//Get root variable if it exists
+		// Get root variable if it exists
 		if(!stringcasecmp((left(k,key.length())+"/"),key))
 			pOutput->append(k + DS + v + DS);
 
-		//Get all subkeys
+		// Get all subkeys
 		if(!stringcasecmp((left(k,key.length())),key))
 			pOutput->append(k + DS + v + DS);
 	}
@@ -158,7 +158,7 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, char action, std::string 
 {
 	assert(action == ACTION_READ || action == ACTION_WRITE);
 
-	if(p_vi->variable[p_vi->variable.length()-1] != '/')//If the last character isn't a '/', just handle value
+	if(p_vi->variable[p_vi->variable.length()-1] != '/')// If the last character isn't a '/', just handle value
 	{
 		if((p_vi->variable[1] == '/' || p_vi->variable[1] == VAR_SIGIL) && p_vi->scope.keyExists<Var>(p_vi->key))
 		{
@@ -244,7 +244,7 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, char action, std::string 
 			exit(-1);
 		}
 	}
-	else//...and the last character is a '/', print a list of p_vi->keys and constructors
+	else// ...and the last character is a '/', print a list of p_vi->keys and constructors
 	{
 		std::map<std::string,std::string> c_map;
 		std::map<std::string,std::string> cs_map;
@@ -252,7 +252,7 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, char action, std::string 
 		std::map<std::string,std::string> v_map;
 		std::map<std::string,std::string> w_map;
 
-		//When printing entire containers, treat type sigil as a filter
+		// When printing entire containers, treat type sigil as a filter
 		switch(p_vi->variable[1])
 		{
 			case CURRENCY_SIGIL:
@@ -282,7 +282,7 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, char action, std::string 
 				exit(-1);
 		}
 
-		//Create output string from map
+		// Create output string from map
 		std::string output = "";
 		appendOutput(c_map,p_vi->key,&output);
 		appendOutput(cs_map,p_vi->key,&output);
@@ -290,14 +290,14 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, char action, std::string 
 		appendOutput(v_map,p_vi->key,&output);
 		appendOutput(w_map,p_vi->key,&output);
 
-		//Cut off the extraneous DS
+		// Cut off the extraneous DS
 		output = left(output,output.length()-DS.length());
 		return output;
 	}
 
 	if(action == ACTION_WRITE) p_vi->scope.save();
 
-	return ""; //Supress -Wreturn-type
+	return ""; // Supress -Wreturn-type
 }
 template<typename TL, typename TR>
 TL doModOp(TL lhs, std::string op, TR rhs)
@@ -377,7 +377,7 @@ TL doModOp(TL lhs, std::string op, TR rhs)
 		try{lhs -= rhs;}
 		catch(...){throw;}
 	}
-	else // We should only get here if I forgot to code an operation
+	else// We should only get here if I forgot to code an operation
 	{
 		throw std::runtime_error(E_UNKNOWN_OPERATION);
 	}
@@ -422,7 +422,7 @@ bool doRelOp(TL lhs, std::string op, TR rhs)
 		try{return approxEquals<TL,TR>(lhs,rhs);}
 		catch(...){throw;}
 	}
-	else // We should only get here if I forgot to code an operation
+	else// We should only get here if I forgot to code an operation
 	{
 		throw std::runtime_error(E_UNKNOWN_OPERATION);
 	}
@@ -433,7 +433,7 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 	for(long unsigned int precedence=0; precedence<operations.size(); precedence++)
 	{
 		int op_match = findInStrVect(operations[precedence],op,0) > -1;
-		if(op_match > -1 && (precedence < 3 || precedence == 5))//Mod operators
+		if(op_match > -1 && (precedence < 3 || precedence == 5))// Mod operators
 		{
 			try
 			{
@@ -458,7 +458,7 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 				}
 			}
 		}
-		else if(op_match > -1 && (precedence >= 3 && precedence < 5))//Relational operators
+		else if(op_match > -1 && (precedence >= 3 && precedence < 5))// Relational operators
 		{
 			try
 			{
@@ -483,19 +483,19 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 				}
 			}
 		}
-		else //We shouldn't ever get here?
+		else// We shouldn't ever get here?
 		{
 			output(Error,"Unsupported operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
 			exit(-1);
 		}
 	}
 
-	return ""; //Supress -Wreturn-type
+	return "";// Supress -Wreturn-type
 }
 template<typename TL>
 std::string parseRHSAndDoOp(VariableInfo** vi, std::vector<std::string>** v, unsigned int* lhs_pos, unsigned int* op_pos, unsigned int* rhs_pos)
 {
-	if((*rhs_pos) == UINT_MAX) // Unary operators
+	if((*rhs_pos) == UINT_MAX)// Unary operators
 	{
 		if((*vi)->property == "")
 			return getResult<TL,Var>((*vi)->scope.getStr<TL>((*vi)->key),(**v)[*op_pos],"");
@@ -516,11 +516,11 @@ std::string parseRHSAndDoOp(VariableInfo** vi, std::vector<std::string>** v, uns
 	else
 		return getResult<TL,Var>((**v)[*lhs_pos],(**v)[*op_pos],(**v)[*rhs_pos]);
 
-	return ""; //Supress -Wreturn-type
+	return "";// Supress -Wreturn-type
 }
 void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int lhs_pos, unsigned int op_pos, unsigned int rhs_pos)
 {
-	//TODO Handle quote-wrapped strings to force string interpretation
+	// TODO Handle quote-wrapped strings to force string interpretation
 
 	std::string result = "";
 
@@ -531,10 +531,9 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 	else
 	{
 		fprintf(stdout,"Performing operation: %s %s\n",(*v)[lhs_pos].c_str(),(*v)[op_pos].c_str());
-		rhs_pos = UINT_MAX; // Unary operators. MAX_BUFFER is way less than UINT_MAX, so this is okay
+		rhs_pos = UINT_MAX;// Unary operators. MAX_BUFFER is way less than UINT_MAX, so this is okay
 	}
 
-	//TODO: Handle when we are altering the base variable (lhs_pos == 0)
 	if(left((*v)[lhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
 		result = parseRHSAndDoOp<Var>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
@@ -545,17 +544,17 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 		result = parseRHSAndDoOp<Currency>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
 		result = parseRHSAndDoOp<CurrencySystem>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
-	else//Treat non-explicit constructors as Var
+	else// Treat non-explicit constructors as Var
 		result = parseRHSAndDoOp<Var>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
 
-	//If the first arg is a variable and we are assigning it, we'll need to save the result
+	// If the first arg is a variable and we are assigning it, we'll need to save the result
 	if(lhs_pos == 0 && vi->key != "" &&
 	  (findInStrVect(assignOps,(*v)[op_pos],0) > -1 || findInStrVect(unaryOps,(*v)[op_pos],0) > -1))
 		(void)readOrWriteDataOnScope(vi, ACTION_WRITE, result);
 
 	fprintf(stdout,"Result: \"%s\"\n",result.c_str());
 
-	//Replace operators and operands with result
+	// Replace operators and operands with result
 	v->erase(v->begin()+rhs_pos);
 	v->erase(v->begin()+op_pos);
 	v->erase(v->begin()+lhs_pos);
@@ -567,7 +566,7 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 
 int main(int argc, char** argv)
 {
-	//Initialize operator group vectors
+	// Initialize operator group vectors
 	modOps.insert(modOps.end(),operations[0].begin(),operations[0].end());
 	modOps.insert(modOps.end(),operations[1].begin(),operations[1].end());
 	modOps.insert(modOps.end(),operations[2].begin(),operations[2].end());
@@ -579,7 +578,7 @@ int main(int argc, char** argv)
 
 	check_print_app_description(argv,"Not meant for direct call by user. Implicitly called when modifying variables.");
 
-	if(std::string(argv[1]).find('/') == std::string::npos)//If the user only enters the scope sigil
+	if(std::string(argv[1]).find('/') == std::string::npos)// If the user only enters the scope sigil
 	{
 		output(Error,"Expected at least one '/' delimiter.");
 		exit(-1);
@@ -592,15 +591,24 @@ int main(int argc, char** argv)
 	if(isScopeSigil(variable[0]) && (isTypeSigil(variable[1]) || variable[1] == '/'))
 		vi = parseVariable(variable);
 
-	if(argc == 2)//If the user just submits a variable...
+	if(argc == 2)// If the user just submits a variable...
 	{
 		fprintf(stdout,"%s\n",readOrWriteDataOnScope(&vi, ACTION_READ, "").c_str());
 	}
-	else//Perform operation
+	else// Perform operation
 	{
 		std::vector<std::string> args;
 		unsigned int open_paren_ctr = 0;
 		unsigned int close_paren_ctr = 0;
+
+		// Need to know final operation to determine whether we print to screen or not
+		std::string final_op = std::string(argv[2]);
+		if(final_op[0] == '(')
+			final_op = right(final_op,1);
+		if(final_op[final_op.length()-1] == ')')
+			final_op = left(final_op,final_op.length()-1);
+
+		// Generate vector of operators and operands, while also determining number of parentheses
 		for(int i=1; i<argc; i++)
 		{
 			std::string arg = std::string(argv[i]);
@@ -625,7 +633,7 @@ int main(int argc, char** argv)
 
 		int args_size = args.size();
 
-		//Replace first arg with value if it's a variable
+		// Replace first arg with value if it's a variable
 		if(vi.key != "" && vi.property != "")
 		{
 			switch(args[0][1])
@@ -693,7 +701,7 @@ int main(int argc, char** argv)
 			}
 		}
 
-		//Wrap everything in parenthesis just to make below code simpler
+		// Wrap everything in parenthesis just to make below code simpler
 		args[0] = '('+args[0];
 		args[args_size-1] += ')';
 
@@ -711,7 +719,7 @@ int main(int argc, char** argv)
 			exit(-1);
 		}
 
-		//PEMDAS
+		// PEMDAS
 		for(int start=0; start<args_size-1; start++)
 		{
 			fprintf(stdout,"Checking args[%d]: %s\n",start,args[start].c_str());
@@ -722,7 +730,7 @@ int main(int argc, char** argv)
 					fprintf(stdout,"\tChecking args[%d]: %s\n",end,args[end].c_str());
 					if(args[end][args[end].length()-1] == ')')
 					{
-						//Strip parenthesis off args to ensure good parsing
+						// Strip parenthesis off args to ensure good parsing
 						fprintf(stdout,"\targs[start] = %s\n",args[start].c_str());
 						fprintf(stdout,"\targs[end] = %s\n",args[end].c_str());
 						std::string rparens = right(args[end],args[end].find(')')+1);
@@ -731,7 +739,7 @@ int main(int argc, char** argv)
 						fprintf(stdout,"\targs[start] = %s\n",args[start].c_str());
 						fprintf(stdout,"\targs[end] = %s\n",args[end].c_str());
 
-						//Vectors for each operation type are in order of operator precedence
+						// Vectors for each operation type are in order of operator precedence
 						for(const auto& precedence : operations)
 						{
 							for(const auto& op : precedence)
@@ -741,7 +749,7 @@ int main(int argc, char** argv)
 								{
 									fprintf(stdout,"\top_pos (%s) = %d\n",op.c_str(),op_pos);
 									parseLHSAndDoOp(&vi,&args,op_pos-1,op_pos,op_pos+1);
-									args[start] += rparens;//Maintain end parens
+									args[start] += rparens;// Maintain end parens
 								}
 							}
 						}
@@ -750,7 +758,7 @@ int main(int argc, char** argv)
 						start = 1;
 						break;
 					}
-					else if(args[end].find('(') != std::string::npos && end>start)//Nested '('
+					else if(args[end].find('(') != std::string::npos && end>start)// Nested '('
 					{
 						start = end-1;
 						break;
@@ -758,7 +766,7 @@ int main(int argc, char** argv)
 				}
 			}
 
-			//Check if parenthesis still exist. If so, restart loop to go back through PEMDAS
+			// Check if parenthesis still exist. If so, restart loop to go back through PEMDAS
 			if(start == args_size-1)
 			{
 				for(const auto& arg : args)
@@ -771,6 +779,10 @@ int main(int argc, char** argv)
 				}
 			}
 		}
+
+		// Print result if we aren't writing to a variable
+		if(findInStrVect(assignOps,final_op,0) == -1 && findInStrVect(unaryOps,final_op,0) == -1)
+			fprintf(stdout,"%s\n",args[0].c_str());
 	}
 	return 0;
 }
