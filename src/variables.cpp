@@ -432,7 +432,7 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 {
 	for(long unsigned int precedence=0; precedence<operations.size(); precedence++)
 	{
-		int op_match = findInStrVect(operations[precedence],op,0) > -1;
+		int op_match = findInStrVect(operations[precedence],op,0);
 		if(op_match > -1 && (precedence < 3 || precedence == 5))// Mod operators
 		{
 			try
@@ -482,11 +482,6 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 					exit(-1);
 				}
 			}
-		}
-		else// We shouldn't ever get here?
-		{
-			output(Error,"Unsupported operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
-			exit(-1);
 		}
 	}
 
@@ -731,36 +726,38 @@ int main(int argc, char** argv)
 					if(args[end][args[end].length()-1] == ')')
 					{
 						// Strip parenthesis off args to ensure good parsing
-						fprintf(stdout,"\targs[start] = %s\n",args[start].c_str());
-						fprintf(stdout,"\targs[end] = %s\n",args[end].c_str());
 						std::string rparens = right(args[end],args[end].find(')')+1);
 						args[start] = right(args[start],args[start].rfind('(')+1);
 						args[end] = left(args[end],args[end].find(')'));
-						fprintf(stdout,"\targs[start] = %s\n",args[start].c_str());
-						fprintf(stdout,"\targs[end] = %s\n",args[end].c_str());
+						fprintf(stdout,"\targs[%d] = %s\n",start,args[start].c_str());
+						fprintf(stdout,"\targs[%d] = %s\n",end,args[end].c_str());
 
 						// Vectors for each operation type are in order of operator precedence
+						int op_pos = INT_MAX;
 						for(const auto& precedence : operations)
 						{
 							for(const auto& op : precedence)
 							{
-								int op_pos = findInStrVect(args,op,start);
-								if(op_pos > start && op_pos <= end)
-								{
-									fprintf(stdout,"\top_pos (%s) = %d\n",op.c_str(),op_pos);
-									parseLHSAndDoOp(&vi,&args,op_pos-1,op_pos,op_pos+1);
-									args[start] += rparens;// Maintain end parens
-								}
+								int found_op = findInStrVect(args,op,start);
+								if(found_op > -1 && found_op < op_pos)
+									op_pos = found_op;
 							}
+							if(op_pos < INT_MAX) break;
+						}
+						if(op_pos > start && op_pos <= end)
+						{
+							fprintf(stdout,"\top_pos (%s) = %d\n",args[op_pos].c_str(),op_pos);
+							parseLHSAndDoOp(&vi,&args,op_pos-1,op_pos,op_pos+1);
+							args[start] += rparens;// Maintain end parens
 						}
 						fprintf(stdout,"\n");
 
-						start = 1;
+						start = -1;
 						break;
 					}
 					else if(args[end].find('(') != std::string::npos && end>start)// Nested '('
 					{
-						start = end-1;
+						start = end - 1;
 						break;
 					}
 				}
@@ -773,7 +770,7 @@ int main(int argc, char** argv)
 				{
 					if(arg[0] == '(')
 					{
-						start = 1;
+						start = -1;
 						break;
 					}
 				}
