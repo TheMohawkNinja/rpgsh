@@ -683,16 +683,17 @@ int main(int argc, char** argv)
 					args[0] = vi.scope.getStr<CurrencySystem>(vi.key);
 					break;
 				case '/':
-					try{args[0] = vi.scope.getStr<Var>(vi.key);break;}
-					catch(...){}
-					try{args[0] = vi.scope.getStr<Dice>(vi.key);break;}
-					catch(...){}
-					try{args[0] = vi.scope.getStr<Wallet>(vi.key);break;}
-					catch(...){}
-					try{args[0] = vi.scope.getStr<Currency>(vi.key);break;}
-					catch(...){}
-					try{args[0] = vi.scope.getStr<CurrencySystem>(vi.key);break;}
-					catch(...){}
+					if(vi.scope.keyExists<Var>(vi.key))
+					{args[0] = vi.scope.getStr<Var>(vi.key);break;}
+					else if(vi.scope.keyExists<Dice>(vi.key))
+					{args[0] = vi.scope.getStr<Dice>(vi.key);break;}
+					else if(vi.scope.keyExists<Wallet>(vi.key))
+					{args[0] = vi.scope.getStr<Wallet>(vi.key);break;}
+					else if(vi.scope.keyExists<Currency>(vi.key))
+					{args[0] = vi.scope.getStr<Currency>(vi.key);break;}
+					else if(vi.scope.keyExists<CurrencySystem>(vi.key))
+					{args[0] = vi.scope.getStr<CurrencySystem>(vi.key);break;}
+					else{args[0] = "";}
 			}
 		}
 
