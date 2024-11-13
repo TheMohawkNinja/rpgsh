@@ -447,6 +447,7 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 				output(Error,"Unknown operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
 			else
 				output(Error,"Error during operation: \"%s %s %s\" (%s)",lhs.c_str(),op.c_str(),rhs.c_str(),e.what());
+
 			exit(-1);
 		}
 	}
@@ -485,15 +486,8 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 
 	std::string result = "";
 
-	if(rhs_pos < v->size())
-	{
-		fprintf(stdout,"Performing operation: %s %s %s\n",(*v)[lhs_pos].c_str(),(*v)[op_pos].c_str(),(*v)[rhs_pos].c_str());
-	}
-	else
-	{
-		fprintf(stdout,"Performing operation: %s %s\n",(*v)[lhs_pos].c_str(),(*v)[op_pos].c_str());
+	if(rhs_pos >= v->size())
 		rhs_pos = UINT_MAX;// Unary operators. MAX_BUFFER is way less than UINT_MAX, so this is okay
-	}
 
 	if(left((*v)[lhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
 		result = parseRHSAndDoOp<Var>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
@@ -513,16 +507,11 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 	  (findInStrVect(assignOps,(*v)[op_pos],0) > -1 || findInStrVect(unaryOps,(*v)[op_pos],0) > -1))
 		(void)readOrWriteDataOnScope(vi, Write, result);
 
-	fprintf(stdout,"Result: \"%s\"\n",result.c_str());
-
 	// Replace operators and operands with result
 	v->erase(v->begin()+rhs_pos);
 	v->erase(v->begin()+op_pos);
 	v->erase(v->begin()+lhs_pos);
 	v->insert(v->begin()+lhs_pos,result);
-
-	for(const auto& s : (*v))
-		fprintf(stdout,"\ts: \"%s\"\n",s.c_str());
 }
 
 int main(int argc, char** argv)
@@ -667,9 +656,6 @@ int main(int argc, char** argv)
 		args[0] = '('+args[0];
 		args[args_size-1] += ')';
 
-		for(const auto& arg : args)
-			fprintf(stdout,"Arg: %s\n",arg.c_str());
-
 		if(open_paren_ctr > close_paren_ctr)
 		{
 			output(Error,"Missing close parenthesis to match open parenthesis.");
@@ -684,20 +670,16 @@ int main(int argc, char** argv)
 		// PEMDAS
 		for(int start=0; start<args_size-1; start++)
 		{
-			fprintf(stdout,"Checking args[%d]: %s\n",start,args[start].c_str());
 			if(args[start].find('(') != std::string::npos)
 			{
 				for(int end=start; end<args_size; end++)
 				{
-					fprintf(stdout,"\tChecking args[%d]: %s\n",end,args[end].c_str());
 					if(args[end][args[end].length()-1] == ')')
 					{
 						// Strip parenthesis off args to ensure good parsing
 						std::string rparens = right(args[end],args[end].find(')')+1);
 						args[start] = right(args[start],args[start].rfind('(')+1);
 						args[end] = left(args[end],args[end].find(')'));
-						fprintf(stdout,"\targs[%d] = %s\n",start,args[start].c_str());
-						fprintf(stdout,"\targs[%d] = %s\n",end,args[end].c_str());
 
 						// Vectors for each operation type are in order of operator precedence
 						int op_pos = INT_MAX;
@@ -713,11 +695,9 @@ int main(int argc, char** argv)
 						}
 						if(op_pos > start && op_pos <= end)
 						{
-							fprintf(stdout,"\top_pos (%s) = %d\n",args[op_pos].c_str(),op_pos);
 							parseLHSAndDoOp(&vi,&args,op_pos-1,op_pos,op_pos+1);
 							args[start] += rparens;// Maintain end parens
 						}
-						fprintf(stdout,"\n");
 
 						start = -1;
 						break;
