@@ -202,7 +202,13 @@ Var& Var::operator /= ([[maybe_unused]] const CurrencySystem b)
 }
 Var& Var::operator ^= (const int b)
 {
-	try{Value = std::stoi(Value) ^ b;}
+	try
+	{
+		int total = std::stoi(Value);
+		for(int i = 1; i < b; i++)
+			total *= std::stoi(Value);
+		Value = std::to_string(total);
+	}
 	catch(...){throw std::runtime_error(E_INVALID_OPERATION);}
 
 	return *this;
