@@ -52,17 +52,17 @@ std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir
 	output(Error,"Invalid xref \"%s\".",xref.c_str());
 	exit(-1);
 }
-std::string loadXRef(std::string arg, Scope* p_scope)
+void loadXRef(std::string* arg, Scope* p_scope)
 {
 	// Ending square bracket not found
-	if(arg.find(']') == std::string::npos)
+	if(arg->find(']') == std::string::npos)
 	{
 		output(Error,"No terminating \']\' found for xref.");
 		exit(-1);
 	}
 
 	// Get string between the square brackets
-	std::string xref = arg.substr(arg.find('[')+1,arg.find(']')-(arg.find('[')+1));
+	std::string xref = arg->substr(arg->find('[')+1,arg->find(']')-(arg->find('[')+1));
 
 	// Actually load the xref into the scope
 	std::vector<std::string> campaigns;
@@ -71,7 +71,7 @@ std::string loadXRef(std::string arg, Scope* p_scope)
 			       "characters/";
 	std::string xref_char = xref;
 	std::string campaign = "";
-	switch(arg[0])
+	switch((*arg)[0])
 	{
 		case CHARACTER_SIGIL:
 			if(xref.find('/') != std::string::npos)// Attempting to get a character from another campaign
@@ -98,8 +98,7 @@ std::string loadXRef(std::string arg, Scope* p_scope)
 	}
 
 	// Remove external reference string so we can continue to use the current arg under the new context
-	arg = arg[0]+left(arg,arg.find('[')-1)+right(arg,arg.find(']')+1);
-	return arg;
+	(*arg) = (*arg)[0]+left((*arg),arg->find('[')-1)+right((*arg),arg->find(']')+1);
 }
 VariableInfo parseVariable(std::string v)// Derive information about variable from string
 {
@@ -123,7 +122,7 @@ VariableInfo parseVariable(std::string v)// Derive information about variable fr
 	}
 
 	// Check for external references
-	if(v[1] == '[') v = loadXRef(v,&vi.scope);
+	if(v[1] == '[') loadXRef(&v,&vi.scope);
 
 	vi.variable = v;
 	vi.key = right(v,v.find('/')+1);
@@ -583,7 +582,7 @@ int main(int argc, char** argv)
 	std::string variable(argv[1]);
 	std::string scope_str = "";
 
-	if(isScopeSigil(variable[0]) && (isTypeSigil(variable[1]) || variable[1] == '/'))
+	if(isScopeSigil(variable[0]) && (isTypeSigil(variable[1]) || variable[1] == '/' || variable[1] == '['))
 		vi = parseVariable(variable);
 
 	if(argc == 2)// If the user just submits a variable...
