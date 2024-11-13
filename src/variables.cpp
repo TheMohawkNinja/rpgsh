@@ -432,55 +432,22 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 	for(long unsigned int precedence=0; precedence<operations.size(); precedence++)
 	{
 		int op_match = findInStrVect(operations[precedence],op,0);
-		if(op_match > -1 && (precedence < 3 || precedence == 5))// Mod operators
+		try
 		{
-			try
-			{
+			if(op_match > -1 && (precedence < 3 || precedence == 5))// Mod operators
 				return std::string(doModOp<TL,TR>(TL(lhs),op,TR(rhs)));
-			}
-			catch(const std::runtime_error& e)
-			{
-				if(e.what() == std::string(E_INVALID_OPERATION))
-				{
-					output(Error,"Invalid operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
-					exit(-1);
-				}
-				else if(e.what() == std::string(E_UNKNOWN_OPERATION))
-				{
-					output(Error,"Unknown operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
-					exit(-1);
-				}
-				else
-				{
-					output(Error,"Error during operation: \"%s %s %s\" (%s)",lhs.c_str(),op.c_str(),rhs.c_str(),e.what());
-					exit(-1);
-				}
-			}
-		}
-		else if(op_match > -1 && (precedence >= 3 && precedence < 5))// Relational operators
-		{
-			try
-			{
+			else if(op_match > -1 && (precedence >= 3 && precedence < 5))// Relational operators
 				return btos(doRelOp<TL,TR>(TL(lhs),op,TR(rhs)));
-			}
-			catch(const std::runtime_error& e)
-			{
-				if(e.what() == std::string(E_INVALID_OPERATION))
-				{
-					output(Error,"Invalid operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
-					exit(-1);
-				}
-				else if(e.what() == std::string(E_UNKNOWN_OPERATION))
-				{
-					output(Error,"Unknown operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
-					exit(-1);
-				}
-				else
-				{
-					output(Error,"Error during operation: \"%s %s %s\" (%s)",lhs.c_str(),op.c_str(),rhs.c_str(),e.what());
-					exit(-1);
-				}
-			}
+		}
+		catch(const std::runtime_error& e)
+		{
+			if(e.what() == std::string(E_INVALID_OPERATION))
+				output(Error,"Invalid operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
+			else if(e.what() == std::string(E_UNKNOWN_OPERATION))
+				output(Error,"Unknown operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
+			else
+				output(Error,"Error during operation: \"%s %s %s\" (%s)",lhs.c_str(),op.c_str(),rhs.c_str(),e.what());
+			exit(-1);
 		}
 	}
 
