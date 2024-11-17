@@ -39,6 +39,8 @@
 #define OP_EQ				"=="
 #define OP_NE				"!="
 #define OP_AEQ				"~="
+#define OP_AND				"&&"
+#define OP_OR				"||"
 #define OP_ASSIGN			"="
 #define OP_ADDA				"+="
 #define OP_SUBA				"-="
