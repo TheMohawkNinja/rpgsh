@@ -73,33 +73,32 @@ std::string addSpaces(int n)
 	std::string ret = "";
 	for(int i=0; i<n; i++)
 		ret += " ";
+
 	return ret;
 }
 
 void confirmEnvVariablesFile()
 {
-	if(!std::filesystem::exists(rpgsh_env_variables_path.c_str()))
-	{
-		output(Info,"Environment variables file not found, creating file at \"%s\".",rpgsh_env_variables_path.c_str());
-		std::ofstream ofs(rpgsh_env_variables_path.c_str());
-		ofs.close();
+	if(std::filesystem::exists(rpgsh_env_variables_path.c_str())) return;
 
-		//Set default values for built-in env variables
-		Config config = Config();
-		Character c = Character(templates_dir + config.setting[DEFAULT_GAME].c_str());
-		set_env_variable(CURRENT_CHAR_SHELL_VAR,c.getName());
-		set_env_variable(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
-	}
+	output(Info,"Environment variables file not found, creating file at \"%s\".",rpgsh_env_variables_path.c_str());
+	std::ofstream ofs(rpgsh_env_variables_path.c_str());
+	ofs.close();
+
+	//Set default values for built-in env variables
+	Config config = Config();
+	Character c = Character(templates_dir + config.setting[DEFAULT_GAME].c_str());
+	set_env_variable(CURRENT_CHAR_SHELL_VAR,c.getName());
+	set_env_variable(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
 }
 
 void confirmShellVariablesFile()
 {
-	if(!std::filesystem::exists(shell_variables_path.c_str()))
-	{
-		output(Info,"Shell variables file not found, creating file at \"%s\".",shell_variables_path.c_str());
-		std::ofstream ofs(shell_variables_path.c_str());
-		ofs.close();
-	}
+	if(std::filesystem::exists(shell_variables_path.c_str())) return;
+
+	output(Info,"Shell variables file not found, creating file at \"%s\".",shell_variables_path.c_str());
+	std::ofstream ofs(shell_variables_path.c_str());
+	ofs.close();
 }
 
 void confirmCampaignVariablesFile()
@@ -107,21 +106,27 @@ void confirmCampaignVariablesFile()
 	std::string campaign_variables_file = campaigns_dir +
 					      get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR) +
 					      variable_file_name;
-	if(!std::filesystem::exists(campaign_variables_file.c_str()))
-	{
-		output(Info,"Campaign variables file not found, creating file at \'%s\'.",campaign_variables_file.c_str());
-		std::ofstream ofs(campaign_variables_file.c_str());
-		ofs.close();
-	}
+
+	if(std::filesystem::exists(campaign_variables_file.c_str())) return;
+
+	output(Info,"Campaign variables file not found, creating file at \'%s\'.",campaign_variables_file.c_str());
+	std::ofstream ofs(campaign_variables_file.c_str());
+	ofs.close();
 }
 
 std::vector<std::string> getDirectoryListing(std::string path)
 {
-	if(!std::filesystem::exists(path) || !std::filesystem::is_directory(path))
+	if(!std::filesystem::exists(path))
 	{
-		output(Error,"Invalid directory \"%s\".",path.c_str());
+		output(Error,"Directory \"%s\" does not exist.",path.c_str());
 		exit(-1);
 	}
+	else if(!std::filesystem::is_directory(path))
+	{
+		output(Error,"\"%s\" is not a directory.",path.c_str());
+		exit(-1);
+	}
+
 	std::vector<std::string> entries;
 	for(const auto& entry : std::filesystem::directory_iterator(path))
 		entries.push_back(entry.path().filename().string());
@@ -137,9 +142,7 @@ void padding()
 	try
 	{
 		if(stob(config.setting[PADDING]))
-		{
 			fprintf(stdout,"\n");
-		}
 	}
 	catch(...)
 	{
@@ -158,15 +161,10 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	extern char** environ;
 	pid_t pid;
 
-	if(!redirect_output)
-		padding();
+	if(!redirect_output) padding();
 
-	if(arg_str[0] == CHARACTER_SIGIL ||
-	arg_str[0] == CAMPAIGN_SIGIL ||
-	arg_str[0] == SHELL_SIGIL) //Check if user is operating on a variable
-	{
+	if(isScopeSigil(arg_str[0])) //Check if user is operating on a variable
 		arg_str = "variables " + arg_str;
-	}
 
 	std::string path = "/bin/";
 	std::regex arg_pattern("[^\\s]{1,}");
@@ -189,16 +187,13 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	{
 		std::string arg = arg_str_it->str();
 
-		if(arg[0] == CHARACTER_SIGIL ||
-		   arg[0] == CAMPAIGN_SIGIL  ||
-		   arg[0] == SHELL_SIGIL)
+		if(isScopeSigil(arg[0]))
 			arg = get_prog_output(arg)[0];
 
 		//Don't try to run a program if the data type sigil was invalid
 		if(arg == "")
 		{
-			if(!redirect_output)
-				padding();
+			if(!redirect_output) padding();
 
 			return;
 		}
@@ -208,7 +203,6 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	}
 
 	//Combine arg_str wrapped in quotes
-	//TODO There really has to be a more elegant way to do this
 	for(long unsigned int i=0; i<args.size(); i++)
 	{
 		long unsigned int quote_begin = args[i].find("\"");
@@ -280,9 +274,8 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	{
 		do
 		{
-			if(waitpid(pid, &status, 0) == -1)
-				exit(1);
-		}while (!WIFEXITED(status) && !WIFSIGNALED(status));
+			if(waitpid(pid, &status, 0) == -1) exit(1);
+		}while(!WIFEXITED(status) && !WIFSIGNALED(status));
 	}
 	else
 	{
@@ -370,10 +363,8 @@ void set_env_variable(std::string v,std::string value)
 		}
 	}
 
-	if(!ReplacedValue)
-	{
-		ofs<<v + DS + value + "\n";
-	}
+	if(!ReplacedValue) ofs<<v + DS + value + "\n";
+
 	ifs.close();
 	ofs.close();
 	std::filesystem::remove(rpgsh_env_variables_path.c_str());
@@ -407,16 +398,13 @@ bool approxEquals<Var,int>(Var lhs, int rhs)
 template<>
 bool approxEquals<Var,std::string>(Var lhs, std::string rhs)
 {
-	bool lhs_is_int = false;
 	bool rhs_is_int = false;
-	try{std::stoi(lhs.Value); lhs_is_int = true;}
-	catch(...){}
 	try{std::stoi(rhs); rhs_is_int = true;}
 	catch(...){}
 
-	if(lhs_is_int && rhs_is_int)
-		return std::stoi(lhs.Value) == std::stoi(rhs);
-	else if((lhs_is_int && !rhs_is_int) || (!lhs_is_int && rhs_is_int))
+	if(lhs.isInt() && rhs_is_int)
+		return int(lhs) == std::stoi(rhs);
+	else if((lhs.isInt() && !rhs_is_int) || (!lhs.isInt() && rhs_is_int))
 		return false;
 	else
 		return stringcasecmp(lhs.Value,rhs);
@@ -581,20 +569,16 @@ template<>
 bool approxEquals<Wallet,Currency>(Wallet lhs, Currency rhs)
 {
 	for(const auto& [c,q] : lhs)
-	{
-		if(c == rhs)
-			return true;
-	}
+		if(c == rhs) return true;
+
 	return false;
 }
 template<>
 bool approxEquals<Wallet,CurrencySystem>(Wallet lhs, CurrencySystem rhs)
 {
 	for(const auto& [c,q] : lhs)
-	{
-		if(*c.System == rhs)
-			return true;
-	}
+		if(*c.System == rhs) return true;
+
 	return lhs == rhs;
 }
 
@@ -602,42 +586,6 @@ template<>
 bool approxEquals<Wallet,Wallet>(Wallet lhs, Wallet rhs)
 {
 	return getWalletValue(lhs) == getWalletValue(rhs);
-}
-
-template <>
-std::string toString<int>(int t)
-{
-	return std::to_string(t);
-}
-template <>
-std::string toString<std::string>(std::string t)
-{
-	return t;
-}
-template <>
-std::string toString<Currency>(Currency t)
-{
-	return std::string(t);
-}
-template <>
-std::string toString<CurrencySystem>(CurrencySystem t)
-{
-	return std::string(t);
-}
-template <>
-std::string toString<Dice>(Dice t)
-{
-	return std::string(t);
-}
-template <>
-std::string toString<Var>(Var t)
-{
-	return std::string(t);
-}
-template <>
-std::string toString<Wallet>(Wallet t)
-{
-	return std::string(t);
 }
 
 template <typename T>
