@@ -30,12 +30,14 @@ std::vector<std::vector<std::string>> operations = {	{OP_INC,OP_DEC},
 							{OP_ADD,OP_SUB},
 							{OP_LT,OP_LE,OP_GT,OP_GE},
 							{OP_EQ,OP_NE,OP_AEQ},
+							{OP_AND},
+							{OP_OR},
 							{OP_ASSIGN,OP_ADDA,OP_SUBA,OP_MULA,OP_DIVA,OP_EXPA,OP_MODA}};
 
 // Vectors for readability
 std::vector<std::string> modOps;
 std::vector<std::string> unaryOps;
-std::vector<std::string> relOps;
+std::vector<std::string> boolOps;
 std::vector<std::string> assignOps;
 
 std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir,std::string xref)
@@ -159,9 +161,11 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 {
 	if(p_vi->variable[p_vi->variable.length()-1] != '/')// If the last character isn't a '/', just handle value
 	{
-		if((p_vi->variable[1] == '/' || p_vi->variable[1] == VAR_SIGIL) && p_vi->scope.keyExists<Var>(p_vi->key))
+		if(p_vi->variable[1] == '/' || p_vi->variable[1] == VAR_SIGIL)
 		{
-			if(action == Read && p_vi->property == "")
+			if(action == Read && !p_vi->scope.keyExists<Var>(p_vi->key))
+				return "";
+			else if(action == Read && p_vi->property == "")
 				return p_vi->scope.getStr<Var>(p_vi->key);
 			else if(action == Write && p_vi->property == "")
 				p_vi->scope.set<Var>(p_vi->key,Var(value));
@@ -170,9 +174,11 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 			else if(action == Write && !stringcasecmp(p_vi->property,"Value"))
 				p_vi->scope.setProperty<Var,std::string>(p_vi->key,p_vi->property,Var(value).Value);
 		}
-		else if((p_vi->variable[1] == '/' || p_vi->variable[1] == DICE_SIGIL) && p_vi->scope.keyExists<Dice>(p_vi->key))
+		else if(p_vi->variable[1] == '/' || p_vi->variable[1] == DICE_SIGIL)
 		{
-			if(action == Read && p_vi->property == "")
+			if(action == Read && !p_vi->scope.keyExists<Dice>(p_vi->key))
+				return "";
+			else if(action == Read && p_vi->property == "")
 				return p_vi->scope.getStr<Dice>(p_vi->key);
 			else if(action == Write && p_vi->property == "")
 				p_vi->scope.set<Dice>(p_vi->key,Dice(value));
@@ -191,9 +197,11 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 			else if(action == Write && !stringcasecmp(p_vi->property,"List"))
 				p_vi->scope.setProperty<Dice,std::string>(p_vi->key,p_vi->property,Dice(value).List);
 		}
-		else if((p_vi->variable[1] == '/' || p_vi->variable[1] == WALLET_SIGIL) && p_vi->scope.keyExists<Wallet>(p_vi->key))
+		else if(p_vi->variable[1] == '/' || p_vi->variable[1] == WALLET_SIGIL)
 		{
-			if(action == Read && p_vi->property == "")
+			if(action == Read && !p_vi->scope.keyExists<Wallet>(p_vi->key))
+				return "";
+			else if(action == Read && p_vi->property == "")
 				return p_vi->scope.getStr<Wallet>(p_vi->key);
 			else if(action == Write && p_vi->property == "")
 				p_vi->scope.set<Wallet>(p_vi->key,Wallet(value));
@@ -202,9 +210,11 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 			else if(action == Write)
 				p_vi->scope.setProperty<Wallet,int>(p_vi->key,p_vi->property,Wallet(value).Money[Currency(p_vi->property)]);
 		}
-		else if((p_vi->variable[1] == '/' || p_vi->variable[1] == CURRENCY_SIGIL) && p_vi->scope.keyExists<Currency>(p_vi->key))
+		else if(p_vi->variable[1] == '/' || p_vi->variable[1] == CURRENCY_SIGIL)
 		{
-			if(action == Read && p_vi->property == "")
+			if(action == Read && !p_vi->scope.keyExists<Currency>(p_vi->key))
+				return "";
+			else if(action == Read && p_vi->property == "")
 				return p_vi->scope.getStr<Currency>(p_vi->key);
 			else if(action == Write && p_vi->property == "")
 				p_vi->scope.set<Currency>(p_vi->key,Currency(value));
@@ -226,9 +236,11 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 			else if(action == Write && !stringcasecmp(p_vi->property,"SmallerAmount"))
 				p_vi->scope.setProperty<Currency,int>(p_vi->key,p_vi->property,Currency(value).SmallerAmount);
 		}
-		else if((p_vi->variable[1] == '/' || p_vi->variable[1] == CURRENCYSYSTEM_SIGIL) && p_vi->scope.keyExists<CurrencySystem>(p_vi->key))
+		else if(p_vi->variable[1] == '/' || p_vi->variable[1] == CURRENCYSYSTEM_SIGIL)
 		{
-			if(action == Read && p_vi->property == "")
+			if(action == Read && !p_vi->scope.keyExists<Dice>(p_vi->key))
+				return "";
+			else if(action == Read && p_vi->property == "")
 				return p_vi->scope.getStr<CurrencySystem>(p_vi->key);
 			else if(action == Write && p_vi->property == "")
 				p_vi->scope.set<CurrencySystem>(p_vi->key,CurrencySystem(value));
@@ -384,7 +396,7 @@ TL doModOp(TL lhs, std::string op, TR rhs)
 	return lhs;
 }
 template<typename TL, typename TR>
-bool doRelOp(TL lhs, std::string op, TR rhs)
+bool doBoolOp(TL lhs, std::string op, TR rhs)
 {
 	if(op == OP_LT)
 	{
@@ -421,6 +433,16 @@ bool doRelOp(TL lhs, std::string op, TR rhs)
 		try{return approxEquals<TL,TR>(lhs,rhs);}
 		catch(...){throw;}
 	}
+	else if(op == OP_AND)
+	{
+		try{return lhs && rhs;}
+		catch(...){throw;}
+	}
+	else if(op == OP_OR)
+	{
+		try{return lhs || rhs;}
+		catch(...){throw;}
+	}
 	else// We should only get here if I forgot to code an operation
 	{
 		throw std::runtime_error(E_UNKNOWN_OPERATION);
@@ -434,10 +456,10 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 		int op_match = findInStrVect(operations[precedence],op,0);
 		try
 		{
-			if(op_match > -1 && (precedence < 3 || precedence == 5))// Mod operators
+			if(op_match > -1 && (precedence < 3 || precedence == 7))// Mod operators
 				return std::string(doModOp<TL,TR>(TL(lhs),op,TR(rhs)));
-			else if(op_match > -1 && (precedence >= 3 && precedence < 5))// Relational operators
-				return btos(doRelOp<TL,TR>(TL(lhs),op,TR(rhs)));
+			else if(op_match > -1 && (precedence >= 3 && precedence < 7))// Boolean operators
+				return btos(doBoolOp<TL,TR>(TL(lhs),op,TR(rhs)));
 		}
 		catch(const std::runtime_error& e)
 		{
@@ -522,9 +544,11 @@ int main(int argc, char** argv)
 	modOps.insert(modOps.end(),operations[2].begin(),operations[2].end());
 	modOps.insert(modOps.end(),operations[5].begin(),operations[5].end());
 	unaryOps.insert(unaryOps.end(),operations[0].begin(),operations[0].end());
-	relOps.insert(relOps.end(),operations[3].begin(),operations[3].end());
-	relOps.insert(relOps.end(),operations[4].begin(),operations[4].end());
-	assignOps.insert(assignOps.end(),operations[5].begin(),operations[5].end());
+	boolOps.insert(boolOps.end(),operations[3].begin(),operations[3].end());
+	boolOps.insert(boolOps.end(),operations[4].begin(),operations[4].end());
+	boolOps.insert(boolOps.end(),operations[5].begin(),operations[5].end());
+	boolOps.insert(boolOps.end(),operations[6].begin(),operations[6].end());
+	assignOps.insert(assignOps.end(),operations[7].begin(),operations[7].end());
 
 	check_print_app_description(argv,"Not meant for direct call by user. Implicitly called when modifying variables.");
 
@@ -543,7 +567,8 @@ int main(int argc, char** argv)
 
 	if(argc == 2)// If the user just submits a variable...
 	{
-		fprintf(stdout,"%s\n",readOrWriteDataOnScope(&vi, Read, "").c_str());
+		std::string str = readOrWriteDataOnScope(&vi, Read, "");
+		if(str != "") fprintf(stdout,"%s\n",str.c_str());
 	}
 	else// Perform operation
 	{
