@@ -238,7 +238,7 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 		}
 		else if(p_vi->variable[1] == '/' || p_vi->variable[1] == CURRENCYSYSTEM_SIGIL)
 		{
-			if(action == Read && !p_vi->scope.keyExists<Dice>(p_vi->key))
+			if(action == Read && !p_vi->scope.keyExists<CurrencySystem>(p_vi->key))
 				return "";
 			else if(action == Read && p_vi->property == "")
 				return p_vi->scope.getStr<CurrencySystem>(p_vi->key);
@@ -565,7 +565,7 @@ int main(int argc, char** argv)
 	if(isScopeSigil(variable[0]) && (isTypeSigil(variable[1]) || variable[1] == '/' || variable[1] == '['))
 		vi = parseVariable(variable);
 
-	if(argc == 2)// If the user just submits a variable...
+	if(argc == 2)// Print data if all the user enters is a variable
 	{
 		std::string str = readOrWriteDataOnScope(&vi, Read, "");
 		if(str != "") fprintf(stdout,"%s\n",str.c_str());
