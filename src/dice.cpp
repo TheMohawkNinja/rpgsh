@@ -251,9 +251,9 @@ Dice::operator std::string() const
 	else
 		return std::string(1,DICE_SIGIL)+"{"+List+"}";
 }
-const char* Dice::c_str() const
+Dice::operator bool() const
 {
-	return std::string(*this).c_str();
+	return Quantity > 0;
 }
 Dice& Dice::operator = ([[maybe_unused]] const int b)
 {
@@ -900,6 +900,62 @@ bool Dice::operator != (const CurrencySystem& b) const
 {
 	return !(*this == b);
 }
+bool Dice::operator && (const int b)
+{
+	return bool(*this) && (b != 0);
+}
+bool Dice::operator && (const std::string b)
+{
+	return bool(*this) && (b != "" && stringcasecmp(b,"false"));
+}
+bool Dice::operator && (const Var b)
+{
+	return bool(*this) && bool(b);
+}
+bool Dice::operator && (const Dice b)
+{
+	return bool(*this) && bool(b);
+}
+bool Dice::operator && (const Wallet b)
+{
+	return bool(*this) && bool(b);
+}
+bool Dice::operator && (const Currency b)
+{
+	return bool(*this) && bool(b);
+}
+bool Dice::operator && (const CurrencySystem b)
+{
+	return bool(*this) && bool(b);
+}
+bool Dice::operator || (const int b)
+{
+	return bool(*this) || (b != 0);
+}
+bool Dice::operator || (const std::string b)
+{
+	return bool(*this) || (b != "" && stringcasecmp(b,"false"));
+}
+bool Dice::operator || (const Var b)
+{
+	return bool(*this) || bool(b);
+}
+bool Dice::operator || (const Dice b)
+{
+	return bool(*this) || bool(b);
+}
+bool Dice::operator || (const Wallet b)
+{
+	return bool(*this) || bool(b);
+}
+bool Dice::operator || (const Currency b)
+{
+	return bool(*this) || bool(b);
+}
+bool Dice::operator || (const CurrencySystem b)
+{
+	return bool(*this) || bool(b);
+}
 Dice& Dice::operator ++ (int)
 {
 	Modifier++;
@@ -925,6 +981,10 @@ std::string Dice::dice() const
 		ret += Modifier;
 	}
 	return ret;
+}
+const char* Dice::c_str() const
+{
+	return std::string(*this).c_str();
 }
 void Dice::roll()
 {

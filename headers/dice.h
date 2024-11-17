@@ -33,8 +33,8 @@ class Dice
 	Dice(std::string dice_str, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count);
 	Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count);
 
-	operator std::string() const;
-	const char* c_str() const;
+	explicit operator std::string() const;
+	explicit operator bool() const;
 	Dice& operator = ([[maybe_unused]] const int b);
 	Dice& operator = (const std::string b);
 	Dice& operator = (const Var b);
@@ -168,10 +168,25 @@ class Dice
 	bool operator != (const Wallet& b) const;
 	bool operator != (const Currency& b) const;
 	bool operator != (const CurrencySystem& b) const;
+	bool operator && (const int b);
+	bool operator && (const std::string b);
+	bool operator && (const Var b);
+	bool operator && (const Dice b);
+	bool operator && (const Wallet b);
+	bool operator && (const Currency b);
+	bool operator && (const CurrencySystem b);
+	bool operator || (const int b);
+	bool operator || (const std::string b);
+	bool operator || (const Var b);
+	bool operator || (const Dice b);
+	bool operator || (const Wallet b);
+	bool operator || (const Currency b);
+	bool operator || (const CurrencySystem b);
 	Dice& operator ++ (int);
 	Dice& operator -- (int);
 
 	std::string dice() const;
+	const char* c_str() const;
 	void roll();
 	void test();
 };

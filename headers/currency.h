@@ -42,6 +42,7 @@ class Currency
 	Currency(std::shared_ptr<CurrencySystem> _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
 
 	explicit operator std::string() const;
+	explicit operator bool() const;
 	const char* c_str() const;
 	Currency& operator = ([[maybe_unused]] const int b);
 	Currency& operator = ([[maybe_unused]] const std::string b);
@@ -176,6 +177,20 @@ class Currency
 	bool operator != (const Wallet& b) const;
 	bool operator != (const Currency& b) const;
 	bool operator != (const CurrencySystem& b) const;
+	bool operator && (const int b);
+	bool operator && (const std::string b);
+	bool operator && (const Var b);
+	bool operator && (const Dice b);
+	bool operator && (const Wallet b);
+	bool operator && (const Currency b);
+	bool operator && (const CurrencySystem b);
+	bool operator || (const int b);
+	bool operator || (const std::string b);
+	bool operator || (const Var b);
+	bool operator || (const Dice b);
+	bool operator || (const Wallet b);
+	bool operator || (const Currency b);
+	bool operator || (const CurrencySystem b);
 	Currency& operator ++ (int);
 	Currency& operator -- (int);
 };
@@ -191,6 +206,7 @@ class CurrencySystem
 	CurrencySystem(std::string str);
 
 	explicit operator std::string() const;
+	explicit operator bool() const;
 	const char* c_str() const;
 
 	Currency& operator [] (const std::string b);
@@ -327,6 +343,20 @@ class CurrencySystem
 	bool operator != (const Wallet& b) const;
 	bool operator != (const Currency& b) const;
 	bool operator != (const CurrencySystem& b) const;
+	bool operator && (const int b);
+	bool operator && (const std::string b);
+	bool operator && (const Var b);
+	bool operator && (const Dice b);
+	bool operator && (const Wallet b);
+	bool operator && (const Currency b);
+	bool operator && (const CurrencySystem b);
+	bool operator || (const int b);
+	bool operator || (const std::string b);
+	bool operator || (const Var b);
+	bool operator || (const Dice b);
+	bool operator || (const Wallet b);
+	bool operator || (const Currency b);
+	bool operator || (const CurrencySystem b);
 	CurrencySystem& operator ++ (int);
 	CurrencySystem& operator -- (int);
 
@@ -357,6 +387,7 @@ class Wallet
 	Currency getExistingCurrency(std::string currency_str);
 
 	explicit operator std::string() const;
+	explicit operator bool() const;
 	const char* c_str() const;
 
 	int& operator [] (const Currency b);
@@ -510,6 +541,20 @@ class Wallet
 	bool operator != (const Wallet& b) const;
 	bool operator != (const Currency& b) const;
 	bool operator != (const CurrencySystem& b) const;
+	bool operator && (const int b);
+	bool operator && (const std::string b);
+	bool operator && (const Var b);
+	bool operator && (const Dice b);
+	bool operator && (const Wallet b);
+	bool operator && (const Currency b);
+	bool operator && (const CurrencySystem b);
+	bool operator || (const int b);
+	bool operator || (const std::string b);
+	bool operator || (const Var b);
+	bool operator || (const Dice b);
+	bool operator || (const Wallet b);
+	bool operator || (const Currency b);
+	bool operator || (const CurrencySystem b);
 	Wallet& operator ++ ();
 	Wallet& operator ++ (int);
 	Wallet& operator -- ();

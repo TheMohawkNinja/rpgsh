@@ -219,6 +219,10 @@ Currency::operator std::string() const
 		       Smaller+","+
 		       Larger+"}";
 }
+Currency::operator bool() const
+{
+	return Smaller != "";
+}
 const char* Currency::c_str() const
 {
 	return std::string(*this).c_str();
@@ -876,6 +880,62 @@ bool Currency::operator != (const CurrencySystem& b) const
 {
 	return !(*this == b);
 }
+bool Currency::operator && (const int b)
+{
+	return bool(*this) && (b != 0);
+}
+bool Currency::operator && (const std::string b)
+{
+	return bool(*this) && (b != "" && stringcasecmp(b,"false"));
+}
+bool Currency::operator && (const Var b)
+{
+	return bool(*this) && bool(b);
+}
+bool Currency::operator && (const Dice b)
+{
+	return bool(*this) && bool(b);
+}
+bool Currency::operator && (const Wallet b)
+{
+	return bool(*this) && bool(b);
+}
+bool Currency::operator && (const Currency b)
+{
+	return bool(*this) && bool(b);
+}
+bool Currency::operator && (const CurrencySystem b)
+{
+	return bool(*this) && bool(b);
+}
+bool Currency::operator || (const int b)
+{
+	return bool(*this) || (b != 0);
+}
+bool Currency::operator || (const std::string b)
+{
+	return bool(*this) || (b != "" && stringcasecmp(b,"false"));
+}
+bool Currency::operator || (const Var b)
+{
+	return bool(*this) || bool(b);
+}
+bool Currency::operator || (const Dice b)
+{
+	return bool(*this) || bool(b);
+}
+bool Currency::operator || (const Wallet b)
+{
+	return bool(*this) || bool(b);
+}
+bool Currency::operator || (const Currency b)
+{
+	return bool(*this) || bool(b);
+}
+bool Currency::operator || (const CurrencySystem b)
+{
+	return bool(*this) || bool(b);
+}
 Currency& Currency::operator ++ (int)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
@@ -926,6 +986,10 @@ CurrencySystem::CurrencySystem(std::string str)
 CurrencySystem::operator std::string() const
 {
 	return std::string(1,CURRENCYSYSTEM_SIGIL)+"{"+Name+"}";
+}
+CurrencySystem::operator bool() const
+{
+	return Name != "";
 }
 const char* CurrencySystem::c_str() const
 {
@@ -1555,6 +1619,62 @@ bool CurrencySystem::operator != (const CurrencySystem& b) const
 {
 	return !(*this == b);
 }
+bool CurrencySystem::operator && (const int b)
+{
+	return bool(*this) && (b != 0);
+}
+bool CurrencySystem::operator && (const std::string b)
+{
+	return bool(*this) && (b != "" && stringcasecmp(b,"false"));
+}
+bool CurrencySystem::operator && (const Var b)
+{
+	return bool(*this) && bool(b);
+}
+bool CurrencySystem::operator && (const Dice b)
+{
+	return bool(*this) && bool(b);
+}
+bool CurrencySystem::operator && (const Wallet b)
+{
+	return bool(*this) && bool(b);
+}
+bool CurrencySystem::operator && (const Currency b)
+{
+	return bool(*this) && bool(b);
+}
+bool CurrencySystem::operator && (const CurrencySystem b)
+{
+	return bool(*this) && bool(b);
+}
+bool CurrencySystem::operator || (const int b)
+{
+	return bool(*this) || (b != 0);
+}
+bool CurrencySystem::operator || (const std::string b)
+{
+	return bool(*this) || (b != "" && stringcasecmp(b,"false"));
+}
+bool CurrencySystem::operator || (const Var b)
+{
+	return bool(*this) || bool(b);
+}
+bool CurrencySystem::operator || (const Dice b)
+{
+	return bool(*this) || bool(b);
+}
+bool CurrencySystem::operator || (const Wallet b)
+{
+	return bool(*this) || bool(b);
+}
+bool CurrencySystem::operator || (const Currency b)
+{
+	return bool(*this) || bool(b);
+}
+bool CurrencySystem::operator || (const CurrencySystem b)
+{
+	return bool(*this) || bool(b);
+}
 CurrencySystem& CurrencySystem::operator ++ (int)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
@@ -1802,6 +1922,13 @@ Wallet::operator std::string() const
 	ret = left(ret,ret.length()-1) + "}";
 
 	return ret;
+}
+Wallet::operator bool() const
+{
+	for(const auto& [c,q] : Money)
+		if(q > 0) return true;
+
+	return false;
 }
 const char* Wallet::c_str() const
 {
@@ -2560,6 +2687,62 @@ bool Wallet::operator != (const Currency& b) const
 bool Wallet::operator != (const CurrencySystem& b) const
 {
 	return !(*this == b);
+}
+bool Wallet::operator && (const int b)
+{
+	return bool(*this) && (b != 0);
+}
+bool Wallet::operator && (const std::string b)
+{
+	return bool(*this) && (b != "" && stringcasecmp(b,"false"));
+}
+bool Wallet::operator && (const Var b)
+{
+	return bool(*this) && bool(b);
+}
+bool Wallet::operator && (const Dice b)
+{
+	return bool(*this) && bool(b);
+}
+bool Wallet::operator && (const Wallet b)
+{
+	return bool(*this) && bool(b);
+}
+bool Wallet::operator && (const Currency b)
+{
+	return bool(*this) && bool(b);
+}
+bool Wallet::operator && (const CurrencySystem b)
+{
+	return bool(*this) && bool(b);
+}
+bool Wallet::operator || (const int b)
+{
+	return bool(*this) || (b != 0);
+}
+bool Wallet::operator || (const std::string b)
+{
+	return bool(*this) || (b != "" && stringcasecmp(b,"false"));
+}
+bool Wallet::operator || (const Var b)
+{
+	return bool(*this) || bool(b);
+}
+bool Wallet::operator || (const Dice b)
+{
+	return bool(*this) || bool(b);
+}
+bool Wallet::operator || (const Wallet b)
+{
+	return bool(*this) || bool(b);
+}
+bool Wallet::operator || (const Currency b)
+{
+	return bool(*this) || bool(b);
+}
+bool Wallet::operator || (const CurrencySystem b)
+{
+	return bool(*this) || bool(b);
 }
 Wallet& Wallet::operator ++ ()
 {

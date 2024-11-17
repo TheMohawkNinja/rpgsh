@@ -1,5 +1,6 @@
 #include <stdexcept>
 #include "../headers/define.h"
+#include "../headers/functions.h"
 #include "../headers/output.h"
 #include "../headers/var.h"
 
@@ -7,13 +8,29 @@ Var::operator std::string() const
 {
 	return std::string(1,VAR_SIGIL)+"{"+Value+"}";
 }
+Var::operator int() const
+{
+	return std::stoi(Value);
+}
+Var::operator bool() const
+{
+	if(isInt() && int(*this) != 0)
+		return true;
+	else if(isInt())
+		return false;
+	else if(!isInt() && (Value != "" && stringcasecmp(Value,"false")))
+		return true;
+	else
+		return false;
+}
 const char* Var::c_str() const
 {
 	return std::string(*this).c_str();
 }
-Var::operator int() const
+bool Var::isInt() const
 {
-	return std::stoi(Value);
+	try{int(*this); return true;}
+	catch(...){return false;}
 }
 Var::Var(const Var& b)
 {
@@ -52,22 +69,28 @@ Var& Var::operator = ([[maybe_unused]] const CurrencySystem b)
 }
 Var& Var::operator += (const int b)
 {
-	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) + b);}
-	catch(...){throw std::runtime_error(E_INVALID_OPERATION);}
+	if(isInt())
+		Value = std::to_string(int(*this) + b);
+	else
+		throw std::runtime_error(E_INVALID_OPERATION);
 
 	return *this;
 }
 Var& Var::operator += (const std::string b)
 {
-	try{std::stoi(Value); throw std::runtime_error(E_INVALID_OPERATION);}
-	catch(...){Value = Value + b;}
+	if(isInt())
+		throw std::runtime_error(E_INVALID_OPERATION);
+	else
+		Value = Value + b;
 
 	return *this;
 }
 Var& Var::operator += (const Var b)
 {
-	try{*this += std::stoi(b.Value);}
-	catch(...){*this += b.Value;}
+	if(b.isInt())
+		*this += int(b);
+	else
+		*this += b.Value;
 
 	return *this;
 }
@@ -89,8 +112,10 @@ Var& Var::operator += ([[maybe_unused]] const CurrencySystem b)
 }
 Var& Var::operator -= (const int b)
 {
-	try{std::stoi(Value); Value = std::to_string((std::stoi(Value) - b));}
-	catch(...){throw std::runtime_error(E_INVALID_OPERATION);}
+	if(isInt())
+		Value = std::to_string((int(*this) - b));
+	else
+		throw std::runtime_error(E_INVALID_OPERATION);
 
 	return *this;
 }
@@ -100,8 +125,10 @@ Var& Var::operator -= ([[maybe_unused]] const std::string b)
 }
 Var& Var::operator -= (const Var b)
 {
-	try{*this -= std::stoi(b.Value);}
-	catch(...){*this -= b.Value;}
+	if(b.isInt())
+		*this -= int(b);
+	else
+		*this -= b.Value;
 
 	return *this;
 }
@@ -123,19 +150,14 @@ Var& Var::operator -= ([[maybe_unused]] const CurrencySystem b)
 }
 Var& Var::operator *= (const int b)
 {
-	try
-	{
-		Value = std::to_string(std::stoi(Value) * b);
-	}
-	catch(...)
-	{
-		if(b < 0)
-			throw std::runtime_error(E_INVALID_OPERATION);
-		else if(b == 0)
-			Value = "";
-		else
-			for(int i=1; i<b; i++){Value += Value;}
-	}
+	if(isInt())
+		Value = std::to_string(int(*this) * b);
+	else if(b < 0)
+		throw std::runtime_error(E_INVALID_OPERATION);
+	else if(b == 0)
+		Value = "";
+	else
+		for(int i=1; i<b; i++){Value += Value;}
 
 	return *this;
 }
@@ -145,8 +167,10 @@ Var& Var::operator *= ([[maybe_unused]] const std::string b)
 }
 Var& Var::operator *= (const Var b)
 {
-	try{*this *= std::stoi(b.Value);}
-	catch(...){*this *= b.Value;}
+	if(b.isInt())
+		*this *= int(b);
+	else
+		*this *= b.Value;
 
 	return *this;
 }
@@ -168,8 +192,10 @@ Var& Var::operator *= ([[maybe_unused]] const CurrencySystem b)
 }
 Var& Var::operator /= (const int b)
 {
-	try{Value = std::to_string(std::stoi(Value) / b);}
-	catch(...){throw std::runtime_error(E_INVALID_OPERATION);}
+	if(isInt())
+		Value = std::to_string(int(*this) / b);
+	else
+		throw std::runtime_error(E_INVALID_OPERATION);
 
 	return *this;
 }
@@ -179,8 +205,10 @@ Var& Var::operator /= ([[maybe_unused]] const std::string b)
 }
 Var& Var::operator /= (const Var b)
 {
-	try{*this /= std::stoi(b.Value);}
-	catch(...){*this /= b.Value;}
+	if(b.isInt())
+		*this /= int(b);
+	else
+		*this /= b.Value;
 
 	return *this;
 }
@@ -202,14 +230,17 @@ Var& Var::operator /= ([[maybe_unused]] const CurrencySystem b)
 }
 Var& Var::operator ^= (const int b)
 {
-	try
+	if(isInt())
 	{
-		int total = std::stoi(Value);
+		int total = int(*this);
 		for(int i = 1; i < b; i++)
-			total *= std::stoi(Value);
+			total *= int(*this);
 		Value = std::to_string(total);
 	}
-	catch(...){throw std::runtime_error(E_INVALID_OPERATION);}
+	else
+	{
+		throw std::runtime_error(E_INVALID_OPERATION);
+	}
 
 	return *this;
 }
@@ -219,8 +250,10 @@ Var& Var::operator ^= ([[maybe_unused]] const std::string b)
 }
 Var& Var::operator ^= (const Var b)
 {
-	try{*this ^= std::stoi(b.Value);}
-	catch(...){*this ^= b.Value;}
+	if(b.isInt())
+		*this ^= int(b);
+	else
+		*this ^= b.Value;
 
 	return *this;
 }
@@ -242,8 +275,10 @@ Var& Var::operator ^= ([[maybe_unused]] const CurrencySystem b)
 }
 Var& Var::operator %= (const int b)
 {
-	try{Value = std::to_string(std::stoi(Value) % b);}
-	catch(...){throw std::runtime_error(E_INVALID_OPERATION);}
+	if(isInt())
+		Value = std::to_string(int(*this) % b);
+	else
+		throw std::runtime_error(E_INVALID_OPERATION);
 
 	return *this;
 }
@@ -253,8 +288,10 @@ Var& Var::operator %= ([[maybe_unused]] const std::string b)
 }
 Var& Var::operator %= (const Var b)
 {
-	try{*this %= std::stoi(b.Value);}
-	catch(...){*this %= b.Value;}
+	if(b.isInt())
+		*this %= int(b);
+	else
+		*this %= b.Value;
 
 	return *this;
 }
@@ -486,8 +523,10 @@ Var Var::operator % (const CurrencySystem b)
 }
 bool Var::operator == (const int b)
 {
-	try{return std::stoi(Value) == b;}
-	catch(...){return false;}
+	if(isInt())
+		return int(*this) == b;
+	else
+		return false;
 }
 bool Var::operator == (const std::string b)
 {
@@ -495,13 +534,17 @@ bool Var::operator == (const std::string b)
 }
 bool Var::operator == (const Var b)
 {
-	try{return *this == std::stoi(b.Value);}
-	catch(...){return *this == b.Value;}
+	if(b.isInt())
+		return *this == int(b);
+	else
+		return *this == b.Value;
 }
 bool Var::operator == (const Dice b)
 {
-	try{return Dice(Value) == b;}
-	catch(...){return false;}
+	if(isInt())
+		return Dice(Value) == b;
+	else
+		return false;
 }
 bool Var::operator == ([[maybe_unused]] const Wallet b)
 {
@@ -517,8 +560,10 @@ bool Var::operator == ([[maybe_unused]] const CurrencySystem b)
 }
 bool Var::operator < (const int b)
 {
-	try{return std::stoi(Value) < b;}
-	catch(...){return false;}
+if(isInt())
+		return int(*this) < b;
+	else
+		return false;
 }
 bool Var::operator < (const std::string b)
 {
@@ -526,13 +571,17 @@ bool Var::operator < (const std::string b)
 }
 bool Var::operator < (const Var b)
 {
-	try{return *this < std::stoi(b.Value);}
-	catch(...){return *this < b.Value;}
+	if(b.isInt())
+		return *this < int(b);
+	else
+		return *this < b.Value;
 }
 bool Var::operator < (const Dice b)
 {
-	try{return Dice(Value) < b;}
-	catch(...){return false;}
+	if(isInt())
+		return Dice(Value) < b;
+	else
+		return false;
 }
 bool Var::operator < ([[maybe_unused]] const Wallet b)
 {
@@ -548,8 +597,10 @@ bool Var::operator < ([[maybe_unused]] const CurrencySystem b)
 }
 bool Var::operator > (const int b)
 {
-	try{return std::stoi(Value) > b;}
-	catch(...){return false;}
+	if(isInt())
+		return int(*this) > b;
+	else
+		return false;
 }
 bool Var::operator > (const std::string b)
 {
@@ -557,13 +608,17 @@ bool Var::operator > (const std::string b)
 }
 bool Var::operator > (const Var b)
 {
-	try{return *this > std::stoi(b.Value);}
-	catch(...){return *this > b.Value;}
+	if(b.isInt())
+		return *this > int(b);
+	else
+		return *this > b.Value;
 }
 bool Var::operator > (const Dice b)
 {
-	try{return Dice(Value) > b;}
-	catch(...){return false;}
+	if(isInt())
+		return Dice(Value) > b;
+	else
+		return false;
 }
 bool Var::operator > ([[maybe_unused]] const Wallet b)
 {
@@ -682,17 +737,77 @@ bool Var::operator != (const CurrencySystem b)
 	Var lhs = *this;
 	return !(lhs == b);
 }
+bool Var::operator && (const int b)
+{
+	return bool(*this) && (b != 0);
+}
+bool Var::operator && (const std::string b)
+{
+	return bool(*this) && (b != "" && stringcasecmp(b,"false"));
+}
+bool Var::operator && (const Var b)
+{
+	return bool(*this) && bool(b);
+}
+bool Var::operator && (const Dice b)
+{
+	return bool(*this) && bool(b);
+}
+bool Var::operator && (const Wallet b)
+{
+	return bool(*this) && bool(b);
+}
+bool Var::operator && (const Currency b)
+{
+	return bool(*this) && bool(b);
+}
+bool Var::operator && (const CurrencySystem b)
+{
+	return bool(*this) && bool(b);
+}
+bool Var::operator || (const int b)
+{
+	return bool(*this) || (b != 0);
+}
+bool Var::operator || (const std::string b)
+{
+	return bool(*this) || (b != "" && stringcasecmp(b,"false"));
+}
+bool Var::operator || (const Var b)
+{
+	return bool(*this) || bool(b);
+}
+bool Var::operator || (const Dice b)
+{
+	return bool(*this) || bool(b);
+}
+bool Var::operator || (const Wallet b)
+{
+	return bool(*this) || bool(b);
+}
+bool Var::operator || (const Currency b)
+{
+	return bool(*this) || bool(b);
+}
+bool Var::operator || (const CurrencySystem b)
+{
+	return bool(*this) || bool(b);
+}
 Var& Var::operator ++ (int)
 {
-	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) + 1);}
-	catch(...){throw std::runtime_error(E_INVALID_OPERATION);}
+	if(isInt())
+		Value = std::to_string(int(*this) + 1);
+	else
+		throw std::runtime_error(E_INVALID_OPERATION);
 
 	return *this;
 }
 Var& Var::operator -- (int)
 {
-	try{std::stoi(Value); Value = std::to_string(std::stoi(Value) - 1);}
-	catch(...){throw std::runtime_error(E_INVALID_OPERATION);}
+	if(isInt())
+		Value = std::to_string(int(*this) - 1);
+	else
+		throw std::runtime_error(E_INVALID_OPERATION);
 
 	return *this;
 }
