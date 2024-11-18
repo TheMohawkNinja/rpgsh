@@ -1,4 +1,5 @@
 #include <climits>
+#include <string.h>
 #include "../headers/currency.h"
 #include "../headers/dice.h"
 #include "../headers/functions.h"
@@ -8,7 +9,11 @@
 enum Action
 {
 	Read,
-	Write
+	Write,
+	SetAdd,
+	SetRemove,
+	SetAddA,
+	SetRemoveA
 };
 
 struct VariableInfo
@@ -255,7 +260,7 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 			exit(-1);
 		}
 	}
-	else// ...and the last character is a '/', print a list of p_vi->keys and constructors
+	else if(action == Read)// If the last character is a '/' and we are just printing the value, print a list of keys and constructors
 	{
 		std::map<std::string,std::string> c_map;
 		std::map<std::string,std::string> cs_map;
@@ -302,11 +307,73 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 		appendOutput(w_map,p_vi->key,&output);
 
 		// Cut off the extraneous DS
-		output = left(output,output.length()-DS.length());
-		return output;
+		return left(output,output.length()-DS.length());
+	}
+	else if(action == SetAdd || action == SetAddA)// Perform write operation on dataset
+	{
+		VariableInfo rhs_vi = parseVariable(value);
+		std::string rhs_value = get_prog_output("variables "+value)[0];
+
+		if(rhs_vi.key[rhs_vi.key.length()-1] != '/')// RHS is just a variable
+		{
+			switch(rhs_value[0])
+			{
+				case VAR_SIGIL:
+					p_vi->scope.set<Var>(p_vi->key+rhs_vi.key,rhs_value);
+					break;
+				case DICE_SIGIL:
+					p_vi->scope.set<Dice>(p_vi->key+rhs_vi.key,rhs_value);
+					break;
+				case WALLET_SIGIL:
+					p_vi->scope.set<Wallet>(p_vi->key+rhs_vi.key,rhs_value);
+					break;
+				case CURRENCY_SIGIL:
+					p_vi->scope.set<Currency>(p_vi->key+rhs_vi.key,rhs_value);
+					break;
+				case CURRENCYSYSTEM_SIGIL:
+					p_vi->scope.set<CurrencySystem>(p_vi->key+rhs_vi.key,rhs_value);
+					break;
+			}
+		}
+		else// RHS is a variable set
+		{
+			while(true)
+			{
+				if(rhs_value.find(DS) != std::string::npos)
+				{
+					std::string set_key = left(rhs_value,rhs_value.find(DS));
+					rhs_value = right(rhs_value,rhs_value.find(set_key)+set_key.length()+DS.length());
+					std::string set_value = left(rhs_value,rhs_value.find(DS));
+
+					switch(set_value[0])
+					{
+						case VAR_SIGIL:
+							p_vi->scope.set<Var>(p_vi->key+set_key,set_value);
+							break;
+						case DICE_SIGIL:
+							p_vi->scope.set<Dice>(p_vi->key+set_key,set_value);
+							break;
+						case WALLET_SIGIL:
+							p_vi->scope.set<Wallet>(p_vi->key+set_key,set_value);
+							break;
+						case CURRENCY_SIGIL:
+							p_vi->scope.set<Currency>(p_vi->key+set_key,set_value);
+							break;
+						case CURRENCYSYSTEM_SIGIL:
+							p_vi->scope.set<CurrencySystem>(p_vi->key+set_key,set_value);
+							break;
+					}
+
+					if(rhs_value.find(DS) != std::string::npos)
+						rhs_value = right(rhs_value,rhs_value.find(set_value)+set_value.length()+DS.length());
+					else
+						break;
+				}
+			}
+		}
 	}
 
-	if(action == Write) p_vi->scope.save();
+	if(action == Write || action == SetAddA) p_vi->scope.save();
 
 	return ""; // Supress -Wreturn-type
 }
@@ -562,7 +629,7 @@ int main(int argc, char** argv)
 	std::string variable(argv[1]);
 	std::string scope_str = "";
 
-	if(isScopeSigil(variable[0]) && (isTypeSigil(variable[1]) || variable[1] == '/' || variable[1] == '['))
+	if(variable.length() > 1 && (isTypeSigil(variable[1]) || variable[1] == '/' || variable[1] == '['))
 		vi = parseVariable(variable);
 
 	if(argc == 2)// Print data if all the user enters is a variable
@@ -570,7 +637,7 @@ int main(int argc, char** argv)
 		std::string str = readOrWriteDataOnScope(&vi, Read, "");
 		if(str != "") fprintf(stdout,"%s\n",str.c_str());
 	}
-	else// Perform operation
+	else if(variable[variable.length()-1] != '/')// Perform operation on variable
 	{
 		std::vector<std::string> args;
 		unsigned int open_paren_ctr = 0;
@@ -756,6 +823,32 @@ int main(int argc, char** argv)
 		// Print result if we aren't writing to a variable
 		if(findInStrVect(assignOps,final_op,0) == -1 && findInStrVect(unaryOps,final_op,0) == -1)
 			fprintf(stdout,"%s\n",args[0].c_str());
+	}
+	else// Perform operation on set
+	{
+
+		if(argc != 4 ||
+		   (strcasecmp(argv[2],OP_ADD) && strcasecmp(argv[2],OP_SUB) && strcasecmp(argv[2],OP_ADDA) && strcasecmp(argv[2],OP_SUBA)))
+		{
+			output(Error,"Variable set modification only supports the following operators: %s, %s, %s, %s",OP_ADD,OP_SUB,OP_ADDA,OP_SUBA);
+			return -1;
+		}
+
+		std::string rhs = std::string(argv[3]);
+
+		if(!isScopeSigil(rhs[0]))
+		{
+			output(Error,"Right-hand side of variable set modification cannot be a constant.");
+			return -1;
+		}
+		else if((int)rhs.find('.') > (int)rhs.find('/'))
+		{
+			output(Error,"Variable set modifications cannot be performed with properties.");
+			return -1;
+		}
+
+		if(rhs.length() > 1 && (isTypeSigil(rhs[1]) || rhs[1] == '/' || rhs[1] == '[') && !strcasecmp(argv[2],OP_ADDA))
+			(void)readOrWriteDataOnScope(&vi, SetAddA, rhs);
 	}
 	return 0;
 }
