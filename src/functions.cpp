@@ -166,18 +166,20 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	if(isScopeSigil(arg_str[0])) //Check if user is operating on a variable
 		arg_str = "variables " + arg_str;
 
+	bool runningVariables = (left(arg_str,9) == "variables");
+
 	std::string path = "/bin/";
 	std::regex arg_pattern("[^\\s]{1,}");
-
 	std::sregex_iterator arg_str_it(arg_str.begin(), arg_str.end(), arg_pattern);
 	std::sregex_iterator arg_str_end;
 
-	//Replaces all instances of variables with their respective value
-	//Except for the first arg if it is a variable
+	//Push back program we are going to run
 	args.push_back(path+prefix+arg_str_it->str());
 	arg_str_it++;
 
-	if(arg_str.substr(0,9) == "variables")
+	//Replaces all instances of variables with their respective value
+	//Except for the first arg if it is a variable
+	if(runningVariables)
 	{
 		args.push_back(arg_str_it->str());
 		arg_str_it++;
@@ -187,14 +189,14 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	{
 		std::string arg = arg_str_it->str();
 
-		if(isScopeSigil(arg[0]))
+					   // Special condition for modifying sets, as keys need preserved
+		if(isScopeSigil(arg[0]) && ((runningVariables && args[1][args[1].length()-1] != '/') || !runningVariables))
 			arg = get_prog_output(arg)[0];
 
 		//Don't try to run a program if the data type sigil was invalid
 		if(arg == "")
 		{
 			if(!redirect_output) padding();
-
 			return;
 		}
 
