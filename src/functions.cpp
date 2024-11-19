@@ -189,9 +189,7 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	{
 		std::string arg = arg_str_it->str();
 
-					   // Special condition for modifying sets, as keys need preserved
-		if(isScopeSigil(arg[0]) && ((runningVariables && args[1][args[1].length()-1] != '/') || !runningVariables))
-			arg = get_prog_output(arg)[0];
+		if(isScopeSigil(arg[0])) arg = get_prog_output(arg)[0];
 
 		//Don't try to run a program if the data type sigil was invalid
 		if(arg == "")
