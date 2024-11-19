@@ -164,30 +164,40 @@ void appendOutput(std::map<std::string,std::string> map, std::string key, std::s
 }
 std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::string value)
 {
-	if(p_vi->variable[p_vi->variable.length()-1] != '/')// If the last character isn't a '/', just handle value
+	if(p_vi->variable.back() != '/')// If the last character isn't a '/', just handle value
 	{
+		if(p_vi->variable[1] != '/' && !isTypeSigil(p_vi->variable[1]))
+		{
+			output(Error,"Unknown type specifier \'%c\' in \"%s\"",p_vi->variable[1],p_vi->variable.c_str());
+			exit(-1);
+		}
+
 		if(p_vi->variable[1] == '/' || p_vi->variable[1] == VAR_SIGIL)
 		{
-			if(action == Read && !p_vi->scope.keyExists<Var>(p_vi->key))
-				return "";
-			else if(action == Read && p_vi->property == "")
+			bool keyExists = p_vi->scope.keyExists<Var>(p_vi->key);
+			if(action == Read && keyExists && p_vi->property == "")
 				return p_vi->scope.getStr<Var>(p_vi->key);
 			else if(action == Write && p_vi->property == "")
 				p_vi->scope.set<Var>(p_vi->key,Var(value));
-			else if(action == Read && !stringcasecmp(p_vi->property,"Value"))
+			else if(action == Read && keyExists && !stringcasecmp(p_vi->property,"Value"))
 				return p_vi->scope.getProperty<Var>(p_vi->key,p_vi->property);
 			else if(action == Write && !stringcasecmp(p_vi->property,"Value"))
 				p_vi->scope.setProperty<Var,std::string>(p_vi->key,p_vi->property,Var(value).Value);
-		}
-		else if(p_vi->variable[1] == '/' || p_vi->variable[1] == DICE_SIGIL)
-		{
-			if(action == Read && !p_vi->scope.keyExists<Dice>(p_vi->key))
+
+			if(keyExists && action == Write)
+			{
+				p_vi->scope.save();
 				return "";
-			else if(action == Read && p_vi->property == "")
+			}
+		}
+		if(p_vi->variable[1] == '/' || p_vi->variable[1] == DICE_SIGIL)
+		{
+			bool keyExists = p_vi->scope.keyExists<Dice>(p_vi->key);
+			if(action == Read && keyExists && p_vi->property == "")
 				return p_vi->scope.getStr<Dice>(p_vi->key);
 			else if(action == Write && p_vi->property == "")
 				p_vi->scope.set<Dice>(p_vi->key,Dice(value));
-			else if(action == Read &&
+			else if(action == Read && keyExists &&
 				(!stringcasecmp(p_vi->property,"Quantity") ||
 			         !stringcasecmp(p_vi->property,"Faces") ||
 			         !stringcasecmp(p_vi->property,"Modifier") ||
@@ -201,29 +211,39 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 				p_vi->scope.setProperty<Dice,int>(p_vi->key,p_vi->property,Dice(value).Modifier);
 			else if(action == Write && !stringcasecmp(p_vi->property,"List"))
 				p_vi->scope.setProperty<Dice,std::string>(p_vi->key,p_vi->property,Dice(value).List);
-		}
-		else if(p_vi->variable[1] == '/' || p_vi->variable[1] == WALLET_SIGIL)
-		{
-			if(action == Read && !p_vi->scope.keyExists<Wallet>(p_vi->key))
+
+			if(keyExists && action == Write)
+			{
+				p_vi->scope.save();
 				return "";
-			else if(action == Read && p_vi->property == "")
+			}
+		}
+		if(p_vi->variable[1] == '/' || p_vi->variable[1] == WALLET_SIGIL)
+		{
+			bool keyExists = p_vi->scope.keyExists<Wallet>(p_vi->key);
+			if(action == Read && keyExists && p_vi->property == "")
 				return p_vi->scope.getStr<Wallet>(p_vi->key);
 			else if(action == Write && p_vi->property == "")
 				p_vi->scope.set<Wallet>(p_vi->key,Wallet(value));
-			else if(action == Read && p_vi->scope.get<Wallet>(p_vi->key).containsCurrency(p_vi->property))
+			else if(action == Read && keyExists && p_vi->scope.get<Wallet>(p_vi->key).containsCurrency(p_vi->property))
 				return p_vi->scope.getProperty<Wallet>(p_vi->key,p_vi->property);
 			else if(action == Write)
 				p_vi->scope.setProperty<Wallet,int>(p_vi->key,p_vi->property,Wallet(value).Money[Currency(p_vi->property)]);
-		}
-		else if(p_vi->variable[1] == '/' || p_vi->variable[1] == CURRENCY_SIGIL)
-		{
-			if(action == Read && !p_vi->scope.keyExists<Currency>(p_vi->key))
+
+			if(keyExists && action == Write)
+			{
+				p_vi->scope.save();
 				return "";
-			else if(action == Read && p_vi->property == "")
+			}
+		}
+		if(p_vi->variable[1] == '/' || p_vi->variable[1] == CURRENCY_SIGIL)
+		{
+			bool keyExists = p_vi->scope.keyExists<Currency>(p_vi->key);
+			if(action == Read && keyExists && p_vi->property == "")
 				return p_vi->scope.getStr<Currency>(p_vi->key);
 			else if(action == Write && p_vi->property == "")
 				p_vi->scope.set<Currency>(p_vi->key,Currency(value));
-			else if(action == Read &&
+			else if(action == Read && keyExists &&
 				(!stringcasecmp(p_vi->property,"CurrencySystem") ||
 				 !stringcasecmp(p_vi->property,"Name") ||
 				 !stringcasecmp(p_vi->property,"SmallerAmount") ||
@@ -240,24 +260,30 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,Currency(value).Larger);
 			else if(action == Write && !stringcasecmp(p_vi->property,"SmallerAmount"))
 				p_vi->scope.setProperty<Currency,int>(p_vi->key,p_vi->property,Currency(value).SmallerAmount);
-		}
-		else if(p_vi->variable[1] == '/' || p_vi->variable[1] == CURRENCYSYSTEM_SIGIL)
-		{
-			if(action == Read && !p_vi->scope.keyExists<CurrencySystem>(p_vi->key))
+
+			if(keyExists && action == Write)
+			{
+				p_vi->scope.save();
 				return "";
-			else if(action == Read && p_vi->property == "")
+			}
+		}
+		if(p_vi->variable[1] == '/' || p_vi->variable[1] == CURRENCYSYSTEM_SIGIL)
+		{
+			bool keyExists = p_vi->scope.keyExists<CurrencySystem>(p_vi->key);
+			if(action == Read && keyExists && p_vi->property == "")
 				return p_vi->scope.getStr<CurrencySystem>(p_vi->key);
 			else if(action == Write && p_vi->property == "")
 				p_vi->scope.set<CurrencySystem>(p_vi->key,CurrencySystem(value));
-			else if(action == Read && !stringcasecmp(p_vi->property,"Name"))
+			else if(action == Read && keyExists && !stringcasecmp(p_vi->property,"Name"))
 				return p_vi->scope.getProperty<CurrencySystem>(p_vi->key,p_vi->property);
 			else if(action == Write && !stringcasecmp(p_vi->property,"Name"))
 				p_vi->scope.setProperty<CurrencySystem,std::string>(p_vi->key,p_vi->property,CurrencySystem(value).Name);
-		}
-		else if(p_vi->variable[1] != '/' && !isTypeSigil(p_vi->variable[1]))
-		{
-			output(Error,"Unknown type specifier \'%c\' in \"%s\"",p_vi->variable[1],p_vi->variable.c_str());
-			exit(-1);
+
+			if(keyExists && action == Write)
+			{
+				p_vi->scope.save();
+				return "";
+			}
 		}
 	}
 	else if(action == Read)// If the last character is a '/' and we are just printing the value, print a list of keys and constructors
@@ -311,69 +337,39 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 	}
 	else if(action == SetAdd || action == SetAddA)// Perform write operation on dataset
 	{
-		VariableInfo rhs_vi = parseVariable(value);
-		std::string rhs_value = get_prog_output("variables "+value)[0];
-
-		if(rhs_vi.key[rhs_vi.key.length()-1] != '/')// RHS is just a variable
+		while(value.find(DS) != std::string::npos)
 		{
-			switch(rhs_value[0])
+			std::string set_key = left(value,value.find(DS));
+			value = right(value,value.find(set_key)+set_key.length()+DS.length());
+			std::string set_value = left(value,value.find(DS));
+
+			switch(set_value[0])
 			{
 				case VAR_SIGIL:
-					p_vi->scope.set<Var>(p_vi->key+rhs_vi.key,rhs_value);
+					p_vi->scope.set<Var>(p_vi->key+set_key,set_value);
 					break;
 				case DICE_SIGIL:
-					p_vi->scope.set<Dice>(p_vi->key+rhs_vi.key,rhs_value);
+					p_vi->scope.set<Dice>(p_vi->key+set_key,set_value);
 					break;
 				case WALLET_SIGIL:
-					p_vi->scope.set<Wallet>(p_vi->key+rhs_vi.key,rhs_value);
+					p_vi->scope.set<Wallet>(p_vi->key+set_key,set_value);
 					break;
 				case CURRENCY_SIGIL:
-					p_vi->scope.set<Currency>(p_vi->key+rhs_vi.key,rhs_value);
+					p_vi->scope.set<Currency>(p_vi->key+set_key,set_value);
 					break;
 				case CURRENCYSYSTEM_SIGIL:
-					p_vi->scope.set<CurrencySystem>(p_vi->key+rhs_vi.key,rhs_value);
+					p_vi->scope.set<CurrencySystem>(p_vi->key+set_key,set_value);
 					break;
 			}
-		}
-		else// RHS is a variable set
-		{
-			while(true)
-			{
-				if(rhs_value.find(DS) != std::string::npos)
-				{
-					std::string set_key = left(rhs_value,rhs_value.find(DS));
-					rhs_value = right(rhs_value,rhs_value.find(set_key)+set_key.length()+DS.length());
-					std::string set_value = left(rhs_value,rhs_value.find(DS));
 
-					switch(set_value[0])
-					{
-						case VAR_SIGIL:
-							p_vi->scope.set<Var>(p_vi->key+set_key,set_value);
-							break;
-						case DICE_SIGIL:
-							p_vi->scope.set<Dice>(p_vi->key+set_key,set_value);
-							break;
-						case WALLET_SIGIL:
-							p_vi->scope.set<Wallet>(p_vi->key+set_key,set_value);
-							break;
-						case CURRENCY_SIGIL:
-							p_vi->scope.set<Currency>(p_vi->key+set_key,set_value);
-							break;
-						case CURRENCYSYSTEM_SIGIL:
-							p_vi->scope.set<CurrencySystem>(p_vi->key+set_key,set_value);
-							break;
-					}
-
-					if(rhs_value.find(DS) != std::string::npos)
-						rhs_value = right(rhs_value,rhs_value.find(set_value)+set_value.length()+DS.length());
-					else
-						break;
-				}
-			}
+			if(value.find(DS) != std::string::npos)
+				value = right(value,value.find(set_value)+set_value.length()+DS.length());
+			else
+				break;
 		}
+
+		if(action == SetAddA) p_vi->scope.save();
 	}
-
-	if(action == Write || action == SetAddA) p_vi->scope.save();
 
 	return ""; // Supress -Wreturn-type
 }
@@ -637,8 +633,9 @@ int main(int argc, char** argv)
 		std::string str = readOrWriteDataOnScope(&vi, Read, "");
 		if(str != "") fprintf(stdout,"%s\n",str.c_str());
 	}
-	else if(variable[variable.length()-1] != '/')// Perform operation on variable
+	else if(variable.back() != '/')// Perform operation on variable
 	{
+		fprintf(stdout,"handing variables\n");
 		std::vector<std::string> args;
 		unsigned int open_paren_ctr = 0;
 		unsigned int close_paren_ctr = 0;
@@ -647,7 +644,7 @@ int main(int argc, char** argv)
 		std::string final_op = std::string(argv[2]);
 		if(final_op[0] == '(')
 			final_op = right(final_op,1);
-		if(final_op[final_op.length()-1] == ')')
+		if(final_op.back() == ')')
 			final_op = left(final_op,final_op.length()-1);
 
 		// Generate vector of operators and operands, while also determining number of parentheses
@@ -746,7 +743,7 @@ int main(int argc, char** argv)
 
 		// Wrap everything in parenthesis just to make below code simpler
 		args[0] = '('+args[0];
-		args[args_size-1] += ')';
+		args.back() += ')';
 
 		if(open_paren_ctr > close_paren_ctr)
 		{
@@ -766,7 +763,7 @@ int main(int argc, char** argv)
 			{
 				for(int end=start; end<args_size; end++)
 				{
-					if(args[end][args[end].length()-1] == ')')
+					if(args[end].back() == ')')
 					{
 						// Strip parenthesis off args to ensure good parsing
 						std::string rparens = right(args[end],args[end].find(')')+1);
@@ -805,8 +802,8 @@ int main(int argc, char** argv)
 			// Check if parenthesis still exist, and re-wrap if needed. Restart loop to go back through PEMDAS if needed
 			if(args.size() > 1 && args[0][0] != '(')
 				args[0] = '(' + args[0];
-			if(args.size() > 1 && args[args.size()-1][args[args.size()-1].length()-1] != ')')
-				args[args.size()-1] += ')';
+			if(args.size() > 1 && args.back().back() != ')')
+				args.back() += ')';
 			if(start == args_size-1)
 			{
 				for(const auto& arg : args)
@@ -835,19 +832,17 @@ int main(int argc, char** argv)
 		}
 
 		std::string rhs = std::string(argv[3]);
+		fprintf(stdout,"rhs = \"%s\"\n",rhs.c_str());
 
-		if(!isScopeSigil(rhs[0]))
+		if(!((int)rhs.find("::") > -1 && rhs.back() != ':'))// If it doesn't look like a variable set.
 		{
-			output(Error,"Right-hand side of variable set modification cannot be a constant.");
-			return -1;
-		}
-		else if((int)rhs.find('.') > (int)rhs.find('/'))
-		{
-			output(Error,"Variable set modifications cannot be performed with properties.");
+			output(Error,"Variable set modifications can only be performed with other variable sets.");
 			return -1;
 		}
 
-		if(rhs.length() > 1 && (isTypeSigil(rhs[1]) || rhs[1] == '/' || rhs[1] == '[') && !strcasecmp(argv[2],OP_ADDA))
+		if(!strcasecmp(argv[2],OP_ADDA))
+			(void)readOrWriteDataOnScope(&vi, SetAdd, rhs);
+		else if(!strcasecmp(argv[2],OP_ADDA))
 			(void)readOrWriteDataOnScope(&vi, SetAddA, rhs);
 	}
 	return 0;
