@@ -16,14 +16,6 @@ enum Action
 	SetRemoveA
 };
 
-struct VariableInfo
-{
-	Scope scope = Scope();
-	std::string variable = "";
-	std::string key = "";
-	std::string property = "";
-};
-
 Character c = Character(false);
 Campaign m = Campaign();
 Shell s = Shell();
@@ -142,25 +134,6 @@ VariableInfo parseVariable(std::string v)// Derive information about variable fr
 	}
 
 	return vi;
-}
-template<typename T>
-void appendMap(Scope scope, std::map<std::string,std::string>* p_map)
-{
-	for(const auto& [k,v] : scope.getDatamap<T>())
-		(*p_map)[k] = scope.getStr<T>(k);
-}
-void appendOutput(std::map<std::string,std::string> map, std::string key, std::string* pOutput)
-{
-	for(const auto& [k,v] : map)
-	{
-		// Get root variable if it exists
-		if(!stringcasecmp((left(k,key.length())+"/"),key))
-			pOutput->append(k + DS + v + DS);
-
-		// Get all subkeys
-		if(!stringcasecmp((left(k,key.length())),key))
-			pOutput->append(k + DS + v + DS);
-	}
 }
 std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::string value)
 {
@@ -288,52 +261,7 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 	}
 	else if(action == Read)// If the last character is a '/' and we are just printing the value, print a list of keys and constructors
 	{
-		std::map<std::string,std::string> c_map;
-		std::map<std::string,std::string> cs_map;
-		std::map<std::string,std::string> d_map;
-		std::map<std::string,std::string> v_map;
-		std::map<std::string,std::string> w_map;
-
-		// When printing entire containers, treat type sigil as a filter
-		switch(p_vi->variable[1])
-		{
-			case CURRENCY_SIGIL:
-				appendMap<Currency>(p_vi->scope,&c_map);
-				break;
-			case CURRENCYSYSTEM_SIGIL:
-				appendMap<CurrencySystem>(p_vi->scope,&cs_map);
-				break;
-			case DICE_SIGIL:
-				appendMap<Dice>(p_vi->scope,&d_map);
-				break;
-			case VAR_SIGIL:
-				appendMap<Var>(p_vi->scope,&v_map);
-				break;
-			case WALLET_SIGIL:
-				appendMap<Wallet>(p_vi->scope,&w_map);
-				break;
-			case '/':
-				appendMap<Currency>(p_vi->scope,&c_map);
-				appendMap<CurrencySystem>(p_vi->scope,&cs_map);
-				appendMap<Dice>(p_vi->scope,&d_map);
-				appendMap<Var>(p_vi->scope,&v_map);
-				appendMap<Wallet>(p_vi->scope,&w_map);
-				break;
-			default:
-				output(Error,"Unknown type specifier \'%c\' in \"%s\"",p_vi->variable[1],p_vi->variable.c_str());
-				exit(-1);
-		}
-
-		// Create output string from map
-		std::string output = "";
-		appendOutput(c_map,p_vi->key,&output);
-		appendOutput(cs_map,p_vi->key,&output);
-		appendOutput(d_map,p_vi->key,&output);
-		appendOutput(v_map,p_vi->key,&output);
-		appendOutput(w_map,p_vi->key,&output);
-
-		// Cut off the extraneous DS
-		return left(output,output.length()-DS.length());
+		return getSet((*p_vi));
 	}
 	else if(action == SetAdd || action == SetAddA)// Perform write operation on dataset
 	{
@@ -832,15 +760,14 @@ int main(int argc, char** argv)
 		}
 
 		std::string rhs = std::string(argv[3]);
-		fprintf(stdout,"rhs = \"%s\"\n",rhs.c_str());
 
-		if(!((int)rhs.find("::") > -1 && rhs.back() != ':'))// If it doesn't look like a variable set.
+		if(!((int)rhs.find(DS) > -1 && rhs.back() != ':'))// If it doesn't look like a variable set.
 		{
 			output(Error,"Variable set modifications can only be performed with other variable sets.");
 			return -1;
 		}
 
-		if(!strcasecmp(argv[2],OP_ADDA))
+		if(!strcasecmp(argv[2],OP_ADD))
 			(void)readOrWriteDataOnScope(&vi, SetAdd, rhs);
 		else if(!strcasecmp(argv[2],OP_ADDA))
 			(void)readOrWriteDataOnScope(&vi, SetAddA, rhs);
