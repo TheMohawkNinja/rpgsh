@@ -2,10 +2,10 @@
 
 #include <map>
 #include <string>
-//#include <type_traits>//std::is_same<T,U>
 #include "currency.h"
 #include "define.h"
 #include "dice.h"
+#include "functions.h"
 #include "output.h"
 #include "var.h"
 
