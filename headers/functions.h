@@ -4,9 +4,18 @@
 #include <filesystem>
 #include <string>
 #include <vector>
-#include "output.h"
 #include "define.h"
+#include "output.h"
+#include "scope.h"
 #include "var.h"
+
+struct VariableInfo
+{
+	Scope scope = Scope();
+	std::string variable = "";
+	std::string key = "";
+	std::string property = "";
+};
 
 std::string btos(bool b);
 
@@ -48,6 +57,12 @@ std::string get_env_variable(std::string v);
 void set_env_variable(std::string v, std::string value);
 
 unsigned int getWalletValue(Wallet w);
+
+template<typename T>
+void appendMap(Scope scope, std::map<std::string,std::string>* p_map);
+void appendOutput(std::map<std::string,std::string> map, std::string key, std::string* pOutput);
+
+std::string getSet(VariableInfo vi);
 
 template <typename TL, typename TR>
 bool approxEquals(TL lhs, TR rhs);
