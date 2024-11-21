@@ -261,9 +261,9 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 	}
 	else if(action == Read)// If the last character is a '/' and we are just printing the value, print a list of keys and constructors
 	{
-		return getSet((*p_vi));
+		return getSet(*p_vi);
 	}
-	else if(action == SetAdd || action == SetAddA)// Perform write operation on dataset
+	else if(action == SetAdd || action == SetAddA)// Perform write operation on variable set
 	{
 		while(value.find(DS) != std::string::npos)
 		{
@@ -274,18 +274,28 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 			switch(set_value[0])
 			{
 				case VAR_SIGIL:
+					if(p_vi->variable[1] == '/' ||
+					   p_vi->variable[1] == VAR_SIGIL)
 					p_vi->scope.set<Var>(p_vi->key+set_key,set_value);
 					break;
 				case DICE_SIGIL:
+					if(p_vi->variable[1] == '/' ||
+					   p_vi->variable[1] == DICE_SIGIL)
 					p_vi->scope.set<Dice>(p_vi->key+set_key,set_value);
 					break;
 				case WALLET_SIGIL:
+					if(p_vi->variable[1] == '/' ||
+					   p_vi->variable[1] == WALLET_SIGIL)
 					p_vi->scope.set<Wallet>(p_vi->key+set_key,set_value);
 					break;
 				case CURRENCY_SIGIL:
+					if(p_vi->variable[1] == '/' ||
+					   p_vi->variable[1] == CURRENCY_SIGIL)
 					p_vi->scope.set<Currency>(p_vi->key+set_key,set_value);
 					break;
 				case CURRENCYSYSTEM_SIGIL:
+					if(p_vi->variable[1] == '/' ||
+					   p_vi->variable[1] == CURRENCYSYSTEM_SIGIL)
 					p_vi->scope.set<CurrencySystem>(p_vi->key+set_key,set_value);
 					break;
 			}
@@ -296,7 +306,54 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 				break;
 		}
 
-		if(action == SetAddA) p_vi->scope.save();
+		if (action == SetAdd) return getSet(*p_vi);
+		else if(action == SetAddA) p_vi->scope.save();
+	}
+	else if(action == SetRemove || action == SetRemoveA)// Perform write operations on variable set
+	{
+		while(value.find(DS) != std::string::npos)
+		{
+			std::string set_key = left(value,value.find(DS));
+			value = right(value,value.find(set_key)+set_key.length()+DS.length());
+			std::string set_value = left(value,value.find(DS));
+
+			switch(set_value[0])
+			{
+				case VAR_SIGIL:
+					if(p_vi->variable[1] == '/' ||
+					   p_vi->variable[1] == VAR_SIGIL)
+					p_vi->scope.remove<Var>(set_key);
+					break;
+				case DICE_SIGIL:
+					if(p_vi->variable[1] == '/' ||
+					   p_vi->variable[1] == DICE_SIGIL)
+					p_vi->scope.remove<Dice>(set_key);
+					break;
+				case WALLET_SIGIL:
+					if(p_vi->variable[1] == '/' ||
+					   p_vi->variable[1] == WALLET_SIGIL)
+					p_vi->scope.remove<Wallet>(set_key);
+					break;
+				case CURRENCY_SIGIL:
+					if(p_vi->variable[1] == '/' ||
+					   p_vi->variable[1] == CURRENCY_SIGIL)
+					p_vi->scope.remove<Currency>(set_key);
+					break;
+				case CURRENCYSYSTEM_SIGIL:
+					if(p_vi->variable[1] == '/' ||
+					   p_vi->variable[1] == CURRENCYSYSTEM_SIGIL)
+					p_vi->scope.remove<CurrencySystem>(set_key);
+					break;
+			}
+
+			if(value.find(DS) != std::string::npos)
+				value = right(value,value.find(set_value)+set_value.length()+DS.length());
+			else
+				break;
+		}
+
+		if (action == SetRemove) return getSet(*p_vi);
+		else if(action == SetRemoveA) p_vi->scope.save();
 	}
 
 	return ""; // Supress -Wreturn-type
@@ -563,7 +620,6 @@ int main(int argc, char** argv)
 	}
 	else if(variable.back() != '/')// Perform operation on variable
 	{
-		fprintf(stdout,"handing variables\n");
 		std::vector<std::string> args;
 		unsigned int open_paren_ctr = 0;
 		unsigned int close_paren_ctr = 0;
@@ -768,9 +824,13 @@ int main(int argc, char** argv)
 		}
 
 		if(!strcasecmp(argv[2],OP_ADD))
-			(void)readOrWriteDataOnScope(&vi, SetAdd, rhs);
+			fprintf(stdout,"%s\n",readOrWriteDataOnScope(&vi, SetAdd, rhs).c_str());
 		else if(!strcasecmp(argv[2],OP_ADDA))
 			(void)readOrWriteDataOnScope(&vi, SetAddA, rhs);
+		else if(!strcasecmp(argv[2],OP_SUB))
+			fprintf(stdout,"%s\n",readOrWriteDataOnScope(&vi, SetRemove, rhs).c_str());
+		else if(!strcasecmp(argv[2],OP_SUBA))
+			(void)readOrWriteDataOnScope(&vi, SetRemoveA, rhs);
 	}
 	return 0;
 }
