@@ -74,6 +74,10 @@ class Scope
 		//Set entire datamap to another datamap
 		template <typename T>
 		void setDatamap(datamap<T> map);
+
+		//Delete single variable
+		template <typename T>
+		void remove(std::string key);
 };
 
 class Character: public Scope

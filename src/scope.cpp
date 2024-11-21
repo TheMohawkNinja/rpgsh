@@ -525,6 +525,33 @@ void Scope::setDatamap<Wallet>(datamap<Wallet> map)
 	wallets = map;
 }
 
+//Delete single variable
+template<>
+void Scope::remove<Currency>(std::string key)
+{
+	currencies.erase(getExistingKey<Currency>(key));
+}
+template<>
+void Scope::remove<CurrencySystem>(std::string key)
+{
+	currencysystems.erase(getExistingKey<CurrencySystem>(key));
+}
+template<>
+void Scope::remove<Dice>(std::string key)
+{
+	dice.erase(getExistingKey<Dice>(key));
+}
+template<>
+void Scope::remove<Var>(std::string key)
+{
+	vars.erase(getExistingKey<Var>(key));
+}
+template<>
+void Scope::remove<Wallet>(std::string key)
+{
+	wallets.erase(getExistingKey<Wallet>(key));
+}
+
 //			//
 //	CHARACTER	//
 //			//
