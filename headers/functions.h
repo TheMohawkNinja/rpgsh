@@ -25,6 +25,8 @@ bool isScopeSigil(char c);
 
 bool isTypeSigil(char c);
 
+bool looksLikeSet(std::string s);
+
 int stringcasecmp(std::string a, std::string b);
 
 int findInStrVect(std::vector<std::string> v, std::string str, unsigned int start);
