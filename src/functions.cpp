@@ -50,10 +50,7 @@ bool looksLikeSet(std::string s)
 	std::regex set_pattern("(([\\.a-zA-Z0-9]{1,}\\/*)*::[a-z]\\{[^\\}]{1,}\\}(::)?)*");
 	std::sregex_iterator match_it(s.begin(), s.end(), set_pattern);
 
-	fprintf(stdout,"Comparing \"%s\" to \"%s\"\n",match_it->str().c_str(),s.c_str());
-
-	if(match_it->str() == s) return true;
-	return false;
+	return match_it->str() == s;
 }
 
 int stringcasecmp(std::string a, std::string b)
