@@ -772,7 +772,6 @@ int main(int argc, char** argv)
 	}
 	else// Perform operation on set
 	{
-
 		if(argc != 4 ||
 		   (strcasecmp(argv[2],OP_ADD) && strcasecmp(argv[2],OP_SUB) && strcasecmp(argv[2],OP_ADDA) && strcasecmp(argv[2],OP_SUBA)))
 		{
@@ -782,7 +781,7 @@ int main(int argc, char** argv)
 
 		std::string rhs = std::string(argv[3]);
 
-		if(!((int)rhs.find(DS) > -1 && rhs.back() != ':'))// If it doesn't look like a variable set.
+		if(!looksLikeSet(rhs))
 		{
 			output(Error,"Variable set modifications can only be performed with other variable sets.");
 			return -1;
