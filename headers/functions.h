@@ -14,6 +14,7 @@ struct VariableInfo
 	Scope scope = Scope();
 	std::string variable = "";
 	char type = '\0';
+	char evalType = '\0';
 	std::string key = "";
 	std::string property = "";
 };
