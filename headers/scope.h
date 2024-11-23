@@ -28,6 +28,8 @@ class Scope
 		std::string formatLine(char type, std::string k, std::string v);
 
 	public:
+		char sigil = '/';
+
 		//Confirm datasource exists
 		bool confirmDatasource();
 
@@ -77,7 +79,7 @@ class Scope
 
 		//Delete single variable
 		template <typename T>
-		void remove(std::string key);
+		bool remove(std::string key);
 };
 
 class Character: public Scope

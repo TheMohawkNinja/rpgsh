@@ -527,29 +527,29 @@ void Scope::setDatamap<Wallet>(datamap<Wallet> map)
 
 //Delete single variable
 template<>
-void Scope::remove<Currency>(std::string key)
+bool Scope::remove<Currency>(std::string key)
 {
-	currencies.erase(getExistingKey<Currency>(key));
+	return currencies.erase(getExistingKey<Currency>(key));
 }
 template<>
-void Scope::remove<CurrencySystem>(std::string key)
+bool Scope::remove<CurrencySystem>(std::string key)
 {
-	currencysystems.erase(getExistingKey<CurrencySystem>(key));
+	return currencysystems.erase(getExistingKey<CurrencySystem>(key));
 }
 template<>
-void Scope::remove<Dice>(std::string key)
+bool Scope::remove<Dice>(std::string key)
 {
-	dice.erase(getExistingKey<Dice>(key));
+	return dice.erase(getExistingKey<Dice>(key));
 }
 template<>
-void Scope::remove<Var>(std::string key)
+bool Scope::remove<Var>(std::string key)
 {
-	vars.erase(getExistingKey<Var>(key));
+	return vars.erase(getExistingKey<Var>(key));
 }
 template<>
-void Scope::remove<Wallet>(std::string key)
+bool Scope::remove<Wallet>(std::string key)
 {
-	wallets.erase(getExistingKey<Wallet>(key));
+	return wallets.erase(getExistingKey<Wallet>(key));
 }
 
 //			//
@@ -558,12 +558,14 @@ void Scope::remove<Wallet>(std::string key)
 
 Character::Character(bool backup)
 {
+	sigil = CHARACTER_SIGIL;
 	datasource = getCurrentCharacterFilePath();
 	if(backup) datasource += ".bak";
 	load();
 }
 Character::Character(std::string path)
 {
+	sigil = CHARACTER_SIGIL;
 	load(path);
 }
 
@@ -595,6 +597,7 @@ void Character::setDatasource(std::string path)
 
 Campaign::Campaign()
 {
+	sigil = CAMPAIGN_SIGIL;
 	datasource = campaigns_dir+
 		     get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
 		     variable_file_name;
@@ -602,6 +605,7 @@ Campaign::Campaign()
 }
 Campaign::Campaign(std::string path)
 {
+	sigil = CAMPAIGN_SIGIL;
 	load(path);
 }
 
@@ -611,6 +615,7 @@ Campaign::Campaign(std::string path)
 
 Shell::Shell()
 {
+	sigil = SHELL_SIGIL;
 	confirmShellVariablesFile();
 	load(shell_variables_path);
 }
