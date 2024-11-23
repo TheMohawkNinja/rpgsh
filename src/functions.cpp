@@ -141,6 +141,112 @@ std::vector<std::string> getDirectoryListing(std::string path)
 
 	return entries;
 }
+std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir,std::string xref)
+{
+	for(const auto& entry : getDirectoryListing(chk_dir))
+	{
+		if(is_dir &&
+		   !stringcasecmp(entry,chk_file) &&
+		   std::filesystem::is_directory(campaigns_dir+entry))
+			return entry;
+		else if(!is_dir &&
+			!stringcasecmp(entry,chk_file) &&
+			std::filesystem::is_regular_file(chk_dir+entry))
+			return entry;
+	}
+	output(Error,"Invalid xref \"%s\".",xref.c_str());
+	exit(-1);
+}
+void loadXRef(std::string* arg, Scope* p_scope)
+{
+	// Ending square bracket not found
+	if(arg->find(']') == std::string::npos)
+	{
+		output(Error,"No terminating \']\' found for xref.");
+		exit(-1);
+	}
+
+	// Get string between the square brackets
+	std::string xref = arg->substr(arg->find('[')+1,arg->find(']')-(arg->find('[')+1));
+
+	// Actually load the xref into the scope
+	std::vector<std::string> campaigns;
+	std::string xref_dir = campaigns_dir+
+			       get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
+			       "characters/";
+	std::string xref_char = xref;
+	std::string campaign = "";
+	switch((*arg)[0])
+	{
+		case CHARACTER_SIGIL:
+			if(xref.find('/') != std::string::npos)// Attempting to get a character from another campaign
+			{
+				campaign = left(xref,xref.find('/'));
+				xref_char = right(xref,xref.find('/')+1);
+				xref_dir = campaigns_dir+
+					   getLikeFileName(campaign,campaigns_dir,true,xref)+
+					   "/characters/";
+			}
+
+			p_scope->load(xref_dir+
+				      getLikeFileName(xref_char+".char",xref_dir,false,xref));
+			break;
+		case CAMPAIGN_SIGIL:
+			p_scope->load(campaigns_dir+
+				      getLikeFileName(xref,campaigns_dir,true,xref)+
+				      "/"+
+				      variable_file_name);
+			break;
+		case SHELL_SIGIL:
+			output(Error,"Cannot use xref with shell scope.");
+			exit(-1);
+	}
+
+	// Remove external reference string so we can continue to use the current arg under the new context
+	(*arg) = (*arg)[0]+left((*arg),arg->find('[')-1)+right((*arg),arg->find(']')+1);
+}
+VariableInfo parseVariable(std::string v)// Derive information about variable from string
+{
+	VariableInfo vi;
+
+	// Check scope sigil
+	switch(v[0])
+	{
+		case CHARACTER_SIGIL:
+			vi.scope = Character(false);
+			break;
+		case CAMPAIGN_SIGIL:
+			vi.scope = Campaign();
+			break;
+		case SHELL_SIGIL:
+			vi.scope = Shell();
+			break;
+		default:
+			output(Error,"Unknown scope sigil \'%c\'.",v[0]);
+			exit(-1);
+	}
+
+	// Check for external references
+	if(v[1] == '[') loadXRef(&v,&vi.scope);
+
+	// Check type sigil
+	if(!isTypeSigil(v[1]) && v[1] != '/')
+	{
+			output(Error,"Unknown type sigil \'%c\'.",v[1]);
+			exit(-1);
+	}
+
+	vi.type = v[1];
+	vi.variable = v;
+	vi.key = right(v,v.find('/')+1);
+	if((int)v.find('.') > (int)v.rfind('/'))
+	{
+		vi.key = left(vi.key,vi.key.find('.'));
+		vi.property = right(v,v.find('.')+1);
+	}
+
+	return vi;
+}
 
 void padding()
 {

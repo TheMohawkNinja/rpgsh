@@ -13,6 +13,7 @@ struct VariableInfo
 {
 	Scope scope = Scope();
 	std::string variable = "";
+	char type = '\0';
 	std::string key = "";
 	std::string property = "";
 };
@@ -44,6 +45,9 @@ void confirmShellVariablesFile();
 void confirmCampaignVariablesFile();
 
 std::vector<std::string> getDirectoryListing(std::string path);
+std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir,std::string xref);
+void loadXRef(std::string* arg, Scope* p_scope);
+VariableInfo parseVariable(std::string v);// Derive information about variable from string
 
 void printBadOpAndThrow(std::string bad_op);
 
