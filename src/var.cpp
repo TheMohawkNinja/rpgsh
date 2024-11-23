@@ -824,7 +824,7 @@ Var::Var(std::string str)
 		return;
 	}
 
-	//Make sure first character is 'c'
+	//Make sure first character is 'v'
 	if(str[0] != VAR_SIGIL)
 	{
 		output(Error,"Incorrect data type specifier sigil for var explicit constructor.");
