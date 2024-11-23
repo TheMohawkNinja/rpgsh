@@ -232,8 +232,8 @@ VariableInfo parseVariable(std::string v)// Derive information about variable fr
 	// Check type sigil
 	if(!isTypeSigil(v[1]) && v[1] != '/')
 	{
-			output(Error,"Unknown type sigil \'%c\'.",v[1]);
-			exit(-1);
+		output(Error,"Unknown type sigil \'%c\'.",v[1]);
+		exit(-1);
 	}
 
 	vi.type = v[1];
@@ -243,6 +243,26 @@ VariableInfo parseVariable(std::string v)// Derive information about variable fr
 	{
 		vi.key = left(vi.key,vi.key.find('.'));
 		vi.property = right(v,v.find('.')+1);
+	}
+
+	if(isTypeSigil(v[1]))
+	{
+		vi.evalType = vi.type;
+	}
+	else
+	{
+		if(vi.scope.keyExists<Var>(vi.key))
+			vi.evalType = VAR_SIGIL;
+		else if(vi.scope.keyExists<Dice>(vi.key))
+			vi.evalType = DICE_SIGIL;
+		else if(vi.scope.keyExists<Wallet>(vi.key))
+			vi.evalType = WALLET_SIGIL;
+		else if(vi.scope.keyExists<Currency>(vi.key))
+			vi.evalType = CURRENCY_SIGIL;
+		else if(vi.scope.keyExists<CurrencySystem>(vi.key))
+			vi.evalType = CURRENCYSYSTEM_SIGIL;
+		else
+			vi.evalType = VAR_SIGIL;
 	}
 
 	return vi;
