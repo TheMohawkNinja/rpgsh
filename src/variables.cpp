@@ -43,7 +43,9 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 			exit(-1);
 		}
 
-		if(p_vi->type == '/' || p_vi->type == VAR_SIGIL)
+		if((p_vi->type == '/' && action == Write && p_vi->evalType == VAR_SIGIL) ||
+		   (p_vi->type == '/' && p_vi->scope.keyExists<Var>(p_vi->key)) ||
+		   p_vi->type == VAR_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<Var>(p_vi->key);
 			if(action == Read && keyExists && p_vi->property == "")
@@ -61,7 +63,7 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 				return "";
 			}
 		}
-		if(p_vi->type == '/' || p_vi->type == DICE_SIGIL)
+		else if(p_vi->type == '/' || p_vi->type == DICE_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<Dice>(p_vi->key);
 			if(action == Read && keyExists && p_vi->property == "")
@@ -89,7 +91,7 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 				return "";
 			}
 		}
-		if(p_vi->type == '/' || p_vi->type == WALLET_SIGIL)
+		else if(p_vi->type == '/' || p_vi->type == WALLET_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<Wallet>(p_vi->key);
 			if(action == Read && keyExists && p_vi->property == "")
@@ -107,7 +109,7 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 				return "";
 			}
 		}
-		if(p_vi->type == '/' || p_vi->type == CURRENCY_SIGIL)
+		else if(p_vi->type == '/' || p_vi->type == CURRENCY_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<Currency>(p_vi->key);
 			if(action == Read && keyExists && p_vi->property == "")
@@ -138,7 +140,7 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 				return "";
 			}
 		}
-		if(p_vi->type == '/' || p_vi->type == CURRENCYSYSTEM_SIGIL)
+		else if(p_vi->type == '/' || p_vi->type == CURRENCYSYSTEM_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<CurrencySystem>(p_vi->key);
 			if(action == Read && keyExists && p_vi->property == "")
@@ -170,6 +172,14 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 			value = right(value,value.find(set_key)+set_key.length()+DS.length());
 			std::string set_value = left(value,value.find(DS));
 
+			struct RemovedKey
+			{
+				bool isRemoved = false;
+				char type = '\0';
+			};
+
+			RemovedKey rk;
+
 			switch(set_value[0])
 			{
 				case VAR_SIGIL:
@@ -177,37 +187,43 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 					   (action == SetAdd || action == SetAddA))
 						p_vi->scope.set<Var>(p_vi->key+set_key,set_value);
 					else if(p_vi->type == '/' || p_vi->type == VAR_SIGIL)
-						p_vi->scope.remove<Var>(set_key);
+						rk = {p_vi->scope.remove<Var>(set_key),VAR_SIGIL};
 					break;
 				case DICE_SIGIL:
 					if((p_vi->type == '/' || p_vi->type == DICE_SIGIL) &&
 					   (action == SetAdd || action == SetAddA))
 						p_vi->scope.set<Dice>(p_vi->key+set_key,set_value);
 					else if(p_vi->type == '/' || p_vi->type == DICE_SIGIL)
-						p_vi->scope.remove<Dice>(set_key);
+						rk = {p_vi->scope.remove<Dice>(set_key),DICE_SIGIL};
 					break;
 				case WALLET_SIGIL:
 					if((p_vi->type == '/' || p_vi->type == WALLET_SIGIL) &&
 					   (action == SetAdd || action == SetAddA))
 						p_vi->scope.set<Wallet>(p_vi->key+set_key,set_value);
 					else if(p_vi->type == '/' || p_vi->type == WALLET_SIGIL)
-						p_vi->scope.remove<Wallet>(set_key);
+						rk = {p_vi->scope.remove<Wallet>(set_key),WALLET_SIGIL};
 					break;
 				case CURRENCY_SIGIL:
 					if((p_vi->type == '/' || p_vi->type == CURRENCY_SIGIL) &&
 					   (action == SetAdd || action == SetAddA))
 						p_vi->scope.set<Currency>(p_vi->key+set_key,set_value);
 					else if(p_vi->type == '/' || p_vi->type == CURRENCY_SIGIL)
-						p_vi->scope.remove<Currency>(set_key);
+						rk = {p_vi->scope.remove<Currency>(set_key),CURRENCY_SIGIL};
 					break;
 				case CURRENCYSYSTEM_SIGIL:
 					if((p_vi->type == '/' || p_vi->type == CURRENCYSYSTEM_SIGIL) &&
 					   (action == SetAdd || action == SetAddA))
 						p_vi->scope.set<CurrencySystem>(p_vi->key+set_key,set_value);
 					else if(p_vi->type == '/' || p_vi->type == CURRENCYSYSTEM_SIGIL)
-						p_vi->scope.remove<CurrencySystem>(set_key);
+						rk = {p_vi->scope.remove<CurrencySystem>(set_key),CURRENCYSYSTEM_SIGIL};
 					break;
 			}
+
+			if(action == SetAddA)
+				output(Info,"Set \"%c%c/%s\" to \"%s\"",p_vi->scope.sigil,p_vi->evalType,(p_vi->key+set_key).c_str(),set_value.c_str());
+			else if(action == SetRemoveA && rk.isRemoved)
+				output(Warning,"Removed \"%c%c/%s\"",p_vi->scope.sigil,rk.type,set_key.c_str());
+
 
 			if(value.find(DS) != std::string::npos)
 				value = right(value,value.find(set_value)+set_value.length()+DS.length());
@@ -384,32 +400,26 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 			exit(-1);
 		}
 	}
-
 	return "";// Supress -Wreturn-type
 }
 template<typename TL>
-std::string parseRHSAndDoOp(VariableInfo** vi, std::vector<std::string>** v, unsigned int* lhs_pos, unsigned int* op_pos, unsigned int* rhs_pos)
+std::string parseRHSAndDoOp(std::vector<std::string>** v, unsigned int lhs_pos, unsigned int op_pos, unsigned int rhs_pos)
 {
-	if((*rhs_pos) == UINT_MAX)// Unary operators
-	{
-		if((*vi)->property == "")
-			return getResult<TL,Var>((*vi)->scope.getStr<TL>((*vi)->key),(**v)[*op_pos],"");
-		else
-			return getResult<TL,Var>((*vi)->scope.getProperty<TL>((*vi)->key,(*vi)->property),(**v)[*op_pos],"");
-	}
+	if(rhs_pos == UINT_MAX)// Unary operators
+		return getResult<TL,Var>((**v)[lhs_pos],(**v)[op_pos],"");
 
-	if(left((**v)[*rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
-		return getResult<TL,Var>((**v)[*lhs_pos],(**v)[*op_pos],(**v)[*rhs_pos]);
-	else if(left((**v)[*rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
-		return getResult<TL,Dice>((**v)[*lhs_pos],(**v)[*op_pos],(**v)[*rhs_pos]);
-	else if(left((**v)[*rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
-		return getResult<TL,Wallet>((**v)[*lhs_pos],(**v)[*op_pos],(**v)[*rhs_pos]);
-	else if(left((**v)[*rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
-		return getResult<TL,Currency>((**v)[*lhs_pos],(**v)[*op_pos],(**v)[*rhs_pos]);
-	else if(left((**v)[*rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
-		return getResult<TL,CurrencySystem>((**v)[*lhs_pos],(**v)[*op_pos],(**v)[*rhs_pos]);
+	if(left((**v)[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
+		return getResult<TL,Var>((**v)[lhs_pos],(**v)[op_pos],(**v)[rhs_pos]);
+	else if(left((**v)[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
+		return getResult<TL,Dice>((**v)[lhs_pos],(**v)[op_pos],(**v)[rhs_pos]);
+	else if(left((**v)[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
+		return getResult<TL,Wallet>((**v)[lhs_pos],(**v)[op_pos],(**v)[rhs_pos]);
+	else if(left((**v)[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
+		return getResult<TL,Currency>((**v)[lhs_pos],(**v)[op_pos],(**v)[rhs_pos]);
+	else if(left((**v)[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
+		return getResult<TL,CurrencySystem>((**v)[lhs_pos],(**v)[op_pos],(**v)[rhs_pos]);
 	else
-		return getResult<TL,Var>((**v)[*lhs_pos],(**v)[*op_pos],(**v)[*rhs_pos]);
+		return getResult<TL,Var>((**v)[lhs_pos],(**v)[op_pos],(**v)[rhs_pos]);
 
 	return "";// Supress -Wreturn-type
 }
@@ -423,17 +433,17 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 		rhs_pos = UINT_MAX;// Unary operators. MAX_BUFFER is way less than UINT_MAX, so this is okay
 
 	if(left((*v)[lhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
-		result = parseRHSAndDoOp<Var>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<Var>(&v, lhs_pos, op_pos, rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
-		result = parseRHSAndDoOp<Dice>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<Dice>(&v, lhs_pos, op_pos, rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
-		result = parseRHSAndDoOp<Wallet>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<Wallet>(&v, lhs_pos, op_pos, rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
-		result = parseRHSAndDoOp<Currency>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<Currency>(&v, lhs_pos, op_pos, rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
-		result = parseRHSAndDoOp<CurrencySystem>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<CurrencySystem>(&v, lhs_pos, op_pos, rhs_pos);
 	else// Treat non-explicit constructors as Var
-		result = parseRHSAndDoOp<Var>(&vi, &v, &lhs_pos, &op_pos, &rhs_pos);
+		result = parseRHSAndDoOp<Var>(&v, lhs_pos, op_pos, rhs_pos);
 
 	// If the first arg is a variable and we are assigning it, we'll need to save the result
 	if(lhs_pos == 0 && vi->key != "" &&
@@ -441,7 +451,8 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 		(void)readOrWriteDataOnScope(vi, Write, result);
 
 	// Replace operators and operands with result
-	v->erase(v->begin()+rhs_pos);
+	if(rhs_pos < UINT_MAX)
+		v->erase(v->begin()+rhs_pos);
 	v->erase(v->begin()+op_pos);
 	v->erase(v->begin()+lhs_pos);
 	v->insert(v->begin()+lhs_pos,result);
@@ -470,19 +481,19 @@ int main(int argc, char** argv)
 	}
 
 	VariableInfo vi;
-	std::string variable(argv[1]);
-	std::string scope_str = "";
 
-	if(variable.length() > 1 && (isTypeSigil(variable[1]) || variable[1] == '/' || variable[1] == '['))
-		vi = parseVariable(variable);
+	if(strlen(argv[1]) > 1 && (isTypeSigil(argv[1][1]) || argv[1][1] == '/' || argv[1][1] == '['))
+		vi = parseVariable(std::string(argv[1]));
 
 	if(argc == 2)// Print data if all the user enters is a variable
 	{
 		std::string str = readOrWriteDataOnScope(&vi, Read, "");
 		if(str != "") fprintf(stdout,"%s\n",str.c_str());
 	}
-	else if(variable.back() != '/')// Perform operation on variable
+	else if(vi.variable.back() != '/')// Perform operation on variable
 	{
+		std::string old_value = get_prog_output("variables "+vi.variable)[0];
+
 		std::vector<std::string> args;
 		unsigned int open_paren_ctr = 0;
 		unsigned int close_paren_ctr = 0;
@@ -664,16 +675,25 @@ int main(int argc, char** argv)
 			}
 		}
 
-		// Print result if we aren't writing to a variable
+		// Print result
+		std::string new_value = get_prog_output("variables "+vi.variable)[0];
 		if(findInStrVect(assignOps,final_op,0) == -1 && findInStrVect(unaryOps,final_op,0) == -1)
 			fprintf(stdout,"%s\n",args[0].c_str());
+		else if(old_value != new_value)
+			output(Info,"%c%c/%s has changed from %s to %s",
+			       vi.scope.sigil,vi.evalType,vi.key.c_str(),old_value.c_str(),new_value.c_str());
+		else
+			output(Info,"%c%c/%s is unchanged, current value: %s",
+			       vi.scope.sigil,vi.evalType,vi.key.c_str(),old_value.c_str());
 	}
 	else// Perform operation on set
 	{
 		if(argc != 4 ||
-		   (strcasecmp(argv[2],OP_ADD) && strcasecmp(argv[2],OP_SUB) && strcasecmp(argv[2],OP_ADDA) && strcasecmp(argv[2],OP_SUBA)))
+		   (strcasecmp(argv[2],OP_ADD) && strcasecmp(argv[2],OP_SUB) &&
+		    strcasecmp(argv[2],OP_ADDA) && strcasecmp(argv[2],OP_SUBA)))
 		{
-			output(Error,"Variable set modification only supports the following operators: %s, %s, %s, %s",OP_ADD,OP_SUB,OP_ADDA,OP_SUBA);
+			output(Error,"Variable set modification only supports the following operators: %s, %s, %s, %s",
+			       OP_ADD,OP_SUB,OP_ADDA,OP_SUBA);
 			return -1;
 		}
 
