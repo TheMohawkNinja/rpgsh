@@ -425,8 +425,6 @@ std::string parseRHSAndDoOp(std::vector<std::string>** v, unsigned int lhs_pos, 
 }
 void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int lhs_pos, unsigned int op_pos, unsigned int rhs_pos)
 {
-	// TODO Handle quote-wrapped strings to force string interpretation
-
 	std::string result = "";
 
 	if(rhs_pos >= v->size())
