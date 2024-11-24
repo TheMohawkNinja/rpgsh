@@ -169,4 +169,5 @@ class Var
 
 	const char* c_str() const;
 	bool isInt() const;
+	std::string stripQuotes() const;
 };

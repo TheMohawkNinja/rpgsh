@@ -32,6 +32,16 @@ bool Var::isInt() const
 	try{int(*this); return true;}
 	catch(...){return false;}
 }
+std::string Var::stripQuotes() const
+{
+	//TODO: Modifiy for escaping quote marks
+	std::string ret = "";
+	for(const auto& c : Value)
+		if(c != '\"' && c != '\'') ret += c;
+
+	return ret;
+}
+
 Var::Var(const Var& b)
 {
 	Value = b.Value;
@@ -90,7 +100,7 @@ Var& Var::operator += (const Var b)
 	if(b.isInt())
 		*this += int(b);
 	else
-		*this += b.Value;
+		*this += b.stripQuotes();
 
 	return *this;
 }
@@ -128,7 +138,7 @@ Var& Var::operator -= (const Var b)
 	if(b.isInt())
 		*this -= int(b);
 	else
-		*this -= b.Value;
+		*this -= b.stripQuotes();
 
 	return *this;
 }
@@ -170,7 +180,7 @@ Var& Var::operator *= (const Var b)
 	if(b.isInt())
 		*this *= int(b);
 	else
-		*this *= b.Value;
+		*this *= b.stripQuotes();
 
 	return *this;
 }
@@ -208,7 +218,7 @@ Var& Var::operator /= (const Var b)
 	if(b.isInt())
 		*this /= int(b);
 	else
-		*this /= b.Value;
+		*this /= b.stripQuotes();
 
 	return *this;
 }
@@ -253,7 +263,7 @@ Var& Var::operator ^= (const Var b)
 	if(b.isInt())
 		*this ^= int(b);
 	else
-		*this ^= b.Value;
+		*this ^= b.stripQuotes();
 
 	return *this;
 }
@@ -291,7 +301,7 @@ Var& Var::operator %= (const Var b)
 	if(b.isInt())
 		*this %= int(b);
 	else
-		*this %= b.Value;
+		*this %= b.stripQuotes();
 
 	return *this;
 }
