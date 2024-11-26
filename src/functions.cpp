@@ -53,6 +53,12 @@ bool looksLikeSet(std::string s)
 	return match_it->str() == s;
 }
 
+bool isEscaped(std::string str, int pos)
+{
+	if(!pos) return false;
+	else return str[pos-1] == '\\';
+}
+
 int stringcasecmp(std::string a, std::string b)
 {
 	return strcasecmp(a.c_str(),b.c_str());
@@ -81,6 +87,33 @@ std::string addSpaces(int n)
 	std::string ret = "";
 	for(int i=0; i<n; i++)
 		ret += " ";
+
+	return ret;
+}
+
+std::string stripQuotes(std::string str)
+{
+	std::string ret = "";
+	for(long unsigned int i=0; i<str.length(); i++)
+	{
+		if(isEscaped(str,i) && (str[i] == '\"' || str[i] == '\''))
+			ret += str[i];
+		else if(str[i] != '\"' && str[i] != '\'' && str[i] != '\\')
+			ret += str[i];
+	}
+
+	return ret;
+}
+std::string escapeQuotes(std::string str)
+{
+	std::string ret = "";
+	for(long unsigned int i=0; i<str.length(); i++)
+	{
+		if(str[i] == '\"' || str[i] == '\'')
+			ret += "\\"+str[i];
+		else if(str[i] != '\"' && str[i] != '\'' && str[i] != '\\')
+			ret += str[i];
+	}
 
 	return ret;
 }
@@ -339,8 +372,24 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	//Combine arg_str wrapped in quotes
 	for(long unsigned int i=0; i<args.size(); i++)
 	{
-		long unsigned int quote_begin = args[i].find("\"");
-		long unsigned int quote_end = args[i].find("\"",quote_begin+1);
+		long unsigned int quote_begin = std::string::npos;
+		for(long unsigned int j=0; j<args[i].length(); j++)
+		{
+			if(args[i][j] == '\"' && !isEscaped(args[i],j))
+			{
+				quote_begin = j;
+				break;
+			}
+		}
+		long unsigned int quote_end = std::string::npos;
+		for(long unsigned int j=quote_begin+1; j<args[i].length(); j++)
+		{
+			if(args[i][j] == '\"' && !isEscaped(args[i],j))
+			{
+				quote_end = j;
+				break;
+			}
+		}
 		if(quote_begin != std::string::npos && quote_end != std::string::npos)//Quote-wrapped arg doesn't contain a space
 		{
 			args[i] = args[i].substr(quote_begin,(quote_end+1)-quote_begin);
@@ -357,7 +406,14 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 
 			for(long unsigned int j=i+1; j<args.size(); j++)
 			{
-				quote_end = args[j].find("\"");
+				for(long unsigned int k=j; k<args[j].length(); k++)
+				{
+					if(args[j][k] == '\"' && !isEscaped(args[j],k))
+					{
+						quote_end = k;
+						break;
+					}
+				}
 				if(quote_end != std::string::npos)
 				{
 					args[i] += " " + args[j].substr(0,quote_end+1);

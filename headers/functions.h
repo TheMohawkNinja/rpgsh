@@ -29,6 +29,8 @@ bool isTypeSigil(char c);
 
 bool looksLikeSet(std::string s);
 
+bool isEscaped(std::string str, int pos);
+
 int stringcasecmp(std::string a, std::string b);
 
 int findInStrVect(std::vector<std::string> v, std::string str, unsigned int start);
@@ -38,6 +40,9 @@ std::string left(std::string str, int n);
 std::string right(std::string str, int n);
 
 std::string addSpaces(int n);
+
+std::string stripQuotes(std::string str);
+std::string escapeQuotes(std::string str);
 
 void confirmEnvVariablesFile();
 
