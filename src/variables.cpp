@@ -403,23 +403,23 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 	return "";// Supress -Wreturn-type
 }
 template<typename TL>
-std::string parseRHSAndDoOp(std::vector<std::string>** v, unsigned int lhs_pos, unsigned int op_pos, unsigned int rhs_pos)
+std::string parseRHSAndDoOp(std::vector<std::string> v, unsigned int lhs_pos, unsigned int op_pos, unsigned int rhs_pos)
 {
 	if(rhs_pos == UINT_MAX)// Unary operators
-		return getResult<TL,Var>((**v)[lhs_pos],(**v)[op_pos],"");
+		return getResult<TL,Var>((v)[lhs_pos],(v)[op_pos],"");
 
-	if(left((**v)[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
-		return getResult<TL,Var>((**v)[lhs_pos],(**v)[op_pos],(**v)[rhs_pos]);
-	else if(left((**v)[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
-		return getResult<TL,Dice>((**v)[lhs_pos],(**v)[op_pos],(**v)[rhs_pos]);
-	else if(left((**v)[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
-		return getResult<TL,Wallet>((**v)[lhs_pos],(**v)[op_pos],(**v)[rhs_pos]);
-	else if(left((**v)[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
-		return getResult<TL,Currency>((**v)[lhs_pos],(**v)[op_pos],(**v)[rhs_pos]);
-	else if(left((**v)[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
-		return getResult<TL,CurrencySystem>((**v)[lhs_pos],(**v)[op_pos],(**v)[rhs_pos]);
+	if(left((v)[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
+		return getResult<TL,Var>((v)[lhs_pos],(v)[op_pos],(v)[rhs_pos]);
+	else if(left((v)[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
+		return getResult<TL,Dice>((v)[lhs_pos],(v)[op_pos],(v)[rhs_pos]);
+	else if(left((v)[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
+		return getResult<TL,Wallet>((v)[lhs_pos],(v)[op_pos],(v)[rhs_pos]);
+	else if(left((v)[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
+		return getResult<TL,Currency>((v)[lhs_pos],(v)[op_pos],(v)[rhs_pos]);
+	else if(left((v)[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
+		return getResult<TL,CurrencySystem>((v)[lhs_pos],(v)[op_pos],(v)[rhs_pos]);
 	else
-		return getResult<TL,Var>((**v)[lhs_pos],(**v)[op_pos],(**v)[rhs_pos]);
+		return getResult<TL,Var>((v)[lhs_pos],(v)[op_pos],(v)[rhs_pos]);
 
 	return "";// Supress -Wreturn-type
 }
@@ -431,17 +431,17 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 		rhs_pos = UINT_MAX;// Unary operators. MAX_BUFFER is way less than UINT_MAX, so this is okay
 
 	if(left((*v)[lhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
-		result = parseRHSAndDoOp<Var>(&v, lhs_pos, op_pos, rhs_pos);
+		result = parseRHSAndDoOp<Var>(*v, lhs_pos, op_pos, rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
-		result = parseRHSAndDoOp<Dice>(&v, lhs_pos, op_pos, rhs_pos);
+		result = parseRHSAndDoOp<Dice>(*v, lhs_pos, op_pos, rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
-		result = parseRHSAndDoOp<Wallet>(&v, lhs_pos, op_pos, rhs_pos);
+		result = parseRHSAndDoOp<Wallet>(*v, lhs_pos, op_pos, rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
-		result = parseRHSAndDoOp<Currency>(&v, lhs_pos, op_pos, rhs_pos);
+		result = parseRHSAndDoOp<Currency>(*v, lhs_pos, op_pos, rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
-		result = parseRHSAndDoOp<CurrencySystem>(&v, lhs_pos, op_pos, rhs_pos);
+		result = parseRHSAndDoOp<CurrencySystem>(*v, lhs_pos, op_pos, rhs_pos);
 	else// Treat non-explicit constructors as Var
-		result = parseRHSAndDoOp<Var>(&v, lhs_pos, op_pos, rhs_pos);
+		result = parseRHSAndDoOp<Var>(*v, lhs_pos, op_pos, rhs_pos);
 
 	// If the first arg is a variable and we are assigning it, we'll need to save the result
 	if(lhs_pos == 0 && vi->key != "" &&
