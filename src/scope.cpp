@@ -107,7 +107,6 @@ void Scope::load()
 				break;
 			}
 
-			//NOTE: This requires that a string constructor exists!
 			switch(type)
 			{
 				case CURRENCY_SIGIL:
