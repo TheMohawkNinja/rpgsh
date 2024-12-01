@@ -44,7 +44,7 @@ Var& Var::operator = (const int b)
 }
 Var& Var::operator = (const std::string b)
 {
-	Value = stripQuotes(b);
+	Value = mergeQuotes(b);
 	return *this;
 }
 Var& Var::operator = (const Var b)
@@ -82,7 +82,7 @@ Var& Var::operator += (const std::string b)
 	if(isInt())
 		throw std::runtime_error(E_INVALID_OPERATION);
 	else
-		Value = Value + stripQuotes(b);
+		Value = mergeQuotes(Value + b);
 
 	return *this;
 }
