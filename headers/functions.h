@@ -41,7 +41,7 @@ std::string right(std::string str, int n);
 
 std::string addSpaces(int n);
 
-std::string stripQuotes(std::string str);
+std::string mergeQuotes(std::string str);
 std::string escapeQuotes(std::string str);
 
 void confirmEnvVariablesFile();
@@ -59,7 +59,7 @@ void printBadOpAndThrow(std::string bad_op);
 
 void padding();
 
-void run_rpgsh_prog(std::string args, bool redirect_output);
+int run_rpgsh_prog(std::string args, bool redirect_output);
 
 std::vector<std::string> get_prog_output(std::string prog);
 

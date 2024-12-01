@@ -91,18 +91,30 @@ std::string addSpaces(int n)
 	return ret;
 }
 
-std::string stripQuotes(std::string str)
+std::string mergeQuotes(std::string str)
 {
 	std::string ret = "";
+
+	// When running a program, rpgsh should already cut off any charaters outside of unescaped quotation marks.
+	// Therefore, we shouldn't need to check for odd inputs
+
+	// If neither end has quotes, just return the string as is.
+	if(str.front() != '\"' && (str.back() != '\"' || isEscaped(str,str.length()-1)))
+		return str;
+
+	// Strip unescaped quote marks out
 	for(long unsigned int i=0; i<str.length(); i++)
 	{
-		if(isEscaped(str,i) && (str[i] == '\"' || str[i] == '\''))
-			ret += str[i];
-		else if(str[i] != '\"' && str[i] != '\'' && str[i] != '\\')
+		if(str[i] != '\"' || (str[i] == '\"' && isEscaped(str,i)))
 			ret += str[i];
 	}
 
-	return ret;
+	// If the resulting string isn't a valid integer, return the quote-stripped string
+	if(!Var(ret).isInt())
+		return ret;
+
+	// The string is a valid integer, and also had quotes around it, so it still should be reated as a string
+	return '\"'+ret+'\"';
 }
 std::string escapeQuotes(std::string str)
 {
@@ -110,9 +122,19 @@ std::string escapeQuotes(std::string str)
 	for(long unsigned int i=0; i<str.length(); i++)
 	{
 		if(str[i] == '\"' || str[i] == '\'')
-			ret += "\\"+str[i];
-		else if(str[i] != '\"' && str[i] != '\'' && str[i] != '\\')
+		{
+			//TODO: Figure out how to merge these two lines into the same one line
+			ret += "\\";
 			ret += str[i];
+		}
+		else if(str[i] != '\"' && str[i] != '\'' && str[i] != '\\')
+		{
+			ret += str[i];
+		}
+		else if(str[i] == '\\' && (i+1)<str.length() && str[i+1] == '\"')
+		{
+			ret += str[i];
+		}
 	}
 
 	return ret;
@@ -318,7 +340,7 @@ void padding()
 	}
 }
 
-void run_rpgsh_prog(std::string arg_str, bool redirect_output)
+int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 {
 	Character c = Character(false);
 	Campaign m = Campaign();
@@ -358,13 +380,6 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 
 		if(isScopeSigil(arg[0])) arg = get_prog_output(arg)[0];
 
-		//Don't try to run a program if the data type sigil was invalid
-		if(arg == "")
-		{
-			if(!redirect_output) padding();
-			return;
-		}
-
 		args.push_back(arg);
 		arg_str_it++;
 	}
@@ -381,6 +396,8 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 				break;
 			}
 		}
+		if(quote_begin == std::string::npos) continue;
+
 		long unsigned int quote_end = std::string::npos;
 		for(long unsigned int j=quote_begin+1; j<args[i].length(); j++)
 		{
@@ -390,16 +407,19 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 				break;
 			}
 		}
-		if(quote_begin != std::string::npos && quote_end != std::string::npos)//Quote-wrapped arg doesn't contain a space
+
+		if(quote_end != std::string::npos)//Quote-wrapped arg doesn't contain a space
 		{
 			args[i] = args[i].substr(quote_begin,(quote_end+1)-quote_begin);
 		}
-		else if(quote_begin != std::string::npos)//Quote-wrapped arg with space
+		else//Quote-wrapped arg with space
 		{
-			if(i == args.size())
+			if(i == args.size()-1)
 			{
 				output(Error,"Missing terminating quotation mark.");
-				exit(-1);
+				if(!redirect_output) padding();
+
+				return -2;
 			}
 
 			args[i] = args[i].substr(quote_begin,args[i].length()-quote_begin);
@@ -416,7 +436,7 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 				}
 				if(quote_end != std::string::npos)
 				{
-					args[i] += " " + args[j].substr(0,quote_end+1);
+					args[i] += " " + left(args[j],quote_end+1);
 					args.erase(args.begin()+j);
 					break;
 				}
@@ -475,20 +495,29 @@ void run_rpgsh_prog(std::string arg_str, bool redirect_output)
 			output(Error,"Error code %d while attempting to run \"%s\": Not a valid rpgsh command.",status,displayed_command.c_str());
 		else
 			output(Error,"Error code %d while attempting to run \"%s\": %s",status,displayed_command.c_str(),strerror(status));
+
+		if(!redirect_output) padding();
+		return status;
 	}
 
 	if(redirect_output && posix_spawn_file_actions_destroy(&fa))
+	{
 		output(Error,"Error code %d during posix_spawn_file_actions_destroy(): %s",status,strerror(status));
 
-	if(!redirect_output)
-		padding();
+		if(!redirect_output) padding();
+		return status;
+	}
+
+	if(!redirect_output) padding();
+
+	return 0;
 }
 
 std::vector<std::string> get_prog_output(std::string prog)
 {
 	std::vector<std::string> output;
 
-	run_rpgsh_prog(prog,true);
+	(void)run_rpgsh_prog(prog,true);
 
 	std::ifstream ifs(rpgsh_output_redirect_path);
 	while(!ifs.eof())
