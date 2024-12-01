@@ -224,7 +224,6 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 			else if(action == SetRemoveA && rk.isRemoved)
 				output(Warning,"Removed \"%c%c/%s\"",p_vi->scope.sigil,rk.type,set_key.c_str());
 
-
 			if(value.find(DS) != std::string::npos)
 				value = right(value,value.find(set_value)+set_value.length()+DS.length());
 			else
