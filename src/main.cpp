@@ -557,7 +557,7 @@ int prompt()
 		}
 		else if(buffer[0] != COMMENT)
 		{
-			run_rpgsh_prog(buffer,false);
+			(void)run_rpgsh_prog(buffer,false);
 		}
 	}
 	return 0;
@@ -596,8 +596,8 @@ int main()
 		c.save();
 	}
 
-	run_rpgsh_prog((char*)"banner",false);
-	run_rpgsh_prog((char*)"version",false);
+	(void)run_rpgsh_prog((char*)"banner",false);
+	(void)run_rpgsh_prog((char*)"version",false);
 
 	if(!stob(config.setting[HIDE_TIPS]))
 	{
