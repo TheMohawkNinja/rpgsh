@@ -116,29 +116,6 @@ std::string mergeQuotes(std::string str)
 	// The string is a valid integer, and also had quotes around it, so it still should be reated as a string
 	return '\"'+ret+'\"';
 }
-std::string escapeQuotes(std::string str)
-{
-	std::string ret = "";
-	for(long unsigned int i=0; i<str.length(); i++)
-	{
-		if(str[i] == '\"' || str[i] == '\'')
-		{
-			//TODO: Figure out how to merge these two lines into the same one line
-			ret += "\\";
-			ret += str[i];
-		}
-		else if(str[i] != '\"' && str[i] != '\'' && str[i] != '\\')
-		{
-			ret += str[i];
-		}
-		else if(str[i] == '\\' && (i+1)<str.length() && str[i+1] == '\"')
-		{
-			ret += str[i];
-		}
-	}
-
-	return ret;
-}
 
 void confirmEnvVariablesFile()
 {

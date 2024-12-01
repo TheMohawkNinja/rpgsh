@@ -42,7 +42,6 @@ std::string right(std::string str, int n);
 std::string addSpaces(int n);
 
 std::string mergeQuotes(std::string str);
-std::string escapeQuotes(std::string str);
 
 void confirmEnvVariablesFile();
 
