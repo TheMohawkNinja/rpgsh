@@ -29,6 +29,12 @@ const char* Var::c_str() const
 }
 bool Var::isInt() const
 {
+	// std::stoi will return "true" so long as the first character is an integer
+	// Therefore, we have to manually check each character to see if the whole string is ACTUALLY an integer -_-
+	for(const auto& c : Value)
+		if(!isdigit(c)) return false;
+
+	// This should only throw if int(*this) > INT_MAX
 	try{int(*this); return true;}
 	catch(...){return false;}
 }
