@@ -63,7 +63,7 @@ if [[ $EUID -eq 0 ]]; then
 	g++ -Wall -Wextra -Wpedantic src/banner.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-banner
 	echo -e "\tsrc/roll.cpp\t\t->\t$bold_white""/bin/rpgsh-roll"$normal
 	g++ -Wall -Wextra -Wpedantic src/roll.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-roll
-	echo -e "\tsrc/list.cpp\t\t->\t$bold_white""/bin/rpgsh-list"$normal
+	echo -e "\tsrc/print.cpp\t\t->\t$bold_white""/bin/rpgsh-print"$normal
 	g++ -Wall -Wextra -Wpedantic src/list.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-list
 	echo -e "\tsrc/help.cpp\t\t->\t$bold_white""/bin/rpgsh-help"$normal
 	g++ -Wall -Wextra -Wpedantic src/help.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-help
