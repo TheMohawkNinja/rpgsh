@@ -23,10 +23,8 @@ void get_longest_key_from_datamap(datamap<T> m, unsigned int* p_current_longest_
 }
 const char* print_value(std::string value)
 {
-	if(value != "")
-		return value.c_str();
-	else
-		return empty_str.c_str();
+	if(value != "") return value.c_str();
+	else return empty_str.c_str();
 }
 void print_data(Scope scope)
 {
@@ -114,7 +112,7 @@ void print_data(Scope scope)
 		fprintf(stdout,"\n");
 	}
 }
-void print_player_attrs()
+void print_character_variables()
 {
 	Character c = Character(false);
 	std::string sigil(1,CHARACTER_SIGIL);
@@ -139,22 +137,85 @@ void print_shell_variables()
 }
 int main(int argc, char** argv)
 {
-	check_print_app_description(argv,"Prints one or all variable scopes.");
+	check_print_app_description(argv,"Pretty prints variables, variable sets, and scopes.");
 
 	if(argc > 2)
 		output(Warning,"Expected only one argument. All args past \"%s\" will be ignored.",argv[1]);
 
-	if(argc == 1 || !strcmp(argv[1],"--all"))// Print everything
+	if(argc == 1 || !strcmp(argv[1],"--all"))
 	{
 		print_shell_variables();
 		fprintf(stdout,"\n");
 		print_campaign_variables();
 		fprintf(stdout,"\n");
-		print_player_attrs();
+		print_character_variables();
+	}
+	else if(isTypeSigil(argv[1][0]) && argv[1][1] == '{')
+	{
+		Scope variable;
+		std::string v_str = std::string(argv[1]);
+
+		switch(argv[1][0])
+		{
+			case(VAR_SIGIL):
+				variable.set<Var>("",Var(v_str));
+				break;
+			case(DICE_SIGIL):
+				variable.set<Dice>("",Dice(v_str));
+				break;
+			case(WALLET_SIGIL):
+				variable.set<Wallet>("",Wallet(v_str));
+				break;
+			case(CURRENCY_SIGIL):
+				variable.set<Currency>("",Currency(v_str));
+				break;
+			case(CURRENCYSYSTEM_SIGIL):
+				variable.set<CurrencySystem>("",CurrencySystem(v_str));
+				break;
+		}
+		print_data(variable);
+	}
+	else if(looksLikeSet(std::string(argv[1])))
+	{
+		std::string set_string = std::string(argv[1]);
+		Scope set;
+
+		while(set_string.find(DS) != std::string::npos)
+		{
+			std::string set_key = left(set_string,set_string.find(DS));
+			set_string = right(set_string,set_string.find(set_key)+set_key.length()+DS.length());
+			std::string set_value = left(set_string,set_string.find(DS));
+
+			switch(set_value[0])
+			{
+				case VAR_SIGIL:
+					set.set<Var>(set_key,set_value);
+					break;
+				case DICE_SIGIL:
+					set.set<Dice>(set_key,set_value);
+					break;
+				case WALLET_SIGIL:
+					set.set<Wallet>(set_key,set_value);
+					break;
+				case CURRENCY_SIGIL:
+					set.set<Currency>(set_key,set_value);
+					break;
+				case CURRENCYSYSTEM_SIGIL:
+					set.set<CurrencySystem>(set_key,set_value);
+					break;
+			}
+
+			if(set_string.find(DS) != std::string::npos)
+				set_string = right(set_string,set_string.find(set_value)+set_value.length()+DS.length());
+			else
+				break;
+		}
+
+		print_data(set);
 	}
 	else if(!strcmp(argv[1],"-c") || !strcmp(argv[1],"--character"))
 	{
-		print_player_attrs();
+		print_character_variables();
 	}
 	else if(!strcmp(argv[1],"-m") || !strcmp(argv[1],"--campaign"))
 	{
@@ -166,15 +227,18 @@ int main(int argc, char** argv)
 	}
 	else if(!strcmp(argv[1],"-?") || !strcmp(argv[1],"--help"))
 	{
-		fprintf(stdout,"Prints all variables contained in one or all Scopes\n\n");
+		fprintf(stdout,"Pretty prints variables, variable sets, and scopes.\n\n");
 		fprintf(stdout,"USAGE:\n");
-		fprintf(stdout,"\tlist %soption%s\n\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\tprint\t\t\tPrints all variables in all scopes.\n");
+		fprintf(stdout,"\tprint %svariable%s\t\tPretty prints information about variable.\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\tprint %svariable set%s\tPretty prints information about all variables in the set.\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\tprint %soption%s\t\tSee %sOPTIONS.%s\n\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"OPTIONS:\n");
-		fprintf(stdout,"\t--all\tPrints all variables in all Scopes, this is the default behavior.\n");
-		fprintf(stdout,"\t--character\tPrints all character attributes.\n");
-		fprintf(stdout,"\t--campaign\tPrints all current campaign variables.\n");
-		fprintf(stdout,"\t--shell\t\tPrints all shell variables.\n");
-		fprintf(stdout,"\t-? | --all\tPrints this help text.\n");
+		fprintf(stdout,"\t--all\t\t\tEquivalent to entering no arguments.\n");
+		fprintf(stdout,"\t--character\t\tPrints all character attributes.\n");
+		fprintf(stdout,"\t--campaign\t\tPrints all current campaign variables.\n");
+		fprintf(stdout,"\t--shell\t\t\tPrints all shell variables.\n");
+		fprintf(stdout,"\t-? | --all\t\tPrints this help text.\n");
 	}
 	else
 	{
