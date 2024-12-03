@@ -331,8 +331,22 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 
 	if(isScopeSigil(arg_str[0])) //Check if user is operating on a variable
 		arg_str = "variables " + arg_str;
-
 	bool runningVariables = (left(arg_str,9) == "variables");
+
+	std::regex variable_pattern("[@|#|$][vdwcs]?[^\\s,]{1,}");
+	std::sregex_iterator v_str_it(arg_str.begin(), arg_str.end(), variable_pattern);
+	std::sregex_iterator v_str_end;
+
+	//Replaces all instances of variables with their respective value
+	//Except for the first arg if it is a variable
+	if(runningVariables) v_str_it++;
+
+	while(v_str_it != v_str_end)
+	{
+		std::string v_str = v_str_it->str();
+		arg_str = std::regex_replace(arg_str,std::regex(v_str),get_prog_output(v_str)[0]);
+		v_str_it++;
+	}
 
 	std::string path = "/bin/";
 	std::regex arg_pattern("[^\\s]{1,}");
@@ -343,20 +357,10 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	args.push_back(path+prefix+arg_str_it->str());
 	arg_str_it++;
 
-	//Replaces all instances of variables with their respective value
-	//Except for the first arg if it is a variable
-	if(runningVariables)
-	{
-		args.push_back(arg_str_it->str());
-		arg_str_it++;
-	}
-
+	//Get args for program
 	while(arg_str_it != arg_str_end)
 	{
 		std::string arg = arg_str_it->str();
-
-		if(isScopeSigil(arg[0])) arg = get_prog_output(arg)[0];
-
 		args.push_back(arg);
 		arg_str_it++;
 	}
