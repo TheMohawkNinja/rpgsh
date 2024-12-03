@@ -63,7 +63,9 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 				return "";
 			}
 		}
-		else if(p_vi->type == '/' || p_vi->type == DICE_SIGIL)
+		else if((p_vi->type == '/' && action == Write && p_vi->evalType == DICE_SIGIL) ||
+		   (p_vi->type == '/' && p_vi->scope.keyExists<Dice>(p_vi->key)) ||
+		   p_vi->type == DICE_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<Dice>(p_vi->key);
 			if(action == Read && keyExists && p_vi->property == "")
@@ -91,7 +93,9 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 				return "";
 			}
 		}
-		else if(p_vi->type == '/' || p_vi->type == WALLET_SIGIL)
+		else if((p_vi->type == '/' && action == Write && p_vi->evalType == WALLET_SIGIL) ||
+		   (p_vi->type == '/' && p_vi->scope.keyExists<Wallet>(p_vi->key)) ||
+		   p_vi->type == WALLET_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<Wallet>(p_vi->key);
 			if(action == Read && keyExists && p_vi->property == "")
@@ -109,7 +113,9 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 				return "";
 			}
 		}
-		else if(p_vi->type == '/' || p_vi->type == CURRENCY_SIGIL)
+		else if((p_vi->type == '/' && action == Write && p_vi->evalType == CURRENCY_SIGIL) ||
+		   (p_vi->type == '/' && p_vi->scope.keyExists<Currency>(p_vi->key)) ||
+		   p_vi->type == CURRENCY_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<Currency>(p_vi->key);
 			if(action == Read && keyExists && p_vi->property == "")
@@ -140,7 +146,9 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 				return "";
 			}
 		}
-		else if(p_vi->type == '/' || p_vi->type == CURRENCYSYSTEM_SIGIL)
+		else if((p_vi->type == '/' && action == Write && p_vi->evalType == CURRENCYSYSTEM_SIGIL) ||
+		   (p_vi->type == '/' && p_vi->scope.keyExists<CurrencySystem>(p_vi->key)) ||
+		   p_vi->type == CURRENCYSYSTEM_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<CurrencySystem>(p_vi->key);
 			if(action == Read && keyExists && p_vi->property == "")
