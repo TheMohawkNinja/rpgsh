@@ -43,9 +43,7 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 			exit(-1);
 		}
 
-		if((p_vi->type == '/' && action == Write && p_vi->evalType == VAR_SIGIL) ||
-		   (p_vi->type == '/' && p_vi->scope.keyExists<Var>(p_vi->key)) ||
-		   p_vi->type == VAR_SIGIL)
+		if(p_vi->evalType == VAR_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<Var>(p_vi->key);
 			if(action == Read && keyExists && p_vi->property == "")
@@ -57,15 +55,13 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 			else if(action == Write && !stringcasecmp(p_vi->property,"Value"))
 				p_vi->scope.setProperty<Var,std::string>(p_vi->key,p_vi->property,Var(value).Value);
 
-			if(keyExists && action == Write)
+			if(action == Write)
 			{
 				p_vi->scope.save();
 				return "";
 			}
 		}
-		else if((p_vi->type == '/' && action == Write && p_vi->evalType == DICE_SIGIL) ||
-		   (p_vi->type == '/' && p_vi->scope.keyExists<Dice>(p_vi->key)) ||
-		   p_vi->type == DICE_SIGIL)
+		else if(p_vi->evalType == DICE_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<Dice>(p_vi->key);
 			if(action == Read && keyExists && p_vi->property == "")
@@ -87,15 +83,13 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 			else if(action == Write && !stringcasecmp(p_vi->property,"List"))
 				p_vi->scope.setProperty<Dice,std::string>(p_vi->key,p_vi->property,Dice(value).List);
 
-			if(keyExists && action == Write)
+			if(action == Write)
 			{
 				p_vi->scope.save();
 				return "";
 			}
 		}
-		else if((p_vi->type == '/' && action == Write && p_vi->evalType == WALLET_SIGIL) ||
-		   (p_vi->type == '/' && p_vi->scope.keyExists<Wallet>(p_vi->key)) ||
-		   p_vi->type == WALLET_SIGIL)
+		else if(p_vi->evalType == WALLET_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<Wallet>(p_vi->key);
 			if(action == Read && keyExists && p_vi->property == "")
@@ -107,15 +101,13 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 			else if(action == Write)
 				p_vi->scope.setProperty<Wallet,int>(p_vi->key,p_vi->property,Wallet(value).Money[Currency(p_vi->property)]);
 
-			if(keyExists && action == Write)
+			if(action == Write)
 			{
 				p_vi->scope.save();
 				return "";
 			}
 		}
-		else if((p_vi->type == '/' && action == Write && p_vi->evalType == CURRENCY_SIGIL) ||
-		   (p_vi->type == '/' && p_vi->scope.keyExists<Currency>(p_vi->key)) ||
-		   p_vi->type == CURRENCY_SIGIL)
+		else if(p_vi->evalType == CURRENCY_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<Currency>(p_vi->key);
 			if(action == Read && keyExists && p_vi->property == "")
@@ -140,15 +132,13 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 			else if(action == Write && !stringcasecmp(p_vi->property,"SmallerAmount"))
 				p_vi->scope.setProperty<Currency,int>(p_vi->key,p_vi->property,Currency(value).SmallerAmount);
 
-			if(keyExists && action == Write)
+			if(action == Write)
 			{
 				p_vi->scope.save();
 				return "";
 			}
 		}
-		else if((p_vi->type == '/' && action == Write && p_vi->evalType == CURRENCYSYSTEM_SIGIL) ||
-		   (p_vi->type == '/' && p_vi->scope.keyExists<CurrencySystem>(p_vi->key)) ||
-		   p_vi->type == CURRENCYSYSTEM_SIGIL)
+		else if(p_vi->evalType == CURRENCYSYSTEM_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<CurrencySystem>(p_vi->key);
 			if(action == Read && keyExists && p_vi->property == "")
@@ -160,7 +150,7 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 			else if(action == Write && !stringcasecmp(p_vi->property,"Name"))
 				p_vi->scope.setProperty<CurrencySystem,std::string>(p_vi->key,p_vi->property,CurrencySystem(value).Name);
 
-			if(keyExists && action == Write)
+			if(action == Write)
 			{
 				p_vi->scope.save();
 				return "";
@@ -174,17 +164,17 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 	else if(action == SetAdd || action == SetAddA ||
 		action == SetRemove || action == SetRemoveA)// Perform write operation on variable set
 	{
+		struct RemovedKey
+		{
+			bool isRemoved = false;
+			char type = '\0';
+		};
+
 		while(value.find(DS) != std::string::npos)
 		{
 			std::string set_key = left(value,value.find(DS));
 			value = right(value,value.find(set_key)+set_key.length()+DS.length());
 			std::string set_value = left(value,value.find(DS));
-
-			struct RemovedKey
-			{
-				bool isRemoved = false;
-				char type = '\0';
-			};
 
 			RemovedKey rk;
 
@@ -684,6 +674,9 @@ int main(int argc, char** argv)
 		std::string new_value = get_prog_output("variables "+vi.variable)[0];
 		if(findInStrVect(assignOps,final_op,0) == -1 && findInStrVect(unaryOps,final_op,0) == -1)
 			fprintf(stdout,"%s\n",args[0].c_str());
+		else if(old_value == "")
+			output(Info,"%c%c/%s has been initialized to %s",
+			       vi.scope.sigil,vi.evalType,vi.key.c_str(),new_value.c_str());
 		else if(old_value != new_value)
 			output(Info,"%c%c/%s has changed from %s to %s",
 			       vi.scope.sigil,vi.evalType,vi.key.c_str(),old_value.c_str(),new_value.c_str());
