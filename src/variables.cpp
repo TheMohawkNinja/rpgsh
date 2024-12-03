@@ -33,7 +33,7 @@ std::vector<std::string> unaryOps;
 std::vector<std::string> boolOps;
 std::vector<std::string> assignOps;
 
-std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::string value)
+std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 {
 	if(p_vi->variable.back() != '/')// If the last character isn't a '/', just handle value
 	{
@@ -54,12 +54,6 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 				return p_vi->scope.getProperty<Var>(p_vi->key,p_vi->property);
 			else if(action == Write && !stringcasecmp(p_vi->property,"Value"))
 				p_vi->scope.setProperty<Var,std::string>(p_vi->key,p_vi->property,Var(value).Value);
-
-			if(action == Write)
-			{
-				p_vi->scope.save();
-				return "";
-			}
 		}
 		else if(p_vi->evalType == DICE_SIGIL)
 		{
@@ -82,12 +76,6 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 				p_vi->scope.setProperty<Dice,int>(p_vi->key,p_vi->property,Dice(value).Modifier);
 			else if(action == Write && !stringcasecmp(p_vi->property,"List"))
 				p_vi->scope.setProperty<Dice,std::string>(p_vi->key,p_vi->property,Dice(value).List);
-
-			if(action == Write)
-			{
-				p_vi->scope.save();
-				return "";
-			}
 		}
 		else if(p_vi->evalType == WALLET_SIGIL)
 		{
@@ -100,12 +88,6 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 				return p_vi->scope.getProperty<Wallet>(p_vi->key,p_vi->property);
 			else if(action == Write)
 				p_vi->scope.setProperty<Wallet,int>(p_vi->key,p_vi->property,Wallet(value).Money[Currency(p_vi->property)]);
-
-			if(action == Write)
-			{
-				p_vi->scope.save();
-				return "";
-			}
 		}
 		else if(p_vi->evalType == CURRENCY_SIGIL)
 		{
@@ -131,12 +113,6 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,Currency(value).Larger);
 			else if(action == Write && !stringcasecmp(p_vi->property,"SmallerAmount"))
 				p_vi->scope.setProperty<Currency,int>(p_vi->key,p_vi->property,Currency(value).SmallerAmount);
-
-			if(action == Write)
-			{
-				p_vi->scope.save();
-				return "";
-			}
 		}
 		else if(p_vi->evalType == CURRENCYSYSTEM_SIGIL)
 		{
@@ -149,13 +125,11 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 				return p_vi->scope.getProperty<CurrencySystem>(p_vi->key,p_vi->property);
 			else if(action == Write && !stringcasecmp(p_vi->property,"Name"))
 				p_vi->scope.setProperty<CurrencySystem,std::string>(p_vi->key,p_vi->property,CurrencySystem(value).Name);
-
-			if(action == Write)
-			{
-				p_vi->scope.save();
-				return "";
-			}
 		}
+
+		// Should only execute if action == Write
+		p_vi->scope.save();
+		return "";
 	}
 	else if(action == Read)// If the last character is a '/' and we are just printing the value, print a list of keys and constructors
 	{
@@ -167,7 +141,7 @@ std::string readOrWriteDataOnScope(VariableInfo* p_vi, Action action, std::strin
 		struct RemovedKey
 		{
 			bool isRemoved = false;
-			char type = '\0';
+			char type = 0;
 		};
 
 		while(value.find(DS) != std::string::npos)
@@ -405,16 +379,16 @@ std::string parseRHSAndDoOp(std::vector<std::string> v, unsigned int lhs_pos, un
 	if(rhs_pos == UINT_MAX)// Unary operators
 		return getResult<TL,Var>((v)[lhs_pos],(v)[op_pos],"");
 
-	if(left((v)[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
-		return getResult<TL,Var>((v)[lhs_pos],(v)[op_pos],(v)[rhs_pos]);
-	else if(left((v)[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
-		return getResult<TL,Dice>((v)[lhs_pos],(v)[op_pos],(v)[rhs_pos]);
-	else if(left((v)[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
-		return getResult<TL,Wallet>((v)[lhs_pos],(v)[op_pos],(v)[rhs_pos]);
-	else if(left((v)[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
-		return getResult<TL,Currency>((v)[lhs_pos],(v)[op_pos],(v)[rhs_pos]);
-	else if(left((v)[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
-		return getResult<TL,CurrencySystem>((v)[lhs_pos],(v)[op_pos],(v)[rhs_pos]);
+	if(left(v[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
+		return getResult<TL,Var>(v[lhs_pos],v[op_pos],v[rhs_pos]);
+	else if(left(v[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
+		return getResult<TL,Dice>(v[lhs_pos],v[op_pos],v[rhs_pos]);
+	else if(left(v[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
+		return getResult<TL,Wallet>(v[lhs_pos],v[op_pos],v[rhs_pos]);
+	else if(left(v[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
+		return getResult<TL,Currency>(v[lhs_pos],v[op_pos],v[rhs_pos]);
+	else if(left(v[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
+		return getResult<TL,CurrencySystem>(v[lhs_pos],v[op_pos],v[rhs_pos]);
 	else
 		return getResult<TL,Var>((v)[lhs_pos],(v)[op_pos],(v)[rhs_pos]);
 
@@ -443,7 +417,7 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 	// If the first arg is a variable and we are assigning it, we'll need to save the result
 	if(lhs_pos == 0 && vi->key != "" &&
 	  (findInStrVect(assignOps,(*v)[op_pos],0) > -1 || findInStrVect(unaryOps,(*v)[op_pos],0) > -1))
-		(void)readOrWriteDataOnScope(vi, Write, result);
+		(void)doAction(vi, Write, result);
 
 	// Replace operators and operands with result
 	if(rhs_pos < UINT_MAX)
@@ -482,7 +456,7 @@ int main(int argc, char** argv)
 
 	if(argc == 2)// Print data if all the user enters is a variable
 	{
-		std::string str = readOrWriteDataOnScope(&vi, Read, "");
+		std::string str = doAction(&vi, Read, "");
 		if(str != "") fprintf(stdout,"%s\n",str.c_str());
 	}
 	else if(vi.variable.back() != '/')// Perform operation on variable
@@ -495,10 +469,8 @@ int main(int argc, char** argv)
 
 		// Need to know final operation to determine whether we print to screen or not
 		std::string final_op = std::string(argv[2]);
-		if(final_op[0] == '(')
-			final_op = right(final_op,1);
-		if(final_op.back() == ')')
-			final_op = left(final_op,final_op.length()-1);
+		if(final_op[0] == '(') final_op = right(final_op,1);
+		if(final_op.back() == ')') final_op = left(final_op,final_op.length()-1);
 
 		// Generate vector of operators and operands, while also determining number of parentheses
 		for(int i=1; i<argc; i++)
@@ -594,10 +566,6 @@ int main(int argc, char** argv)
 			}
 		}
 
-		// Wrap everything in parenthesis just to make below code simpler
-		args[0] = '('+args[0];
-		args.back() += ')';
-
 		if(open_paren_ctr > close_paren_ctr)
 		{
 			output(Error,"Missing close parenthesis to match open parenthesis.");
@@ -608,6 +576,10 @@ int main(int argc, char** argv)
 			output(Error,"Missing open parenthesis to match close parenthesis.");
 			exit(-1);
 		}
+
+		// Wrap everything in parenthesis just to make below code simpler
+		args[0] = '('+args[0];
+		args.back() += ')';
 
 		// PEMDAS
 		for(int start=0; start<args_size-1; start++)
@@ -704,13 +676,13 @@ int main(int argc, char** argv)
 		}
 
 		if(!strcasecmp(argv[2],OP_ADD))
-			fprintf(stdout,"%s\n",readOrWriteDataOnScope(&vi, SetAdd, rhs).c_str());
+			fprintf(stdout,"%s\n",doAction(&vi, SetAdd, rhs).c_str());
 		else if(!strcasecmp(argv[2],OP_ADDA))
-			(void)readOrWriteDataOnScope(&vi, SetAddA, rhs);
+			(void)doAction(&vi, SetAddA, rhs);
 		else if(!strcasecmp(argv[2],OP_SUB))
-			fprintf(stdout,"%s\n",readOrWriteDataOnScope(&vi, SetRemove, rhs).c_str());
+			fprintf(stdout,"%s\n",doAction(&vi, SetRemove, rhs).c_str());
 		else if(!strcasecmp(argv[2],OP_SUBA))
-			(void)readOrWriteDataOnScope(&vi, SetRemoveA, rhs);
+			(void)doAction(&vi, SetRemoveA, rhs);
 	}
 	return 0;
 }
