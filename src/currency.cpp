@@ -1862,7 +1862,6 @@ Wallet::Wallet(std::string str)
 
 	//Cut off the initial "w{" to make parsing consistent
 	str = str.substr(2,str.length()-2);
-	fprintf(stdout,"str = %s\n",str.c_str());
 
 	//Main parsing loop
 	while(true)
