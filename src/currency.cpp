@@ -1862,29 +1862,31 @@ Wallet::Wallet(std::string str)
 
 	//Cut off the initial "w{" to make parsing consistent
 	str = str.substr(2,str.length()-2);
+	fprintf(stdout,"str = %s\n",str.c_str());
 
 	//Main parsing loop
 	while(true)
 	{
 		int str_ln = str.length();
-		std::string delimiter = ",";
+		char delimiter = ',';
 
 		if(str.find(delimiter) == std::string::npos)
 		{
-			output(Error,"Unable to parse currency for wallet, missing \'%s\'",delimiter.c_str());
+			output(Error,"Unable to parse currency for wallet, missing \'%c\'",delimiter);
 			exit(-1);
 		}
 
 		//Create currency object to be added to wallet
 		std::string c(1,CURRENCY_SIGIL);
-		std::string currency_str = str.substr(str.find(c),str.find("}")+1-str.find(c));
+		int c_pos = str.find(c+"{");
+		std::string currency_str = str.substr(c_pos,str.find("}")+1-c_pos);
 		int c_str_ln = currency_str.length();
 		currency = Currency(currency_str);
 
 		//If we're at the end of the constructor
 		const long unsigned int next_delimiter = str.find(delimiter,c_str_ln+1);
 		if(next_delimiter == std::string::npos)
-			delimiter = "}";
+			delimiter = '}';
 
 		//Parse quantity string
 		std::string quantity_str = str.substr(c_str_ln+1,next_delimiter-c_str_ln-1);
@@ -1903,7 +1905,7 @@ Wallet::Wallet(std::string str)
 
 		//Remove what we just worked on
 		int end_of_last_c = c_str_ln+q_str_ln+2;
-		if(delimiter != "}")
+		if(delimiter != '}')
 			str = str.substr(end_of_last_c,str_ln-c_str_ln);
 		else
 			break;
