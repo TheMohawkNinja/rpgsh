@@ -1863,6 +1863,8 @@ Wallet::Wallet(std::string str)
 	//Cut off the initial "w{" to make parsing consistent
 	str = str.substr(2,str.length()-2);
 
+	if(str == "}") return; // Empty constructor, so don't continue parsing
+
 	//Main parsing loop
 	while(true)
 	{
@@ -1881,14 +1883,14 @@ Wallet::Wallet(std::string str)
 		std::string currency_str = str.substr(c_pos,str.find("}")+1-c_pos);
 		int c_str_ln = currency_str.length();
 		currency = Currency(currency_str);
+		str = right(str,c_str_ln+1);
 
 		//If we're at the end of the constructor
-		const long unsigned int next_delimiter = str.find(delimiter,c_str_ln+1);
-		if(next_delimiter == std::string::npos)
-			delimiter = '}';
+		if(str.find(delimiter) == std::string::npos) delimiter = '}';
+		const long unsigned int next_delimiter = str.find(delimiter);
 
 		//Parse quantity string
-		std::string quantity_str = str.substr(c_str_ln+1,next_delimiter-c_str_ln-1);
+		std::string quantity_str = left(str,next_delimiter);
 		int q_str_ln = quantity_str.length();
 
 		//Try to add money to the wallet
@@ -1898,16 +1900,16 @@ Wallet::Wallet(std::string str)
 		}
 		catch(...)
 		{
-			output(Error,"Unable to add the currency \"%s\" in the quantity \"%s\" to the wallet.",currency.Name.c_str(),quantity_str.c_str());
+			output(Error,"Unable to add the currency \"%s\" in the quantity \"%s\" to the wallet.",
+				     currency.Name.c_str(),quantity_str.c_str());
 			exit(-1);
 		}
 
+		if(delimiter == '}') break;
+
 		//Remove what we just worked on
 		int end_of_last_c = c_str_ln+q_str_ln+2;
-		if(delimiter != '}')
-			str = str.substr(end_of_last_c,str_ln-c_str_ln);
-		else
-			break;
+		str = str.substr(end_of_last_c,str_ln-c_str_ln);
 	}
 }
 
@@ -1920,7 +1922,9 @@ Wallet::operator std::string() const
 		ret += std::string(c) + "," + std::to_string(q) + ",";
 
 	//Cut final ',' and add terminating '}'
-	ret = left(ret,ret.length()-1) + "}";
+	if(ret.find(',') != std::string::npos)
+		ret = left(ret,ret.length()-1);
+	ret += "}";
 
 	return ret;
 }
