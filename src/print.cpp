@@ -213,18 +213,6 @@ int main(int argc, char** argv)
 
 		print_data(set);
 	}
-	else if(!strcmp(argv[1],"-c") || !strcmp(argv[1],"--character"))
-	{
-		print_character_variables();
-	}
-	else if(!strcmp(argv[1],"-m") || !strcmp(argv[1],"--campaign"))
-	{
-		print_campaign_variables();
-	}
-	else if(!strcmp(argv[1],"-s") || !strcmp(argv[1],"--shell"))
-	{
-		print_shell_variables();
-	}
 	else if(!strcmp(argv[1],"-?") || !strcmp(argv[1],"--help"))
 	{
 		fprintf(stdout,"Pretty prints variables, variable sets, and scopes.\n\n");
@@ -235,9 +223,6 @@ int main(int argc, char** argv)
 		fprintf(stdout,"\tprint %soption%s\t\tSee %sOPTIONS.%s\n\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"OPTIONS:\n");
 		fprintf(stdout,"\t--all\t\t\tEquivalent to entering no arguments.\n");
-		fprintf(stdout,"\t--character\t\tPrints all character attributes.\n");
-		fprintf(stdout,"\t--campaign\t\tPrints all current campaign variables.\n");
-		fprintf(stdout,"\t--shell\t\t\tPrints all shell variables.\n");
 		fprintf(stdout,"\t-? | --all\t\tPrints this help text.\n");
 	}
 	else
