@@ -21,6 +21,34 @@ std::string templates_dir = 			root_dir + "templates/";
 std::string dice_lists_dir = 			root_dir + "dice-lists/";
 std::string prefix =				"rpgsh-";
 
+//RegEx patterns
+std::string arg_pattern_str =			"[^\\s]{1,}";
+std::string variable_pattern_str =		"["+
+						std::string(1,CHARACTER_SIGIL)+
+						std::string(1,CAMPAIGN_SIGIL)+
+						std::string(1,SHELL_SIGIL)+
+						"]["+
+						std::string(1,VAR_SIGIL)+
+						std::string(1,DICE_SIGIL)+
+						std::string(1,WALLET_SIGIL)+
+						std::string(1,CURRENCY_SIGIL)+
+						std::string(1,CURRENCYSYSTEM_SIGIL)+
+						"]?[^\\s,]{1,}";
+std::string exp_const_pattern_str =		"["+
+						std::string(1,VAR_SIGIL)+
+						std::string(1,DICE_SIGIL)+
+						std::string(1,WALLET_SIGIL)+
+						std::string(1,CURRENCY_SIGIL)+
+						std::string(1,CURRENCYSYSTEM_SIGIL)+
+						"]\\{[^}]{1,}\\}";
+std::string set_pattern_str =			"(([\\.a-zA-Z0-9]{1,}\\/*)*::["+
+						std::string(1,VAR_SIGIL)+
+						std::string(1,DICE_SIGIL)+
+						std::string(1,WALLET_SIGIL)+
+						std::string(1,CURRENCY_SIGIL)+
+						std::string(1,CURRENCYSYSTEM_SIGIL)+
+						"]\\{.*(?!::)\\}(::)?)*";
+
 //Data separator string. Name shortened for brevity in the code.
 std::string DS = "::";
 

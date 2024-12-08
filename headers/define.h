@@ -96,6 +96,12 @@ extern std::string templates_dir;
 extern std::string dice_lists_dir;
 extern std::string prefix;
 
+//RegEx patterns
+extern std::string arg_pattern_str;
+extern std::string variable_pattern_str;
+extern std::string exp_const_pattern_str;
+extern std::string set_pattern_str;
+
 //Data separator string. Name shortened for brevity in the code.
 extern std::string DS;
 
