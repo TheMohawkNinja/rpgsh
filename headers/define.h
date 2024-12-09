@@ -81,6 +81,7 @@
 //dir = Directory
 //file = File name
 //path = Directory + file name
+#define RPGSH_INSTALL_DIR		"/bin/"
 extern const char* random_seed_path;
 extern const char* backup_random_seed_path;
 extern const char* rpgsh_programs_cache_path;
