@@ -567,7 +567,7 @@ int main()
 	//Generate cache of valid rpgsh programs to speed up "help" program
 	//It takes a noticable amount of time to search through all of /bin even on an i7-4700k
 	fprintf(stdout,"Generating rpgsh program list...");
-	std::vector<std::string> applications = getDirectoryListing("/bin");
+	std::vector<std::string> applications = getDirectoryListing(std::string(RPGSH_INSTALL_DIR));
 	std::vector<std::string> rpgsh_apps;
 	std::filesystem::remove(rpgsh_programs_cache_path);
 	for(const auto& app : applications)

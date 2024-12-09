@@ -351,7 +351,7 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 
 	//Push back program we are going to run
 	//This does mean no spaces for program names, but meh
-	std::string path = "/bin/";
+	std::string path = std::string(RPGSH_INSTALL_DIR);
 	args.push_back(path+prefix+left(arg_str,arg_str.find(" ")));
 
 	//Replaces all instances of variables with their respective value
