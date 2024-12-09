@@ -355,7 +355,7 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 		try
 		{
 			if(op_match > -1 && (precedence < 3 || precedence == 7))// Mod operators
-				return std::string(doModOp<TL,TR>(TL(lhs),op,TR(rhs)));
+				return escapeSpaces(std::string(doModOp<TL,TR>(TL(lhs),op,TR(rhs))));
 			else if(op_match > -1 && (precedence >= 3 && precedence < 7))// Boolean operators
 				return btos(doBoolOp<TL,TR>(TL(lhs),op,TR(rhs)));
 		}
@@ -596,6 +596,7 @@ int main(int argc, char** argv)
 						args[end] = left(args[end],args[end].find(')'));
 
 						// Vectors for each operation type are in order of operator precedence
+						// TODO Don't use INT_MAX, as MAX_BUFFER_SIZE will need to be increased greatly to support large descriptions
 						int op_pos = INT_MAX;
 						for(const auto& precedence : operations)
 						{
