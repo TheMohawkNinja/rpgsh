@@ -47,8 +47,9 @@ bool isTypeSigil(char c)
 
 bool looksLikeSet(std::string s)
 {
-	std::regex set_pattern("(([\\.a-zA-Z0-9]{1,}\\/*)*::[a-z]\\{[^\\}]{1,}\\}(::)?)*");
+	std::regex set_pattern(set_pattern_str);
 	std::sregex_iterator match_it(s.begin(), s.end(), set_pattern);
+	std::sregex_iterator match_end;
 
 	return match_it->str() == s;
 }
@@ -102,7 +103,7 @@ std::string mergeQuotes(std::string str)
 	if(str.front() != '\"' && (str.back() != '\"' || isEscaped(str,str.length()-1)))
 		return str;
 
-	// Strip unescaped quote marks out
+	// Strip unescaped quote marks out from anywhere else but the ends of the string
 	for(long unsigned int i=0; i<str.length(); i++)
 	{
 		if(str[i] != '\"' || (str[i] == '\"' && isEscaped(str,i)))
@@ -115,6 +116,21 @@ std::string mergeQuotes(std::string str)
 
 	// The string is a valid integer, and also had quotes around it, so it still should be reated as a string
 	return '\"'+ret+'\"';
+}
+
+std::string escapeSpaces(std::string str)
+{
+	std::string ret = "";
+
+	for(long unsigned int i=0; i<str.length(); i++)
+	{
+		if(str[i] == ' ' && !isEscaped(str,i))
+			ret += "\\ ";
+		else
+			ret += str[i];
+	}
+
+	return ret;
 }
 
 void confirmEnvVariablesFile()
@@ -333,12 +349,17 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 		arg_str = "variables " + arg_str;
 	bool runningVariables = (left(arg_str,9) == "variables");
 
-	std::regex variable_pattern("[@|#|$][vdwcs]?[^\\s,]{1,}");
-	std::sregex_iterator v_str_it(arg_str.begin(), arg_str.end(), variable_pattern);
-	std::sregex_iterator v_str_end;
+	//Push back program we are going to run
+	//This does mean no spaces for program names, but meh
+	std::string path = "/bin/";
+	args.push_back(path+prefix+left(arg_str,arg_str.find(" ")));
 
 	//Replaces all instances of variables with their respective value
 	//Except for the first arg if it is a variable
+	std::regex variable_pattern(variable_pattern_str);
+	std::sregex_iterator v_str_it(arg_str.begin(), arg_str.end(), variable_pattern);
+	std::sregex_iterator v_str_end;
+
 	if(runningVariables) v_str_it++;
 
 	while(v_str_it != v_str_end)
@@ -348,85 +369,68 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 		v_str_it++;
 	}
 
-	std::string path = "/bin/";
-	std::regex arg_pattern("[^\\s]{1,}");
+	//Get args for program
+	std::regex arg_pattern(arg_pattern_str);
 	std::sregex_iterator arg_str_it(arg_str.begin(), arg_str.end(), arg_pattern);
 	std::sregex_iterator arg_str_end;
-
-	//Push back program we are going to run
-	args.push_back(path+prefix+arg_str_it->str());
 	arg_str_it++;
 
-	//Get args for program
 	while(arg_str_it != arg_str_end)
 	{
 		std::string arg = arg_str_it->str();
+		while(arg.back() == '\\')//Merge args with escaped spaces
+		{
+			arg_str_it++;
+			arg = left(arg,arg.length()) + " " + arg_str_it->str();
+		}
 		args.push_back(arg);
 		arg_str_it++;
 	}
 
-	//Combine arg_str wrapped in quotes
-	for(long unsigned int i=0; i<args.size(); i++)
+	//Merge args wrapped in quotes
+	unsigned long int quote_begin = std::string::npos;
+	unsigned long int quote_end = std::string::npos;
+	unsigned long int quote_start_arg = 0;
+	for(unsigned long int i=0; i<args.size(); i++)
 	{
-		long unsigned int quote_begin = std::string::npos;
-		for(long unsigned int j=0; j<args[i].length(); j++)
+		//Find unescaped quote marks
+		for(unsigned long int c=0; c<args[i].length(); c++)
 		{
-			if(args[i][j] == '\"' && !isEscaped(args[i],j))
+			if(quote_begin == std::string::npos && args[i][c] == '\"' && !isEscaped(args[i],c))
 			{
-				quote_begin = j;
-				break;
-			}
-		}
-		if(quote_begin == std::string::npos) continue;
-
-		long unsigned int quote_end = std::string::npos;
-		for(long unsigned int j=quote_begin+1; j<args[i].length(); j++)
-		{
-			if(args[i][j] == '\"' && !isEscaped(args[i],j))
-			{
-				quote_end = j;
-				break;
-			}
-		}
-
-		if(quote_end != std::string::npos)//Quote-wrapped arg doesn't contain a space
-		{
-			args[i] = args[i].substr(quote_begin,(quote_end+1)-quote_begin);
-		}
-		else//Quote-wrapped arg with space
-		{
-			if(i == args.size()-1)
-			{
-				output(Error,"Missing terminating quotation mark.");
-				if(!redirect_output) padding();
-
-				return -2;
-			}
-
-			args[i] = args[i].substr(quote_begin,args[i].length()-quote_begin);
-
-			for(long unsigned int j=i+1; j<args.size(); j++)
-			{
-				for(long unsigned int k=j; k<args[j].length(); k++)
+				quote_begin = c;
+				quote_end = args[i].find('\"',c+1);
+				quote_start_arg = i;
+				if(quote_end == std::string::npos)
 				{
-					if(args[j][k] == '\"' && !isEscaped(args[j],k))
-					{
-						quote_end = k;
-						break;
-					}
+					args[i] = right(args[i],c+1);
 				}
-				if(quote_end != std::string::npos)
+				else//No spaces in quote-wrapped string
 				{
-					args[i] += " " + left(args[j],quote_end+1);
-					args.erase(args.begin()+j);
+					args[i] = mergeQuotes(left(args[i],quote_end));
+					quote_begin = std::string::npos;
+					quote_end = std::string::npos;
+					quote_start_arg = 0;
 					break;
 				}
-				else
+			}
+			else if(quote_end == std::string::npos && args[i][c] == '\"' && !isEscaped(args[i],c))
+			{
+				quote_end = c;
+
+				for(unsigned long int q=quote_start_arg+1; q<=i;)
 				{
-					args[i] += " " + args[j];
-					args.erase(args.begin()+j);
-					j--;
+					if(q < i) args[quote_start_arg] += " "+args[q];
+					else args[quote_start_arg] += " "+left(args[q],quote_end);
+
+					args.erase(args.begin()+q);
+					i--;
 				}
+				args[i] = mergeQuotes(args[i]);
+				quote_begin = std::string::npos;
+				quote_end = std::string::npos;
+				quote_start_arg = 0;
+				break;
 			}
 		}
 	}

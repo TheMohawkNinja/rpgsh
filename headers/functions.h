@@ -43,6 +43,8 @@ std::string addSpaces(int n);
 
 std::string mergeQuotes(std::string str);
 
+std::string escapeSpaces(std::string str);
+
 void confirmEnvVariablesFile();
 
 void confirmShellVariablesFile();
