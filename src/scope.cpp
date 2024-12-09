@@ -430,7 +430,7 @@ void Scope::setProperty<Currency,std::shared_ptr<CurrencySystem>>(std::string ke
 	if(!stringcasecmp(property,"CurrencySystem"))
 		currencies[getExistingKey<Currency>(key)].System = value;
 	else
-		throw std::runtime_error("invald_property");
+		throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
 void Scope::setProperty<Currency,int>(std::string key, std::string property, int value)
@@ -438,7 +438,7 @@ void Scope::setProperty<Currency,int>(std::string key, std::string property, int
 	if(!stringcasecmp(property,"SmallerAmount"))
 		currencies[getExistingKey<Currency>(key)].SmallerAmount = value;
 	else
-		throw std::runtime_error("invald_property");
+		throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
 void Scope::setProperty<Currency,std::string>(std::string key, std::string property, std::string value)
@@ -450,7 +450,7 @@ void Scope::setProperty<Currency,std::string>(std::string key, std::string prope
 	else if(!stringcasecmp(property,"Larger"))
 		currencies[getExistingKey<Currency>(key)].Larger = value;
 	else
-		throw std::runtime_error("invald_property");
+		throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
 void Scope::setProperty<CurrencySystem,std::string>(std::string key, std::string property, std::string value)
@@ -458,7 +458,7 @@ void Scope::setProperty<CurrencySystem,std::string>(std::string key, std::string
 	if(!stringcasecmp(property,"Name"))
 		currencysystems[getExistingKey<CurrencySystem>(key)].Name = value;
 	else
-		throw std::runtime_error("invald_property");
+		throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
 void Scope::setProperty<Dice,int>(std::string key, std::string property, int value)
@@ -470,7 +470,7 @@ void Scope::setProperty<Dice,int>(std::string key, std::string property, int val
 	else if(!stringcasecmp(property,"Modifier"))
 		dice[getExistingKey<Dice>(key)].Modifier = value;
 	else
-		throw std::runtime_error("invald_property");
+		throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
 void Scope::setProperty<Dice,std::string>(std::string key, std::string property, std::string value)
@@ -478,7 +478,7 @@ void Scope::setProperty<Dice,std::string>(std::string key, std::string property,
 	if(!stringcasecmp(property,"List"))
 		dice[getExistingKey<Dice>(key)].List = value;
 	else
-		throw std::runtime_error("invald_property");
+		throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
 void Scope::setProperty<Var,std::string>(std::string key, std::string property, std::string value)
@@ -486,7 +486,7 @@ void Scope::setProperty<Var,std::string>(std::string key, std::string property, 
 	if(!stringcasecmp(property,"Value"))
 		vars[getExistingKey<Var>(key)].Value = value;
 	else
-		throw std::runtime_error("invald_property");
+		throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
 void Scope::setProperty<Wallet,int>(std::string key, std::string property, int value)
@@ -494,7 +494,7 @@ void Scope::setProperty<Wallet,int>(std::string key, std::string property, int v
 	if(get<Wallet>(key).containsCurrency(property))
 		wallets[getExistingKey<Wallet>(key)].Money[wallets[getExistingKey<Wallet>(key)].getExistingCurrency(property)] = value;
 	else
-		throw std::runtime_error("invald_property");
+		throw std::runtime_error(E_INVALID_PROPERTY);
 }
 
 //Set entire datamap to another datamap
