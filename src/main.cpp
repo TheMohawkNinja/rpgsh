@@ -585,7 +585,7 @@ int main()
 		ofs<<app<<"\n";
 	ofs.close();
 
-	fprintf(stdout,"\033[2K");//Delete "Generating..." line from start of main()
+	fprintf(stdout,CLEAR_ENTIRE_LINE);//Delete "Generating..." line from start of main()
 
 	//Generate default character if needed
 	if(!c.confirmDatasource())
