@@ -441,7 +441,7 @@ int main(int argc, char** argv)
 	boolOps.insert(boolOps.end(),operations[6].begin(),operations[6].end());
 	assignOps.insert(assignOps.end(),operations[7].begin(),operations[7].end());
 
-	check_print_app_description(argv,"Not meant for direct call by user. Implicitly called when modifying variables.");
+	check_print_app_description(argv,"Prints values and evaluates operations. Implicitly called when modifying variables.");
 
 	if(std::string(argv[1]).find('/') == std::string::npos)// If the user only enters the scope sigil
 	{
@@ -461,7 +461,7 @@ int main(int argc, char** argv)
 	}
 	else if(vi.variable.back() != '/')// Perform operation on variable
 	{
-		std::string old_value = get_prog_output("variables "+vi.variable)[0];
+		std::string old_value = get_prog_output(vi.variable)[0];
 
 		std::vector<std::string> args;
 		unsigned int open_paren_ctr = 0;
@@ -644,7 +644,7 @@ int main(int argc, char** argv)
 		}
 
 		// Print result
-		std::string new_value = get_prog_output("variables "+vi.variable)[0];
+		std::string new_value = get_prog_output(vi.variable)[0];
 		if(findInStrVect(assignOps,final_op,0) == -1 && findInStrVect(unaryOps,final_op,0) == -1)
 			fprintf(stdout,"%s\n",args[0].c_str());
 		else if(old_value == "")

@@ -55,8 +55,8 @@ if [[ $EUID -eq 0 ]]; then
 	g++ -Wall -Wextra -Wpedantic src/main.cpp -L $lib_dir -ldefine -lscope -lvar -lfunctions -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh
 	echo -e "\tsrc/setname.cpp\t\t->\t$bold_white""/bin/rpgsh-setname"$normal
 	g++ -Wall -Wextra -Wpedantic src/setname.cpp -L $lib_dir -lscope -ldefine -lvar -lfunctions -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-setname
-	echo -e "\tsrc/variables.cpp\t->\t$bold_white""/bin/rpgsh-variables"$normal
-	g++ -Wall -Wextra -Wpedantic src/variables.cpp -L $lib_dir -lscope -ldefine -lvar -lfunctions -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-variables
+	echo -e "\tsrc/eval.cpp\t\t->\t$bold_white""/bin/rpgsh-eval"$normal
+	g++ -Wall -Wextra -Wpedantic src/eval.cpp -L $lib_dir -lscope -ldefine -lvar -lfunctions -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-eval
 	echo -e "\tsrc/version.cpp\t\t->\t$bold_white""/bin/rpgsh-version"$normal
 	g++ -Wall -Wextra -Wpedantic src/version.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-version
 	echo -e "\tsrc/banner.cpp\t\t->\t$bold_white""/bin/rpgsh-banner"$normal

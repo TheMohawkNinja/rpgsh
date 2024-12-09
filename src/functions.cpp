@@ -346,8 +346,8 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	if(!redirect_output) padding();
 
 	if(isScopeSigil(arg_str[0])) //Check if user is operating on a variable
-		arg_str = "variables " + arg_str;
-	bool runningVariables = (left(arg_str,9) == "variables");
+		arg_str = "eval " + arg_str;
+	bool runningVariables = (left(arg_str,4) == "eval");
 
 	//Push back program we are going to run
 	//This does mean no spaces for program names, but meh
