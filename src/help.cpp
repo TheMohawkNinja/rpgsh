@@ -16,7 +16,7 @@ int main(int argc, char** argv)
 	while(!ifs.eof())
 	{
 		getline(ifs,line);
-		applications.push_back(line);
+		if(line.length()) applications.push_back(line);
 	}
 	ifs.close();
 
@@ -27,17 +27,9 @@ int main(int argc, char** argv)
 	for(long unsigned int i=0; i<applications.size(); i++)
 	{
 		std::string app = applications[i];
-		if(app.substr(0,prefix.length()) == prefix)
-		{
-			appname = right(app,prefix.length());
-			if(appname.length() > longestNameLength)
-				longestNameLength = appname.length();
-		}
-		else
-		{
-			applications.erase(applications.begin()+i);
-			i--;
-		}
+		appname = right(app,prefix.length());
+		if(appname.length() > longestNameLength)
+			longestNameLength = appname.length();
 	}
 
 	//Print results

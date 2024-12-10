@@ -360,7 +360,7 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	std::sregex_iterator v_str_it(arg_str.begin(), arg_str.end(), variable_pattern);
 	std::sregex_iterator v_str_end;
 
-	if(runningVariables) v_str_it++;
+	if(runningVariables && v_str_it != v_str_end) v_str_it++;
 
 	while(v_str_it != v_str_end)
 	{
