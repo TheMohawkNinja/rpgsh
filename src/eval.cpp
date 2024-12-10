@@ -443,6 +443,12 @@ int main(int argc, char** argv)
 
 	check_print_app_description(argv,"Prints values and evaluates operations. Implicitly called when modifying variables.");
 
+	if(argc == 1)
+	{
+		output(Error,"eval expects at least one argument.");
+		exit(-1);
+	}
+
 	if(std::string(argv[1]).find('/') == std::string::npos)// If the user only enters the scope sigil
 	{
 		output(Error,"Expected at least one '/' delimiter.");
