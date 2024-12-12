@@ -725,17 +725,21 @@ bool Currency::operator < (const Currency& b) const//Orders std::map with Curren
 		else
 			return true;
 	}
-	if(System != b.System)//May be source of some issues due to getting rid of apparently unneeded for loop
-		return false;
-	else if(b.Larger == Name)
-		return true;
-	else if(b.Smaller == Name)
-		return false;
-	else if(b.Name == Name)
-		return false;
-	else
-		return true;
 
+	//No idea why this needs to be in a loop, but it doesn't work right otherwise
+	for([[maybe_unused]] const auto& [k,v] : *System)
+	{
+		if(System != b.System)
+			continue;
+		else if(b.Larger == Name)
+			return true;
+		else if(b.Smaller == Name)
+			return false;
+		else if(b.Name == Name)
+			return false;
+		else
+			return true;
+	}
 	return (Name < b.Name);
 }
 bool Currency::operator < ([[maybe_unused]] const CurrencySystem& b) const
@@ -1868,7 +1872,6 @@ Wallet::Wallet(std::string str)
 	//Main parsing loop
 	while(true)
 	{
-		int str_ln = str.length();
 		char delimiter = ',';
 
 		if(str.find(delimiter) == std::string::npos)
@@ -1889,11 +1892,8 @@ Wallet::Wallet(std::string str)
 		if(str.find(delimiter) == std::string::npos) delimiter = '}';
 		const long unsigned int next_delimiter = str.find(delimiter);
 
-		//Parse quantity string
+		//Parse quantity string and try to add it to the wallet
 		std::string quantity_str = left(str,next_delimiter);
-		int q_str_ln = quantity_str.length();
-
-		//Try to add money to the wallet
 		try
 		{
 			Money[currency] += std::stoi(quantity_str);
@@ -1908,8 +1908,7 @@ Wallet::Wallet(std::string str)
 		if(delimiter == '}') break;
 
 		//Remove what we just worked on
-		int end_of_last_c = c_str_ln+q_str_ln+2;
-		str = str.substr(end_of_last_c,str_ln-c_str_ln);
+		str = right(str,str.find(",")+1);
 	}
 }
 
