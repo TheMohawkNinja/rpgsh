@@ -315,7 +315,7 @@ template<>
 std::string Scope::getProperty<Currency>(std::string key, std::string property)
 {
 	if(!stringcasecmp(property,"CurrencySystem"))
-		return get<Currency>(key).System->Name;
+		return get<Currency>(key).System;
 	else if(!stringcasecmp(property,"SmallerAmount"))
 		return std::to_string(get<Currency>(key).SmallerAmount);
 	else if(!stringcasecmp(property,"Name"))
@@ -425,14 +425,6 @@ void Scope::set<Wallet>(std::string key, Wallet value)
 
 //Set a property
 template<>
-void Scope::setProperty<Currency,std::shared_ptr<CurrencySystem>>(std::string key, std::string property, std::shared_ptr<CurrencySystem> value)
-{
-	if(!stringcasecmp(property,"CurrencySystem"))
-		currencies[getExistingKey<Currency>(key)].System = value;
-	else
-		throw std::runtime_error(E_INVALID_PROPERTY);
-}
-template<>
 void Scope::setProperty<Currency,int>(std::string key, std::string property, int value)
 {
 	if(!stringcasecmp(property,"SmallerAmount"))
@@ -443,7 +435,9 @@ void Scope::setProperty<Currency,int>(std::string key, std::string property, int
 template<>
 void Scope::setProperty<Currency,std::string>(std::string key, std::string property, std::string value)
 {
-	if(!stringcasecmp(property,"Name"))
+	if(!stringcasecmp(property,"CurrencySystem"))
+		currencies[getExistingKey<Currency>(key)].System = value;
+	else if(!stringcasecmp(property,"Name"))
 		currencies[getExistingKey<Currency>(key)].Name = value;
 	else if(!stringcasecmp(property,"Smaller"))
 		currencies[getExistingKey<Currency>(key)].Smaller = value;
