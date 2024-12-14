@@ -575,6 +575,14 @@ void set_env_variable(std::string v,std::string value)
 	std::filesystem::rename((rpgsh_env_variables_path+".bak").c_str(),rpgsh_env_variables_path.c_str());
 }
 
+CurrencySystem findMatchingCurrencySystem(std::string str)
+{
+	for(const auto& [k,v] : getDatamapFromAllScopes<CurrencySystem>(CURRENCYSYSTEM_SIGIL))
+		if(!stringcasecmp(k,str)) return v;
+
+	return CurrencySystem();
+}
+
 unsigned int getWalletValue(Wallet w)
 {
 	unsigned int total = 0;
@@ -582,10 +590,10 @@ unsigned int getWalletValue(Wallet w)
 
 	for(const auto& [c,q] : w.Money)
 	{
-		if(findInStrVect(systems,c.System->Name,0) != -1)
+		if(findInStrVect(systems,c.System,0) != -1)
 		{
-			systems.push_back(c.System->Name);
-			total += w.getEquivalentValueInLowestDenomination(*c.System);
+			systems.push_back(c.System);
+			total += w.getEquivalentValueInLowestDenomination(findMatchingCurrencySystem(c.System));
 		}
 	}
 
@@ -851,7 +859,7 @@ template<>
 bool approxEquals<Wallet,CurrencySystem>(Wallet lhs, CurrencySystem rhs)
 {
 	for(const auto& [c,q] : lhs)
-		if(*c.System == rhs) return true;
+		if(c.System == rhs.Name) return true;
 
 	return lhs == rhs;
 }
@@ -869,8 +877,7 @@ void save_obj_to_file(std::string path, datamap<Dice> obj, char obj_id);
 void save_obj_to_file(std::string path, datamap<Var> obj, char obj_id);
 
 template <typename T>
-datamap<Dice> load_obj_from_file(std::string path, char var_id);
-datamap<Var> load_obj_from_file(std::string path, char var_id);
+datamap<Currency> load_obj_from_file(std::string path, char var_id);
 
 template <typename T>
-datamap<Currency> loadDatamapFromAllScopes(char type);
+datamap<Currency> getDatamapFromAllScopes(char type);

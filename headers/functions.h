@@ -69,6 +69,8 @@ void check_print_app_description(char** _argv, std::string description);
 std::string get_env_variable(std::string v);
 void set_env_variable(std::string v, std::string value);
 
+CurrencySystem findMatchingCurrencySystem(std::string str);
+
 unsigned int getWalletValue(Wallet w);
 
 template<typename T>
