@@ -104,7 +104,7 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 				 !stringcasecmp(p_vi->property,"Larger")))
 				return p_vi->scope.getProperty<Currency>(p_vi->key,p_vi->property);
 			else if(action == Write && !stringcasecmp(p_vi->property,"CurrencySystem"))
-				p_vi->scope.setProperty<Currency,std::shared_ptr<CurrencySystem>>(p_vi->key,p_vi->property,Currency(value).System);
+				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,Currency(value).System);
 			else if(action == Write && !stringcasecmp(p_vi->property,"Name"))
 				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,Currency(value).Name);
 			else if(action == Write && !stringcasecmp(p_vi->property,"Smaller"))
@@ -365,6 +365,8 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 				output(Error,"Invalid operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
 			else if(e.what() == std::string(E_UNKNOWN_OPERATION))
 				output(Error,"Unknown operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
+			else if(e.what() == std::string(E_INSUFFICIENT_FUNDS))
+				output(Error,"Insufficient funds: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
 			else
 				output(Error,"Error during operation: \"%s %s %s\" (%s)",lhs.c_str(),op.c_str(),rhs.c_str(),e.what());
 
