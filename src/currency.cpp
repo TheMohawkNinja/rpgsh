@@ -6,36 +6,17 @@
 #include "../headers/text.h"
 #include "../headers/var.h"
 
-void Currency::tryParseCurrencySystem(datamap<CurrencySystem> currencysystems, std::string* str, std::string fullstr)
+void Currency::tryParseCurrencySystem(std::string* str, std::string fullstr)
 {
-	std::string cs_match = "";
-
 	try
 	{
-		cs_match = str->substr(0,str->find(","));
+		System = str->substr(0,str->find(","));
 		(*str) = str->substr(str->find(",")+1,
 				     str->length()-str->find(",")+1);
 	}
 	catch(...)
 	{
 		output(Error,"Unable to parse currencysystem from \"%s\".",fullstr.c_str());
-		exit(-1);
-	}
-
-	if(cs_match == "")
-	{
-		//Currency isn't part of a CurrencySystem, so just exit
-		exit(-1);
-	}
-
-	for(const auto& [k,v] : currencysystems)
-	{
-		if(!stringcasecmp(v.Name,cs_match))
-			AttachToCurrencySystem(std::make_shared<CurrencySystem>(v));
-	}
-	if(!System)
-	{
-		output(Error,"No currency system matches \"%s\".",cs_match.c_str());
 		exit(-1);
 	}
 }
@@ -136,17 +117,12 @@ Currency::Currency(std::string str)
 {
 	//FORMAT
 	//@c/MyCurrency = c{CurrencySystem,Name,SmallerAmount,Smaller,Larger}
-
-	datamap<CurrencySystem> currencysystems = getDatamapFromAllScopes<CurrencySystem>(CURRENCYSYSTEM_SIGIL);
 	std::string fullstr = str;
 
 	//Get number of commas to determine if we are involving a CurrencySystem
 	int commas = 0;
 	for(const auto& c : str)
-	{
-		if(c == ',')
-			commas++;
-	}
+		if(c == ',') commas++;
 
 	//Make sure start of explicit constructor is formatted correctly
 	if(str[1] != '{')
@@ -180,7 +156,7 @@ Currency::Currency(std::string str)
 	str = str.substr(2,str.length()-2);
 
 	//Parse everything
-	tryParseCurrencySystem(currencysystems, &str, fullstr);
+	tryParseCurrencySystem(&str, fullstr);
 	tryParseName(&str, fullstr);
 	tryParseSmallerAmount(&str, fullstr);
 	tryParseSmaller(&str, fullstr);
@@ -193,21 +169,20 @@ Currency::Currency(std::string _Name, int _SmallerAmount, std::string _Smaller, 
 	SmallerAmount = _SmallerAmount;
 	Larger = _Larger;
 }
-Currency::Currency(std::shared_ptr<CurrencySystem> _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
+Currency::Currency(std::string _System, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
 {
+	System = _System;
 	Name = _Name;
 	Smaller = _Smaller;
 	SmallerAmount = _SmallerAmount;
 	Larger = _Larger;
-
-	AttachToCurrencySystem(_CS);
 }
 
 Currency::operator std::string() const
 {
-	if(System)
+	if(System != "")
 		return std::string(1,CURRENCY_SIGIL)+"{"+
-		       System->Name+","+
+		       System+","+
 		       Name+","+
 		       std::to_string(SmallerAmount)+","+
 		       Smaller+","+
@@ -712,9 +687,9 @@ bool Currency::operator < ([[maybe_unused]] const Wallet& b) const
 }
 bool Currency::operator < (const Currency& b) const//Orders std::map with Currency key
 {
-	if((!System && b.System) || (!b.System && System))
+	if((System == ""  && b.System != "") || (b.System == "" && System != ""))
 		return false;
-	if(!System && !b.System)
+	if(System == "" && b.System == "")
 	{
 		if(b.Larger == Name)
 			return true;
@@ -727,7 +702,7 @@ bool Currency::operator < (const Currency& b) const//Orders std::map with Curren
 	}
 
 	//No idea why this needs to be in a loop, but it doesn't work right otherwise
-	for([[maybe_unused]] const auto& [k,v] : *System)
+	while(true)
 	{
 		if(System != b.System)
 			continue;
@@ -770,9 +745,9 @@ bool Currency::operator > ([[maybe_unused]] const Wallet& b) const
 }
 bool Currency::operator > (const Currency& b) const
 {
-	if((!System && b.System) || (!b.System && System))
+	if((System == ""  && b.System != "") || (b.System == "" && System != ""))
 		return false;
-	if(!System && !b.System)
+	if(System == "" && b.System == "")
 	{
 		if(b.Larger == Name)
 			return false;
@@ -783,17 +758,20 @@ bool Currency::operator > (const Currency& b) const
 		else
 			return true;
 	}
-	if(System != b.System)//May be source of some issues due to getting rid of apparently unneeded for loop
-		return false;
-	else if(b.Larger == Name)
-		return false;
-	else if(b.Smaller == Name)
-		return true;
-	else if(b.Name == Name)
-		return false;
-	else
-		return true;
 
+	while(true)
+	{
+		if(System != b.System)//May be source of some issues due to getting rid of apparently unneeded for loop
+			return false;
+		else if(b.Larger == Name)
+			return false;
+		else if(b.Smaller == Name)
+			return true;
+		else if(b.Name == Name)
+			return false;
+		else
+			return true;
+	}
 	return (Name > b.Name);
 }
 bool Currency::operator > ([[maybe_unused]] const CurrencySystem& b) const
@@ -961,11 +939,8 @@ CurrencySystem::CurrencySystem(std::string str)
 	std::string s(1,CURRENCYSYSTEM_SIGIL);
 
 	//If second character isn't a '{', this isn't an explicit constructor, so just treat it as a normal value
-	if(str[1] != '{')
-	{
+	if(str.length() == 1 || str[1] != '{')
 		Name = str;
-		exit(-1);
-	}
 
 	//Make sure first character is 's'
 	if(str[0] != CURRENCYSYSTEM_SIGIL)
@@ -975,16 +950,18 @@ CurrencySystem::CurrencySystem(std::string str)
 	}
 
 	//Check for end of explicit constructor definition
-	if(str.find("}") == std::string::npos)
+	if(str.find("}") != std::string::npos && str.find("}") == std::string::npos)
 	{
 		output(Error,"Missing terminating \'}\' for currency system explicit constructor.");
 		exit(-1);
 	}
 
 	if(str.substr(0,2) == (s+"{") && str.find("}") != std::string::npos)// Explicit constructor
-	{
 		Name = str.substr(2,str.find("}")-2);
-	}
+
+	//Populate denominations
+	for(const auto& [k,v] : getDatamapFromAllScopes<Currency>(CURRENCY_SIGIL))
+		if(!stringcasecmp(v.System,Name)) Denomination[v.Name] = v;
 }
 
 CurrencySystem::operator std::string() const
@@ -1708,7 +1685,7 @@ bool Wallet::HasEffectivelyAtLeast(int q, Currency c)
 
 	while(c.Larger != "")
 	{
-		c = c.System->Denomination[c.Larger];
+		c = findMatchingCurrencySystem(c.System).Denomination[c.Larger];
 
 		totalFactor *= c.SmallerAmount;
 		total += Money[c] * totalFactor;
@@ -1725,23 +1702,23 @@ unsigned int Wallet::getEquivalentValueInLowestDenomination(CurrencySystem CS)
 	//Get smallest Currency
 	for(const auto& [s,c] : CS.Denomination)
 	{
-		if(c.Smaller == "")
-		{
-			current_denomination = c;
-			break;
-		}
+		if(c.Smaller != "") continue;
+
+		current_denomination = c;
+		break;
 	}
 
 	//Get total
 	while(current_denomination.Larger != "")
 	{
+		CurrencySystem cur_denom_sys = findMatchingCurrencySystem(current_denomination.System);
 		if(current_denomination.SmallerAmount > 0)
 			totalFactor *= current_denomination.SmallerAmount;
 
 		if(Money[current_denomination])
 			total += Money[current_denomination] * totalFactor;
 
-		current_denomination = current_denomination.System->Denomination[current_denomination.Larger];
+		current_denomination = cur_denom_sys.Denomination[current_denomination.Larger];
 	}
 
 	return total;
@@ -1781,7 +1758,7 @@ void Wallet::FloatQuantityToIntCurrency(Currency c, float q)
 	while(c.Smaller != "")
 	{
 		totalFactor *= c.SmallerAmount;
-		c = c.System->Denomination[c.Smaller];
+		c = findMatchingCurrencySystem(c.System).Denomination[c.Smaller];
 	}
 
 	*this += money_t(c,(int)(q*totalFactor));
@@ -1999,13 +1976,11 @@ Wallet& Wallet::operator += (const money_t b)
 
 	if(q > 0)
 	{
-		output(Info,"Crediting %d %s",q,c.Name.c_str());
 		Money[c] += q;
+		CurrencySystem s = findMatchingCurrencySystem(c.System);
 
-		if(c.System && (c.System->Denomination[c.Larger].SmallerAmount <= Money[c]))
-		{
-			c.System->TradeUp(c.System,this);
-		}
+		if(c.System != "" && s[c.Larger].SmallerAmount <= Money[c])
+			s.TradeUp(this);
 	}
 	return *this;
 }
@@ -2022,14 +1997,12 @@ Wallet& Wallet::operator += ([[maybe_unused]] const Dice b)
 Wallet& Wallet::operator += ([[maybe_unused]] const Wallet b)
 {
 	for(const auto& [c,q] : b)
-	{
 		*this += money_t(c,q);
-	}
 	return *this;
 }
 Wallet& Wallet::operator += (const Currency b)
 {
-	Money[b]++;
+	*this += money_t(b,1);
 	return *this;
 }
 Wallet& Wallet::operator += ([[maybe_unused]] const CurrencySystem b)
@@ -2051,19 +2024,17 @@ Wallet& Wallet::operator -= (const money_t b)
 
 	transaction = b;
 
-	if(Money[c]-q < 0 && c.System && HasEffectivelyAtLeast(q,c))
+	if(Money[c]-q < 0 && c.System != "" && HasEffectivelyAtLeast(q,c))
 	{
-		output(Info,"Debiting %d %s",q,c.Name.c_str());
 		Money[c] -= q;
-		c.System->MakeChange(c, this);
+		findMatchingCurrencySystem(c.System).MakeChange(c,this);
 	}
-	else if(Money[c]-q < 0 && c.System)
+	else if(Money[c]-q < 0 && c.System != "")//TODO: Maybe create option to allow users to go into debt?
 	{
 		output(Error,"Insufficient funds!");
 	}
 	else if(Money[c]-q >= 0)
 	{
-		output(Info,"Debiting %d %s",q,c.Name.c_str());
 		Money[c] -= q;
 	}
 	return *this;
@@ -2095,7 +2066,7 @@ Wallet& Wallet::operator -= (const Wallet b)
 }
 Wallet& Wallet::operator -= (const Currency b)
 {
-	if(Money[b]) Money[b]--;
+	*this -= money_t(b,1);
 	return *this;
 }
 Wallet& Wallet::operator -= ([[maybe_unused]] const CurrencySystem b)
@@ -2163,18 +2134,15 @@ Wallet& Wallet::operator /= (const int b)
 		unsigned int _floor = floor(quotient);
 
 		if(_floor != 0)
-		{
 			change[c] = (quotient-_floor);
-		}
 		Money[c] = _floor;
 	}
 
 	//Convert everything to the right of the decimal point to the closest whole currencies
 	//Will necessarily be a bit lossy just like real finances when dealing with repeating decimals and the like
 	for(const auto& [c,q] : change)
-	{
 		FloatQuantityToIntCurrency(c,q);
-	}
+
 	return *this;
 }
 Wallet& Wallet::operator /= ([[maybe_unused]] const std::string b)
@@ -2753,7 +2721,7 @@ Wallet& Wallet::operator ++ ()
 	//Add 1 of the smallest currency
 	for(const auto& [c,q] : Money)
 	{
-		if(!c.System || c.Smaller == "")
+		if(c.System == "" || c.Smaller == "")
 		{
 			*this += money_t(c,1);
 			break;
@@ -2770,7 +2738,7 @@ Wallet& Wallet::operator -- ()
 	//Subtracy 1 of the smallest currency
 	for(const auto& [c,q] : Money)
 	{
-		if(!c.System || c.Smaller == "")
+		if(c.System == "" || c.Smaller == "")
 		{
 			*this -= money_t(c,1);
 			break;
@@ -2781,15 +2749,6 @@ Wallet& Wallet::operator -- ()
 Wallet& Wallet::operator -- (int)
 {
 	return --(*this);
-}
-
-//Links the instance of Currency to the instance of CurrencySystem
-//Allows the instance of CurrencySystem to detect changes in the attached Currency
-//Also automatically adds the Currency to the map of Currencies within the CurrencySystem
-void Currency::AttachToCurrencySystem(std::shared_ptr<CurrencySystem> _CurrencySystem)
-{
-	System = _CurrencySystem;
-	System->Denomination[Name] = *this;
 }
 
 void CurrencySystem::MakeChange(Currency c, Wallet* w)
@@ -2806,41 +2765,31 @@ void CurrencySystem::MakeChange(Currency c, Wallet* w)
 	int MinimumAmountToBreak = ChangeCount*ConversionFactor;
 	int PreTransactionQuantity = transactionAmount+(*w)[c];
 	if((MinimumAmountToBreak + PreTransactionQuantity) < transactionAmount)
-	{
 		ChangeCount++;
-	}
 
 	//Prevent unneccesary subtraction
 	//Check if the player has to make change with the currency after that to complete transaction
 	if(ChangeCount == 0)
-	{
 		return;
-	}
 	else if((*w)[Denomination[NextHighest]] < ChangeCount)
-	{
 		MakeChange(Denomination[NextHighest],w);
-	}
 
 	//Make change by breaking the larger denomination into the smaller denomination
 	(*w)[c] += ConversionFactor*ChangeCount;
 	(*w) -= money_t(Denomination[NextHighest],ChangeCount);
 }
-void CurrencySystem::TradeUp(std::shared_ptr<CurrencySystem> S, Wallet* w)
+void CurrencySystem::TradeUp(Wallet* w)
 {
-	for(auto i = (*w).Money.rbegin(); i != (*w).Money.rend(); ++i)
+	for(const auto& [c,q] : (*w).Money)
 	{
-		//'c' and 'q' for the currency and quantity respectively
-		const auto& c = i->first;
-		const auto& q = i->second;
-
-		if(c.System == S &&
+		if(c.System == Name &&
 		c.Larger != "" &&
-		q >= S->Denomination[c.Larger].SmallerAmount)
+		q >= Denomination[c.Larger].SmallerAmount)
 		{
 			//Make use of the trucation of the divison return value to int to simplify the math
-			int ConversionFactor = S->Denomination[c.Larger].SmallerAmount;
+			int ConversionFactor = Denomination[c.Larger].SmallerAmount;
 			int AmountTradable = ((*w)[c] / ConversionFactor);
-			(*w)[S->Denomination[c.Larger]] += AmountTradable;
+			(*w)[Denomination[c.Larger]] += AmountTradable;
 			(*w)[c] -= (AmountTradable * ConversionFactor);
 		}
 	}

@@ -17,18 +17,16 @@ class Wallet;
 class Currency
 {
 	public:
-		std::shared_ptr<CurrencySystem> System = nullptr;
+		std::string System = "";
 		std::string Name = "";
 		int SmallerAmount = 0;
 		std::string Smaller = "";
 		std::string Larger = "";
 
-	void AttachToCurrencySystem(std::shared_ptr<CurrencySystem> _CurrencySystem);
-
 	private:
 
-	//Parsing methods for Currency(datamap<CurrencySystem, std::string)
-	void tryParseCurrencySystem(datamap<CurrencySystem> currencysystems, std::string* str, std::string fullstr);
+	//Parsing methods for Currency(std::string)
+	void tryParseCurrencySystem(std::string* str, std::string fullstr);
 	void tryParseName(std::string* str, std::string fullstr);
 	void tryParseSmallerAmount(std::string* str, std::string fullstr);
 	void tryParseSmaller(std::string* str, std::string fullstr);
@@ -39,7 +37,7 @@ class Currency
 	Currency(const Currency& b);
 	Currency(std::string str);
 	Currency(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
-	Currency(std::shared_ptr<CurrencySystem> _CS, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
+	Currency(std::string _System, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger);
 
 	explicit operator std::string() const;
 	explicit operator bool() const;
@@ -369,7 +367,7 @@ class CurrencySystem
 	std::map<std::string, Currency>::const_iterator end() const;
 
 	void MakeChange(Currency c, Wallet* w);
-	void TradeUp(std::shared_ptr<CurrencySystem> S, Wallet* w);
+	void TradeUp(Wallet* w);
 	bool HasEquivalentTo(int Quantity, std::string Denomination);
 };
 typedef std::pair<Currency, int> money_t;
