@@ -31,8 +31,7 @@ void print_data(Scope scope)
 	for(auto& [k,v] : scope.getDatamap<CurrencySystem>())
 	{
 		//Skip hidden variables
-		if(k[0] == '.')
-			continue;
+		if(k[0] == '.') continue;
 
 		fprintf(stdout,"%s%sCurrencySystem%s%s",TEXT_BOLD,CURRENCYSYSTEM_COLOR,TEXT_NORMAL,addSpaces(COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
@@ -42,12 +41,11 @@ void print_data(Scope scope)
 	for(auto& [k,v] : scope.getDatamap<Currency>())
 	{
 		//Skip hidden variables
-		if(k[0] == '.')
-			continue;
+		if(k[0] == '.') continue;
 
 		fprintf(stdout,"%s%sCurrency%s%s",TEXT_BOLD,CURRENCY_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
-		fprintf(stdout,"%sSystem:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.System->Name));
+		fprintf(stdout,"%sSystem:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.System));
 		fprintf(stdout,"%sName:             %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Name));
 		fprintf(stdout,"%sSmallerAmount:    %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(std::to_string(v.SmallerAmount)));
 		fprintf(stdout,"%sSmaller:          %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Smaller));
@@ -57,8 +55,7 @@ void print_data(Scope scope)
 	for(auto& [k,v] : scope.getDatamap<Dice>())
 	{
 		//Skip hidden variables
-		if(k[0] == '.')
-			continue;
+		if(k[0] == '.') continue;
 
 		fprintf(stdout,"%s%sDice%s%s",TEXT_BOLD,DICE_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
@@ -77,8 +74,7 @@ void print_data(Scope scope)
 	for(auto& [k,v] : scope.getDatamap<Var>())
 	{
 		//Skip hidden variables
-		if(k[0] == '.')
-			continue;
+		if(k[0] == '.') continue;
 
 		fprintf(stdout,"%s%sVar%s%s",TEXT_BOLD,VAR_COLOR,TEXT_NORMAL,addSpaces(COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
@@ -88,13 +84,13 @@ void print_data(Scope scope)
 	for(auto& [k,v] : scope.getDatamap<Wallet>())
 	{
 		//Skip hidden variables
-		if(k[0] == '.')
-			continue;
+		if(k[0] == '.') continue;
 
 		//Get longest currency name
 		long unsigned int longest_cur = 0;
 		for(auto& [c,q] : v)
 		{
+			if(!q) continue;
 			if(c.Name.length() > longest_cur)
 				longest_cur = c.Name.length();
 		}
@@ -105,6 +101,8 @@ void print_data(Scope scope)
 		//Print values
 		for(auto& [c,q] : v)
 		{
+			if(!q) continue;
+
 			fprintf(stdout,"%s%s:%s%s",TEXT_ITALIC,c.Name.c_str(),TEXT_NORMAL,addSpaces(longest_cur-c.Name.length()+COLUMN_PADDING).c_str());
 			fprintf(stdout,"%s\n",print_value(std::to_string(q)));
 		}
