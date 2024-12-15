@@ -352,6 +352,23 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 	for(long unsigned int precedence=0; precedence<operations.size(); precedence++)
 	{
 		int op_match = findInStrVect(operations[precedence],op,0);
+
+		try{(void)TL(lhs);}
+		catch(const std::runtime_error& e)
+		{
+			if(e.what() == std::string(E_INVALID_EXPLICIT_CONSTRUCTOR))
+				output(Error,"Invalid LHS explicit constructor: \"%s\"",lhs.c_str());
+			else
+				output(Error,"Error constructing LHS: %s",e.what());
+		}
+		try{(void)TR(rhs);}
+		catch(const std::runtime_error& e)
+		{
+			if(e.what() == std::string(E_INVALID_EXPLICIT_CONSTRUCTOR))
+				output(Error,"Invalid RHS explicit constructor: \"%s\"",rhs.c_str());
+			else
+				output(Error,"Error constructing RHS: %s",e.what());
+		}
 		try
 		{
 			if(op_match > -1 && (precedence < 3 || precedence == 7))// Mod operators
@@ -379,7 +396,27 @@ template<typename TL>
 std::string parseRHSAndDoOp(std::vector<std::string> v, unsigned int lhs_pos, unsigned int op_pos, unsigned int rhs_pos)
 {
 	if(rhs_pos == UINT_MAX)// Unary operators
-		return getResult<TL,Var>((v)[lhs_pos],(v)[op_pos],"");
+		return getResult<TL,Var>(v[lhs_pos],v[op_pos],"");
+
+	// Exceptions to the "return type is always LHS"
+	try
+	{
+		if(std::is_same_v<TL,Currency> && left(v[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{" && Var(v[rhs_pos]).isInt() && v[op_pos] == OP_MUL)
+			return escapeSpaces(std::string(Currency(v[lhs_pos]) * Var(v[rhs_pos])));
+		else if(std::is_same_v<TL,Currency> && left(v[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{" && v[op_pos] == OP_ADD)
+			return escapeSpaces(std::string(Currency(v[lhs_pos]) + Currency(v[rhs_pos])));
+		else if(std::is_same_v<TL,Currency> && left(v[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{" && v[op_pos] == OP_ADD)
+			return escapeSpaces(std::string(Currency(v[lhs_pos]) + Wallet(v[rhs_pos])));
+	}
+	catch(const std::runtime_error& e)
+	{
+		if(e.what() == std::string(E_INVALID_EXPLICIT_CONSTRUCTOR))
+			output(Error,"Invalid RHS explicit constructor: %s\n",v[rhs_pos].c_str());
+		else
+			output(Error,"Error during operation: \"%s %s %s\" (%s)",v[lhs_pos].c_str(),v[op_pos].c_str(),v[rhs_pos].c_str(),e.what());
+
+		exit(-1);
+	}
 
 	if(left(v[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
 		return getResult<TL,Var>(v[lhs_pos],v[op_pos],v[rhs_pos]);
