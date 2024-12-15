@@ -67,6 +67,8 @@ if [[ $EUID -eq 0 ]]; then
 	g++ -Wall -Wextra -Wpedantic src/print.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-print
 	echo -e "\tsrc/help.cpp\t\t->\t$bold_white""/bin/rpgsh-help"$normal
 	g++ -Wall -Wextra -Wpedantic src/help.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-help
+	echo -e "\tsrc/clear.cpp\t\t->\t$bold_white""/bin/rpgsh-clear"$normal
+	g++ -Wall -Wextra -Wpedantic src/clear.cpp -L $lib_dir -lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency $fs $debug -o /bin/rpgsh-clear
 
 	echo "Done!"
 else
