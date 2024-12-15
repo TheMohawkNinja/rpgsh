@@ -18,7 +18,7 @@ class Dice
 		std::string count_expr = "";
 		std::vector<int> result_quantity;
 
-	int get_value(std::string d, std::string value, long unsigned int start, std::string terminator, bool allow_sign, bool required);
+	int get_value(std::string d, long unsigned int start, std::string terminator, bool allow_sign, bool required);
 
 	public:
 		unsigned int	Quantity	=	0;

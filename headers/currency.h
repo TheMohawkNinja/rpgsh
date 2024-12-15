@@ -26,11 +26,11 @@ class Currency
 	private:
 
 	//Parsing methods for Currency(std::string)
-	void tryParseCurrencySystem(std::string* str, std::string fullstr);
-	void tryParseName(std::string* str, std::string fullstr);
-	void tryParseSmallerAmount(std::string* str, std::string fullstr);
-	void tryParseSmaller(std::string* str, std::string fullstr);
-	void tryParseLarger(std::string* str, std::string fullstr);
+	void tryParseCurrencySystem(std::string* str);
+	void tryParseName(std::string* str);
+	void tryParseSmallerAmount(std::string* str);
+	void tryParseSmaller(std::string* str);
+	void tryParseLarger(std::string* str);
 
 	public:
 	Currency();

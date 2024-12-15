@@ -6,7 +6,7 @@
 #include "../headers/text.h"
 #include "../headers/var.h"
 
-void Currency::tryParseCurrencySystem(std::string* str, std::string fullstr)
+void Currency::tryParseCurrencySystem(std::string* str)
 {
 	try
 	{
@@ -16,11 +16,10 @@ void Currency::tryParseCurrencySystem(std::string* str, std::string fullstr)
 	}
 	catch(...)
 	{
-		output(Error,"Unable to parse currencysystem from \"%s\".",fullstr.c_str());
-		exit(-1);
+		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 	}
 }
-void Currency::tryParseName(std::string* str, std::string fullstr)
+void Currency::tryParseName(std::string* str)
 {
 	try
 	{
@@ -30,34 +29,21 @@ void Currency::tryParseName(std::string* str, std::string fullstr)
 	}
 	catch(...)
 	{
-		output(Error,"Unable to parse currency Name from \"%s\".",fullstr.c_str());
-		exit(-1);
+		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 	}
 
 	if(Name == "")
-	{
-		output(Error,"Currency Name cannot be empty.");
-		exit(-1);
-	}
+		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 }
-void Currency::tryParseSmallerAmount(std::string* str, std::string fullstr)
+void Currency::tryParseSmallerAmount(std::string* str)
 {
 	std::string SmallerAmountStr = "";
 
 	try
 	{
 		SmallerAmountStr = str->substr(0,str->find(","));
-		(*str) = str->substr(str->find(",")+1,
-				     str->length()-str->find(",")+1);
-	}
-	catch(...)
-	{
-		output(Error,"Unable to parse currency SmallerAmount from \"%s\".",fullstr.c_str());
-		exit(-1);
-	}
+		(*str) = str->substr(str->find(",")+1,str->length()-str->find(",")+1);
 
-	try
-	{
 		//Allow an empty SmallerAmount to imply 0
 		if(SmallerAmountStr == "")
 		{
@@ -68,30 +54,25 @@ void Currency::tryParseSmallerAmount(std::string* str, std::string fullstr)
 	}
 	catch(...)
 	{
-		output(Error,"\"%s\" is not an integer.",SmallerAmountStr.c_str());
-		exit(-1);
+		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 	}
 }
-void Currency::tryParseSmaller(std::string* str, std::string fullstr)
+void Currency::tryParseSmaller(std::string* str)
 {
 	try
 	{
 		Smaller = str->substr(0,str->find(","));
-		(*str) = str->substr(str->find(",")+1,
-				     str->length()-str->find(",")+1);
+		(*str) = str->substr(str->find(",")+1,str->length()-str->find(",")+1);
 	}
 	catch(...)
 	{
-		output(Error,"Unable to parse currency Smaller from \"%s\".",fullstr.c_str());
-		exit(-1);
+		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 	}
 }
-void Currency::tryParseLarger(std::string* str, std::string fullstr)
+void Currency::tryParseLarger(std::string* str)
 {
 	if(str->find("}") == std::string::npos)
-	{
-		output(Error,"No ending \'}\' found in currency definition.");
-	}
+		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 
 	try
 	{
@@ -99,8 +80,7 @@ void Currency::tryParseLarger(std::string* str, std::string fullstr)
 	}
 	catch(...)
 	{
-		output(Error,"Unable to parse currency Larger from \"%s\".",fullstr.c_str());
-		exit(-1);
+		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 	}
 }
 
@@ -117,50 +97,28 @@ Currency::Currency(std::string str)
 {
 	//FORMAT
 	//@c/MyCurrency = c{CurrencySystem,Name,SmallerAmount,Smaller,Larger}
-	std::string fullstr = str;
 
 	//Get number of commas to determine if we are involving a CurrencySystem
 	int commas = 0;
 	for(const auto& c : str)
 		if(c == ',') commas++;
 
-	//Make sure start of explicit constructor is formatted correctly
-	if(str[1] != '{')
-	{
-		output(Error,"Missing or misplaced starting \'{\' in currency explicit constructor");
-		exit(-1);
-	}
-
-	//Make sure first character is 'c'
-	if(str[0] != CURRENCY_SIGIL)
-	{
-		output(Error,"Incorrect data type specifier sigil for currency definition.");
-		exit(-1);
-	}
-
-	//Check for end of explicit constructor definition
-	if(str.find("}") == std::string::npos)
-	{
-		output(Error,"Currency explicit constructor missing terminating \'}\'.");
-		exit(-1);
-	}
-
-	//Do we at least have the correct number of args?
-	if(commas != 4)
-	{
-		output(Error,"Invalid argument count in currency explicit constructor. There should be exactly four commas delimiters.");
-		exit(-1);
-	}
+	//Make sure explicit constructor is formatted correctly
+	if(str.length() < 8 ||
+	   str[1] != '{' ||
+	   str[0] != CURRENCY_SIGIL ||
+	   str.find("}") == std::string::npos ||
+	   commas != 4) throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 
 	//Nix the first two characters to make future substrings more intuitive
 	str = str.substr(2,str.length()-2);
 
 	//Parse everything
-	tryParseCurrencySystem(&str, fullstr);
-	tryParseName(&str, fullstr);
-	tryParseSmallerAmount(&str, fullstr);
-	tryParseSmaller(&str, fullstr);
-	tryParseLarger(&str, fullstr);
+	tryParseCurrencySystem(&str);
+	tryParseName(&str);
+	tryParseSmallerAmount(&str);
+	tryParseSmaller(&str);
+	tryParseLarger(&str);
 }
 Currency::Currency(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
 {
@@ -942,19 +900,9 @@ CurrencySystem::CurrencySystem(std::string str)
 	if(str.length() == 1 || str[1] != '{')
 		Name = str;
 
-	//Make sure first character is 's'
-	if(str[0] != CURRENCYSYSTEM_SIGIL)
-	{
-		output(Error,"Incorrect data type specifier sigil for currency system explicit constructor.");
-		exit(-1);
-	}
-
-	//Check for end of explicit constructor definition
-	if(str.find("}") != std::string::npos && str.find("}") == std::string::npos)
-	{
-		output(Error,"Missing terminating \'}\' for currency system explicit constructor.");
-		exit(-1);
-	}
+	//Check if this is a valid CurrencySystem explicit constructor
+	if(str[0] != CURRENCYSYSTEM_SIGIL || (str.find("}") != std::string::npos && str.find("}") == std::string::npos))
+		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 
 	if(str.substr(0,2) == (s+"{") && str.find("}") != std::string::npos)// Explicit constructor
 		Name = str.substr(2,str.find("}")-2);
@@ -1830,16 +1778,16 @@ Wallet::Wallet(std::string str)
 		currencynames[k] = v.Name;
 
 	if(str[1] != '{')
+		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
+
+	if(str[0] == CURRENCY_SIGIL)// Create wallet from currency explicit constructor
 	{
-		output(Error,"Expected starting \'{\' at beginning of wallet explicit constructor.");
-		exit(-1);
+		*this = Wallet(std::string(1,WALLET_SIGIL)+"{"+str+",1}");
+		return;
 	}
 
 	if(str[0] != WALLET_SIGIL)
-	{
-		output(Error,"Incorrect data type specifier sigil for wallet explicit constructor.");
-		exit(-1);
-	}
+		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 
 	//Cut off the initial "w{" to make parsing consistent
 	str = str.substr(2,str.length()-2);
@@ -1852,10 +1800,7 @@ Wallet::Wallet(std::string str)
 		char delimiter = ',';
 
 		if(str.find(delimiter) == std::string::npos)
-		{
-			output(Error,"Unable to parse currency for wallet, missing \'%c\'",delimiter);
-			exit(-1);
-		}
+			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 
 		//Create currency object to be added to wallet
 		std::string c(1,CURRENCY_SIGIL);
@@ -1877,9 +1822,7 @@ Wallet::Wallet(std::string str)
 		}
 		catch(...)
 		{
-			output(Error,"Unable to add the currency \"%s\" in the quantity \"%s\" to the wallet.",
-				     currency.Name.c_str(),quantity_str.c_str());
-			exit(-1);
+			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 		}
 
 		if(delimiter == '}') break;
@@ -2075,15 +2018,11 @@ Wallet& Wallet::operator -= ([[maybe_unused]] const CurrencySystem b)
 }
 Wallet& Wallet::operator *= (const int b)
 {
-	output(Info,"Increasing wallet value by a factor of %d",b);
 	for(const auto& [c,q] : *this)
 	{
-		//Keep from printing pointless "Crediting..." messages
-		//Avoid zeroing out wallet if you factor by 1
+		//Avoid zeroing out wallet if user factors by 1
 		if(q > 0 && b > 1)
-		{
 			*this += money_t(c,(q*(b-1)));
-		}
 	}
 	return *this;
 }
@@ -2119,10 +2058,9 @@ Wallet& Wallet::operator *= ([[maybe_unused]] const CurrencySystem b)
 }
 Wallet& Wallet::operator /= (const int b)
 {
-	output(Info,"Decreasing wallet value by a factor of %d",b);
-	if(b == 0)
+	if(!b)
 	{
-		output(Error,"Attempted to divide wallet value by 0!\n");
+		output(Error,"Attempted to divide wallet value by 0!\n");//TODO: Throw div_by_zero error
 		return *this;
 	}
 
@@ -2133,8 +2071,7 @@ Wallet& Wallet::operator /= (const int b)
 		float quotient = ((float)q/b);
 		unsigned int _floor = floor(quotient);
 
-		if(_floor != 0)
-			change[c] = (quotient-_floor);
+		if(_floor) change[c] = (quotient-_floor);
 		Money[c] = _floor;
 	}
 

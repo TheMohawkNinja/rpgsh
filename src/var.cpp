@@ -4,6 +4,28 @@
 #include "../headers/output.h"
 #include "../headers/var.h"
 
+Var::Var(){}
+Var::Var(std::string str)
+{
+	std::string v(1,VAR_SIGIL);
+
+	//If second character isn't a '{', this isn't an explicit constructor, so just treat it as a normal value
+	if(str[1] != '{')
+	{
+		Value = str;
+		return;
+	}
+
+	//Make sure first character is VAR_SIGIL
+	if(str[0] != VAR_SIGIL || str.find("}") == std::string::npos)
+		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
+
+	Value = str.substr(2,str.find("}")-2);
+}
+Var::Var(int _value)
+{
+	Value = std::to_string(_value);
+}
 Var::operator std::string() const
 {
 	return std::string(1,VAR_SIGIL)+"{"+Value+"}";
@@ -817,40 +839,4 @@ Var& Var::operator -- (int)
 		throw std::runtime_error(E_INVALID_OPERATION);
 
 	return *this;
-}
-
-Var::Var(){}
-Var::Var(std::string str)
-{
-	std::string v(1,VAR_SIGIL);
-
-	//If second character isn't a '{', this isn't an explicit constructor, so just treat it as a normal value
-	if(str[1] != '{')
-	{
-		Value = str;
-		return;
-	}
-
-	//Make sure first character is 'v'
-	if(str[0] != VAR_SIGIL)
-	{
-		output(Error,"Incorrect data type specifier sigil for var explicit constructor.");
-		exit(-1);
-	}
-
-	//Check for end of explicit constructor definition
-	if(str.find("}") == std::string::npos)
-	{
-		output(Error,"Missing terminating \'}\' for var explicit constructor.");
-		exit(-1);
-	}
-
-	if(str.substr(0,2) == (v+"{") && str.find("}") != std::string::npos)// Explicit constructor
-	{
-		Value = str.substr(2,str.find("}")-2);
-	}
-}
-Var::Var(int _value)
-{
-	Value = std::to_string(_value);
 }
