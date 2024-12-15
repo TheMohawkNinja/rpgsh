@@ -6,7 +6,7 @@
 //Version info
 #define MAJOR_VERSION			0
 #define MINOR_VERSION			9
-#define PATCH_VERSION			1
+#define PATCH_VERSION			2
 
 //Comment character definition
 #define COMMENT				'!'
@@ -65,6 +65,7 @@
 //Custom exceptions
 #define E_INVALID_PROPERTY		"invalid_property"
 #define E_INVALID_OPERATION		"invalid_operation"
+#define E_INVALID_EXPLICIT_CONSTRUCTOR	"invalid_explicit_constructor"
 #define E_UNKNOWN_OPERATION		"unknown_operation"
 #define E_INSUFFICIENT_FUNDS		"insufficient_funds"
 
