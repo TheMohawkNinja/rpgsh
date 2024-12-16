@@ -1917,14 +1917,12 @@ Wallet& Wallet::operator += (const money_t b)
 	Currency c = b.first;
 	int q = b.second;
 
-	if(q > 0)
-	{
-		Money[c] += q;
-		CurrencySystem s = findMatchingCurrencySystem(c.System);
+	Money[c] += q;
+	CurrencySystem s = findMatchingCurrencySystem(c.System);
 
-		if(c.System != "" && s[c.Larger].SmallerAmount <= Money[c])
-			s.TradeUp(this);
-	}
+	if(c.System != "" && s[c.Larger].SmallerAmount <= Money[c])
+		s.TradeUp(this);
+
 	return *this;
 }
 Wallet& Wallet::operator += (const Var b)
@@ -2019,11 +2017,8 @@ Wallet& Wallet::operator -= ([[maybe_unused]] const CurrencySystem b)
 Wallet& Wallet::operator *= (const int b)
 {
 	for(const auto& [c,q] : *this)
-	{
-		//Avoid zeroing out wallet if user factors by 1
-		if(q > 0 && b > 1)
-			*this += money_t(c,(q*(b-1)));
-	}
+		if(b > 1) *this += money_t(c,(q*(b-1)));//Avoid zeroing out wallet if user factors by 1
+
 	return *this;
 }
 Wallet& Wallet::operator *= ([[maybe_unused]] const std::string b)
@@ -2040,9 +2035,8 @@ Wallet& Wallet::operator *= ([[maybe_unused]] const Wallet b)
 }
 Wallet& Wallet::operator *= (const Var b)
 {
-	Wallet lhs = *this;
-	try{return lhs *= std::stoi(b.Value);}
-	catch(...){return lhs *= b.Value;}
+	try{return *this *= std::stoi(b.Value);}
+	catch(...){return *this *= b.Value;}
 }
 Wallet& Wallet::operator *= ([[maybe_unused]] const Dice b)
 {
@@ -2092,9 +2086,8 @@ Wallet& Wallet::operator /= ([[maybe_unused]] const money_t b)
 }
 Wallet& Wallet::operator /= (const Var b)
 {
-	Wallet lhs = *this;
-	try{return lhs /= std::stoi(b.Value);}
-	catch(...){return lhs /= b.Value;}
+	try{return *this /= std::stoi(b.Value);}
+	catch(...){return *this /= b.Value;}
 }
 Wallet& Wallet::operator /= ([[maybe_unused]] const Dice b)
 {
