@@ -474,213 +474,171 @@ Dice& Dice::operator %= ([[maybe_unused]] const CurrencySystem b)
 }
 Dice Dice::operator + (const int b)
 {
-	Dice lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Dice Dice::operator + (const std::string b)
 {
-	Dice lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Dice Dice::operator + (const Var b)
 {
-	Dice lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Dice Dice::operator + (const Dice b)
 {
-	Dice lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Dice Dice::operator + (const Wallet b)
 {
-	Dice lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Dice Dice::operator + (const Currency b)
 {
-	Dice lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Dice Dice::operator + (const CurrencySystem b)
 {
-	Dice lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Dice Dice::operator - (const int b)
 {
-	Dice lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Dice Dice::operator - (const std::string b)
 {
-	Dice lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Dice Dice::operator - (const Var b)
 {
-	Dice lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Dice Dice::operator - (const Dice b)
 {
-	Dice lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Dice Dice::operator - (const Wallet b)
 {
-	Dice lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Dice Dice::operator - (const Currency b)
 {
-	Dice lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Dice Dice::operator - (const CurrencySystem b)
 {
-	Dice lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Dice Dice::operator * (const int b)
 {
-	Dice lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Dice Dice::operator * (const std::string b)
 {
-	Dice lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Dice Dice::operator * (const Var b)
 {
-	Dice lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Dice Dice::operator * (const Dice b)
 {
-	Dice lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Dice Dice::operator * (const Wallet b)
 {
-	Dice lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Dice Dice::operator * (const Currency b)
 {
-	Dice lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Dice Dice::operator * (const CurrencySystem b)
 {
-	Dice lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Dice Dice::operator / (const int b)
 {
-	Dice lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Dice Dice::operator / (const std::string b)
 {
-	Dice lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Dice Dice::operator / (const Var b)
 {
-	Dice lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Dice Dice::operator / (const Dice b)
 {
-	Dice lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Dice Dice::operator / (const Wallet b)
 {
-	Dice lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Dice Dice::operator / (const Currency b)
 {
-	Dice lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Dice Dice::operator / (const CurrencySystem b)
 {
-	Dice lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Dice Dice::operator ^ (const int b)
 {
-	Dice lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Dice Dice::operator ^ (const std::string b)
 {
-	Dice lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Dice Dice::operator ^ (const Var b)
 {
-	Dice lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Dice Dice::operator ^ (const Dice b)
 {
-	Dice lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Dice Dice::operator ^ (const Wallet b)
 {
-	Dice lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Dice Dice::operator ^ (const Currency b)
 {
-	Dice lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Dice Dice::operator ^ (const CurrencySystem b)
 {
-	Dice lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Dice Dice::operator % (const int b)
 {
-	Dice lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Dice Dice::operator % (const std::string b)
 {
-	Dice lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Dice Dice::operator % (const Var b)
 {
-	Dice lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Dice Dice::operator % (const Dice b)
 {
-	Dice lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Dice Dice::operator % (const Wallet b)
 {
-	Dice lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Dice Dice::operator % (const Currency b)
 {
-	Dice lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Dice Dice::operator % (const CurrencySystem b)
 {
-	Dice lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 bool Dice::operator == ([[maybe_unused]] const int& b) const
 {

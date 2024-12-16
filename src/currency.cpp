@@ -379,213 +379,171 @@ Currency& Currency::operator %= ([[maybe_unused]] const CurrencySystem b)
 }
 Currency Currency::operator + (const int b)
 {
-	Currency lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Currency Currency::operator + (const std::string b)
 {
-	Currency lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Currency Currency::operator + (const Var b)
 {
-	Currency lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Currency Currency::operator + (const Dice b)
 {
-	Currency lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Wallet Currency::operator + (const Wallet b)
 {
-	Currency lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Wallet Currency::operator + (const Currency b)
 {
-	Currency lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Currency Currency::operator + (const CurrencySystem b)
 {
-	Currency lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Currency Currency::operator - (const int b)
 {
-	Currency lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Currency Currency::operator - (const std::string b)
 {
-	Currency lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Currency Currency::operator - (const Var b)
 {
-	Currency lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Currency Currency::operator - (const Dice b)
 {
-	Currency lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Currency Currency::operator - (const Wallet b)
 {
-	Currency lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Currency Currency::operator - (const Currency b)
 {
-	Currency lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Currency Currency::operator - (const CurrencySystem b)
 {
-	Currency lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Wallet Currency::operator * (const int b)
 {
-	Currency lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Wallet Currency::operator * (const std::string b)
 {
-	Currency lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Wallet Currency::operator * (const Var b)
 {
-	Currency lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Currency Currency::operator * (const Dice b)
 {
-	Currency lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Currency Currency::operator * (const Wallet b)
 {
-	Currency lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Currency Currency::operator * (const Currency b)
 {
-	Currency lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Currency Currency::operator * (const CurrencySystem b)
 {
-	Currency lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Currency Currency::operator / (const int b)
 {
-	Currency lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Currency Currency::operator / (const std::string b)
 {
-	Currency lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Currency Currency::operator / (const Var b)
 {
-	Currency lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Currency Currency::operator / (const Dice b)
 {
-	Currency lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Currency Currency::operator / (const Wallet b)
 {
-	Currency lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Currency Currency::operator / (const Currency b)
 {
-	Currency lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Currency Currency::operator / (const CurrencySystem b)
 {
-	Currency lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Currency Currency::operator ^ (const int b)
 {
-	Currency lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Currency Currency::operator ^ (const std::string b)
 {
-	Currency lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Currency Currency::operator ^ (const Var b)
 {
-	Currency lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Currency Currency::operator ^ (const Dice b)
 {
-	Currency lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Currency Currency::operator ^ (const Wallet b)
 {
-	Currency lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Currency Currency::operator ^ (const Currency b)
 {
-	Currency lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Currency Currency::operator ^ (const CurrencySystem b)
 {
-	Currency lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Currency Currency::operator % (const int b)
 {
-	Currency lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Currency Currency::operator % (const std::string b)
 {
-	Currency lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Currency Currency::operator % (const Var b)
 {
-	Currency lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Currency Currency::operator % (const Dice b)
 {
-	Currency lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Currency Currency::operator % (const Wallet b)
 {
-	Currency lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Currency Currency::operator % (const Currency b)
 {
-	Currency lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Currency Currency::operator % (const CurrencySystem b)
 {
-	Currency lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 bool Currency::operator == ([[maybe_unused]] const int& b) const
 {
@@ -2111,9 +2069,8 @@ Wallet& Wallet::operator ^= ([[maybe_unused]] const std::string b)
 }
 Wallet& Wallet::operator ^= (const Var b)
 {
-	Wallet lhs = *this;
-	try{return lhs ^= std::stoi(b.Value);}
-	catch(...){return lhs ^= b.Value;}
+	try{return *this ^= std::stoi(b.Value);}
+	catch(...){return *this ^= b.Value;}
 }
 Wallet& Wallet::operator ^= ([[maybe_unused]] const Dice b)
 {
@@ -2133,8 +2090,7 @@ Wallet& Wallet::operator ^= ([[maybe_unused]] const CurrencySystem b)
 }
 Wallet& Wallet::operator %= (const int b)
 {
-	for(auto& [c,q] : Money)
-		q %= b;
+	for(auto& [c,q] : Money) q %= b;
 
 	return *this;
 }
@@ -2144,9 +2100,8 @@ Wallet& Wallet::operator %= ([[maybe_unused]] const std::string b)
 }
 Wallet& Wallet::operator %= (const Var b)
 {
-	Wallet lhs = *this;
-	try{return lhs %= std::stoi(b.Value);}
-	catch(...){return lhs %= b.Value;}
+	try{return *this %= std::stoi(b.Value);}
+	catch(...){return *this %= b.Value;}
 }
 Wallet& Wallet::operator %= ([[maybe_unused]] const Dice b)
 {
@@ -2166,213 +2121,171 @@ Wallet& Wallet::operator %= ([[maybe_unused]] const CurrencySystem b)
 }
 Wallet Wallet::operator + (const int b)
 {
-	Wallet lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Wallet Wallet::operator + (const std::string b)
 {
-	Wallet lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Wallet Wallet::operator + (const Var b)
 {
-	Wallet lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Wallet Wallet::operator + (const Dice b)
 {
-	Wallet lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Wallet Wallet::operator + (const Wallet b)
 {
-	Wallet lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Wallet Wallet::operator + (const Currency b)
 {
-	Wallet lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Wallet Wallet::operator + (const CurrencySystem b)
 {
-	Wallet lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Wallet Wallet::operator - (const int b)
 {
-	Wallet lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Wallet Wallet::operator - (const std::string b)
 {
-	Wallet lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Wallet Wallet::operator - (const Var b)
 {
-	Wallet lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Wallet Wallet::operator - (const Dice b)
 {
-	Wallet lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Wallet Wallet::operator - (const Wallet b)
 {
-	Wallet lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Wallet Wallet::operator - (const Currency b)
 {
-	Wallet lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Wallet Wallet::operator - (const CurrencySystem b)
 {
-	Wallet lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Wallet Wallet::operator * (const int b)
 {
-	Wallet lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Wallet Wallet::operator * (const std::string b)
 {
-	Wallet lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Wallet Wallet::operator * (const Var b)
 {
-	Wallet lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Wallet Wallet::operator * (const Dice b)
 {
-	Wallet lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Wallet Wallet::operator * (const Wallet b)
 {
-	Wallet lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Wallet Wallet::operator * (const Currency b)
 {
-	Wallet lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Wallet Wallet::operator * (const CurrencySystem b)
 {
-	Wallet lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Wallet Wallet::operator / (const int b)
 {
-	Wallet lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Wallet Wallet::operator / (const std::string b)
 {
-	Wallet lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Wallet Wallet::operator / (const Var b)
 {
-	Wallet lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Wallet Wallet::operator / (const Dice b)
 {
-	Wallet lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Wallet Wallet::operator / (const Wallet b)
 {
-	Wallet lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Wallet Wallet::operator / (const Currency b)
 {
-	Wallet lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Wallet Wallet::operator / (const CurrencySystem b)
 {
-	Wallet lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Wallet Wallet::operator ^ (const int b)
 {
-	Wallet lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Wallet Wallet::operator ^ (const std::string b)
 {
-	Wallet lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Wallet Wallet::operator ^ (const Var b)
 {
-	Wallet lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Wallet Wallet::operator ^ (const Dice b)
 {
-	Wallet lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Wallet Wallet::operator ^ (const Wallet b)
 {
-	Wallet lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Wallet Wallet::operator ^ (const Currency b)
 {
-	Wallet lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Wallet Wallet::operator ^ (const CurrencySystem b)
 {
-	Wallet lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Wallet Wallet::operator % (const int b)
 {
-	Wallet lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Wallet Wallet::operator % (const std::string b)
 {
-	Wallet lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Wallet Wallet::operator % (const Var b)
 {
-	Wallet lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Wallet Wallet::operator % (const Dice b)
 {
-	Wallet lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Wallet Wallet::operator % (const Wallet b)
 {
-	Wallet lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Wallet Wallet::operator % (const Currency b)
 {
-	Wallet lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Wallet Wallet::operator % (const CurrencySystem b)
 {
-	Wallet lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 bool Wallet::operator == ([[maybe_unused]] const int& b) const
 {

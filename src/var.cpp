@@ -342,213 +342,171 @@ Var& Var::operator %= ([[maybe_unused]] const CurrencySystem b)
 }
 Var Var::operator + (const int b)
 {
-	Var lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Var Var::operator + (const std::string b)
 {
-	Var lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Var Var::operator + (const Var b)
 {
-	Var lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Var Var::operator + (const Dice b)
 {
-	Var lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Var Var::operator + (const Wallet b)
 {
-	Var lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Var Var::operator + (const Currency b)
 {
-	Var lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Var Var::operator + (const CurrencySystem b)
 {
-	Var lhs = *this;
-	return (lhs += b);
+	return *this += b;
 }
 Var Var::operator - (const int b)
 {
-	Var lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Var Var::operator - (const std::string b)
 {
-	Var lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Var Var::operator - (const Var b)
 {
-	Var lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Var Var::operator - (const Dice b)
 {
-	Var lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Var Var::operator - (const Wallet b)
 {
-	Var lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Var Var::operator - (const Currency b)
 {
-	Var lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Var Var::operator - (const CurrencySystem b)
 {
-	Var lhs = *this;
-	return (lhs -= b);
+	return *this -= b;
 }
 Var Var::operator * (const int b)
 {
-	Var lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Var Var::operator * (const std::string b)
 {
-	Var lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Var Var::operator * (const Var b)
 {
-	Var lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Var Var::operator * (const Dice b)
 {
-	Var lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Var Var::operator * (const Wallet b)
 {
-	Var lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Var Var::operator * (const Currency b)
 {
-	Var lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Var Var::operator * (const CurrencySystem b)
 {
-	Var lhs = *this;
-	return (lhs *= b);
+	return *this *= b;
 }
 Var Var::operator / (const int b)
 {
-	Var lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Var Var::operator / (const std::string b)
 {
-	Var lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Var Var::operator / (const Var b)
 {
-	Var lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Var Var::operator / (const Dice b)
 {
-	Var lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Var Var::operator / (const Wallet b)
 {
-	Var lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Var Var::operator / (const Currency b)
 {
-	Var lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Var Var::operator / (const CurrencySystem b)
 {
-	Var lhs = *this;
-	return (lhs /= b);
+	return *this /= b;
 }
 Var Var::operator ^ (const int b)
 {
-	Var lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Var Var::operator ^ (const std::string b)
 {
-	Var lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Var Var::operator ^ (const Var b)
 {
-	Var lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Var Var::operator ^ (const Dice b)
 {
-	Var lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Var Var::operator ^ (const Wallet b)
 {
-	Var lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Var Var::operator ^ (const Currency b)
 {
-	Var lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Var Var::operator ^ (const CurrencySystem b)
 {
-	Var lhs = *this;
-	return (lhs ^= b);
+	return *this ^= b;
 }
 Var Var::operator % (const int b)
 {
-	Var lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Var Var::operator % (const std::string b)
 {
-	Var lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Var Var::operator % (const Var b)
 {
-	Var lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Var Var::operator % (const Dice b)
 {
-	Var lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Var Var::operator % (const Wallet b)
 {
-	Var lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Var Var::operator % (const Currency b)
 {
-	Var lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 Var Var::operator % (const CurrencySystem b)
 {
-	Var lhs = *this;
-	return (lhs %= b);
+	return *this %= b;
 }
 bool Var::operator == (const int b)
 {
