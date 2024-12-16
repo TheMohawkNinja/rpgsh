@@ -69,7 +69,6 @@
 #define E_UNKNOWN_OPERATION		"unknown_operation"
 #define E_INSUFFICIENT_FUNDS		"insufficient_funds"
 
-
 //Column formatting
 #define COLUMN_PADDING			5
 
