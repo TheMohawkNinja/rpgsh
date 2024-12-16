@@ -2052,11 +2052,7 @@ Wallet& Wallet::operator *= ([[maybe_unused]] const CurrencySystem b)
 }
 Wallet& Wallet::operator /= (const int b)
 {
-	if(!b)
-	{
-		output(Error,"Attempted to divide wallet value by 0!\n");//TODO: Throw div_by_zero error
-		return *this;
-	}
+	if(!b) throw std::runtime_error(E_INVALID_OPERATION);
 
 	std::map<Currency,float> change;
 
