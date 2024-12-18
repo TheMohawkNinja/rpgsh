@@ -18,7 +18,6 @@
 
 //Variable character type sigils
 #define CURRENCY_SIGIL			'c'
-#define CURRENCYSYSTEM_SIGIL		's'
 #define DICE_SIGIL			'd'
 #define VAR_SIGIL			'v'
 #define WALLET_SIGIL			'w'

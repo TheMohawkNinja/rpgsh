@@ -15,7 +15,6 @@ class Scope
 		std::string datasource;
 
 		datamap<Currency>		currencies;
-		datamap<CurrencySystem>		currencysystems;
 		datamap<Dice>			dice;
 		datamap<Var>			vars;
 		datamap<Wallet>			wallets;
@@ -34,6 +33,7 @@ class Scope
 		bool confirmDatasource();
 
 		//Load/save data
+		void load(std::string path, bool loadVar, bool loadDice, bool loadCurrency, bool loadWallet);
 		void load();
 		void load(std::string path);
 		void save();

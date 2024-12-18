@@ -261,10 +261,6 @@ Dice& Dice::operator = ([[maybe_unused]] const Currency b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Dice& Dice::operator = ([[maybe_unused]] const CurrencySystem b)
-{
-	throw std::runtime_error(E_INVALID_OPERATION);
-}
 Dice& Dice::operator += (const int b)
 {
 	Modifier += b;
@@ -298,10 +294,6 @@ Dice& Dice::operator += ([[maybe_unused]] const Wallet b)
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Dice& Dice::operator += ([[maybe_unused]] const Currency b)
-{
-	throw std::runtime_error(E_INVALID_OPERATION);
-}
-Dice& Dice::operator += ([[maybe_unused]] const CurrencySystem b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -341,10 +333,6 @@ Dice& Dice::operator -= ([[maybe_unused]] const Currency b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Dice& Dice::operator -= ([[maybe_unused]] const CurrencySystem b)
-{
-	throw std::runtime_error(E_INVALID_OPERATION);
-}
 Dice& Dice::operator *= (const int b)
 {
 	Quantity *= b;
@@ -370,10 +358,6 @@ Dice& Dice::operator *= ([[maybe_unused]] const Wallet b)
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Dice& Dice::operator *= ([[maybe_unused]] const Currency b)
-{
-	throw std::runtime_error(E_INVALID_OPERATION);
-}
-Dice& Dice::operator *= ([[maybe_unused]] const CurrencySystem b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -405,10 +389,6 @@ Dice& Dice::operator /= ([[maybe_unused]] const Currency b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Dice& Dice::operator /= ([[maybe_unused]] const CurrencySystem b)
-{
-	throw std::runtime_error(E_INVALID_OPERATION);
-}
 Dice& Dice::operator ^= ([[maybe_unused]] const int b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
@@ -433,10 +413,6 @@ Dice& Dice::operator ^= ([[maybe_unused]] const Wallet b)
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Dice& Dice::operator ^= ([[maybe_unused]] const Currency b)
-{
-	throw std::runtime_error(E_INVALID_OPERATION);
-}
-Dice& Dice::operator ^= ([[maybe_unused]] const CurrencySystem b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -468,10 +444,6 @@ Dice& Dice::operator %= ([[maybe_unused]] const Currency b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Dice& Dice::operator %= ([[maybe_unused]] const CurrencySystem b)
-{
-	throw std::runtime_error(E_INVALID_OPERATION);
-}
 Dice Dice::operator + (const int b)
 {
 	return *this += b;
@@ -493,10 +465,6 @@ Dice Dice::operator + (const Wallet b)
 	return *this += b;
 }
 Dice Dice::operator + (const Currency b)
-{
-	return *this += b;
-}
-Dice Dice::operator + (const CurrencySystem b)
 {
 	return *this += b;
 }
@@ -524,10 +492,6 @@ Dice Dice::operator - (const Currency b)
 {
 	return *this -= b;
 }
-Dice Dice::operator - (const CurrencySystem b)
-{
-	return *this -= b;
-}
 Dice Dice::operator * (const int b)
 {
 	return *this *= b;
@@ -549,10 +513,6 @@ Dice Dice::operator * (const Wallet b)
 	return *this *= b;
 }
 Dice Dice::operator * (const Currency b)
-{
-	return *this *= b;
-}
-Dice Dice::operator * (const CurrencySystem b)
 {
 	return *this *= b;
 }
@@ -580,10 +540,6 @@ Dice Dice::operator / (const Currency b)
 {
 	return *this /= b;
 }
-Dice Dice::operator / (const CurrencySystem b)
-{
-	return *this /= b;
-}
 Dice Dice::operator ^ (const int b)
 {
 	return *this ^= b;
@@ -608,10 +564,6 @@ Dice Dice::operator ^ (const Currency b)
 {
 	return *this ^= b;
 }
-Dice Dice::operator ^ (const CurrencySystem b)
-{
-	return *this ^= b;
-}
 Dice Dice::operator % (const int b)
 {
 	return *this %= b;
@@ -633,10 +585,6 @@ Dice Dice::operator % (const Wallet b)
 	return *this %= b;
 }
 Dice Dice::operator % (const Currency b)
-{
-	return *this %= b;
-}
-Dice Dice::operator % (const CurrencySystem b)
 {
 	return *this %= b;
 }
@@ -669,10 +617,6 @@ bool Dice::operator == ([[maybe_unused]] const Currency& b) const
 {
 	return false;
 }
-bool Dice::operator == ([[maybe_unused]] const CurrencySystem& b) const
-{
-	return false;
-}
 bool Dice::operator < ([[maybe_unused]] const int& b) const
 {
 	return false;
@@ -696,10 +640,6 @@ bool Dice::operator < ([[maybe_unused]] const Wallet& b) const
 	return false;
 }
 bool Dice::operator < ([[maybe_unused]] const Currency& b) const
-{
-	return false;
-}
-bool Dice::operator < ([[maybe_unused]] const CurrencySystem& b) const
 {
 	return false;
 }
@@ -729,10 +669,6 @@ bool Dice::operator > ([[maybe_unused]] const Currency& b) const
 {
 	return false;
 }
-bool Dice::operator > ([[maybe_unused]] const CurrencySystem& b) const
-{
-	return false;
-}
 bool Dice::operator <= (const int& b) const
 {
 	return (*this < b || *this == b);
@@ -756,10 +692,6 @@ bool Dice::operator <= (const Wallet& b) const
 	return (*this < b || *this == b);
 }
 bool Dice::operator <= (const Currency& b) const
-{
-	return (*this < b || *this == b);
-}
-bool Dice::operator <= (const CurrencySystem& b) const
 {
 	return (*this < b || *this == b);
 }
@@ -789,10 +721,6 @@ bool Dice::operator >= (const Currency& b) const
 {
 	return (*this > b || *this == b);
 }
-bool Dice::operator >= (const CurrencySystem& b) const
-{
-	return (*this > b || *this == b);
-}
 bool Dice::operator != (const int& b) const
 {
 	return !(*this == b);
@@ -814,10 +742,6 @@ bool Dice::operator != (const Wallet& b) const
 	return !(*this == b);
 }
 bool Dice::operator != (const Currency& b) const
-{
-	return !(*this == b);
-}
-bool Dice::operator != (const CurrencySystem& b) const
 {
 	return !(*this == b);
 }
@@ -845,10 +769,6 @@ bool Dice::operator && (const Currency b)
 {
 	return bool(*this) && bool(b);
 }
-bool Dice::operator && (const CurrencySystem b)
-{
-	return bool(*this) && bool(b);
-}
 bool Dice::operator || (const int b)
 {
 	return bool(*this) || (b != 0);
@@ -870,10 +790,6 @@ bool Dice::operator || (const Wallet b)
 	return bool(*this) || bool(b);
 }
 bool Dice::operator || (const Currency b)
-{
-	return bool(*this) || bool(b);
-}
-bool Dice::operator || (const CurrencySystem b)
 {
 	return bool(*this) || bool(b);
 }

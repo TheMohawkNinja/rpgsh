@@ -39,7 +39,6 @@ bool isScopeSigil(char c)
 bool isTypeSigil(char c)
 {
 	return (c == CURRENCY_SIGIL ||
-		c == CURRENCYSYSTEM_SIGIL ||
 		c == DICE_SIGIL ||
 		c == VAR_SIGIL ||
 		c == WALLET_SIGIL);
@@ -307,8 +306,6 @@ VariableInfo parseVariable(std::string v)// Derive information about variable fr
 			vi.evalType = WALLET_SIGIL;
 		else if(vi.scope.keyExists<Currency>(vi.key))
 			vi.evalType = CURRENCY_SIGIL;
-		else if(vi.scope.keyExists<CurrencySystem>(vi.key))
-			vi.evalType = CURRENCYSYSTEM_SIGIL;
 		else
 			vi.evalType = VAR_SIGIL;
 	}
@@ -575,14 +572,6 @@ void set_env_variable(std::string v,std::string value)
 	std::filesystem::rename((rpgsh_env_variables_path+".bak").c_str(),rpgsh_env_variables_path.c_str());
 }
 
-CurrencySystem findMatchingCurrencySystem(std::string str)
-{
-	for(const auto& [k,v] : getDatamapFromAllScopes<CurrencySystem>(CURRENCYSYSTEM_SIGIL))
-		if(!stringcasecmp(k,str)) return v;
-
-	return CurrencySystem();
-}
-
 unsigned int getWalletValue(Wallet w)
 {
 	unsigned int total = 0;
@@ -593,7 +582,7 @@ unsigned int getWalletValue(Wallet w)
 		if(findInStrVect(systems,c.System,0) != -1)
 		{
 			systems.push_back(c.System);
-			total += w.getEquivalentValueInLowestDenomination(findMatchingCurrencySystem(c.System));
+			total += w.getEquivalentValueInLowestDenomination(c.System);
 		}
 	}
 
@@ -623,7 +612,6 @@ void appendOutput(std::map<std::string,std::string> map, std::string key, std::s
 std::string getSet(VariableInfo vi)
 {
 	std::map<std::string,std::string> c_map;
-	std::map<std::string,std::string> cs_map;
 	std::map<std::string,std::string> d_map;
 	std::map<std::string,std::string> v_map;
 	std::map<std::string,std::string> w_map;
@@ -633,9 +621,6 @@ std::string getSet(VariableInfo vi)
 	{
 		case CURRENCY_SIGIL:
 			appendMap<Currency>(vi.scope,&c_map);
-			break;
-		case CURRENCYSYSTEM_SIGIL:
-			appendMap<CurrencySystem>(vi.scope,&cs_map);
 			break;
 		case DICE_SIGIL:
 			appendMap<Dice>(vi.scope,&d_map);
@@ -648,7 +633,6 @@ std::string getSet(VariableInfo vi)
 			break;
 		case '/':
 			appendMap<Currency>(vi.scope,&c_map);
-			appendMap<CurrencySystem>(vi.scope,&cs_map);
 			appendMap<Dice>(vi.scope,&d_map);
 			appendMap<Var>(vi.scope,&v_map);
 			appendMap<Wallet>(vi.scope,&w_map);
@@ -661,7 +645,6 @@ std::string getSet(VariableInfo vi)
 	// Create output string from map
 	std::string output = "";
 	appendOutput(c_map,vi.key,&output);
-	appendOutput(cs_map,vi.key,&output);
 	appendOutput(d_map,vi.key,&output);
 	appendOutput(v_map,vi.key,&output);
 	appendOutput(w_map,vi.key,&output);
@@ -708,11 +691,6 @@ bool approxEquals<Var,Currency>([[maybe_unused]]Var lhs, [[maybe_unused]]Currenc
 	return false;
 }
 template<>
-bool approxEquals<Var,CurrencySystem>([[maybe_unused]]Var lhs, [[maybe_unused]]CurrencySystem rhs)
-{
-	return false;
-}
-template<>
 bool approxEquals<Var,Wallet>([[maybe_unused]]Var lhs, [[maybe_unused]]Wallet rhs)
 {
 	return false;
@@ -748,11 +726,6 @@ bool approxEquals<Dice,Currency>([[maybe_unused]]Dice lhs, [[maybe_unused]]Curre
 	return false;
 }
 template<>
-bool approxEquals<Dice,CurrencySystem>([[maybe_unused]]Dice lhs, [[maybe_unused]]CurrencySystem rhs)
-{
-	return false;
-}
-template<>
 bool approxEquals<Dice,Wallet>([[maybe_unused]]Dice lhs, [[maybe_unused]]Wallet rhs)
 {
 	return false;
@@ -783,47 +756,7 @@ bool approxEquals<Currency,Currency>(Currency lhs, Currency rhs)
 	return lhs.System == rhs.System;
 }
 template<>
-bool approxEquals<Currency,CurrencySystem>([[maybe_unused]]Currency lhs, [[maybe_unused]]CurrencySystem rhs)
-{
-	return false;
-}
-template<>
 bool approxEquals<Currency,Wallet>([[maybe_unused]]Currency lhs, [[maybe_unused]]Wallet rhs)
-{
-	return false;
-}
-template<>
-bool approxEquals<CurrencySystem,int>([[maybe_unused]]CurrencySystem lhs, [[maybe_unused]]int rhs)
-{
-	return false;
-}
-template<>
-bool approxEquals<CurrencySystem,std::string>([[maybe_unused]]CurrencySystem lhs, [[maybe_unused]]std::string rhs)
-{
-	return false;
-}
-template<>
-bool approxEquals<CurrencySystem,Var>([[maybe_unused]]CurrencySystem lhs, [[maybe_unused]]Var rhs)
-{
-	return false;
-}
-template<>
-bool approxEquals<CurrencySystem,Dice>([[maybe_unused]]CurrencySystem lhs, [[maybe_unused]]Dice rhs)
-{
-	return false;
-}
-template<>
-bool approxEquals<CurrencySystem,Currency>([[maybe_unused]]CurrencySystem lhs, [[maybe_unused]]Currency rhs)
-{
-	return false;
-}
-template<>
-bool approxEquals<CurrencySystem,CurrencySystem>(CurrencySystem lhs, CurrencySystem rhs)
-{
-	return lhs == rhs;
-}
-template<>
-bool approxEquals<CurrencySystem,Wallet>([[maybe_unused]]CurrencySystem lhs, [[maybe_unused]]Wallet rhs)
 {
 	return false;
 }
@@ -856,14 +789,6 @@ bool approxEquals<Wallet,Currency>(Wallet lhs, Currency rhs)
 	return false;
 }
 template<>
-bool approxEquals<Wallet,CurrencySystem>(Wallet lhs, CurrencySystem rhs)
-{
-	for(const auto& [c,q] : lhs)
-		if(c.System == rhs.Name) return true;
-
-	return lhs == rhs;
-}
-template<>
 bool approxEquals<Wallet,Wallet>(Wallet lhs, Wallet rhs)
 {
 	return getWalletValue(lhs) == getWalletValue(rhs);
@@ -872,12 +797,30 @@ bool approxEquals<Wallet,Wallet>(Wallet lhs, Wallet rhs)
 template <typename T>
 void sort(std::vector<std::string>* v);
 
-template <typename T>
-void save_obj_to_file(std::string path, datamap<Dice> obj, char obj_id);
-void save_obj_to_file(std::string path, datamap<Var> obj, char obj_id);
+template <>
+datamap<Currency> getDatamapFromAllScopes()
+{
+	std::string character = get_env_variable(CURRENT_CHAR_SHELL_VAR);
+	std::string campaign = get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR);
+	std::string current_campaign_dir = campaigns_dir+campaign;
+	std::string current_campaign_path = current_campaign_dir+variable_file_name;
+	std::string current_character_path = current_campaign_dir+"characters/"+character+".char";
 
-template <typename T>
-datamap<Currency> load_obj_from_file(std::string path, char var_id);
+	datamap<Currency> ret;
+	Scope scope;
 
-template <typename T>
-datamap<Currency> getDatamapFromAllScopes(char type);
+	scope.load(current_character_path, false, false, true, false);
+	for(const auto& [k,v] : scope.getDatamap<Currency>())
+		ret[k] = v;
+
+	scope.load(current_campaign_path, false, false, true, false);
+	for(const auto& [k,v] : scope.getDatamap<Currency>())
+		ret[k] = v;
+
+	scope.load(shell_variables_path, false, false, true, false);
+	for(const auto& [k,v] : scope.getDatamap<Currency>())
+		ret[k] = v;
+
+	return ret;
+
+}

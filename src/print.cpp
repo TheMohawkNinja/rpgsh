@@ -28,16 +28,6 @@ const char* print_value(std::string value)
 }
 void print_data(Scope scope)
 {
-	for(auto& [k,v] : scope.getDatamap<CurrencySystem>())
-	{
-		//Skip hidden variables
-		if(k[0] == '.') continue;
-
-		fprintf(stdout,"%s%sCurrencySystem%s%s",TEXT_BOLD,CURRENCYSYSTEM_COLOR,TEXT_NORMAL,addSpaces(COLUMN_PADDING).c_str());
-		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
-		fprintf(stdout,"%sName:              %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Name));
-		fprintf(stdout,"\n");
-	}
 	for(auto& [k,v] : scope.getDatamap<Currency>())
 	{
 		//Skip hidden variables
@@ -167,9 +157,6 @@ int main(int argc, char** argv)
 			case(CURRENCY_SIGIL):
 				variable.set<Currency>("",Currency(v_str));
 				break;
-			case(CURRENCYSYSTEM_SIGIL):
-				variable.set<CurrencySystem>("",CurrencySystem(v_str));
-				break;
 		}
 		print_data(variable);
 	}
@@ -197,9 +184,6 @@ int main(int argc, char** argv)
 					break;
 				case CURRENCY_SIGIL:
 					set.set<Currency>(set_key,set_value);
-					break;
-				case CURRENCYSYSTEM_SIGIL:
-					set.set<CurrencySystem>(set_key,set_value);
 					break;
 			}
 

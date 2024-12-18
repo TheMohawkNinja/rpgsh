@@ -114,18 +114,6 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 			else if(action == Write && !stringcasecmp(p_vi->property,"SmallerAmount"))
 				p_vi->scope.setProperty<Currency,int>(p_vi->key,p_vi->property,Currency(value).SmallerAmount);
 		}
-		else if(p_vi->evalType == CURRENCYSYSTEM_SIGIL)
-		{
-			bool keyExists = p_vi->scope.keyExists<CurrencySystem>(p_vi->key);
-			if(action == Read && keyExists && p_vi->property == "")
-				return p_vi->scope.getStr<CurrencySystem>(p_vi->key);
-			else if(action == Write && p_vi->property == "")
-				p_vi->scope.set<CurrencySystem>(p_vi->key,CurrencySystem(value));
-			else if(action == Read && keyExists && !stringcasecmp(p_vi->property,"Name"))
-				return p_vi->scope.getProperty<CurrencySystem>(p_vi->key,p_vi->property);
-			else if(action == Write && !stringcasecmp(p_vi->property,"Name"))
-				p_vi->scope.setProperty<CurrencySystem,std::string>(p_vi->key,p_vi->property,CurrencySystem(value).Name);
-		}
 
 		// Should only execute if action == Write
 		p_vi->scope.save();
@@ -181,13 +169,6 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 						p_vi->scope.set<Currency>(p_vi->key+set_key,set_value);
 					else if(p_vi->type == '/' || p_vi->type == CURRENCY_SIGIL)
 						rk = {p_vi->scope.remove<Currency>(set_key),CURRENCY_SIGIL};
-					break;
-				case CURRENCYSYSTEM_SIGIL:
-					if((p_vi->type == '/' || p_vi->type == CURRENCYSYSTEM_SIGIL) &&
-					   (action == SetAdd || action == SetAddA))
-						p_vi->scope.set<CurrencySystem>(p_vi->key+set_key,set_value);
-					else if(p_vi->type == '/' || p_vi->type == CURRENCYSYSTEM_SIGIL)
-						rk = {p_vi->scope.remove<CurrencySystem>(set_key),CURRENCYSYSTEM_SIGIL};
 					break;
 			}
 
@@ -426,8 +407,6 @@ std::string parseRHSAndDoOp(std::vector<std::string> v, unsigned int lhs_pos, un
 		return getResult<TL,Wallet>(v[lhs_pos],v[op_pos],v[rhs_pos]);
 	else if(left(v[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
 		return getResult<TL,Currency>(v[lhs_pos],v[op_pos],v[rhs_pos]);
-	else if(left(v[rhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
-		return getResult<TL,CurrencySystem>(v[lhs_pos],v[op_pos],v[rhs_pos]);
 	else
 		return getResult<TL,Var>((v)[lhs_pos],(v)[op_pos],(v)[rhs_pos]);
 
@@ -448,9 +427,7 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 		result = parseRHSAndDoOp<Wallet>(*v, lhs_pos, op_pos, rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
 		result = parseRHSAndDoOp<Currency>(*v, lhs_pos, op_pos, rhs_pos);
-	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCYSYSTEM_SIGIL)+"{")
-		result = parseRHSAndDoOp<CurrencySystem>(*v, lhs_pos, op_pos, rhs_pos);
-	else// Treat non-explicit constructors as Var
+	else// Treat non-explicit constructors as Var TODO: This can also be CurrencySystem or Dice.
 		result = parseRHSAndDoOp<Var>(*v, lhs_pos, op_pos, rhs_pos);
 
 	// If the first arg is a variable and we are assigning it, we'll need to save the result
@@ -559,9 +536,6 @@ int main(int argc, char** argv)
 				case CURRENCY_SIGIL:
 					args[0] = vi.scope.getProperty<Currency>(vi.key,vi.property);
 					break;
-				case CURRENCYSYSTEM_SIGIL:
-					args[0] = vi.scope.getProperty<CurrencySystem>(vi.key,vi.property);
-					break;
 				case '/':
 					try{args[0] = vi.scope.getProperty<Var>(vi.key,vi.property);break;}
 					catch(...){}
@@ -570,8 +544,6 @@ int main(int argc, char** argv)
 					try{args[0] = vi.scope.getProperty<Wallet>(vi.key,vi.property);break;}
 					catch(...){}
 					try{args[0] = vi.scope.getProperty<Currency>(vi.key,vi.property);break;}
-					catch(...){}
-					try{args[0] = vi.scope.getProperty<CurrencySystem>(vi.key,vi.property);break;}
 					catch(...){}
 					output(Error,"%s is not a valid property of %s.",vi.property.c_str(),vi.key.c_str());
 					exit(-1);
@@ -593,9 +565,6 @@ int main(int argc, char** argv)
 				case CURRENCY_SIGIL:
 					args[0] = vi.scope.getStr<Currency>(vi.key);
 					break;
-				case CURRENCYSYSTEM_SIGIL:
-					args[0] = vi.scope.getStr<CurrencySystem>(vi.key);
-					break;
 				case '/':
 					if(vi.scope.keyExists<Var>(vi.key))
 					{args[0] = vi.scope.getStr<Var>(vi.key);break;}
@@ -605,8 +574,6 @@ int main(int argc, char** argv)
 					{args[0] = vi.scope.getStr<Wallet>(vi.key);break;}
 					else if(vi.scope.keyExists<Currency>(vi.key))
 					{args[0] = vi.scope.getStr<Currency>(vi.key);break;}
-					else if(vi.scope.keyExists<CurrencySystem>(vi.key))
-					{args[0] = vi.scope.getStr<CurrencySystem>(vi.key);break;}
 					else{args[0] = "";}
 			}
 		}

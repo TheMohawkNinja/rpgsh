@@ -47,11 +47,12 @@ bool Scope::confirmDatasource()
 }
 
 //Load all data in from file
-void Scope::load()
+void Scope::load(std::string path, bool loadVar, bool loadDice, bool loadCurrency, bool loadWallet)
 {
+	datasource = path;
+
 	//Start from a clean slate
 	currencies.clear();
-	currencysystems.clear();
 	dice.clear();
 	vars.clear();
 	wallets.clear();
@@ -84,7 +85,7 @@ void Scope::load()
 			continue;
 		}
 
-		if(data != "" && data[0] != COMMENT)
+		if(data != "" && data[0] != COMMENT)//TODO Left-shift this
 		{
 			type = data[0];
 			try
@@ -107,30 +108,23 @@ void Scope::load()
 				break;
 			}
 
-			switch(type)
-			{
-				case CURRENCY_SIGIL:
-					currencies[key] = Currency(value);
-					break;
-				case CURRENCYSYSTEM_SIGIL:
-					currencysystems[key] = CurrencySystem(value);
-					break;
-				case DICE_SIGIL:
-					dice[key] = Dice(value);
-					break;
-				case VAR_SIGIL:
-					vars[key] = Var(value);
-					break;
-				case WALLET_SIGIL:
-					wallets[key] = Wallet(value);
-					break;
-				default:
-					output(Warning,"Unknown type specifier \'%c\' in \"%s:%d\"",type,datasource.c_str(),linenum);
-					break;
-			}
+			if(type == CURRENCY_SIGIL && loadCurrency)
+				currencies[key] = Currency(value);
+			else if(type == DICE_SIGIL && loadDice)
+				dice[key] = Dice(value);
+			else if(type == VAR_SIGIL && loadVar)
+				vars[key] = Var(value);
+			else if(type == WALLET_SIGIL && loadWallet)
+				wallets[key] = Wallet(value);
+			else if(!isTypeSigil(type))
+				output(Warning,"Unknown type specifier \'%c\' in \"%s:%d\"",type,datasource.c_str(),linenum);
 		}
 	}
 	ifs.close();
+}
+void Scope::load()
+{
+	load(datasource, true,true,true,true);
 }
 void Scope::load(std::string path)
 {
@@ -154,8 +148,6 @@ void Scope::save()
 
 	for(const auto& [k,v] : currencies)
 		ofs<<formatLine(CURRENCY_SIGIL,k,std::string(v));
-	for(const auto& [k,v] : currencysystems)
-		ofs<<formatLine(CURRENCYSYSTEM_SIGIL,k,std::string(v));
 	for(const auto& [k,v] : dice)
 		ofs<<formatLine(DICE_SIGIL,k,std::string(v));
 	for(const auto& [k,v] : vars)
@@ -177,14 +169,6 @@ template<>
 bool Scope::keyExists<Currency>(std::string key)
 {
 	for(const auto& [k,v] : currencies)
-		if(!stringcasecmp(k,key)) return true;
-
-	return false;
-}
-template<>
-bool Scope::keyExists<CurrencySystem>(std::string key)
-{
-	for(const auto& [k,v] : currencysystems)
 		if(!stringcasecmp(k,key)) return true;
 
 	return false;
@@ -224,14 +208,6 @@ std::string Scope::getExistingKey<Currency>(std::string key)
 	return key;
 }
 template<>
-std::string Scope::getExistingKey<CurrencySystem>(std::string key)
-{
-	for(const auto& [k,v] : currencysystems)
-		if(!stringcasecmp(k,key)) return k;
-
-	return key;
-}
-template<>
 std::string Scope::getExistingKey<Dice>(std::string key)
 {
 	for(const auto& [k,v] : dice)
@@ -263,11 +239,6 @@ Currency Scope::get<Currency>(std::string key)
 	return currencies[getExistingKey<Currency>(key)];
 }
 template<>
-CurrencySystem Scope::get<CurrencySystem>(std::string key)
-{
-	return currencysystems[getExistingKey<CurrencySystem>(key)];
-}
-template<>
 Dice Scope::get<Dice>(std::string key)
 {
 	return dice[getExistingKey<Dice>(key)];
@@ -288,11 +259,6 @@ template<>
 std::string Scope::getStr<Currency>(std::string key)
 {
 	return std::string(Scope::get<Currency>(key));
-}
-template<>
-std::string Scope::getStr<CurrencySystem>(std::string key)
-{
-	return std::string(Scope::get<CurrencySystem>(key));
 }
 template<>
 std::string Scope::getStr<Dice>(std::string key)
@@ -324,14 +290,6 @@ std::string Scope::getProperty<Currency>(std::string key, std::string property)
 		return get<Currency>(key).Smaller;
 	else if(!stringcasecmp(property,"Larger"))
 		return get<Currency>(key).Larger;
-
-	throw std::runtime_error(E_INVALID_PROPERTY);
-}
-template<>
-std::string Scope::getProperty<CurrencySystem>(std::string key, std::string property)
-{
-	if(!stringcasecmp(property,"Name"))
-		return get<CurrencySystem>(key).Name;
 
 	throw std::runtime_error(E_INVALID_PROPERTY);
 }
@@ -376,11 +334,6 @@ datamap<Currency> Scope::getDatamap<Currency>()
 	return currencies;
 }
 template<>
-datamap<CurrencySystem> Scope::getDatamap<CurrencySystem>()
-{
-	return currencysystems;
-}
-template<>
 datamap<Dice> Scope::getDatamap<Dice>()
 {
 	return dice;
@@ -401,11 +354,6 @@ template<>
 void Scope::set<Currency>(std::string key, Currency value)
 {
 	currencies[getExistingKey<Currency>(key)] = value;
-}
-template<>
-void Scope::set<CurrencySystem>(std::string key, CurrencySystem value)
-{
-	currencysystems[getExistingKey<CurrencySystem>(key)] = value;
 }
 template<>
 void Scope::set<Dice>(std::string key, Dice value)
@@ -443,14 +391,6 @@ void Scope::setProperty<Currency,std::string>(std::string key, std::string prope
 		currencies[getExistingKey<Currency>(key)].Smaller = value;
 	else if(!stringcasecmp(property,"Larger"))
 		currencies[getExistingKey<Currency>(key)].Larger = value;
-	else
-		throw std::runtime_error(E_INVALID_PROPERTY);
-}
-template<>
-void Scope::setProperty<CurrencySystem,std::string>(std::string key, std::string property, std::string value)
-{
-	if(!stringcasecmp(property,"Name"))
-		currencysystems[getExistingKey<CurrencySystem>(key)].Name = value;
 	else
 		throw std::runtime_error(E_INVALID_PROPERTY);
 }
@@ -498,11 +438,6 @@ void Scope::setDatamap<Currency>(datamap<Currency> map)
 	currencies = map;
 }
 template<>
-void Scope::setDatamap<CurrencySystem>(datamap<CurrencySystem> map)
-{
-	currencysystems = map;
-}
-template<>
 void Scope::setDatamap<Dice>(datamap<Dice> map)
 {
 	dice = map;
@@ -523,11 +458,6 @@ template<>
 bool Scope::remove<Currency>(std::string key)
 {
 	return currencies.erase(getExistingKey<Currency>(key));
-}
-template<>
-bool Scope::remove<CurrencySystem>(std::string key)
-{
-	return currencysystems.erase(getExistingKey<CurrencySystem>(key));
 }
 template<>
 bool Scope::remove<Dice>(std::string key)

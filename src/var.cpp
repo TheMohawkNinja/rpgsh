@@ -92,10 +92,6 @@ Var& Var::operator = ([[maybe_unused]] const Currency b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Var& Var::operator = ([[maybe_unused]] const CurrencySystem b)
-{
-	throw std::runtime_error(E_INVALID_OPERATION);
-}
 Var& Var::operator += (const int b)
 {
 	if(isInt())
@@ -135,10 +131,6 @@ Var& Var::operator += ([[maybe_unused]] const Currency b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Var& Var::operator += ([[maybe_unused]] const CurrencySystem b)
-{
-	throw std::runtime_error(E_INVALID_OPERATION);
-}
 Var& Var::operator -= (const int b)
 {
 	if(isInt())
@@ -170,10 +162,6 @@ Var& Var::operator -= ([[maybe_unused]] const Wallet b)
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator -= ([[maybe_unused]] const Currency b)
-{
-	throw std::runtime_error(E_INVALID_OPERATION);
-}
-Var& Var::operator -= ([[maybe_unused]] const CurrencySystem b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -215,10 +203,6 @@ Var& Var::operator *= ([[maybe_unused]] const Currency b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Var& Var::operator *= ([[maybe_unused]] const CurrencySystem b)
-{
-	throw std::runtime_error(E_INVALID_OPERATION);
-}
 Var& Var::operator /= (const int b)
 {
 	if(isInt())
@@ -250,10 +234,6 @@ Var& Var::operator /= ([[maybe_unused]] const Wallet b)
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
 Var& Var::operator /= ([[maybe_unused]] const Currency b)
-{
-	throw std::runtime_error(E_INVALID_OPERATION);
-}
-Var& Var::operator /= ([[maybe_unused]] const CurrencySystem b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -298,10 +278,6 @@ Var& Var::operator ^= ([[maybe_unused]] const Currency b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Var& Var::operator ^= ([[maybe_unused]] const CurrencySystem b)
-{
-	throw std::runtime_error(E_INVALID_OPERATION);
-}
 Var& Var::operator %= (const int b)
 {
 	if(isInt())
@@ -336,10 +312,6 @@ Var& Var::operator %= ([[maybe_unused]] const Currency b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Var& Var::operator %= ([[maybe_unused]] const CurrencySystem b)
-{
-	throw std::runtime_error(E_INVALID_OPERATION);
-}
 Var Var::operator + (const int b)
 {
 	return *this += b;
@@ -361,10 +333,6 @@ Var Var::operator + (const Wallet b)
 	return *this += b;
 }
 Var Var::operator + (const Currency b)
-{
-	return *this += b;
-}
-Var Var::operator + (const CurrencySystem b)
 {
 	return *this += b;
 }
@@ -392,10 +360,6 @@ Var Var::operator - (const Currency b)
 {
 	return *this -= b;
 }
-Var Var::operator - (const CurrencySystem b)
-{
-	return *this -= b;
-}
 Var Var::operator * (const int b)
 {
 	return *this *= b;
@@ -417,10 +381,6 @@ Var Var::operator * (const Wallet b)
 	return *this *= b;
 }
 Var Var::operator * (const Currency b)
-{
-	return *this *= b;
-}
-Var Var::operator * (const CurrencySystem b)
 {
 	return *this *= b;
 }
@@ -448,10 +408,6 @@ Var Var::operator / (const Currency b)
 {
 	return *this /= b;
 }
-Var Var::operator / (const CurrencySystem b)
-{
-	return *this /= b;
-}
 Var Var::operator ^ (const int b)
 {
 	return *this ^= b;
@@ -476,10 +432,6 @@ Var Var::operator ^ (const Currency b)
 {
 	return *this ^= b;
 }
-Var Var::operator ^ (const CurrencySystem b)
-{
-	return *this ^= b;
-}
 Var Var::operator % (const int b)
 {
 	return *this %= b;
@@ -501,10 +453,6 @@ Var Var::operator % (const Wallet b)
 	return *this %= b;
 }
 Var Var::operator % (const Currency b)
-{
-	return *this %= b;
-}
-Var Var::operator % (const CurrencySystem b)
 {
 	return *this %= b;
 }
@@ -541,10 +489,6 @@ bool Var::operator == ([[maybe_unused]] const Currency b)
 {
 	return false;
 }
-bool Var::operator == ([[maybe_unused]] const CurrencySystem b)
-{
-	return false;
-}
 bool Var::operator < (const int b)
 {
 if(isInt())
@@ -575,10 +519,6 @@ bool Var::operator < ([[maybe_unused]] const Wallet b)
 	return false;
 }
 bool Var::operator < ([[maybe_unused]] const Currency b)
-{
-	return false;
-}
-bool Var::operator < ([[maybe_unused]] const CurrencySystem b)
 {
 	return false;
 }
@@ -615,10 +555,6 @@ bool Var::operator > ([[maybe_unused]] const Currency b)
 {
 	return false;
 }
-bool Var::operator > ([[maybe_unused]] const CurrencySystem b)
-{
-	return false;
-}
 bool Var::operator <= (const int b)
 {
 	Var lhs = *this;
@@ -645,11 +581,6 @@ bool Var::operator <= (const Wallet b)
 	return (lhs < b || lhs == b);
 }
 bool Var::operator <= (const Currency b)
-{
-	Var lhs = *this;
-	return (lhs < b || lhs == b);
-}
-bool Var::operator <= (const CurrencySystem b)
 {
 	Var lhs = *this;
 	return (lhs < b || lhs == b);
@@ -684,11 +615,6 @@ bool Var::operator >= (const Currency b)
 	Var lhs = *this;
 	return (lhs > b || lhs == b);
 }
-bool Var::operator >= (const CurrencySystem b)
-{
-	Var lhs = *this;
-	return (lhs > b || lhs == b);
-}
 bool Var::operator != (const int b)
 {
 	Var lhs = *this;
@@ -719,11 +645,6 @@ bool Var::operator != (const Currency b)
 	Var lhs = *this;
 	return !(lhs == b);
 }
-bool Var::operator != (const CurrencySystem b)
-{
-	Var lhs = *this;
-	return !(lhs == b);
-}
 bool Var::operator && (const int b)
 {
 	return bool(*this) && (b != 0);
@@ -748,10 +669,6 @@ bool Var::operator && (const Currency b)
 {
 	return bool(*this) && bool(b);
 }
-bool Var::operator && (const CurrencySystem b)
-{
-	return bool(*this) && bool(b);
-}
 bool Var::operator || (const int b)
 {
 	return bool(*this) || (b != 0);
@@ -773,10 +690,6 @@ bool Var::operator || (const Wallet b)
 	return bool(*this) || bool(b);
 }
 bool Var::operator || (const Currency b)
-{
-	return bool(*this) || bool(b);
-}
-bool Var::operator || (const CurrencySystem b)
 {
 	return bool(*this) || bool(b);
 }

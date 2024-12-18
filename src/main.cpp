@@ -50,10 +50,6 @@ void addKeysToMatches(std::vector<std::string>* pMatches, Scope scope, std::stri
 			for(auto& [k,v] : scope.getDatamap<Currency>())
 				addKeyToMatches(&pMatches,k,chk_str,key);
 			break;
-		case CURRENCYSYSTEM_SIGIL:
-			for(auto& [k,v] : scope.getDatamap<CurrencySystem>())
-				addKeyToMatches(&pMatches,k,chk_str,key);
-			break;
 		case DICE_SIGIL:
 			for(auto& [k,v] : scope.getDatamap<Dice>())
 				addKeyToMatches(&pMatches,k,chk_str,key);
@@ -101,10 +97,6 @@ void addPropertiesToMatches(std::vector<std::string>* pMatches, Scope scope, std
 		addPropertyToMatches(&pMatches,chk_str,property,"SmallerAmount");
 		addPropertyToMatches(&pMatches,chk_str,property,"Smaller");
 		addPropertyToMatches(&pMatches,chk_str,property,"Larger");
-	}
-	else if(type == CURRENCYSYSTEM_SIGIL && scope.keyExists<CurrencySystem>(key))
-	{
-		addPropertyToMatches(&pMatches,chk_str,property,"Name");
 	}
 }
 std::string input_handler()
@@ -365,7 +357,6 @@ std::string input_handler()
 				else if(isScopeSigil(type_sigil) || type_sigil == ']')
 				{
 					addKeysToMatches(&matches,tab_comp_scope,chk_str,key,CURRENCY_SIGIL);
-					addKeysToMatches(&matches,tab_comp_scope,chk_str,key,CURRENCYSYSTEM_SIGIL);
 					addKeysToMatches(&matches,tab_comp_scope,chk_str,key,DICE_SIGIL);
 					addKeysToMatches(&matches,tab_comp_scope,chk_str,key,VAR_SIGIL);
 					addKeysToMatches(&matches,tab_comp_scope,chk_str,key,WALLET_SIGIL);
@@ -389,8 +380,6 @@ std::string input_handler()
 						addPropertiesToMatches(&matches,tab_comp_scope,chk_str,k,key,property,WALLET_SIGIL);
 					for(const auto& [k,v] : tab_comp_scope.getDatamap<Currency>())
 						addPropertiesToMatches(&matches,tab_comp_scope,chk_str,k,key,property,CURRENCY_SIGIL);
-					for(const auto& [k,v] : tab_comp_scope.getDatamap<CurrencySystem>())
-						addPropertiesToMatches(&matches,tab_comp_scope,chk_str,k,key,property,CURRENCYSYSTEM_SIGIL);
 				}
 			}
 
