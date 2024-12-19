@@ -77,9 +77,6 @@ void appendOutput(std::map<std::string,std::string> map, std::string key, std::s
 
 std::string getSet(VariableInfo vi);
 
-template <typename TL, typename TR>
-bool approxEquals(TL lhs, TR rhs);
-
 template <typename T>
 void sort(std::vector<T>* v)
 {

@@ -22,7 +22,7 @@ std::vector<std::vector<std::string>> operations = {	{OP_INC,OP_DEC},
 							{OP_MUL,OP_DIV,OP_EXP,OP_MOD},
 							{OP_ADD,OP_SUB},
 							{OP_LT,OP_LE,OP_GT,OP_GE},
-							{OP_EQ,OP_NE,OP_AEQ},
+							{OP_EQ,OP_NE},
 							{OP_AND},
 							{OP_OR},
 							{OP_ASSIGN,OP_ADDA,OP_SUBA,OP_MULA,OP_DIVA,OP_EXPA,OP_MODA}};
@@ -305,11 +305,6 @@ bool doBoolOp(TL lhs, std::string op, TR rhs)
 	else if(op == OP_NE)
 	{
 		try{return lhs != rhs;}
-		catch(...){throw;}
-	}
-	else if(op == OP_AEQ)
-	{
-		try{return approxEquals<TL,TR>(lhs,rhs);}
 		catch(...){throw;}
 	}
 	else if(op == OP_AND)
