@@ -1,5 +1,6 @@
 #pragma once
 
+#include <climits>
 #include <fstream>
 #include <filesystem>
 #include <string>
@@ -33,7 +34,10 @@ bool isEscaped(std::string str, int pos);
 
 int stringcasecmp(std::string a, std::string b);
 
-int findInStrVect(std::vector<std::string> v, std::string str, unsigned int start);
+int findInStrVect(std::vector<std::string> v, std::string str, unsigned int start=0);
+
+long unsigned int findUnescaped(std::string str, char ch, long unsigned int start=0);
+long unsigned int rFindUnescaped(std::string str, char ch, long unsigned int start=UINT_MAX);
 
 std::string left(std::string str, int n);
 

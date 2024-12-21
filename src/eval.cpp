@@ -327,7 +327,7 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 {
 	for(long unsigned int precedence=0; precedence<operations.size(); precedence++)
 	{
-		int op_match = findInStrVect(operations[precedence],op,0);
+		int op_match = findInStrVect(operations[precedence],op);
 
 		try{(void)TL(lhs);}
 		catch(const std::runtime_error& e)
@@ -427,7 +427,7 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 
 	// If the first arg is a variable and we are assigning it, we'll need to save the result
 	if(lhs_pos == 0 && vi->key != "" &&
-	  (findInStrVect(assignOps,(*v)[op_pos],0) > -1 || findInStrVect(unaryOps,(*v)[op_pos],0) > -1))
+	  (findInStrVect(assignOps,(*v)[op_pos]) > -1 || findInStrVect(unaryOps,(*v)[op_pos]) > -1))
 		(void)doAction(vi, Write, result);
 
 	// Replace operators and operands with result
@@ -652,7 +652,7 @@ int main(int argc, char** argv)
 
 		// Print result
 		std::string new_value = get_prog_output(vi.variable)[0];
-		if(findInStrVect(assignOps,final_op,0) == -1 && findInStrVect(unaryOps,final_op,0) == -1)
+		if(findInStrVect(assignOps,final_op) == -1 && findInStrVect(unaryOps,final_op) == -1)
 			fprintf(stdout,"%s\n",args[0].c_str());
 		else if(old_value == "")
 			output(Info,"%c%c/%s has been initialized to %s",

@@ -53,7 +53,7 @@ bool looksLikeSet(std::string s)
 	return match_it->str() == s;
 }
 
-bool isEscaped(std::string str, int pos)
+bool isEscaped(std::string str, long unsigned int pos)
 {
 	if(!pos) return false;
 	else return str[pos-1] == '\\';
@@ -68,6 +68,21 @@ int findInStrVect(std::vector<std::string> v, std::string str, unsigned int star
 {
 	for(long unsigned int i=start; i<v.size(); i++)
 		if(v[i] == str) return i;
+
+	return -1;
+}
+
+long unsigned int findUnescaped(std::string str, char ch, long unsigned int start)
+{
+	for(long unsigned int i=start; i<str.length(); i++)
+		if(str[i] == ch && !isEscaped(str,i)) return i;
+
+	return -1;
+}
+long unsigned int rFindUnescaped(std::string str, char ch, long unsigned int start)
+{
+	for(long unsigned int i=str.length()-start; i>0; i--)
+		if(str[i] == ch && !isEscaped(str,i)) return i;
 
 	return -1;
 }
@@ -579,7 +594,7 @@ unsigned int getWalletValue(Wallet w)
 
 	for(const auto& [c,q] : w.Money)
 	{
-		if(findInStrVect(systems,c.System,0) != -1)
+		if(findInStrVect(systems,c.System) != -1)
 		{
 			systems.push_back(c.System);
 			total += w.getEquivalentValueInLowestDenomination(c.System);
