@@ -30,20 +30,20 @@ std::string variable_pattern_str =		"["+
 						"]["+
 						std::string(1,VAR_SIGIL)+
 						std::string(1,DICE_SIGIL)+
-						std::string(1,WALLET_SIGIL)+
 						std::string(1,CURRENCY_SIGIL)+
+						std::string(1,WALLET_SIGIL)+
 						"]?[^\\s]{1,}";
 std::string exp_const_pattern_str =		"["+
 						std::string(1,VAR_SIGIL)+
 						std::string(1,DICE_SIGIL)+
-						std::string(1,WALLET_SIGIL)+
 						std::string(1,CURRENCY_SIGIL)+
-						"]\\{[^}]{1,}\\}";
+						std::string(1,WALLET_SIGIL)+
+						"]\\{.*\\}";
 std::string set_pattern_str =			"(([\\.a-zA-Z0-9]{1,}\\/*)*::["+
 						std::string(1,VAR_SIGIL)+
 						std::string(1,DICE_SIGIL)+
-						std::string(1,WALLET_SIGIL)+
 						std::string(1,CURRENCY_SIGIL)+
+						std::string(1,WALLET_SIGIL)+
 						"]\\{.*(?!::)\\}(::)?)*";
 
 //Data separator string. Name shortened for brevity in the code.
