@@ -7,44 +7,40 @@
 #include "../headers/functions.h"
 #include "../headers/output.h"
 
-std::string Config::get_config_item(std::string s)
+std::string Config::getConfigItem(std::string s)
 {
-	if(s.find("=")!=std::string::npos)
+	if(s.find("=") != std::string::npos)
 	{
-		return left(s,s.find('='));
+		return left(s,s.find("="));
 	}
 	else//No '='
 	{
-		output(Warning,"No \'=\' found for config item \'%s\', ignoring...",s.c_str());
-		return default_value;
+		output(Warning,"No \'=\' found for config item \"%s\", ignoring...",s.c_str());
+		return "";
 	}
 }
-std::string Config::get_config_value(std::string s)
+std::string Config::getConfigValue(std::string s)
 {
-	if(s.find("=")!=std::string::npos)
+	if(s.find("=") != std::string::npos && s.find("=") == s.length()-1)//Nothing after '='
 	{
-		if(s.find("=") == s.length()-1)//Nothing after '='
+		//If the setting exists, return default value for setting, otherwise return blank
+		for(const auto& [k,v] : setting)
 		{
-			//If the setting exists, return default value for setting, otherwise return default_value
-			if(auto search = setting.find(s); search != setting.end())
-			{
-				output(Warning,"Found blank config setting \'%s\'",setting[s].c_str());
-				return setting[s];
-			}
-			else
-			{
-				output(Warning,"Unknown config setting \'%s\', ignoring...",s.c_str());
-				return default_value;
-			}
+			if(stringcasecmp(left(s,s.find("=")),k)) continue;
+
+			output(Warning,"Found blank value for config setting \"%s\"",setting[s].c_str());
+			return setting[s];
 		}
-		else//Found value
-		{
-			return right(s,s.find("=")+1);
-		}
+		output(Warning,"Unknown config setting \"%s\", ignoring...",s.c_str());
+		return "";
+	}
+	else if(s.find("=") != std::string::npos)//Found value
+	{
+		return right(s,s.find("=")+1);
 	}
 	else//No '='
 	{
-		return default_value;
+		return "";
 	}
 }
 
@@ -80,9 +76,7 @@ Config::Config()
 		std::string data;
 		std::getline(fs,data);
 		if(data.length() && data[0] != COMMENT)
-		{
-			setting[get_config_item(data)] = get_config_value(data);
-		}
+			setting[getConfigItem(data)] = getConfigValue(data);
 	}
 	fs.close();
 }
