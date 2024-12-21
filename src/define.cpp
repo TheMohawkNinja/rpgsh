@@ -32,7 +32,7 @@ std::string variable_pattern_str =		"["+
 						std::string(1,DICE_SIGIL)+
 						std::string(1,WALLET_SIGIL)+
 						std::string(1,CURRENCY_SIGIL)+
-						"]?[^\\s,]{1,}";
+						"]?[^\\s]{1,}";
 std::string exp_const_pattern_str =		"["+
 						std::string(1,VAR_SIGIL)+
 						std::string(1,DICE_SIGIL)+
