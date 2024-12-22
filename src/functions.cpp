@@ -22,7 +22,6 @@ bool stob(std::string s)
 
 	return false;
 }
-
 std::string btos(bool b)
 {
 	if(b) return "True";
@@ -35,7 +34,6 @@ bool isScopeSigil(char c)
 		c == CAMPAIGN_SIGIL ||
 		c == SHELL_SIGIL);
 }
-
 bool isTypeSigil(char c)
 {
 	return (c == CURRENCY_SIGIL ||
@@ -72,26 +70,38 @@ int findInStrVect(std::vector<std::string> v, std::string str, unsigned int star
 	return -1;
 }
 
-long unsigned int findUnescaped(std::string str, char ch, long unsigned int start)
+long unsigned int findu(std::string str, std::string match, long unsigned int start)
 {
-	for(long unsigned int i=start; i<str.length(); i++)
-		if(str[i] == ch && !isEscaped(str,i)) return i;
+	if(match.length() > str.length()) return std::string::npos;
 
-	return -1;
+	for(long unsigned int i=start; i<str.length()-(match.length()-1); i++)
+		if(str.substr(i,match.length()) == match && !isEscaped(str,i)) return i;
+
+	return std::string::npos;
 }
-long unsigned int rFindUnescaped(std::string str, char ch, long unsigned int start)
+long unsigned int findu(std::string str, char ch, long unsigned int start)
 {
-	for(long unsigned int i=str.length()-start; i>0; i--)
-		if(str[i] == ch && !isEscaped(str,i)) return i;
+	return findu(str, std::string(1,ch), start);
+}
+long unsigned int rfindu(std::string str, std::string match, long unsigned int start)
+{
+	if(match.length() > str.length()) return std::string::npos;
+	if(start == UINT_MAX) start = str.length();
 
-	return -1;
+	for(long unsigned int i=start; i>0; i--)
+		if(str.substr(i,match.length()) == match && !isEscaped(str,i)) return i;
+
+	return std::string::npos;
+}
+long unsigned int rfindu(std::string str, char ch, long unsigned int start)
+{
+	return rfindu(str, std::string(1,ch), start);
 }
 
 std::string left(std::string str, int n)
 {
 	return str.substr(0,n);
 }
-
 std::string right(std::string str, int n)
 {
 	return str.substr(n,str.length()-n);
@@ -222,14 +232,14 @@ std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir
 void loadXRef(std::string* arg, Scope* p_scope)
 {
 	// Ending square bracket not found
-	if(arg->find(']') == std::string::npos)
+	if(findu(*arg,']') == std::string::npos)
 	{
 		output(Error,"No terminating \']\' found for xref.");
 		exit(-1);
 	}
 
 	// Get string between the square brackets
-	std::string xref = arg->substr(arg->find('[')+1,arg->find(']')-(arg->find('[')+1));
+	std::string xref = arg->substr(findu(*arg,'[')+1,findu(*arg,']')-(findu(*arg,'[')+1));
 
 	// Actually load the xref into the scope
 	std::vector<std::string> campaigns;
@@ -241,10 +251,10 @@ void loadXRef(std::string* arg, Scope* p_scope)
 	switch((*arg)[0])
 	{
 		case CHARACTER_SIGIL:
-			if(xref.find('/') != std::string::npos)// Attempting to get a character from another campaign
+			if(findu(xref,'/') != std::string::npos)// Attempting to get a character from another campaign
 			{
-				campaign = left(xref,xref.find('/'));
-				xref_char = right(xref,xref.find('/')+1);
+				campaign = left(xref,findu(xref,'/'));
+				xref_char = right(xref,findu(xref,'/')+1);
 				xref_dir = campaigns_dir+
 					   getLikeFileName(campaign,campaigns_dir,true,xref)+
 					   "/characters/";
@@ -265,7 +275,7 @@ void loadXRef(std::string* arg, Scope* p_scope)
 	}
 
 	// Remove external reference string so we can continue to use the current arg under the new context
-	(*arg) = (*arg)[0]+left((*arg),arg->find('[')-1)+right((*arg),arg->find(']')+1);
+	*arg = (*arg)[0]+left(*arg,findu(*arg,'[')-1)+right(*arg,findu(*arg,']')+1);
 }
 VariableInfo parseVariable(std::string v)// Derive information about variable from string
 {
@@ -300,11 +310,11 @@ VariableInfo parseVariable(std::string v)// Derive information about variable fr
 
 	vi.type = v[1];
 	vi.variable = v;
-	vi.key = right(v,v.find('/')+1);
-	if((int)v.find('.') > (int)v.rfind('/'))
+	vi.key = right(v,findu(v,'/')+1);
+	if((int)findu(v,'.') > (int)rfindu(v,'/'))
 	{
-		vi.key = left(vi.key,vi.key.find('.'));
-		vi.property = right(v,v.find('.')+1);
+		vi.key = left(vi.key,findu(vi.key,'.'));
+		vi.property = right(v,findu(v,'.')+1);
 	}
 
 	if(isTypeSigil(v[1]))
@@ -364,7 +374,7 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	//Push back program we are going to run
 	//This does mean no spaces for program names, but meh
 	std::string path = std::string(RPGSH_INSTALL_DIR);
-	args.push_back(path+prefix+left(arg_str,arg_str.find(" ")));
+	args.push_back(path+prefix+left(arg_str,findu(arg_str," ")));
 
 	//Replaces all instances of variables with their respective value
 	//Except for the first arg if it is a variable
@@ -411,7 +421,7 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 			if(quote_begin == std::string::npos && args[i][c] == '\"' && !isEscaped(args[i],c))
 			{
 				quote_begin = c;
-				quote_end = args[i].find('\"',c+1);
+				quote_end = findu(args[i],'\"',c+1);
 				quote_start_arg = i;
 				if(quote_end == std::string::npos)
 				{
@@ -547,8 +557,8 @@ std::string get_env_variable(std::string v)
 		std::string data = "";
 		std::getline(ifs,data);
 
-		if(left(data,data.find(DS)) == v)
-			return right(data,data.find(DS)+DS.length());
+		if(left(data,findu(data,DS)) == v)
+			return right(data,findu(data,DS)+DS.length());
 	}
 	ifs.close();
 	return "";
@@ -568,7 +578,7 @@ void set_env_variable(std::string v,std::string value)
 		std::getline(ifs,data);
 		if(data == "" || data == "\n")// Prevents writing blank lines back to file
 			continue;
-		if(left(data,data.find(DS)) == v)
+		if(left(data,findu(data,DS)) == v)
 		{
 			ofs<<v + DS + value + "\n";
 			ReplacedValue = true;

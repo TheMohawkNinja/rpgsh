@@ -21,26 +21,25 @@ struct VariableInfo
 };
 
 std::string btos(bool b);
-
 bool stob(std::string s);
 
 bool isScopeSigil(char c);
-
 bool isTypeSigil(char c);
 
 bool looksLikeSet(std::string s);
 
-bool isEscaped(std::string str, int pos);
+bool isEscaped(std::string str, long unsigned int pos);
 
 int stringcasecmp(std::string a, std::string b);
 
 int findInStrVect(std::vector<std::string> v, std::string str, unsigned int start=0);
 
-long unsigned int findUnescaped(std::string str, char ch, long unsigned int start=0);
-long unsigned int rFindUnescaped(std::string str, char ch, long unsigned int start=UINT_MAX);
+long unsigned int findu(std::string str, std::string match, long unsigned int start=0);
+long unsigned int findu(std::string str, char ch, long unsigned int start=0);
+long unsigned int rfindu(std::string str, std::string match, long unsigned int start=UINT_MAX);
+long unsigned int rfindu(std::string str, char ch, long unsigned int start=UINT_MAX);
 
 std::string left(std::string str, int n);
-
 std::string right(std::string str, int n);
 
 std::string addSpaces(int n);
