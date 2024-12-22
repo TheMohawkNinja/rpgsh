@@ -18,7 +18,7 @@ class Dice
 		std::string count_expr = "";
 		std::vector<int> result_quantity;
 
-	int get_value(std::string d, long unsigned int start, std::string terminator, bool allow_sign, bool required);
+	int getValue(std::string d, long unsigned int start, std::string terminator, bool allow_sign, bool required);
 
 	public:
 		unsigned int	Quantity	=	0;
@@ -28,9 +28,9 @@ class Dice
 
 	Dice();
 	Dice(const Dice& b);
-	Dice(std::string dice_str);
+	Dice(std::string str);
 	Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier);
-	Dice(std::string dice_str, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count);
+	Dice(std::string str, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count);
 	Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count);
 
 	explicit operator std::string() const;
