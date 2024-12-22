@@ -544,10 +544,8 @@ int prompt()
 			fprintf(stdout,"Exiting...\n");
 			return 1; //Non-zero so we can exit, and positive so user can discriminate between good exits and bad exits
 		}
-		else if(buffer[0] != COMMENT)
-		{
-			(void)run_rpgsh_prog(buffer,false);
-		}
+
+		(void)run_rpgsh_prog(buffer,false);
 	}
 	return 0;
 }

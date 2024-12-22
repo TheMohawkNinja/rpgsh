@@ -311,7 +311,7 @@ VariableInfo parseVariable(std::string v)// Derive information about variable fr
 	vi.type = v[1];
 	vi.variable = v;
 	vi.key = right(v,findu(v,'/')+1);
-	if((int)findu(v,'.') > (int)rfindu(v,'/'))
+	if(findu(v,'.') > rfindu(v,'/') && rfindu(v,'.') < UINT_MAX)
 	{
 		vi.key = left(vi.key,findu(vi.key,'.'));
 		vi.property = right(v,findu(v,'.')+1);
@@ -405,8 +405,22 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 			arg_str_it++;
 			arg = left(arg,arg.length()) + " " + arg_str_it->str();
 		}
-		args.push_back(arg);
-		arg_str_it++;
+
+		//Handle comments
+		if(findu(arg,COMMENT) != std::string::npos && findu(arg,COMMENT) > 0)
+		{
+			args.push_back(left(arg,findu(arg,COMMENT)));
+			break;
+		}
+		else if(findu(arg,COMMENT) == std::string::npos)
+		{
+			args.push_back(arg);
+			arg_str_it++;
+		}
+		else
+		{
+			break;
+		}
 	}
 
 	//Merge args wrapped in quotes
