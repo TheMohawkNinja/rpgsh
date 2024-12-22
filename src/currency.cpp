@@ -18,8 +18,9 @@ void Currency::tryParseCurrencySystem(std::string* str)
 {
 	try
 	{
-		System = str->substr(0,str->find(","));
-		(*str) = str->substr(str->find(",")+1,str->length()-str->find(",")+1);
+		long unsigned int comma_pos = findu(*str,',');
+		System = left(*str,comma_pos);
+		*str = str->substr(comma_pos+1,str->length()-(comma_pos+1));
 	}
 	catch(...)
 	{
@@ -30,8 +31,9 @@ void Currency::tryParseName(std::string* str)
 {
 	try
 	{
-		Name = str->substr(0,str->find(","));
-		(*str) = str->substr(str->find(",")+1,str->length()-str->find(",")+1);
+		long unsigned int comma_pos = findu(*str,',');
+		Name = left(*str,comma_pos);
+		*str = str->substr(comma_pos+1,str->length()-(comma_pos+1));
 	}
 	catch(...)
 	{
@@ -43,19 +45,15 @@ void Currency::tryParseName(std::string* str)
 }
 void Currency::tryParseSmallerAmount(std::string* str)
 {
-	std::string SmallerAmountStr = "";
-
 	try
 	{
-		SmallerAmountStr = str->substr(0,str->find(","));
-		(*str) = str->substr(str->find(",")+1,str->length()-str->find(",")+1);
+		long unsigned int comma_pos = findu(*str,',');
+		std::string SmallerAmountStr = left(*str,comma_pos);
+		*str = str->substr(comma_pos+1,str->length()-(comma_pos+1));
 
 		//Allow an empty SmallerAmount to imply 0
-		if(SmallerAmountStr == "")
-		{
-			SmallerAmount = 0;
-			return;
-		}
+		if(SmallerAmountStr == "") SmallerAmountStr = "0";
+
 		SmallerAmount = std::stoi(SmallerAmountStr);
 	}
 	catch(...)
@@ -67,8 +65,9 @@ void Currency::tryParseSmaller(std::string* str)
 {
 	try
 	{
-		Smaller = str->substr(0,str->find(","));
-		(*str) = str->substr(str->find(",")+1,str->length()-str->find(",")+1);
+		long unsigned int comma_pos = findu(*str,',');
+		Smaller = left(*str,comma_pos);
+		*str = str->substr(comma_pos+1,str->length()-(comma_pos+1));
 	}
 	catch(...)
 	{
@@ -77,12 +76,9 @@ void Currency::tryParseSmaller(std::string* str)
 }
 void Currency::tryParseLarger(std::string* str)
 {
-	if(str->find("}") == std::string::npos)
-		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
-
 	try
 	{
-		Larger = str->substr(0,str->find("}"));
+		Larger = left(*str,findu(*str,'}'));
 	}
 	catch(...)
 	{
@@ -106,14 +102,14 @@ Currency::Currency(std::string str)
 
 	//Get number of commas to determine if we are involving a CurrencySystem
 	int commas = 0;
-	for(const auto& c : str)
-		if(c == ',') commas++;
+	for(long unsigned int i=0; i<str.length(); i++)
+		if(str[i] == ',' && !isEscaped(str,i)) commas++;
 
 	//Make sure explicit constructor is formatted correctly
 	if(str.length() < 8 ||
 	   str[1] != '{' ||
 	   str[0] != CURRENCY_SIGIL ||
-	   str.find("}") == std::string::npos ||
+	   findu(str,'}') == std::string::npos ||
 	   commas != 4) throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 
 	//Nix the first two characters to make future substrings more intuitive
@@ -938,20 +934,20 @@ Wallet::Wallet(std::string str)
 	{
 		char delimiter = ',';
 
-		if(str.find(delimiter) == std::string::npos)
+		if(findu(str,delimiter) == std::string::npos)
 			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 
 		//Create currency object to be added to wallet
 		std::string c(1,CURRENCY_SIGIL);
-		int c_pos = str.find(c+"{");
-		std::string currency_str = str.substr(c_pos,str.find("}")+1-c_pos);
+		int c_pos = findu(str,c+"{");
+		std::string currency_str = str.substr(c_pos,findu(str,'}')+1-c_pos);
 		int c_str_ln = currency_str.length();
 		currency = Currency(currency_str);
 		str = right(str,c_str_ln+1);
 
 		//If we're at the end of the constructor
-		if(str.find(delimiter) == std::string::npos) delimiter = '}';
-		const long unsigned int next_delimiter = str.find(delimiter);
+		if(findu(str,delimiter) == std::string::npos) delimiter = '}';
+		const long unsigned int next_delimiter = findu(str,delimiter);
 
 		//Parse quantity string and try to add it to the wallet
 		std::string quantity_str = left(str,next_delimiter);
@@ -967,7 +963,7 @@ Wallet::Wallet(std::string str)
 		if(delimiter == '}') break;
 
 		//Remove what we just worked on
-		str = right(str,str.find(",")+1);
+		str = right(str,findu(str,',')+1);
 	}
 }
 
@@ -980,7 +976,7 @@ Wallet::operator std::string() const
 		ret += std::string(c) + "," + std::to_string(q) + ",";
 
 	//Cut final ',' and add terminating '}'
-	if(ret.find(',') != std::string::npos)
+	if(findu(ret,',') != std::string::npos)
 		ret = left(ret,ret.length()-1);
 	ret += "}";
 

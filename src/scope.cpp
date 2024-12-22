@@ -79,9 +79,9 @@ void Scope::load(std::string path, bool loadVar, bool loadDice, bool loadCurrenc
 		This is neccessarily an error with the Scope file formatting,
 		but it is not neccessarily a fatal error, so just print a warning and keep going.
 		*/
-		if(data.find(DS) > 1)
+		if(findu(data,DS) > 1)
 		{
-			output(Warning,"Multi-character type specifier \"%s\" at \"%s:%d\", skipping line...",left(data,data.find(DS)).c_str(),datasource.c_str(),linenum);
+			output(Warning,"Multi-character type specifier \"%s\" at \"%s:%d\", skipping line...",left(data,findu(data,DS)).c_str(),datasource.c_str(),linenum);
 			continue;
 		}
 
@@ -90,7 +90,7 @@ void Scope::load(std::string path, bool loadVar, bool loadDice, bool loadCurrenc
 			type = data[0];
 			try
 			{
-				key = data.substr(1+DS.length(),(data.rfind(DS)-(1+DS.length())));
+				key = data.substr(1+DS.length(),(rfindu(data,DS)-(1+DS.length())));
 			}
 			catch(...)
 			{
@@ -100,7 +100,7 @@ void Scope::load(std::string path, bool loadVar, bool loadDice, bool loadCurrenc
 
 			try
 			{
-				value = right(data,data.rfind(DS)+DS.length());
+				value = right(data,rfindu(data,DS)+DS.length());
 			}
 			catch(...)
 			{

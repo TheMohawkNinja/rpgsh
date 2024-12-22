@@ -132,11 +132,11 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 			char type = 0;
 		};
 
-		while(value.find(DS) != std::string::npos)
+		while(findu(value,DS) != std::string::npos)
 		{
-			std::string set_key = left(value,value.find(DS));
-			value = right(value,value.find(set_key)+set_key.length()+DS.length());
-			std::string set_value = left(value,value.find(DS));
+			std::string set_key = left(value,findu(value,DS));
+			value = right(value,findu(value,set_key)+set_key.length()+DS.length());
+			std::string set_value = left(value,findu(value,DS));
 
 			RemovedKey rk;
 
@@ -177,8 +177,8 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 			else if(action == SetRemoveA && rk.isRemoved)
 				output(Warning,"Removed \"%c%c/%s\"",p_vi->scope.sigil,rk.type,set_key.c_str());
 
-			if(value.find(DS) != std::string::npos)
-				value = right(value,value.find(set_value)+set_value.length()+DS.length());
+			if(findu(value,DS) != std::string::npos)
+				value = right(value,findu(value,set_value)+set_value.length()+DS.length());
 			else
 				break;
 		}
@@ -460,7 +460,7 @@ int main(int argc, char** argv)
 		exit(-1);
 	}
 
-	if(std::string(argv[1]).find('/') == std::string::npos)// If the user only enters the scope sigil
+	if(findu(std::string(argv[1]),'/') == std::string::npos)// If the user only enters the scope sigil
 	{
 		output(Error,"Expected at least one '/' delimiter.");
 		exit(-1);
@@ -493,8 +493,8 @@ int main(int argc, char** argv)
 		for(int i=1; i<argc; i++)
 		{
 			std::string arg = std::string(argv[i]);
-			long unsigned int open_paren = arg.find('(');
-			long unsigned int close_paren = arg.rfind(')');
+			long unsigned int open_paren = findu(arg,'(');
+			long unsigned int close_paren = rfindu(arg,')');
 
 			for(const auto& c : arg)
 			{
@@ -591,16 +591,16 @@ int main(int argc, char** argv)
 		// PEMDAS
 		for(int start=0; start<args_size-1; start++)
 		{
-			if(args[start].find('(') != std::string::npos)
+			if(findu(args[start],'(') != std::string::npos)
 			{
 				for(int end=start; end<args_size; end++)
 				{
 					if(args[end].back() == ')')
 					{
 						// Strip parenthesis off args to ensure good parsing
-						std::string rparens = right(args[end],args[end].find(')')+1);
-						args[start] = right(args[start],args[start].rfind('(')+1);
-						args[end] = left(args[end],args[end].find(')'));
+						std::string rparens = right(args[end],findu(args[end],')')+1);
+						args[start] = right(args[start],rfindu(args[start],'(')+1);
+						args[end] = left(args[end],findu(args[end],')'));
 
 						// Vectors for each operation type are in order of operator precedence
 						// TODO Don't use INT_MAX, as MAX_BUFFER_SIZE will need to be increased greatly to support large descriptions
@@ -624,7 +624,7 @@ int main(int argc, char** argv)
 						start = -1;
 						break;
 					}
-					else if(args[end].find('(') != std::string::npos && end>start)// Nested '('
+					else if(findu(args[end],'(') != std::string::npos && end>start)// Nested '('
 					{
 						start = end - 1;
 						break;

@@ -17,10 +17,10 @@ Var::Var(std::string str)
 	}
 
 	//Make sure first character is VAR_SIGIL
-	if(str[0] != VAR_SIGIL || str.find("}") == std::string::npos)
+	if(str[0] != VAR_SIGIL || findu(str,'}') == std::string::npos)
 		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 
-	Value = str.substr(2,str.find("}")-2);
+	Value = str.substr(2,findu(str,'}')-2);
 }
 Var::Var(int _value)
 {

@@ -165,11 +165,11 @@ int main(int argc, char** argv)
 		std::string set_string = std::string(argv[1]);
 		Scope set;
 
-		while(set_string.find(DS) != std::string::npos)
+		while(findu(set_string,DS) != std::string::npos)
 		{
-			std::string set_key = left(set_string,set_string.find(DS));
-			set_string = right(set_string,set_string.find(set_key)+set_key.length()+DS.length());
-			std::string set_value = left(set_string,set_string.find(DS));
+			std::string set_key = left(set_string,findu(set_string,DS));
+			set_string = right(set_string,findu(set_string,set_key)+set_key.length()+DS.length());
+			std::string set_value = left(set_string,findu(set_string,DS));
 
 			switch(set_value[0])
 			{
@@ -187,8 +187,8 @@ int main(int argc, char** argv)
 					break;
 			}
 
-			if(set_string.find(DS) != std::string::npos)
-				set_string = right(set_string,set_string.find(set_value)+set_value.length()+DS.length());
+			if(findu(set_string,DS) != std::string::npos)
+				set_string = right(set_string,findu(set_string,set_value)+set_value.length()+DS.length());
 			else
 				break;
 		}

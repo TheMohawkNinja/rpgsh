@@ -7,7 +7,7 @@
 #include "../headers/output.h"
 #include "../headers/text.h"
 
-int Dice::get_value(std::string d, long unsigned int start, std::string terminator, bool allow_sign, bool required)
+int Dice::getValue(std::string d, long unsigned int start, std::string terminator, bool allow_sign, bool required)
 {
 	std::string value_str = "";
 	if(terminator != "")
@@ -100,22 +100,22 @@ Dice::Dice(const Dice& b)
 	Modifier = b.Modifier;
 	List = b.List;
 }
-Dice::Dice(std::string dice_str)
+Dice::Dice(std::string str)
 {
 	//
 	// Determine if we are working with an explicit constructor or an string
 	//
 
 	std::string d(1,DICE_SIGIL);
-	if(dice_str.substr(0,2) == (d+"{"))// Explicit constructor
+	if(str.substr(0,2) == (d+"{"))// Explicit constructor
 	{
-		if(dice_str.find("}") == std::string::npos)
+		if(findu(str,'}') == std::string::npos)
 			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 
 		// Get number of commas in explicit constructor
 		unsigned int commas = 0;
-		for(const auto& c : dice_str)
-			if(c == ',') commas++;
+		for(long unsigned int i=0; i<str.length(); i++)
+			if(str[i] == ',' && !isEscaped(str,i)) commas++;
 
 		if(commas && commas != 2)
 		{
@@ -123,38 +123,38 @@ Dice::Dice(std::string dice_str)
 		}
 		else if(!commas)//If no commas, assume list
 		{
-			List = dice_str.substr(2,dice_str.length()-3);
+			List = str.substr(2,str.length()-3);
 			exit(-1);
 		}
 
 		try
 		{
-			Quantity = std::stoi(dice_str.substr(2,dice_str.find(",")-2));
-			dice_str = dice_str.substr(dice_str.find(",")+1,dice_str.length()-(dice_str.find(",")+1));
-			Faces = std::stoi(dice_str.substr(0,dice_str.find(",")));
-			dice_str = dice_str.substr(dice_str.find(",")+1,dice_str.length()-(dice_str.find(",")+1));
-			Modifier = std::stoi(dice_str.substr(0,dice_str.find("}")));
+			Quantity = std::stoi(str.substr(2,findu(str,',')-2));
+			str = str.substr(findu(str,',')+1,str.length()-(findu(str,',')+1));
+			Faces = std::stoi(left(str,findu(str,',')));
+			str = str.substr(findu(str,',')+1,str.length()-(findu(str,',')+1));
+			Modifier = std::stoi(left(str,findu(str,',')));
 		}
 		catch(...)
 		{
 			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 		}
 	}
-	else if(islower(dice_str[0]) && dice_str[1] == '{')
+	else if(islower(str[0]) && str[1] == '{')
 	{
 		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 	}
-	else if(dice_str.substr(0,1) != "d")// Implicit string constructor with explicitly defined Quantity
+	else if(str[0] != 'd')// Implicit string constructor with explicitly defined Quantity
 	{
-		Quantity = get_value(dice_str,0,"d",false,true);
-		Faces = get_value(dice_str,dice_str.find("d",0) + 1,"",false,true);
-		Modifier = get_value(dice_str,dice_str.find(std::to_string(Faces),dice_str.find("d",0)) + std::to_string(Faces).length(),"",true,false);
+		Quantity = getValue(str,0,"d",false,true);
+		Faces = getValue(str,findu(str,'d')+1,"",false,true);
+		Modifier = getValue(str,findu(str,std::to_string(Faces),findu(str,'d'))+std::to_string(Faces).length(),"",true,false);
 	}
 	else// Implicit string construct with implicit Quantity = 1
 	{
 		Quantity = 1;
-		Faces = get_value(dice_str,dice_str.find("d",0) + 1,"",false,true);
-		Modifier = get_value(dice_str,dice_str.find(std::to_string(Faces),dice_str.find("d",0)) + std::to_string(Faces).length(),"",true,false);
+		Faces = getValue(str,findu(str,'d')+1,"",false,true);
+		Modifier = getValue(str,findu(str,std::to_string(Faces),findu(str,'d'))+std::to_string(Faces).length(),"",true,false);
 	}
 }
 Dice::Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier)
@@ -164,26 +164,26 @@ Dice::Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier)
 	Modifier = _Modifier;
 	just_show_total = true;
 }
-Dice::Dice(std::string dice_str, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count)
+Dice::Dice(std::string str, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count)
 {
 	if(!_is_list)
 	{
-		if(dice_str.substr(0,1) != "d")
+		if(str.substr(0,1) != "d")
 		{
-			Quantity = get_value(dice_str,0,"d",false,true);
-			Faces = get_value(dice_str,dice_str.find("d",0) + 1,"",false,true);
-			Modifier = get_value(dice_str,dice_str.find(std::to_string(Faces),dice_str.find("d",0)) + std::to_string(Faces).length(),"",true,false);
+			Quantity = getValue(str,0,"d",false,true);
+			Faces = getValue(str,findu(str,'d')+1,"",false,true);
+			Modifier = getValue(str,findu(str,std::to_string(Faces),findu(str,'d'))+std::to_string(Faces).length(),"",true,false);
 		}
 		else
 		{
 			Quantity = 1;
-			Faces = get_value(dice_str,dice_str.find("d",0) + 1,"",false,true);
-			Modifier = get_value(dice_str,dice_str.find(std::to_string(Faces),dice_str.find("d",0)) + std::to_string(Faces).length(),"",true,false);
+			Faces = getValue(str,findu(str,'d')+1,"",false,true);
+			Modifier = getValue(str,findu(str,std::to_string(Faces),findu(str,'d'))+std::to_string(Faces).length(),"",true,false);
 		}
 	}
 	else
 	{
-		dice_list = dice_str;
+		dice_list = str;
 	}
 
 	just_show_rolls = _just_show_rolls;

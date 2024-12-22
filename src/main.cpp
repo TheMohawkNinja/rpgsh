@@ -25,13 +25,13 @@ void addKeyToMatches(std::vector<std::string>** ppMatches, std::string k, std::s
 	//Limit keys to one level past current
 	if(!stringcasecmp(left(k,key.length()),key) && k[0] != '.')
 	{
-		int key_last_slash = (int)key.rfind('/');
-		int k_next_slash = (int)k.find('/',key_last_slash+1);
-		if(k_next_slash < (int)key.length())
+		long unsigned int key_last_slash = rfindu(key,'/');
+		long unsigned int k_next_slash = findu(k,'/',key_last_slash+1);
+		if(k_next_slash < key.length())
 		{
 			(**ppMatches).push_back(addSpaces(chk_str.length())+right(k,key.length()));
 		}
-		else if(k_next_slash > (int)key.length())
+		else if(k_next_slash > key.length())
 		{
 			std::string potential_match = left(right(k,key.length()),(k_next_slash-key.length()));
 			potential_match = addSpaces(chk_str.length())+potential_match;
@@ -218,15 +218,15 @@ std::string input_handler()
 							"characters/";
 
 				if(chk_str[1] == '[' &&
-				   chk_str.find(']') == std::string::npos &&
-				   chk_str.find('/') == std::string::npos)//Complete xref (same campaign)
+				   findu(chk_str,']') == std::string::npos &&
+				   findu(chk_str,'/') == std::string::npos)//Complete xref (same campaign)
 				{
 					for(auto& c : getDirectoryListing(xref_path))
 					{
 						if(right(c,c.length()-5) != ".char")//Don't include backup files or non-character files
 							continue;
 
-						std::string xref = left(c,c.find(".char"));
+						std::string xref = left(c,findu(c,".char"));
 						std::string chk_str_xref = right(chk_str,2);
 						if(chk_str.length() == 2 ||
 						   (!stringcasecmp(chk_str_xref,left(xref,chk_str.length()-2)) &&
@@ -243,11 +243,11 @@ std::string input_handler()
 					}
 				}
 				else if(chk_str[1] == '[' &&
-					chk_str.find(']') == std::string::npos)//Complete xref (different campaign)
+					findu(chk_str,']') == std::string::npos)//Complete xref (different campaign)
 				{
 					//Get campaign name
-					std::string campaign = right(chk_str,chk_str.find('[')+1);
-					campaign = left(campaign,campaign.find('/'));
+					std::string campaign = right(chk_str,findu(chk_str,'[')+1);
+					campaign = left(campaign,findu(campaign,'/'));
 
 					for(auto& m : getDirectoryListing(campaigns_dir))
 					{
@@ -270,39 +270,39 @@ std::string input_handler()
 						if(right(c,c.length()-5) != ".char")//Don't include backup files or non-character files
 							continue;
 
-						std::string xref = left(c,c.find(".char"));
-						std::string chk_str_xref = right(chk_str,chk_str.find('/')+1);
-						if(!stringcasecmp(chk_str_xref,left(xref,chk_str.length()-chk_str.find('/')-1)) &&
+						std::string xref = left(c,findu(c,".char"));
+						std::string chk_str_xref = right(chk_str,findu(chk_str,'/')+1);
+						if(!stringcasecmp(chk_str_xref,left(xref,chk_str.length()-findu(chk_str,'/')-1)) &&
 						   xref.length() > chk_str_xref.length())
 						{
-							matches.push_back(addSpaces(chk_str.length()-(chk_str.length()-chk_str.find('/'))+1)+
+							matches.push_back(addSpaces(chk_str.length()-(chk_str.length()-findu(chk_str,'/'))+1)+
 									  xref+"]");//Padding is sacrificial for formatting
 						}
 					}
 				}
 				else if(chk_str[1] == '[' &&
-					chk_str.find(']') != std::string::npos)//Load xref
+					findu(chk_str,']') != std::string::npos)//Load xref
 				{
-					if(chk_str.find('/') != std::string::npos &&
-					   chk_str.find('/') > chk_str.find(']'))//Same campaign
+					if(findu(chk_str,'/') != std::string::npos &&
+					   findu(chk_str,'/') > findu(chk_str,']'))//Same campaign
 					{
 						std::string xref_path = campaigns_dir+
 									get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
 									"characters/"+
-									right(left(chk_str,chk_str.find(']')),chk_str.find('[')+1)+
+									right(left(chk_str,findu(chk_str,']')),findu(chk_str,'[')+1)+
 									".char";
 
 						if(std::filesystem::exists(xref_path) && !std::filesystem::is_directory(xref_path))
 							tab_comp_scope.load(xref_path);
 
 					}
-					else if(chk_str.find('/') != std::string::npos &&
-					   chk_str.find('/') < chk_str.find(']'))//Different campaign
+					else if(findu(chk_str,'/') != std::string::npos &&
+					   findu(chk_str,'/') < findu(chk_str,']'))//Different campaign
 					{
 						std::string xref_path = campaigns_dir+
-									right(left(chk_str,chk_str.find('/')+1),chk_str.find('[')+1)+
+									right(left(chk_str,findu(chk_str,'/')+1),findu(chk_str,'[')+1)+
 									"characters/"+
-									right(left(chk_str,chk_str.find(']')),chk_str.find('/')+1)+
+									right(left(chk_str,findu(chk_str,']')),findu(chk_str,'/')+1)+
 									".char";
 
 						if(std::filesystem::exists(xref_path) && !std::filesystem::is_directory(xref_path))
@@ -316,7 +316,7 @@ std::string input_handler()
 				std::string xref_path = campaigns_dir;
 
 				if(chk_str[1] == '[' &&
-				   chk_str.find(']') == std::string::npos)//Complete xref
+				   findu(chk_str,']') == std::string::npos)//Complete xref
 				{
 					for(auto& m : getDirectoryListing(campaigns_dir))
 					{
@@ -328,10 +328,10 @@ std::string input_handler()
 					}
 				}
 				else if(chk_str[1] == '[' &&
-					chk_str.find(']') != std::string::npos)//Load xref
+					findu(chk_str,']') != std::string::npos)//Load xref
 				{
 					std::string xref_path = campaigns_dir+
-								right(left(chk_str,chk_str.find(']')),chk_str.find('[')+1)+
+								right(left(chk_str,findu(chk_str,']')),findu(chk_str,'[')+1)+
 								".variables";
 
 					if(std::filesystem::exists(xref_path) && !std::filesystem::is_directory(xref_path))
@@ -343,11 +343,11 @@ std::string input_handler()
 				tab_comp_scope = Shell();
 			}
 
-			int slash = chk_str.find('/',chk_str.find(']')+1);
-			int rsqbrkt = chk_str.find(']');
-			int period = chk_str.rfind('.');
-			char type_sigil = chk_str[chk_str.find('/',chk_str.find(']')+1)-1];
-			std::string key = right(chk_str,chk_str.find('/',chk_str.find(']')+1)+1);
+			int slash = findu(chk_str,'/',findu(chk_str,']')+1);
+			int rsqbrkt = findu(chk_str,']');
+			int period = rfindu(chk_str,'.');
+			char type_sigil = chk_str[findu(chk_str,'/',findu(chk_str,']')+1)-1];
+			std::string key = right(chk_str,findu(chk_str,'/',findu(chk_str,']')+1)+1);
 			if(slash > rsqbrkt && period < slash)//Keys
 			{
 				if(isTypeSigil(type_sigil))
@@ -364,8 +364,8 @@ std::string input_handler()
 			}
 			else if(slash > rsqbrkt)//Properties
 			{
-				key = left(key,key.rfind("."));
-				std::string property = right(chk_str,chk_str.find('.')+1);
+				key = left(key,rfindu(key,'.'));
+				std::string property = right(chk_str,findu(chk_str,'.')+1);
 				if(isTypeSigil(type_sigil))
 				{
 					addPropertiesToMatches(&matches,tab_comp_scope,chk_str,key,key,property,type_sigil);
@@ -561,7 +561,7 @@ int main()
 	std::filesystem::remove(rpgsh_programs_cache_path);
 	for(const auto& app : applications)
 	{
-		if(!app.find(prefix))
+		if(!findu(app,prefix))
 			rpgsh_apps.push_back(app);
 	}
 
