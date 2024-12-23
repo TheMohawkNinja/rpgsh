@@ -402,8 +402,10 @@ std::string parseRHSAndDoOp(std::vector<std::string> v, unsigned int lhs_pos, un
 		return getResult<TL,Wallet>(v[lhs_pos],v[op_pos],v[rhs_pos]);
 	else if(left(v[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
 		return getResult<TL,Currency>(v[lhs_pos],v[op_pos],v[rhs_pos]);
+	else if(std::is_same_v<TL,Dice> && !Var(v[rhs_pos]).isInt())
+		return getResult<TL,Dice>(v[lhs_pos],v[op_pos],v[rhs_pos]);
 	else
-		return getResult<TL,Var>((v)[lhs_pos],(v)[op_pos],(v)[rhs_pos]);
+		return getResult<TL,Var>(v[lhs_pos],v[op_pos],v[rhs_pos]);
 
 	return "";// Supress -Wreturn-type
 }
@@ -422,7 +424,7 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 		result = parseRHSAndDoOp<Wallet>(*v, lhs_pos, op_pos, rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
 		result = parseRHSAndDoOp<Currency>(*v, lhs_pos, op_pos, rhs_pos);
-	else// Treat non-explicit constructors as Var TODO: This can also be CurrencySystem or Dice.
+	else
 		result = parseRHSAndDoOp<Var>(*v, lhs_pos, op_pos, rhs_pos);
 
 	// If the first arg is a variable and we are assigning it, we'll need to save the result
