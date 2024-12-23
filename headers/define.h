@@ -36,7 +36,7 @@
 #define OP_GT				">"
 #define OP_GE				">="
 #define OP_EQ				"=="
-#define OP_NE				"!="
+#define OP_NE				"<>"
 #define OP_AND				"&&"
 #define OP_OR				"||"
 #define OP_ASSIGN			"="
