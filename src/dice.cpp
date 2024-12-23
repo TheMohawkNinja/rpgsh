@@ -124,7 +124,7 @@ Dice::Dice(std::string str)
 		else if(!commas)//If no commas, assume list
 		{
 			List = str.substr(2,str.length()-3);
-			exit(-1);
+			exit(0);
 		}
 
 		try
