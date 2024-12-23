@@ -200,7 +200,7 @@ Currency& Currency::operator += (const int b)
 }
 Currency& Currency::operator += (const std::string b)
 {
-	Name += b;
+	Name = mergeQuotes(Name + b);
 	return *this;
 }
 Currency& Currency::operator += (const Var b)
