@@ -75,7 +75,7 @@ long unsigned int findu(std::string str, std::string match, long unsigned int st
 	if(match.length() > str.length()) return std::string::npos;
 
 	for(long unsigned int i=start; i<str.length()-(match.length()-1); i++)
-		if(str.substr(i,match.length()) == match && !isEscaped(str,i)) return i;
+		if(str.substr(i,match.length()) == match && !isEscaped(str.substr(i,match.length()),i)) return i;
 
 	return std::string::npos;
 }
@@ -88,8 +88,17 @@ long unsigned int rfindu(std::string str, std::string match, long unsigned int s
 	if(match.length() > str.length()) return std::string::npos;
 	if(start == UINT_MAX) start = str.length();
 
-	for(long unsigned int i=start; i>0; i--)
-		if(str.substr(i,match.length()) == match && !isEscaped(str,i)) return i;
+	bool last_check = false;
+	for(long unsigned int i=start-match.length(); i>0; i--)
+	{
+		if(str.substr(i-last_check,match.length()) == match &&
+		   !isEscaped(str.substr(i-last_check,match.length()),i-last_check)) return i-last_check;
+		else if(i == 1 && !last_check)
+		{
+			i++;
+			last_check = true;
+		}
+	}
 
 	return std::string::npos;
 }
