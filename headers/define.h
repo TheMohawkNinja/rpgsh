@@ -5,8 +5,8 @@
 
 //Version info
 #define MAJOR_VERSION			0
-#define MINOR_VERSION			11
-#define PATCH_VERSION			2
+#define MINOR_VERSION			12
+#define PATCH_VERSION			0
 
 //Comment character definition
 #define COMMENT				'!'
@@ -66,6 +66,9 @@
 #define E_INVALID_EXPLICIT_CONSTRUCTOR	"invalid_explicit_constructor"
 #define E_UNKNOWN_OPERATION		"unknown_operation"
 #define E_INSUFFICIENT_FUNDS		"insufficient_funds"
+#define E_NO_PRNG_FILE			"no_prng_file"
+#define E_FILE_NOT_FOUND		"file_not_found"
+#define E_BAD_FS			"bad_fs"
 
 //Column formatting
 #define COLUMN_PADDING			5
@@ -82,8 +85,8 @@
 //file = File name
 //path = Directory + file name
 #define RPGSH_INSTALL_DIR		"/bin/"
-extern const char* random_seed_path;
-extern const char* backup_random_seed_path;
+extern const char* prng_path;
+extern const char* backup_prng_path;
 extern const char* rpgsh_programs_cache_path;
 extern const char* rpgsh_output_redirect_path;
 extern std::string variable_file_name;
