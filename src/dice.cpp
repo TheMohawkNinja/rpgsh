@@ -34,7 +34,7 @@ int Dice::getValue(std::string d, long unsigned int start, std::string terminato
 			}
 			catch(...)
 			{
-				throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
+				throw;
 			}
 		}
 
@@ -45,7 +45,7 @@ int Dice::getValue(std::string d, long unsigned int start, std::string terminato
 		}
 		catch(...)
 		{
-			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
+			throw;
 		}
 	}
 	else
@@ -53,8 +53,7 @@ int Dice::getValue(std::string d, long unsigned int start, std::string terminato
 		if(start == d.length())
 		{
 			if(!required) return 0;
-
-			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
+			throw;
 		}
 		for(long unsigned int i=start; i<d.length(); i++)
 		{
@@ -76,7 +75,7 @@ int Dice::getValue(std::string d, long unsigned int start, std::string terminato
 			}
 			catch(...)
 			{
-				throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
+				throw;
 			}
 		}
 
@@ -87,7 +86,7 @@ int Dice::getValue(std::string d, long unsigned int start, std::string terminato
 		}
 		catch(...)
 		{
-			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
+			throw;
 		}
 	}
 }
@@ -107,7 +106,7 @@ Dice::Dice(std::string str)
 	//
 
 	std::string d(1,DICE_SIGIL);
-	if(str.substr(0,2) == (d+"{"))// Explicit constructor
+	if(left(str,2) == (d+"{"))// Explicit constructor
 	{
 		if(findu(str,'}') == std::string::npos)
 			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
@@ -146,15 +145,29 @@ Dice::Dice(std::string str)
 	}
 	else if(str[0] != 'd')// Implicit string constructor with explicitly defined Quantity
 	{
-		Quantity = getValue(str,0,"d",false,true);
-		Faces = getValue(str,findu(str,'d')+1,"",false,true);
-		Modifier = getValue(str,findu(str,std::to_string(Faces),findu(str,'d'))+std::to_string(Faces).length(),"",true,false);
+		try
+		{
+			Quantity = getValue(str,0,"d",false,true);
+			Faces = getValue(str,findu(str,'d')+1,"",false,true);
+			Modifier = getValue(str,findu(str,std::to_string(Faces),findu(str,'d'))+std::to_string(Faces).length(),"",true,false);
+		}
+		catch(...)
+		{
+			List = str;
+		}
 	}
 	else// Implicit string construct with implicit Quantity = 1
 	{
-		Quantity = 1;
-		Faces = getValue(str,findu(str,'d')+1,"",false,true);
-		Modifier = getValue(str,findu(str,std::to_string(Faces),findu(str,'d'))+std::to_string(Faces).length(),"",true,false);
+		try
+		{
+			Quantity = 1;
+			Faces = getValue(str,findu(str,'d')+1,"",false,true);
+			Modifier = getValue(str,findu(str,std::to_string(Faces),findu(str,'d'))+std::to_string(Faces).length(),"",true,false);
+		}
+		catch(...)
+		{
+			List = str;
+		}
 	}
 }
 Dice::Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier)
@@ -162,46 +175,6 @@ Dice::Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier)
 	Quantity = _Quantity;
 	Faces = _Faces;
 	Modifier = _Modifier;
-	just_show_total = true;
-}
-Dice::Dice(std::string str, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count)
-{
-	if(!_is_list)
-	{
-		if(str.substr(0,1) != "d")
-		{
-			Quantity = getValue(str,0,"d",false,true);
-			Faces = getValue(str,findu(str,'d')+1,"",false,true);
-			Modifier = getValue(str,findu(str,std::to_string(Faces),findu(str,'d'))+std::to_string(Faces).length(),"",true,false);
-		}
-		else
-		{
-			Quantity = 1;
-			Faces = getValue(str,findu(str,'d')+1,"",false,true);
-			Modifier = getValue(str,findu(str,std::to_string(Faces),findu(str,'d'))+std::to_string(Faces).length(),"",true,false);
-		}
-	}
-	else
-	{
-		dice_list = str;
-	}
-
-	just_show_rolls = _just_show_rolls;
-	just_show_total = _just_show_total;
-	is_list = _is_list;
-	count_expr = _count_expr;
-	count = _count;
-}
-Dice::Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count)
-{
-	Quantity = _Quantity;
-	Faces = _Faces;
-	Modifier = _Modifier;
-	just_show_rolls = _just_show_rolls;
-	just_show_total = _just_show_total;
-	is_list = _is_list;
-	count_expr = _count_expr;
-	count = _count;
 }
 
 Dice::operator std::string() const
@@ -823,34 +796,62 @@ const char* Dice::c_str() const
 {
 	return std::string(*this).c_str();
 }
-void Dice::roll()
+RollResults Dice::roll()
 {
-	if(!std::filesystem::exists(random_seed_path))
-	{
-		if(std::filesystem::exists(backup_random_seed_path))
-		{
-			random_seed_path = backup_random_seed_path;
-		}
-		else
-		{
-			output(Error,"Random seed path file doesn't exist at either \"%s\" or \"%s\". If system corruption is not suspected, please report your system's RNG/pRNG file to the RPGSH Github issues page.",random_seed_path,backup_random_seed_path);
-		}
-	}
-	if(Quantity > 0 && Faces > 0)
-	{
-		for(unsigned int i=0; i<Faces; i++)
-		{
-			result_quantity.push_back(0);
-		}
+	RollResults results;
+	const char* e_prng_path;
 
-		if(!just_show_rolls && !just_show_total)
-		{
-			fprintf(stdout,"Rolling a %s%d%s-sided die %s%d%s time(s) with a modifier of %s%d%s...\n\n",TEXT_WHITE,Faces,TEXT_NORMAL,TEXT_WHITE,Quantity,TEXT_NORMAL,TEXT_WHITE,Modifier,TEXT_NORMAL);
-		}
+	if(std::filesystem::exists(prng_path))
+		e_prng_path = prng_path;
+	else if(std::filesystem::exists(backup_prng_path))
+		e_prng_path = backup_prng_path;
+	else
+		throw std::runtime_error(E_NO_PRNG_FILE);
 
-		std::ifstream fs(random_seed_path);
+	if(List != "")
+	{
+		std::string list_line = "";
+		std::ifstream fs;
+
+		//Check if we are using explicitly define list or built-in list
+		if(List[0] != '/' && left(List,2) != "./" && left(List,3) != "../")
+			List = dice_lists_dir+List;
+
+		if(!std::filesystem::exists(List)) throw std::runtime_error(E_FILE_NOT_FOUND);
+		fs.open(List);
+		if(!fs.good()) throw std::runtime_error(E_BAD_FS);
+
+		std::vector<std::string> list_values;
+		std::string line;
+		while(std::getline(fs,line))
+		{
+			if(line != "" && findu(line,COMMENT) == std::string::npos)
+				list_values.push_back(line);
+			else if(line != "")
+				list_values.push_back(left(line,findu(line,COMMENT)));
+		}
+		fs.close();
+
+		fs.open(e_prng_path);
 		std::string data, seed;
-		unsigned int result;
+		do
+		{
+			std::getline(fs,data);
+		}while((int)data[0] == 0);//Prevents crashing on first seed when (int)seed[0] == 0
+		fs.close();
+
+		seed += data;
+		std::srand((int)seed[0] * (int)seed[seed.length() - 1]);
+		std::srand(std::rand());//Mitigates apparent roll biasing when Faces%result=0
+		long pick = std::rand() % list_values.size();
+		results.push_back({std::to_string(pick),list_values[pick]});
+
+		return results;
+	}
+	else if(Quantity > 0 && Faces > 0)
+	{
+		std::ifstream fs(e_prng_path);
+		std::string data, seed;
 
 		while(seed.length() < Quantity)
 		{
@@ -858,167 +859,21 @@ void Dice::roll()
 			seed += data;
 		}
 
-		int total = 0;
-		std::string color;
+		unsigned int natural = 0;
 
 		for(unsigned int i=0; i<Quantity; i++)
 		{
 			std::srand((int)seed[i] * (int)seed[i] - i);
 			std::srand(std::rand());//Mitigates apparent roll biasing when Faces%result=0
-			result = std::rand() % Faces + 1;
-			result_quantity[result-1]++;
-			total += result;
+			natural = std::rand() % Faces + 1;
 
-			if(count_expr != "")
-			{
-				if(count_expr == "=" && result == count){total_count++;}
-				if(count_expr == "<" && result < count){total_count++;}
-				if(count_expr == ">" && result > count){total_count++;}
-				if(count_expr == "<=" && result <= count){total_count++;}
-				if(count_expr == ">=" && result >= count){total_count++;}
-				if(count_expr == "!=" && result != count){total_count++;}
-			}
-
-			if(result == 1)
-			{
-				color = TEXT_RED;
-			}
-			else if(result == Faces)
-			{
-				color = TEXT_GREEN;
-			}
-			else
-			{
-				color = TEXT_WHITE;
-			}
-
-			if(just_show_rolls)
-			{
-				fprintf(stdout,"%s%d%s\n",color.c_str(),result,TEXT_NORMAL);
-			}
-			else if(!just_show_total)
-			{
-				fprintf(stdout,"Roll");
-				for(long unsigned int space=std::to_string(Quantity).length(); space>=std::to_string(i+1).length(); space--)
-				{
-					fprintf(stdout," ");
-				}
-				fprintf(stdout,"%d:",(i+1));
-				for(long unsigned int space=std::to_string(Faces).length(); space>=std::to_string(result).length(); space--)
-				{
-					fprintf(stdout," ");
-				}
-				fprintf(stdout,"%s%d%s\n",color.c_str(),result,TEXT_NORMAL);
-			}
-		}
-		if(!just_show_rolls && !just_show_total)
-		{
-			fprintf(stdout,"\n");
-			fprintf(stdout,"Natural total:\t%s%d%s\n",TEXT_WHITE,total,TEXT_NORMAL);
-
-			if(Modifier != 0)
-			{
-				fprintf(stdout,"Modifier:\t%s%d%s\n",TEXT_WHITE,Modifier,TEXT_NORMAL);
-				total += Modifier;
-			}
-			fprintf(stdout,"Total:\t\t%s%d%s\n",TEXT_WHITE,total,TEXT_NORMAL);
-
-			if(count_expr != "")
-			{
-				fprintf(stdout,"\n");
-				fprintf(stdout,"Rolls %s%d:\t%s%d%s\n",count_expr.c_str(),count,TEXT_WHITE,total_count,TEXT_NORMAL);
-			}
-		}
-		else if(just_show_total)
-		{
-			total += Modifier;
-			fprintf(stdout,"%d\n",total);
-		}
-		fs.close();
-	}
-	else if(is_list)//TODO Reimplement with list member variable
-	{
-		std::string list_line = "";
-		std::string list_path = "";
-		std::vector<std::string> values;
-		std::ifstream fs;
-
-		if(dice_list.substr(0,1) != "/" && dice_list.substr(0,2) != "./" && dice_list.substr(0,3) != "../")//If not specifying path, assume it's something in the dice-lists folder
-		{
-			list_path = dice_lists_dir+dice_list;
-		}
-		else//Otherwise, user is specifying a path outside of the dice-lists folder, so just go with what the user inputted
-		{
-			list_path = dice_list;
+			results.push_back({std::to_string(natural),std::to_string(natural+Modifier)});
 		}
 
-		if(std::filesystem::exists(list_path))
-		{
-			fs.open(list_path);
-			if(!fs.good())
-			{
-				output(Error,"Unable to open dice list \"%s\".",list_path.c_str());
-			}
-		}
-		else
-		{
-			output(Error,"Dice list \"%s\" does not exist.",list_path.c_str());
-			exit(-1);
-		}
-
-		while(std::getline(fs,list_line))//Get values from dice list, making sure to ignore blank space and comments
-		{
-			if(list_line != "" && list_line[0] != COMMENT)
-			{
-				values.push_back(list_line);
-				list_line = "";
-			}
-		}
 		fs.close();
 
-		fs.open(random_seed_path);
-		std::string data, seed;
-		int result;
-		do
-		{
-			std::getline(fs,data);
-		}while((int)data[0] == 0); //Prevents crashing on first seed when (int)seed[0] == 0
-		fs.close();
-
-		seed += data;
-		std::srand((int)seed[0] * (int)seed[seed.length()-1]);
-		std::srand(std::rand());//Mitigates apparent roll biasing when Faces%result=0
-		result = std::rand() % values.size();
-
-		if(!just_show_total && !just_show_rolls)
-		{
-			fprintf(stdout,"[Roll result: %s%d%s]\n",TEXT_WHITE,result,TEXT_NORMAL);
-		}
-		if(!just_show_rolls)
-		{
-			fprintf(stdout,"%s\n",values[result].c_str());
-		}
-		else
-		{
-			fprintf(stdout,"%d\n",result);
-		}
+		return results;
 	}
-}
-void Dice::test()
-{
-	std::string plus = TEXT_WHITE;
-	plus += "+";
-	Quantity = 100000;
-	Faces = 20;
-	roll();
-	fprintf(stdout,"\n");
-	fprintf(stdout,"\t┌───────────────────────────────────────┐\n");
-	fprintf(stdout,"\t│ %s%s%sTEST RESULTS:%s                         │\n",TEXT_ITALIC,TEXT_BOLD,TEXT_YELLOW,TEXT_NORMAL);
-	fprintf(stdout,"\t│                                       │\n");
-	for(unsigned int i=0; i<Faces; i++)
-	{
-		float percent = ((float)result_quantity[i]/((float)Quantity/(float)Faces))*100-100;
-		fprintf(stdout,"\t│ # of %d's: %s%d (%s%s%.2f%%%s from perfect) │\n",(i+1),(i<9)?" ":"",result_quantity[i],(percent>=0)?plus.c_str():"",TEXT_WHITE,percent,TEXT_NORMAL);
-	}
-	fprintf(stdout,"\t└───────────────────────────────────────┘\n");
+
+	return results; //Supress -Wreturn-type
 }

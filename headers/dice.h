@@ -4,19 +4,13 @@
 #include <vector>
 #include "../headers/var.h"
 
+typedef std::vector<std::pair<std::string,std::string>> RollResults;
 class Dice
 {
 	private:
-		bool just_show_rolls = false;
-		bool just_show_total = false;
 		bool is_list = false;
-		unsigned int count = 0;
-		unsigned int total_count = 0;
-		std::string dice_list = "";
 		std::string Quantity_str = "";
 		std::string Faces_str = "";
-		std::string count_expr = "";
-		std::vector<int> result_quantity;
 
 	int getValue(std::string d, long unsigned int start, std::string terminator, bool allow_sign, bool required);
 
@@ -30,8 +24,6 @@ class Dice
 	Dice(const Dice& b);
 	Dice(std::string str);
 	Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier);
-	Dice(std::string str, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count);
-	Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier, bool _just_show_rolls, bool _just_show_total, bool _is_list, std::string _count_expr, unsigned int _count);
 
 	explicit operator std::string() const;
 	explicit operator bool() const;
@@ -166,6 +158,5 @@ class Dice
 
 	std::string dice() const;
 	const char* c_str() const;
-	void roll();
-	void test();
+	RollResults roll();
 };
