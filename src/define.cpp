@@ -6,8 +6,8 @@
 //dir = Directory
 //file = File name
 //path = Directory + file name
-const char* random_seed_path = 			"/dev/random";
-const char* backup_random_seed_path = 		"/dev/urandom";
+const char* prng_path = 			"/dev/random";
+const char* backup_prng_path = 			"/dev/urandom";
 const char* rpgsh_programs_cache_path =		"/tmp/rpgsh_proglist";
 const char* rpgsh_output_redirect_path =	"/tmp/rpgsh";
 std::string variable_file_name =		".variables";
