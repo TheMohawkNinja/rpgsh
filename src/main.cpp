@@ -119,6 +119,9 @@ std::string input_handler()
 	int tab_ctr = 0;
 	std::string last_match = "";
 	std::vector<char> input;
+	std::vector<std::string> history = get_prog_output("history");
+	unsigned long history_len = history.size();
+	unsigned long history_ctr = history_len-1;
 
 	while(k != KB_ENTER)
 	{
@@ -140,14 +143,16 @@ std::string input_handler()
 			last_match = "";
 		}
 
+		//Reset history ctr
+		if(k != ESC_SEQ || (esc_char != 'A' && esc_char != 'B'))
+			history_ctr = history_len-1;
+
 		if(isprint(k))//Printable characters
 		{
 			if(insert_mode)	//If the "Insert" key is toggled
 			{
-				if(cur_pos < input.size())
-					input[cur_pos] = k;
-				else
-					input.push_back(k);
+				if(cur_pos < input.size()) input[cur_pos] = k;
+				else input.push_back(k);
 			}
 			else
 			{
@@ -178,10 +183,8 @@ std::string input_handler()
 		else if((k == KB_TAB || esc_char == 'Z') && input.size() &&
 			(cur_pos == input.size() || last_match != ""))//Tab (completion)
 		{
-			if(k == KB_TAB)
-				tab_ctr++;
-			else
-				tab_ctr--;
+			if(k == KB_TAB) tab_ctr++;
+			else tab_ctr--;
 
 			Scope tab_comp_scope;
 			std::string match = "";
@@ -416,6 +419,25 @@ std::string input_handler()
 		{
 			switch(esc_char)
 			{
+				case 'A':	//Up
+				case 'B':	//Down
+					if(cur_pos > 0) fprintf(stdout,CURSOR_LEFT_N,cur_pos);
+					fprintf(stdout,CLEAR_TO_LINE_END);
+					input.clear();
+					if(esc_char == 'B' && history_ctr == history_len-1)
+					{
+						cur_pos = 0;
+						break;
+					}
+					if     (esc_char == 'A' && history_ctr > 0)		history_ctr--;
+					else if(esc_char == 'B' && history_ctr < history_len-1)	history_ctr++;
+					for(const auto& c : history[history_ctr])
+					{
+						input.push_back(c);
+						fprintf(stdout,"%c",c);
+					}
+					cur_pos = input.size();
+					break;
 				case 'C':	//Right
 					if(cur_pos < input.size())
 					{
@@ -436,6 +458,21 @@ std::string input_handler()
 						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
 						cur_pos = 0;
 					}
+					break;
+				case '5':	//PgUp
+				case '6':	//PgDown
+					getchar();
+					if(cur_pos > 0) fprintf(stdout,CURSOR_LEFT_N,cur_pos);
+					fprintf(stdout,CLEAR_TO_LINE_END);
+					input.clear();
+					if     (esc_char == '5') history_ctr = 0;
+					else if(esc_char == '6') history_ctr = history_len-2;
+					for(const auto& c : history[history_ctr])
+					{
+						input.push_back(c);
+						fprintf(stdout,"%c",c);
+					}
+					cur_pos = input.size();
 					break;
 				case '7':	//Home
 					if(getchar() == '~' && cur_pos > 0)
@@ -545,6 +582,10 @@ int prompt()
 			return 1; //Non-zero so we can exit, and positive so user can discriminate between good exits and bad exits
 		}
 
+		std::ofstream ofs;
+		ofs.open(history_path,std::ios_base::app);
+		ofs<<std::string(buffer)+"\n";
+		ofs.close();
 		(void)run_rpgsh_prog(buffer,false);
 	}
 	return 0;
@@ -558,10 +599,7 @@ int main()
 	std::vector<std::string> rpgsh_apps;
 	std::filesystem::remove(rpgsh_programs_cache_path);
 	for(const auto& app : applications)
-	{
-		if(!findu(app,prefix))
-			rpgsh_apps.push_back(app);
-	}
+		if(!findu(app,prefix)) rpgsh_apps.push_back(app);
 
 	//Basic alphabetical sort, important for tab completion
 	sort<std::string>(&rpgsh_apps);
