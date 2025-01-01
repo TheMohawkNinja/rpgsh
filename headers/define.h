@@ -5,7 +5,7 @@
 
 //Version info
 #define MAJOR_VERSION			0
-#define MINOR_VERSION			12
+#define MINOR_VERSION			13
 #define PATCH_VERSION			0
 
 //Comment character definition
@@ -56,6 +56,7 @@
 #define PADDING				"padding"
 #define DEFAULT_GAME			"default_game"
 #define HIDE_TIPS			"hide_tips"
+#define HISTORY_LENGTH			"history_length"
 
 //Universal flags
 #define FLAG_APPDESCRIPTION		"--appdescription"
@@ -97,6 +98,7 @@ extern std::string config_path;
 extern std::string campaigns_dir;
 extern std::string templates_dir;
 extern std::string dice_lists_dir;
+extern std::string history_path;
 extern std::string prefix;
 
 //RegEx patterns
