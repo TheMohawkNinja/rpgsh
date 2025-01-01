@@ -203,6 +203,15 @@ void confirmCampaignVariablesFile()
 	ofs.close();
 }
 
+void confirmHistoryFile()
+{
+	if(std::filesystem::exists(history_path.c_str())) return;
+
+	output(Info,"rpgsh history file not found, creating file at \"%s\".",history_path.c_str());
+	std::ofstream ofs(history_path.c_str());
+	ofs.close();
+}
+
 std::vector<std::string> getDirectoryListing(std::string path)
 {
 	if(!std::filesystem::exists(path))
