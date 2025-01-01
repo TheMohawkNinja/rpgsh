@@ -50,24 +50,29 @@ Config::Config()
 	setting[PADDING]	=	"true";
 	setting[DEFAULT_GAME]	=	"dnd5e";
 	setting[HIDE_TIPS]	=	"false";
+	setting[HISTORY_LENGTH]	=	"100";
 
 	// Create default config file if one does not exist
 	if(!std::filesystem::exists(config_path.c_str()))
 	{
-		output(Info,"Config file not found, creating default at \'%s\'.",config_path.c_str());
+		output(Info,"Config file not found, creating default at \"%s\".",config_path.c_str());
 		std::ofstream fs(config_path.c_str());
 		fs<<COMMENT<<" Places a newline character before and after command output.\n";
 		fs<<COMMENT<<" Default: "<<setting[PADDING]<<"\n";
 		fs<<PADDING<<"="<<setting[PADDING]<<"\n";
 		fs<<"\n";
 		fs<<COMMENT<<" Sets the default game for use by rpgsh.\n";
-		fs<<COMMENT<<" Will change things like the character sheet used for the \'print\' command, and what attributes will be created for new characters when using default settings.\n";
+		fs<<COMMENT<<" Will change things like the character sheet used for the \"print\" command, and what attributes will be created for new characters when using default settings.\n";
 		fs<<COMMENT<<" Default: "<<setting[DEFAULT_GAME]<<"\n";
 		fs<<DEFAULT_GAME<<"="<<setting[DEFAULT_GAME]<<"\n";
 		fs<<"\n";
 		fs<<COMMENT<<" If set to \"true\", hides the tip text that appears when launching rpgsh.\n";
 		fs<<COMMENT<<" Default: "<<setting[HIDE_TIPS]<<"\n";
 		fs<<HIDE_TIPS<<"="<<setting[HIDE_TIPS]<<"\n";
+		fs<<"\n";
+		fs<<COMMENT<<" Sets the number of lines to save for rpgsh history.\n";
+		fs<<COMMENT<<" Default: "<<setting[HISTORY_LENGTH]<<"\n";
+		fs<<HIDE_TIPS<<"="<<setting[HISTORY_LENGTH]<<"\n";
 		fs.close();
 	}
 	std::ifstream fs(config_path.c_str());
@@ -75,7 +80,7 @@ Config::Config()
 	{
 		std::string data;
 		std::getline(fs,data);
-		if(data.length() && data[0] != COMMENT)
+		if(data.length() && data[0] != COMMENT)//TODO: Setup for inline comments
 			setting[getConfigItem(data)] = getConfigValue(data);
 	}
 	fs.close();
