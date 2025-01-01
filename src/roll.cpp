@@ -279,7 +279,7 @@ int main(int argc, char** argv)
 				fprintf(stdout,"Roll");
 				fprintf(stdout,"%s",addSpaces(q_str.length()-roll_str.length()+1).c_str());
 				fprintf(stdout,"%ld: ",roll);
-				fprintf(stdout,"%s%ld%s\n",color.c_str(),std::stol(mod_roll),TEXT_NORMAL);
+				fprintf(stdout,"%s%ld%s\n",color.c_str(),std::stol(nat_roll),TEXT_NORMAL);
 			}
 		}
 		if(!only_rolls && !only_total)
