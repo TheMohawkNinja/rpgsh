@@ -19,6 +19,7 @@ std::string config_path = 			root_dir + "config";
 std::string campaigns_dir = 			root_dir + "campaigns/";
 std::string templates_dir = 			root_dir + "templates/";
 std::string dice_lists_dir = 			root_dir + "dice-lists/";
+std::string history_path =			root_dir + ".history";
 std::string prefix =				"rpgsh-";
 
 //RegEx patterns
