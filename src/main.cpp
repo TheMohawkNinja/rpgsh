@@ -461,7 +461,7 @@ std::string input_handler()
 					break;
 				case '5':	//PgUp
 				case '6':	//PgDown
-					getchar();
+					if(getchar() != '~') continue;
 					if(cur_pos > 0) fprintf(stdout,CURSOR_LEFT_N,cur_pos);
 					fprintf(stdout,CLEAR_TO_LINE_END);
 					input.clear();
@@ -582,11 +582,49 @@ int prompt()
 			return 1; //Non-zero so we can exit, and positive so user can discriminate between good exits and bad exits
 		}
 
-		std::ofstream ofs;
-		ofs.open(history_path,std::ios_base::app);
-		ofs<<std::string(buffer)+"\n";
-		ofs.close();
 		(void)run_rpgsh_prog(buffer,false);
+
+		//Handle rpgsh history
+		unsigned long line_count = 0;
+		std::ifstream ifs(history_path);
+		std::vector<std::string> history;
+		std::string data;
+		while(!ifs.eof())
+		{
+			std::getline(ifs,data);
+			if(ifs.eof()) break;
+			history.push_back(data);
+			line_count++;
+		}
+		ifs.close();
+
+		history.push_back(buffer);
+		unsigned long history_len = 0;
+		try
+		{
+			history_len = std::stol(config.setting[HISTORY_LENGTH]);
+		}
+		catch(...)
+		{
+			output(Error,"Invalid value for \"%s\" setting: %s\n",HISTORY_LENGTH,config.setting[HISTORY_LENGTH].c_str());
+			exit(-1);
+		}
+
+		if(line_count >= history_len)
+		{
+			line_count = line_count-history_len+1;
+			std::ofstream ofs(history_path);
+			for(unsigned long i=line_count; i<=history_len; i++)
+				ofs<<history[i]+"\n";
+			ofs.close();
+		}
+		else
+		{
+			std::ofstream ofs(history_path);
+			for(unsigned long i=0; i<history.size(); i++)
+				ofs<<history[i]+"\n";
+			ofs.close();
+		}
 	}
 	return 0;
 }
