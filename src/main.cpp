@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <fstream>
 #include <map>
+#include <regex>
 #include <termios.h>
 #include "../headers/config.h"
 #include "../headers/functions.h"
@@ -581,6 +582,12 @@ int prompt()
 			fprintf(stdout,"Exiting...\n");
 			return 1; //Non-zero so we can exit, and positive so user can discriminate between good exits and bad exits
 		}
+
+		//Auto-escape colons so as to not cause issues with variable sets
+		std::regex colon(":");
+		std::string tmp_buffer = std::regex_replace(std::string(buffer),colon,"\\:");
+		for(unsigned long i=0; i<tmp_buffer.length(); i++)
+			buffer[i]=tmp_buffer[i];
 
 		(void)run_rpgsh_prog(buffer,false);
 
