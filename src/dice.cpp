@@ -242,7 +242,7 @@ Dice& Dice::operator += (const int b)
 Dice& Dice::operator += (const std::string b)
 {
 	try{*this += Dice(b);}
-	catch(...){List += b;}
+	catch(...){List = mergeQuotes(List + b);}
 
 	return *this;
 }
