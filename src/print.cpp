@@ -28,25 +28,27 @@ const char* print_value(std::string value)
 }
 void print_data(Scope scope)
 {
-	for(auto& [k,v] : scope.getDatamap<Currency>())
+	unsigned long var_len = scope.getDatamap<Var>().size();
+	unsigned long dice_len = scope.getDatamap<Dice>().size();
+	unsigned long wallet_len = scope.getDatamap<Wallet>().size();
+	unsigned long currency_len = scope.getDatamap<Currency>().size();
+	unsigned long i=0;
+	for(auto& [k,v] : scope.getDatamap<Var>())
 	{
 		//Skip hidden variables
 		if(k[0] == '.') continue;
-
-		fprintf(stdout,"%s%sCurrency%s%s",TEXT_BOLD,CURRENCY_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
+		i++;
+		fprintf(stdout,"%s%sVar%s%s",TEXT_BOLD,VAR_COLOR,TEXT_NORMAL,addSpaces(COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
-		fprintf(stdout,"%sSystem:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.System));
-		fprintf(stdout,"%sName:             %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Name));
-		fprintf(stdout,"%sSmallerAmount:    %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(std::to_string(v.SmallerAmount)));
-		fprintf(stdout,"%sSmaller:          %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Smaller));
-		fprintf(stdout,"%sLarger:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Larger));
-		fprintf(stdout,"\n");
+		fprintf(stdout,"%sValue:  %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Value));
+		if(i < var_len-1 || dice_len || wallet_len || currency_len) fprintf(stdout,"\n");
 	}
+	i=0;
 	for(auto& [k,v] : scope.getDatamap<Dice>())
 	{
 		//Skip hidden variables
 		if(k[0] == '.') continue;
-
+		i++;
 		fprintf(stdout,"%s%sDice%s%s",TEXT_BOLD,DICE_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		if(v.List != "")
@@ -59,22 +61,14 @@ void print_data(Scope scope)
 			fprintf(stdout,"%sFaces:        %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(std::to_string(v.Faces)));
 			fprintf(stdout,"%sModifier:     %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(std::to_string(v.Modifier)));
 		}
-		fprintf(stdout,"\n");
+		if(i < dice_len || wallet_len || currency_len) fprintf(stdout,"\n");
 	}
-	for(auto& [k,v] : scope.getDatamap<Var>())
-	{
-		//Skip hidden variables
-		if(k[0] == '.') continue;
-
-		fprintf(stdout,"%s%sVar%s%s",TEXT_BOLD,VAR_COLOR,TEXT_NORMAL,addSpaces(COLUMN_PADDING).c_str());
-		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
-		fprintf(stdout,"%sValue:  %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Value));
-		fprintf(stdout,"\n");
-	}
+	i=0;
 	for(auto& [k,v] : scope.getDatamap<Wallet>())
 	{
 		//Skip hidden variables
 		if(k[0] == '.') continue;
+		i++;
 
 		//Get longest currency name
 		long unsigned int longest_cur = 0;
@@ -96,8 +90,22 @@ void print_data(Scope scope)
 			fprintf(stdout,"%s%s:%s%s",TEXT_ITALIC,c.Name.c_str(),TEXT_NORMAL,addSpaces(longest_cur-c.Name.length()+COLUMN_PADDING).c_str());
 			fprintf(stdout,"%s\n",print_value(std::to_string(q)));
 		}
-
-		fprintf(stdout,"\n");
+		if(i < wallet_len || currency_len) fprintf(stdout,"\n");
+	}
+	i=0;
+	for(auto& [k,v] : scope.getDatamap<Currency>())
+	{
+		//Skip hidden variables
+		if(k[0] == '.') continue;
+		i++;
+		fprintf(stdout,"%s%sCurrency%s%s",TEXT_BOLD,CURRENCY_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
+		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
+		fprintf(stdout,"%sSystem:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.System));
+		fprintf(stdout,"%sName:             %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Name));
+		fprintf(stdout,"%sSmallerAmount:    %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(std::to_string(v.SmallerAmount)));
+		fprintf(stdout,"%sSmaller:          %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Smaller));
+		fprintf(stdout,"%sLarger:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Larger));
+		if(i < currency_len) fprintf(stdout,"\n");
 	}
 }
 void print_character_variables()
