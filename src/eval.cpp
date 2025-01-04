@@ -337,13 +337,16 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 			else
 				output(Error,"Error constructing LHS: %s",e.what());
 		}
-		try{(void)TR(rhs);}
-		catch(const std::runtime_error& e)
+		if(rhs != "")
 		{
-			if(e.what() == std::string(E_INVALID_EXPLICIT_CONSTRUCTOR))
-				output(Error,"Invalid RHS explicit constructor: \"%s\"",rhs.c_str());
-			else
-				output(Error,"Error constructing RHS: %s",e.what());
+			try{(void)TR(rhs);}
+			catch(const std::runtime_error& e)
+			{
+				if(e.what() == std::string(E_INVALID_EXPLICIT_CONSTRUCTOR))
+					output(Error,"Invalid RHS explicit constructor: \"%s\"",rhs.c_str());
+				else
+					output(Error,"Error constructing RHS: %s",e.what());
+			}
 		}
 		try
 		{
@@ -414,7 +417,7 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 	std::string result = "";
 
 	if(rhs_pos >= v->size())
-		rhs_pos = UINT_MAX;// Unary operators. MAX_BUFFER is way less than UINT_MAX, so this is okay
+		rhs_pos = UINT_MAX;// Unary operators. MAX_BUFFER is way less than UINT_MAX, so this is okay.
 
 	if(left((*v)[lhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
 		result = parseRHSAndDoOp<Var>(*v, lhs_pos, op_pos, rhs_pos);
@@ -605,7 +608,7 @@ int main(int argc, char** argv)
 						args[end] = left(args[end],findu(args[end],')'));
 
 						// Vectors for each operation type are in order of operator precedence
-						// TODO Don't use INT_MAX, as MAX_BUFFER_SIZE will need to be increased greatly to support large descriptions
+						// INT_MAX as a maximum for op_pos should be fine given that would be a massively complex equation.
 						int op_pos = INT_MAX;
 						for(const auto& precedence : operations)
 						{
@@ -621,6 +624,11 @@ int main(int argc, char** argv)
 						{
 							parseLHSAndDoOp(&vi,&args,op_pos-1,op_pos,op_pos+1);
 							args[start] += rparens;// Maintain end parens
+						}
+						else
+						{
+							output(Error,"Unknown operator \"%s\"",args[start+1].c_str());
+							exit(-1);
 						}
 
 						start = -1;
