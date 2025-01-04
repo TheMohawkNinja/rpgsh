@@ -1,3 +1,4 @@
+#include <climits>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
@@ -8,8 +9,6 @@
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 #include "../headers/text.h"
-
-#define MAX_BUFFER_SIZE 256
 
 Config config = Config();
 Character c = Character(false);
@@ -525,6 +524,8 @@ std::string input_handler()
 }
 int prompt()
 {
+	#define MAX_BUFFER_SIZE 65535 //Not sure why UINT_MAX segfaults, but hard-coding the value of UINT_MAX works fine
+
 	bool backup = false;
 
 	prompt:
@@ -559,14 +560,14 @@ int prompt()
 	char buffer[MAX_BUFFER_SIZE];
 
 	//Zero-out buffer so we have a known dataset
-	for(int i=0; i<MAX_BUFFER_SIZE; i++)
+	for(unsigned int i=0; i<MAX_BUFFER_SIZE; i++)
 		buffer[i] = '\0';
 
 	std::string in = input_handler();
 	if(in.length() > MAX_BUFFER_SIZE)
 	{
 		fprintf(stdout,"\n\n");
-		output(Error,"Input too big (%llu characters)! Please enter <= %d characters.",in.length(),MAX_BUFFER_SIZE);
+		output(Error,"Input too big (%llu characters)! Please enter <= %lu characters.",in.length(),MAX_BUFFER_SIZE);
 		strcpy(buffer,"");
 	}
 	else
@@ -586,7 +587,7 @@ int prompt()
 		//Auto-escape colons so as to not cause issues with variable sets
 		std::regex colon(":");
 		std::string tmp_buffer = std::regex_replace(std::string(buffer),colon,"\\:");
-		for(unsigned long i=0; i<tmp_buffer.length(); i++)
+		for(unsigned int i=0; i<tmp_buffer.length(); i++)
 			buffer[i]=tmp_buffer[i];
 
 		(void)run_rpgsh_prog(buffer,false);
