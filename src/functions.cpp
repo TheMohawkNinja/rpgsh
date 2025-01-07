@@ -498,6 +498,7 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	argv[args.size()] = NULL;
 
 	int status = 0;
+	int exit_code = 0;
 	posix_spawn_file_actions_t fa;
 	if(redirect_output)
 	{
@@ -525,6 +526,8 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 		{
 			if(waitpid(pid, &status, 0) == -1) exit(1);
 		}while(!WIFEXITED(status) && !WIFSIGNALED(status));
+
+		exit_code = WEXITSTATUS(status);
 	}
 	else
 	{
@@ -549,7 +552,7 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 
 	if(!redirect_output) padding();
 
-	return 0;
+	return exit_code;
 }
 
 std::vector<std::string> get_prog_output(std::string prog)
