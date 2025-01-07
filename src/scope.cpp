@@ -108,16 +108,24 @@ void Scope::load(std::string path, bool loadVar, bool loadDice, bool loadCurrenc
 				break;
 			}
 
-			if(type == CURRENCY_SIGIL && loadCurrency)
-				currencies[key] = Currency(value);
-			else if(type == DICE_SIGIL && loadDice)
-				dice[key] = Dice(value);
-			else if(type == VAR_SIGIL && loadVar)
-				vars[key] = Var(value);
-			else if(type == WALLET_SIGIL && loadWallet)
-				wallets[key] = Wallet(value);
-			else if(!isTypeSigil(type))
-				output(Warning,"Unknown type specifier \'%c\' in \"%s:%d\"",type,datasource.c_str(),linenum);
+			try
+			{
+				if(type == CURRENCY_SIGIL && loadCurrency)
+					currencies[key] = Currency(value);
+				else if(type == DICE_SIGIL && loadDice)
+					dice[key] = Dice(value);
+				else if(type == VAR_SIGIL && loadVar)
+					vars[key] = Var(value);
+				else if(type == WALLET_SIGIL && loadWallet)
+					wallets[key] = Wallet(value);
+				else if(!isTypeSigil(type))
+					output(Warning,"Unknown type specifier \'%c\' in \"%s:%d\"",type,datasource.c_str(),linenum);
+			}
+			catch(const std::runtime_error& e)
+			{
+				output(Error,"Unable to load \"%s\" into the character at \"%s:%d\": %s.",data.c_str(),datasource.c_str(),linenum,e.what());
+				exit(-1);
+			}
 		}
 	}
 	ifs.close();
