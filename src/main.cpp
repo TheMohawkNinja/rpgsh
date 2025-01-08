@@ -590,7 +590,9 @@ int prompt()
 		for(unsigned int i=0; i<tmp_buffer.length(); i++)
 			buffer[i]=tmp_buffer[i];
 
+		padding();
 		(void)run_rpgsh_prog(buffer,false);
+		padding();
 
 		//Handle rpgsh history
 		unsigned long line_count = 0;
@@ -672,6 +674,7 @@ int main()
 
 	if(!stob(config.setting[HIDE_TIPS]))
 	{
+		fprintf(stdout,"\n");
 		fprintf(stdout,"%s%sTIP: %sType %s%shelp%s for a list of currently supported commands.\n",TEXT_BOLD,TEXT_CYAN,TEXT_NORMAL,TEXT_BOLD,TEXT_GREEN,TEXT_NORMAL);
 		fprintf(stdout,"%s%sTIP: %sFor more info about a given command, try using the %s%s-?%s or %s%s--help%s flags.\n\n",TEXT_BOLD,TEXT_CYAN,TEXT_NORMAL,TEXT_BOLD,TEXT_GREEN,TEXT_NORMAL,TEXT_BOLD,TEXT_GREEN,TEXT_NORMAL);
 	}
