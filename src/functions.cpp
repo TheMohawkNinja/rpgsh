@@ -383,8 +383,6 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	extern char** environ;
 	pid_t pid;
 
-	if(!redirect_output) padding();
-
 	if(isScopeSigil(arg_str[0])) //Check if user is operating on a variable
 		arg_str = "eval " + arg_str;
 	bool runningVariables = (left(arg_str,4) == "eval");
@@ -405,6 +403,11 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	while(v_str_it != v_str_end)
 	{
 		std::string v_str = v_str_it->str();
+		if(run_rpgsh_prog(v_str,false))
+		{
+			output(Error,"%s is not a valid variable string.",v_str.c_str());
+			return -1;
+		}
 		arg_str = std::regex_replace(arg_str,std::regex(v_str),get_prog_output(v_str)[0]);
 		v_str_it++;
 	}
@@ -538,7 +541,6 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 		else
 			output(Error,"Error code %d while attempting to run \"%s\": %s",status,displayed_command.c_str(),strerror(status));
 
-		if(!redirect_output) padding();
 		return status;
 	}
 
@@ -546,11 +548,8 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	{
 		output(Error,"Error code %d during posix_spawn_file_actions_destroy(): %s",status,strerror(status));
 
-		if(!redirect_output) padding();
 		return status;
 	}
-
-	if(!redirect_output) padding();
 
 	return exit_code;
 }
