@@ -195,6 +195,8 @@ std::string input_handler()
 			for(int i=cur_pos-1; i>=0&&input[i]!=' '; i--)
 				chk_str.insert(0,std::string(1,input[i]));
 
+			if(chk_str[0] == '(') chk_str.erase(chk_str.begin());
+
 			if(isalpha(chk_str[0]))//Applications
 			{
 				//Get matches
