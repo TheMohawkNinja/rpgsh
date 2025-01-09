@@ -403,7 +403,7 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	while(v_str_it != v_str_end)
 	{
 		std::string v_str = v_str_it->str();
-		if(run_rpgsh_prog(v_str,false))
+		if(run_rpgsh_prog(v_str,true))
 		{
 			output(Error,"%s is not a valid variable string.",v_str.c_str());
 			return -1;
