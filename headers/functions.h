@@ -32,7 +32,14 @@ bool isEscaped(std::string str, long unsigned int pos);
 
 int stringcasecmp(std::string a, std::string b);
 
-int findInStrVect(std::vector<std::string> v, std::string str, unsigned int start=0);
+template <typename T>
+long long int findInVect(std::vector<T> v, T match, long unsigned int start=0)
+{
+	for(long unsigned int i=start; i<v.size(); i++)
+		if(v[i] == match) return i;
+
+	return -1;
+}
 
 long unsigned int findu(std::string str, std::string match, long unsigned int start=0);
 long unsigned int findu(std::string str, char ch, long unsigned int start=0);
