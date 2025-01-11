@@ -417,7 +417,6 @@ std::string input_handler()
 			for(long unsigned int i=cur_pos; i<input.size(); i++)
 				fprintf(stdout,"%c",input[i]);
 
-			//fprintf(stdout,"\n%s\n",chk_str.c_str());
 			//CURSOR_LEFT_N(0) still pushes cursor to the left, so we need to check
 			if(cur_pos+(match.length()-2) < input.size())
 				fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos-(match.length()-2)+(chk_str.length()-(findu(chk_str,'/')+1)));
