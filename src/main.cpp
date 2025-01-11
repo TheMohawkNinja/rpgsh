@@ -137,8 +137,10 @@ std::string input_handler()
 		//Reset tab completion variables
 		if(k != KB_TAB && esc_char != 'Z')//Z for shift+tab
 		{
-			if(containsNonSpaceChar(last_match))
+			if(containsNonSpaceChar(last_match) && findInVect<char>(input,' ',cur_pos) == -1)
 				cur_pos += (input.size()-cur_pos);
+			else if(containsNonSpaceChar(last_match))
+				cur_pos = findInVect<char>(input,' ',cur_pos);
 			tab_ctr = 0;
 			last_match = "";
 		}
@@ -181,7 +183,7 @@ std::string input_handler()
 				fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
 		}
 		else if((k == KB_TAB || esc_char == 'Z') && input.size() &&
-			(cur_pos == input.size() || last_match != ""))//Tab (completion)
+			(cur_pos == input.size() || input[cur_pos] == ')' || input[cur_pos] == ' ' || last_match != ""))//Tab (completion)
 		{
 			if(k == KB_TAB) tab_ctr++;
 			else tab_ctr--;
@@ -414,6 +416,11 @@ std::string input_handler()
 
 			for(long unsigned int i=cur_pos; i<input.size(); i++)
 				fprintf(stdout,"%c",input[i]);
+
+			//fprintf(stdout,"\n%s\n",chk_str.c_str());
+			//CURSOR_LEFT_N(0) still pushes cursor to the left, so we need to check
+			if(cur_pos+(match.length()-2) < input.size())
+				fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos-(match.length()-2)+(chk_str.length()-(findu(chk_str,'/')+1)));
 
 			last_match = match;
 		}
