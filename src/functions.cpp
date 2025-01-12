@@ -380,7 +380,6 @@ int runRpgshApp(std::string arg_str, bool redirect_output)
 	bool runningVariables = (left(arg_str,4) == "eval");
 
 	//Push back program we are going to run
-	//This does mean no spaces for program names, but meh
 	std::string path = std::string(RPGSH_INSTALL_DIR);
 	args.push_back(path+prefix+left(arg_str,findu(arg_str," ")));
 
