@@ -28,27 +28,19 @@ const char* print_value(std::string value)
 }
 void print_data(Scope scope)
 {
-	unsigned long var_len = scope.getDatamap<Var>().size();
-	unsigned long dice_len = scope.getDatamap<Dice>().size();
-	unsigned long wallet_len = scope.getDatamap<Wallet>().size();
-	unsigned long currency_len = scope.getDatamap<Currency>().size();
-	unsigned long i=0;
 	for(auto& [k,v] : scope.getDatamap<Var>())
 	{
 		//Skip hidden variables
 		if(k[0] == '.') continue;
-		i++;
 		fprintf(stdout,"%s%sVar%s%s",TEXT_BOLD,VAR_COLOR,TEXT_NORMAL,addSpaces(COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		fprintf(stdout,"%sValue:  %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Value));
-		if(i < var_len-1 || dice_len || wallet_len || currency_len) fprintf(stdout,"\n");
+		fprintf(stdout,"\n");
 	}
-	i=0;
 	for(auto& [k,v] : scope.getDatamap<Dice>())
 	{
 		//Skip hidden variables
 		if(k[0] == '.') continue;
-		i++;
 		fprintf(stdout,"%s%sDice%s%s",TEXT_BOLD,DICE_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		if(v.List != "")
@@ -61,14 +53,12 @@ void print_data(Scope scope)
 			fprintf(stdout,"%sFaces:        %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(std::to_string(v.Faces)));
 			fprintf(stdout,"%sModifier:     %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(std::to_string(v.Modifier)));
 		}
-		if(i < dice_len || wallet_len || currency_len) fprintf(stdout,"\n");
+		fprintf(stdout,"\n");
 	}
-	i=0;
 	for(auto& [k,v] : scope.getDatamap<Wallet>())
 	{
 		//Skip hidden variables
 		if(k[0] == '.') continue;
-		i++;
 
 		//Get longest currency name
 		long unsigned int longest_cur = 0;
@@ -90,14 +80,12 @@ void print_data(Scope scope)
 			fprintf(stdout,"%s%s:%s%s",TEXT_ITALIC,c.Name.c_str(),TEXT_NORMAL,addSpaces(longest_cur-c.Name.length()+COLUMN_PADDING).c_str());
 			fprintf(stdout,"%s\n",print_value(std::to_string(q)));
 		}
-		if(i < wallet_len || currency_len) fprintf(stdout,"\n");
+		fprintf(stdout,"\n");
 	}
-	i=0;
 	for(auto& [k,v] : scope.getDatamap<Currency>())
 	{
 		//Skip hidden variables
 		if(k[0] == '.') continue;
-		i++;
 		fprintf(stdout,"%s%sCurrency%s%s",TEXT_BOLD,CURRENCY_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		fprintf(stdout,"%sSystem:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.System));
@@ -105,8 +93,9 @@ void print_data(Scope scope)
 		fprintf(stdout,"%sSmallerAmount:    %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(std::to_string(v.SmallerAmount)));
 		fprintf(stdout,"%sSmaller:          %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Smaller));
 		fprintf(stdout,"%sLarger:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Larger));
-		if(i < currency_len) fprintf(stdout,"\n");
+		fprintf(stdout,"\n");
 	}
+	fprintf(stdout,"\b");//Remove extraneous newline
 }
 void print_character_variables()
 {
@@ -173,32 +162,23 @@ int main(int argc, char** argv)
 		std::string set_string = std::string(argv[1]);
 		Scope set;
 
-		while(findu(set_string,DS) != std::string::npos)
+		for(const auto& [k,v] : getSet(std::string(argv[1])))
 		{
-			std::string set_key = left(set_string,findu(set_string,DS));
-			set_string = right(set_string,findu(set_string,set_key)+set_key.length()+DS.length());
-			std::string set_value = left(set_string,findu(set_string,DS));
-
-			switch(set_value[0])
+			switch(v[0])
 			{
 				case VAR_SIGIL:
-					set.set<Var>(set_key,set_value);
+					set.set<Var>(k,v);
 					break;
 				case DICE_SIGIL:
-					set.set<Dice>(set_key,set_value);
+					set.set<Dice>(k,v);
 					break;
 				case WALLET_SIGIL:
-					set.set<Wallet>(set_key,set_value);
+					set.set<Wallet>(k,v);
 					break;
 				case CURRENCY_SIGIL:
-					set.set<Currency>(set_key,set_value);
+					set.set<Currency>(k,v);
 					break;
 			}
-
-			if(findu(set_string,DS) != std::string::npos)
-				set_string = right(set_string,findu(set_string,set_value)+set_value.length()+DS.length());
-			else
-				break;
 		}
 
 		print_data(set);
