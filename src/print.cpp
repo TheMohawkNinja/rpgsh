@@ -26,7 +26,7 @@ const char* printValue(std::string value)
 {
 	if(value == "") return empty_str.c_str();
 
-	std::map<std::string,char> common_esc_char = {
+	std::map<std::string,char> common_esc_chars = {
 	{"\\\\a",'\a'}, //Bell
 	{"\\\\b",'\b'}, //Backspace
 	{"\\\\f",'\f'}, //Form feed
@@ -35,12 +35,95 @@ const char* printValue(std::string value)
 	{"\\\\t",'\t'}, //Horizontal tab
 	{"\\\\v",'\v'}};//Vertical tab
 
-	for(const auto& [k,v] : common_esc_char)
+	std::map<std::string,const char*> ansi_esc_chars = {
+	{"%/%",			TEXT_NORMAL},
+	{"%b%",			TEXT_BOLD},
+	{"%/b%",		TEXT_NOBOLD},
+	{"%i%",			TEXT_ITALIC},
+	{"%/i%",		TEXT_NOITALIC},
+	{"%d%",			TEXT_DIM},
+	{"%/d%",		TEXT_NORMALINTENSITY},
+	{"%u%",			TEXT_UNDERLINE},
+	{"%/u%",		TEXT_NOUNDERLINE},
+	{"%blink%",		TEXT_BLINK},
+	{"%/blink%",		TEXT_NOBLINK},
+	{"%r%",			TEXT_REVERSE},
+	{"%/r%",		TEXT_NOREVERSE},
+	{"%black%",		TEXT_BLACK},
+	{"%/black%",		TEXT_DEFAULTCOLOR},
+	{"%red%",		TEXT_RED},
+	{"%/red%",		TEXT_DEFAULTCOLOR},
+	{"%green%",		TEXT_GREEN},
+	{"%/green%",		TEXT_DEFAULTCOLOR},
+	{"%yellow%",		TEXT_YELLOW},
+	{"%/yellow%",		TEXT_DEFAULTCOLOR},
+	{"%blue%",		TEXT_BLUE},
+	{"%/blue%",		TEXT_DEFAULTCOLOR},
+	{"%magenta%",		TEXT_MAGENTA},
+	{"%/magenta%",		TEXT_DEFAULTCOLOR},
+	{"%cyan%",		TEXT_CYAN},
+	{"%/cyan%",		TEXT_DEFAULTCOLOR},
+	{"%lightgray%",		TEXT_LIGHTGRAY},
+	{"%/lightgray%",	TEXT_DEFAULTCOLOR},
+	{"%darkgray%",		TEXT_DARKGRAY},
+	{"%/darkgray%",		TEXT_DEFAULTCOLOR},
+	{"%lightred%",		TEXT_LIGHTRED},
+	{"%/lightred%",		TEXT_DEFAULTCOLOR},
+	{"%lightgreen%",	TEXT_LIGHTGREEN},
+	{"%/lightgreen%",	TEXT_DEFAULTCOLOR},
+	{"%lightyellow%",	TEXT_LIGHTYELLOW},
+	{"%/lightyellow%",	TEXT_DEFAULTCOLOR},
+	{"%lightblue%",		TEXT_LIGHTBLUE},
+	{"%/lightblue%",	TEXT_DEFAULTCOLOR},
+	{"%lightmagenta%",	TEXT_LIGHTMAGENTA},
+	{"%/lightmagenta%",	TEXT_DEFAULTCOLOR},
+	{"%lightcyan%",		TEXT_LIGHTCYAN},
+	{"%/lightcyan%",	TEXT_DEFAULTCOLOR},
+	{"%white%",		TEXT_WHITE},
+	{"%/white%",		TEXT_DEFAULTCOLOR},
+	{"%bgblack%",		TEXT_BG_BLACK},
+	{"%/bgblack%",		TEXT_BG_DEFAULTCOLOR},
+	{"%bgred%",		TEXT_BG_RED},
+	{"%/bgred%",		TEXT_BG_DEFAULTCOLOR},
+	{"%bggreen%",		TEXT_BG_GREEN},
+	{"%/bggreen%",		TEXT_BG_DEFAULTCOLOR},
+	{"%bgyellow%",		TEXT_BG_YELLOW},
+	{"%/bgyellow%",		TEXT_BG_DEFAULTCOLOR},
+	{"%bgblue%",		TEXT_BG_BLUE},
+	{"%/bgblue%",		TEXT_BG_DEFAULTCOLOR},
+	{"%bgmagenta%",		TEXT_BG_MAGENTA},
+	{"%/bgmagenta%",	TEXT_BG_DEFAULTCOLOR},
+	{"%bgcyan%",		TEXT_BG_CYAN},
+	{"%/bgcyan%",		TEXT_BG_DEFAULTCOLOR},
+	{"%bglightgray%",	TEXT_BG_LIGHTGRAY},
+	{"%/bglightgray%",	TEXT_BG_DEFAULTCOLOR},
+	{"%bgdarkgray%",	TEXT_BG_DARKGRAY},
+	{"%/bgdarkgray%",	TEXT_BG_DEFAULTCOLOR},
+	{"%bglightred%",	TEXT_BG_LIGHTRED},
+	{"%/bglightred%",	TEXT_BG_DEFAULTCOLOR},
+	{"%bglightgreen%",	TEXT_BG_LIGHTGREEN},
+	{"%/bglightgreen%",	TEXT_BG_DEFAULTCOLOR},
+	{"%bglightyellow%",	TEXT_BG_LIGHTYELLOW},
+	{"%/bglightyellow%",	TEXT_BG_DEFAULTCOLOR},
+	{"%bglightblue%",	TEXT_BG_LIGHTBLUE},
+	{"%/bglightblue%",	TEXT_BG_DEFAULTCOLOR},
+	{"%bglightmagenta%",	TEXT_BG_LIGHTMAGENTA},
+	{"%/bglightmagenta%",	TEXT_BG_DEFAULTCOLOR},
+	{"%bglightcyan%",	TEXT_BG_LIGHTCYAN},
+	{"%/bglightcyan%",	TEXT_BG_DEFAULTCOLOR},
+	{"%bgwhite%",		TEXT_BG_WHITE},
+	{"%/bgwhite%",		TEXT_BG_DEFAULTCOLOR}};
+
+	for(const auto& [k,v] : common_esc_chars)
 		value = std::regex_replace(value,std::regex(k),std::string(1,v));
 
 	for(long unsigned int i=0; i<value.length(); i++)
 		if(value[i] == '\\') value.erase(value.begin()+i);
 
+	for(const auto& [k,v] : ansi_esc_chars)
+		value = std::regex_replace(value,std::regex(k),std::string(v));
+
+	value += std::string(TEXT_NORMAL); //Make sure we don't carry over any unterminated formatting
 	return value.c_str();
 }
 void printData(Scope scope)
