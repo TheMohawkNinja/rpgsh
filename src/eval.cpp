@@ -121,7 +121,7 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 	}
 	else if(action == Read)// If the last character is a '/' and we are just printing the value, print a list of keys and constructors
 	{
-		return getSet(*p_vi);
+		return getSetStr(*p_vi);
 	}
 	else if(action == SetAdd || action == SetAddA ||
 		action == SetRemove || action == SetRemoveA)// Perform write operation on variable set
@@ -132,58 +132,71 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 			char type = 0;
 		};
 
-		while(findu(value,DS) != std::string::npos)
+		//Make sure we don't remove keys that aren't part of the set being altered
+		if(action == SetRemove || action == SetRemoveA)
 		{
-			std::string set_key = left(value,findu(value,DS));
-			value = right(value,findu(value,set_key)+set_key.length()+DS.length());
-			std::string set_value = left(value,findu(value,DS));
+			for(const auto& [rhs_k,rhs_v] : getSet(value))
+			{
+				bool keyFound = false;
+				for(const auto& [lhs_k,lhs_v] : getSet(getSetStr(*p_vi)))
+				{
+					if(lhs_k == rhs_k)
+					{
+						keyFound = true;
+						break;
+					}
+				}
+				if(!keyFound)
+				{
+					output(Error,"\"%s\" is not contained within the LHS set.",rhs_k.c_str());
+					exit(-1);
+				}
+			}
+		}
 
+		for(const auto& [k,v] : getSet(value))
+		{
 			RemovedKey rk;
 
-			switch(set_value[0])
+			switch(v[0])
 			{
 				case VAR_SIGIL:
 					if((p_vi->type == '/' || p_vi->type == VAR_SIGIL) &&
 					   (action == SetAdd || action == SetAddA))
-						p_vi->scope.set<Var>(p_vi->key+set_key,set_value);
+						p_vi->scope.set<Var>(p_vi->key+k,v);
 					else if(p_vi->type == '/' || p_vi->type == VAR_SIGIL)
-						rk = {p_vi->scope.remove<Var>(set_key),VAR_SIGIL};
+						rk = {p_vi->scope.remove<Var>(k),VAR_SIGIL};
 					break;
 				case DICE_SIGIL:
 					if((p_vi->type == '/' || p_vi->type == DICE_SIGIL) &&
 					   (action == SetAdd || action == SetAddA))
-						p_vi->scope.set<Dice>(p_vi->key+set_key,set_value);
+						p_vi->scope.set<Dice>(p_vi->key+k,v);
 					else if(p_vi->type == '/' || p_vi->type == DICE_SIGIL)
-						rk = {p_vi->scope.remove<Dice>(set_key),DICE_SIGIL};
+						rk = {p_vi->scope.remove<Dice>(k),DICE_SIGIL};
 					break;
 				case WALLET_SIGIL:
 					if((p_vi->type == '/' || p_vi->type == WALLET_SIGIL) &&
 					   (action == SetAdd || action == SetAddA))
-						p_vi->scope.set<Wallet>(p_vi->key+set_key,set_value);
+						p_vi->scope.set<Wallet>(p_vi->key+k,v);
 					else if(p_vi->type == '/' || p_vi->type == WALLET_SIGIL)
-						rk = {p_vi->scope.remove<Wallet>(set_key),WALLET_SIGIL};
+						rk = {p_vi->scope.remove<Wallet>(k),WALLET_SIGIL};
 					break;
 				case CURRENCY_SIGIL:
 					if((p_vi->type == '/' || p_vi->type == CURRENCY_SIGIL) &&
 					   (action == SetAdd || action == SetAddA))
-						p_vi->scope.set<Currency>(p_vi->key+set_key,set_value);
+						p_vi->scope.set<Currency>(p_vi->key+k,v);
 					else if(p_vi->type == '/' || p_vi->type == CURRENCY_SIGIL)
-						rk = {p_vi->scope.remove<Currency>(set_key),CURRENCY_SIGIL};
+						rk = {p_vi->scope.remove<Currency>(k),CURRENCY_SIGIL};
 					break;
 			}
 
 			if(action == SetAddA)
-				output(Info,"Set \"%c%c/%s\" to \"%s\"",p_vi->scope.sigil,p_vi->evalType,(p_vi->key+set_key).c_str(),set_value.c_str());
+				output(Info,"Set \"%c%c/%s\" to \"%s\"",p_vi->scope.sigil,p_vi->evalType,(p_vi->key+k).c_str(),v.c_str());
 			else if(action == SetRemoveA && rk.isRemoved)
-				output(Warning,"Removed \"%c%c/%s\"",p_vi->scope.sigil,rk.type,set_key.c_str());
-
-			if(findu(value,DS) != std::string::npos)
-				value = right(value,findu(value,set_value)+set_value.length()+DS.length());
-			else
-				break;
+				output(Warning,"Removed \"%c%c/%s\"",p_vi->scope.sigil,rk.type,k.c_str());
 		}
 
-		if (action == SetAdd || action == SetRemove) return getSet(*p_vi);
+		if (action == SetAdd || action == SetRemove) return getSetStr(*p_vi);
 		else if(action == SetAddA || action == SetRemoveA) p_vi->scope.save();
 	}
 
