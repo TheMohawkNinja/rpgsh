@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 	std::string dice_str, current_arg;
 	std::string count_expr = "";
 
-	check_print_app_description(argv,"A simple, yet featureful dice rolling program.");
+	chkPrntAppDesc(argv,"A simple, yet featureful dice rolling program.");
 
 	if(argc == 1)
 	{

@@ -3,7 +3,7 @@
 #include "../headers/scope.h"
 #include "../headers/text.h"
 
-void print_header(std::string s)
+void printHeader(std::string s)
 {
 	fprintf(stdout,"%s%s %s %s\n",TEXT_GREEN,TEXT_BOLD,s.c_str(),TEXT_NORMAL);
 	fprintf(stdout,"%s",TEXT_WHITE);
@@ -12,7 +12,7 @@ void print_header(std::string s)
 	fprintf(stdout,"%s\n",TEXT_NORMAL);
 }
 template <typename T>
-void get_longest_key_from_datamap(datamap<T> m, unsigned int* p_current_longest_len)
+void getLongestKey(datamap<T> m, unsigned int* p_current_longest_len)
 {
 	for(auto& [k,v] : m)
 	{
@@ -21,12 +21,12 @@ void get_longest_key_from_datamap(datamap<T> m, unsigned int* p_current_longest_
 			(*p_current_longest_len) = k.length();
 	}
 }
-const char* print_value(std::string value)
+const char* printValue(std::string value)
 {
 	if(value != "") return value.c_str();
 	else return empty_str.c_str();
 }
-void print_data(Scope scope)
+void printData(Scope scope)
 {
 	for(auto& [k,v] : scope.getDatamap<Var>())
 	{
@@ -34,7 +34,7 @@ void print_data(Scope scope)
 		if(k[0] == '.') continue;
 		fprintf(stdout,"%s%sVar%s%s",TEXT_BOLD,VAR_COLOR,TEXT_NORMAL,addSpaces(COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
-		fprintf(stdout,"%sValue:  %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Value));
+		fprintf(stdout,"%sValue:  %s%s\n",TEXT_ITALIC,TEXT_NORMAL,printValue(v.Value));
 		fprintf(stdout,"\n");
 	}
 	for(auto& [k,v] : scope.getDatamap<Dice>())
@@ -45,13 +45,13 @@ void print_data(Scope scope)
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		if(v.List != "")
 		{
-			fprintf(stdout,"%sList:         %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.List));
+			fprintf(stdout,"%sList:         %s%s\n",TEXT_ITALIC,TEXT_NORMAL,printValue(v.List));
 		}
 		else
 		{
-			fprintf(stdout,"%sQuantity:     %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(std::to_string(v.Quantity)));
-			fprintf(stdout,"%sFaces:        %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(std::to_string(v.Faces)));
-			fprintf(stdout,"%sModifier:     %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(std::to_string(v.Modifier)));
+			fprintf(stdout,"%sQuantity:     %s%s\n",TEXT_ITALIC,TEXT_NORMAL,printValue(std::to_string(v.Quantity)));
+			fprintf(stdout,"%sFaces:        %s%s\n",TEXT_ITALIC,TEXT_NORMAL,printValue(std::to_string(v.Faces)));
+			fprintf(stdout,"%sModifier:     %s%s\n",TEXT_ITALIC,TEXT_NORMAL,printValue(std::to_string(v.Modifier)));
 		}
 		fprintf(stdout,"\n");
 	}
@@ -78,7 +78,7 @@ void print_data(Scope scope)
 			if(!q) continue;
 
 			fprintf(stdout,"%s%s:%s%s",TEXT_ITALIC,c.Name.c_str(),TEXT_NORMAL,addSpaces(longest_cur-c.Name.length()+COLUMN_PADDING).c_str());
-			fprintf(stdout,"%s\n",print_value(std::to_string(q)));
+			fprintf(stdout,"%s\n",printValue(std::to_string(q)));
 		}
 		fprintf(stdout,"\n");
 	}
@@ -88,52 +88,52 @@ void print_data(Scope scope)
 		if(k[0] == '.') continue;
 		fprintf(stdout,"%s%sCurrency%s%s",TEXT_BOLD,CURRENCY_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
-		fprintf(stdout,"%sSystem:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.System));
-		fprintf(stdout,"%sName:             %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Name));
-		fprintf(stdout,"%sSmallerAmount:    %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(std::to_string(v.SmallerAmount)));
-		fprintf(stdout,"%sSmaller:          %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Smaller));
-		fprintf(stdout,"%sLarger:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,print_value(v.Larger));
+		fprintf(stdout,"%sSystem:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,printValue(v.System));
+		fprintf(stdout,"%sName:             %s%s\n",TEXT_ITALIC,TEXT_NORMAL,printValue(v.Name));
+		fprintf(stdout,"%sSmallerAmount:    %s%s\n",TEXT_ITALIC,TEXT_NORMAL,printValue(std::to_string(v.SmallerAmount)));
+		fprintf(stdout,"%sSmaller:          %s%s\n",TEXT_ITALIC,TEXT_NORMAL,printValue(v.Smaller));
+		fprintf(stdout,"%sLarger:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,printValue(v.Larger));
 		fprintf(stdout,"\n");
 	}
 	fprintf(stdout,"\b");//Remove extraneous newline
 }
-void print_character_variables()
+void printCharacterVariables()
 {
 	Character c = Character(false);
 	std::string sigil(1,CHARACTER_SIGIL);
-	print_header("("+sigil+") "+c.getName());
-	print_data(c);
+	printHeader("("+sigil+") "+c.getName());
+	printData(c);
 }
-void print_campaign_variables()
+void printCampaignVariables()
 {
 	confirmCampaignVariablesFile();
 	Campaign m = Campaign();
 	std::string sigil(1,CAMPAIGN_SIGIL);
-	std::string m_name = get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR);
-	print_header("("+sigil+") "+left(m_name,m_name.length()-1));// Omit trailing '/'
-	print_data(m);
+	std::string m_name = getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR);
+	printHeader("("+sigil+") "+left(m_name,m_name.length()-1));// Omit trailing '/'
+	printData(m);
 }
-void print_shell_variables()
+void printShellVariables()
 {
 	Shell s = Shell();
 	std::string sigil(1,SHELL_SIGIL);
-	print_header("("+sigil+") "+"Shell");
-	print_data(s);
+	printHeader("("+sigil+") "+"Shell");
+	printData(s);
 }
 int main(int argc, char** argv)
 {
-	check_print_app_description(argv,"Pretty prints variables, variable sets, and scopes.");
+	chkPrntAppDesc(argv,"Pretty prints variables, variable sets, and scopes.");
 
 	if(argc > 2)
 		output(Warning,"Expected only one argument. All args past \"%s\" will be ignored.",argv[1]);
 
 	if(argc == 1 || !strcmp(argv[1],"--all"))
 	{
-		print_shell_variables();
+		printShellVariables();
 		fprintf(stdout,"\n");
-		print_campaign_variables();
+		printCampaignVariables();
 		fprintf(stdout,"\n");
-		print_character_variables();
+		printCharacterVariables();
 	}
 	else if(isTypeSigil(argv[1][0]) && argv[1][1] == '{')
 	{
@@ -155,7 +155,7 @@ int main(int argc, char** argv)
 				variable.set<Currency>("",Currency(v_str));
 				break;
 		}
-		print_data(variable);
+		printData(variable);
 	}
 	else if(looksLikeSet(std::string(argv[1])))
 	{
@@ -181,7 +181,7 @@ int main(int argc, char** argv)
 			}
 		}
 
-		print_data(set);
+		printData(set);
 	}
 	else if(!strcmp(argv[1],"-?") || !strcmp(argv[1],"--help"))
 	{

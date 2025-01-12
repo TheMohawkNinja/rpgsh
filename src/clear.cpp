@@ -7,7 +7,7 @@ int main(int argc, char** argv)
 	if(argc > 2)
 		output(Warning,"clear only expects 0 or 1 arguments, ignoring all other arguments.");
 
-	check_print_app_description(argv,"Clears the screen.");
+	chkPrntAppDesc(argv,"Clears the screen.");
 
 	if(argv[1] && (!strcasecmp(argv[1],"-?") || !strcasecmp(argv[1],"--help")))
 	{

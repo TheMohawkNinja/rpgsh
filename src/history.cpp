@@ -6,7 +6,7 @@
 
 int main(int argc, char** argv)
 {
-	check_print_app_description(argv,"Prints rpgsh history.");
+	chkPrntAppDesc(argv,"Prints rpgsh history.");
 
 	Config config = Config();
 	long rpgsh_history_length;

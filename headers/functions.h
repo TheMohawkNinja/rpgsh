@@ -72,14 +72,14 @@ void printBadOpAndThrow(std::string bad_op);
 
 void padding();
 
-int run_rpgsh_prog(std::string args, bool redirect_output);
+int runRpgshApp(std::string args, bool redirect_output);
 
-std::vector<std::string> get_prog_output(std::string prog);
+std::vector<std::string> getAppOutput(std::string prog);
 
-void check_print_app_description(char** _argv, std::string description);
+void chkPrntAppDesc(char** _argv, std::string description);
 
-std::string get_env_variable(std::string v);
-void set_env_variable(std::string v, std::string value);
+std::string getEnvVariable(std::string v);
+void setEnvVariable(std::string v, std::string value);
 
 unsigned int getWalletValue(Wallet w);
 

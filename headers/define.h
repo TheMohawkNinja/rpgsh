@@ -93,7 +93,7 @@ extern std::string variable_file_name;
 extern std::string user;
 extern std::string root_dir;
 extern std::string shell_variables_path;
-extern std::string rpgsh_env_variables_path;
+extern std::string rpgshEnvVariables_path;
 extern std::string config_path;
 extern std::string campaigns_dir;
 extern std::string templates_dir;

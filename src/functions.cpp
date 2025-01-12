@@ -160,17 +160,17 @@ std::string escapeSpaces(std::string str)
 
 void confirmEnvVariablesFile()
 {
-	if(std::filesystem::exists(rpgsh_env_variables_path.c_str())) return;
+	if(std::filesystem::exists(rpgshEnvVariables_path.c_str())) return;
 
-	output(Info,"Environment variables file not found, creating file at \"%s\".",rpgsh_env_variables_path.c_str());
-	std::ofstream ofs(rpgsh_env_variables_path.c_str());
+	output(Info,"Environment variables file not found, creating file at \"%s\".",rpgshEnvVariables_path.c_str());
+	std::ofstream ofs(rpgshEnvVariables_path.c_str());
 	ofs.close();
 
 	//Set default values for built-in env variables
 	Config config = Config();
 	Character c = Character(templates_dir + config.setting[DEFAULT_GAME].c_str());
-	set_env_variable(CURRENT_CHAR_SHELL_VAR,c.getName());
-	set_env_variable(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
+	setEnvVariable(CURRENT_CHAR_SHELL_VAR,c.getName());
+	setEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
 }
 
 void confirmShellVariablesFile()
@@ -185,7 +185,7 @@ void confirmShellVariablesFile()
 void confirmCampaignVariablesFile()
 {
 	std::string campaign_variables_file = campaigns_dir +
-					      get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR) +
+					      getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR) +
 					      variable_file_name;
 
 	if(std::filesystem::exists(campaign_variables_file.c_str())) return;
@@ -254,7 +254,7 @@ void loadXRef(std::string* arg, Scope* p_scope)
 	// Actually load the xref into the scope
 	std::vector<std::string> campaigns;
 	std::string xref_dir = campaigns_dir+
-			       get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
+			       getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR)+
 			       "characters/";
 	std::string xref_char = xref;
 	std::string campaign = "";
@@ -365,7 +365,7 @@ void padding()
 	}
 }
 
-int run_rpgsh_prog(std::string arg_str, bool redirect_output)
+int runRpgshApp(std::string arg_str, bool redirect_output)
 {
 	Character c = Character(false);
 	Campaign m = Campaign();
@@ -395,12 +395,12 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	while(v_str_it != v_str_end)
 	{
 		std::string v_str = v_str_it->str();
-		if(run_rpgsh_prog(v_str,true))
+		if(runRpgshApp(v_str,true))
 		{
 			output(Error,"%s is not a valid variable string.",v_str.c_str());
 			return -1;
 		}
-		arg_str = std::regex_replace(arg_str,std::regex(v_str),get_prog_output(v_str)[0]);
+		arg_str = std::regex_replace(arg_str,std::regex(v_str),getAppOutput(v_str)[0]);
 		v_str_it++;
 	}
 
@@ -546,11 +546,11 @@ int run_rpgsh_prog(std::string arg_str, bool redirect_output)
 	return exit_code;
 }
 
-std::vector<std::string> get_prog_output(std::string prog)
+std::vector<std::string> getAppOutput(std::string prog)
 {
 	std::vector<std::string> output;
 
-	(void)run_rpgsh_prog(prog,true);
+	(void)runRpgshApp(prog,true);
 
 	std::ifstream ifs(rpgsh_output_redirect_path);
 	while(!ifs.eof())
@@ -564,7 +564,7 @@ std::vector<std::string> get_prog_output(std::string prog)
 	return output;
 }
 
-void check_print_app_description(char** _argv, std::string description)
+void chkPrntAppDesc(char** _argv, std::string description)
 {
 	if(_argv[1] && !strcmp(_argv[1],FLAG_APPDESCRIPTION))
 	{
@@ -573,11 +573,11 @@ void check_print_app_description(char** _argv, std::string description)
 	}
 }
 
-std::string get_env_variable(std::string v)
+std::string getEnvVariable(std::string v)
 {
 	confirmEnvVariablesFile();
 
-	std::ifstream ifs(rpgsh_env_variables_path.c_str());
+	std::ifstream ifs(rpgshEnvVariables_path.c_str());
 	while(!ifs.eof())
 	{
 		std::string data = "";
@@ -589,13 +589,13 @@ std::string get_env_variable(std::string v)
 	ifs.close();
 	return "";
 }
-void set_env_variable(std::string v,std::string value)
+void setEnvVariable(std::string v,std::string value)
 {
 	confirmEnvVariablesFile();
 
-	std::ifstream ifs(rpgsh_env_variables_path.c_str());
-	std::filesystem::remove((rpgsh_env_variables_path+".bak").c_str());
-	std::ofstream ofs((rpgsh_env_variables_path+".bak").c_str());
+	std::ifstream ifs(rpgshEnvVariables_path.c_str());
+	std::filesystem::remove((rpgshEnvVariables_path+".bak").c_str());
+	std::ofstream ofs((rpgshEnvVariables_path+".bak").c_str());
 	bool ReplacedValue = false;
 
 	while(!ifs.eof())
@@ -619,8 +619,8 @@ void set_env_variable(std::string v,std::string value)
 
 	ifs.close();
 	ofs.close();
-	std::filesystem::remove(rpgsh_env_variables_path.c_str());
-	std::filesystem::rename((rpgsh_env_variables_path+".bak").c_str(),rpgsh_env_variables_path.c_str());
+	std::filesystem::remove(rpgshEnvVariables_path.c_str());
+	std::filesystem::rename((rpgshEnvVariables_path+".bak").c_str(),rpgshEnvVariables_path.c_str());
 }
 
 unsigned int getWalletValue(Wallet w)
@@ -734,8 +734,8 @@ void sort(std::vector<std::string>* v);
 template <>
 datamap<Currency> getDatamapFromAllScopes()
 {
-	std::string character = get_env_variable(CURRENT_CHAR_SHELL_VAR);
-	std::string campaign = get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR);
+	std::string character = getEnvVariable(CURRENT_CHAR_SHELL_VAR);
+	std::string campaign = getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR);
 	std::string current_campaign_dir = campaigns_dir+campaign;
 	std::string current_campaign_path = current_campaign_dir+variable_file_name;
 	std::string current_character_path = current_campaign_dir+"characters/"+character+".char";

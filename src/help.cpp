@@ -7,7 +7,7 @@ int main(int argc, char** argv)
 	if(argc > 2)
 		output(Warning,"help only expects 0 or 1 arguments, ignoring all other arguments.");
 
-	check_print_app_description(argv,"Prints this helpful list of applications and what they do.");
+	chkPrntAppDesc(argv,"Prints this helpful list of applications and what they do.");
 
 	//Generate list of apps from cache file
 	std::vector<std::string> applications;
@@ -36,7 +36,7 @@ int main(int argc, char** argv)
 	for(const auto& app : applications)
 	{
 		appname = right(app,prefix.length());
-		appdescription = get_prog_output(appname+" "+FLAG_APPDESCRIPTION);
+		appdescription = getAppOutput(appname+" "+FLAG_APPDESCRIPTION);
 
 		//Not sure why %*s doesn't work here
 		fprintf(stdout,"%s%s%s%s%s",TEXT_BOLD,TEXT_GREEN,appname.c_str(),TEXT_NORMAL,addSpaces(longestNameLength-appname.length()+COLUMN_PADDING).c_str());

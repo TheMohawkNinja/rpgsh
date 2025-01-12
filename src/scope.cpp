@@ -502,8 +502,8 @@ Character::Character(std::string path)
 
 std::string Character::getCurrentCharacterFilePath()
 {
-	std::string character = get_env_variable(CURRENT_CHAR_SHELL_VAR);
-	std::string campaign = get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR);
+	std::string character = getEnvVariable(CURRENT_CHAR_SHELL_VAR);
+	std::string campaign = getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR);
 	std::string current_campaign_dir = campaigns_dir+campaign;
 	std::string current_character_dir = current_campaign_dir+"characters/";
 
@@ -530,7 +530,7 @@ Campaign::Campaign()
 {
 	sigil = CAMPAIGN_SIGIL;
 	datasource = campaigns_dir+
-		     get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
+		     getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR)+
 		     variable_file_name;
 	load();
 }

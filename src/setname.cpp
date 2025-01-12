@@ -7,7 +7,7 @@
 
 int main(int argc, char** argv)
 {
-	check_print_app_description(argv,"Changes the variable used for the loaded character's name.");
+	chkPrntAppDesc(argv,"Changes the variable used for the loaded character's name.");
 
 	if(argc < 2)
 	{

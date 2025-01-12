@@ -470,7 +470,7 @@ int main(int argc, char** argv)
 	boolOps.insert(boolOps.end(),operations[6].begin(),operations[6].end());
 	assignOps.insert(assignOps.end(),operations[7].begin(),operations[7].end());
 
-	check_print_app_description(argv,"Prints values and evaluates operations. Implicitly called when modifying variables.");
+	chkPrntAppDesc(argv,"Prints values and evaluates operations. Implicitly called when modifying variables.");
 
 	if(argc == 1)
 	{
@@ -496,7 +496,7 @@ int main(int argc, char** argv)
 	}
 	else if(vi.variable.back() != '/')// Perform operation on variable
 	{
-		std::string old_value = get_prog_output(vi.variable)[0];
+		std::string old_value = getAppOutput(vi.variable)[0];
 
 		std::vector<std::string> args;
 		unsigned int open_paren_ctr = 0;
@@ -674,7 +674,7 @@ int main(int argc, char** argv)
 		}
 
 		// Print result
-		std::string new_value = get_prog_output(vi.variable)[0];
+		std::string new_value = getAppOutput(vi.variable)[0];
 		if(findInVect<std::string>(assignOps,final_op) == -1 && findInVect<std::string>(unaryOps,final_op) == -1)
 			fprintf(stdout,"%s\n",args[0].c_str());
 		else if(old_value == "")

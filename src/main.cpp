@@ -99,7 +99,7 @@ void addPropertiesToMatches(std::vector<std::string>* pMatches, Scope scope, std
 		addPropertyToMatches(&pMatches,chk_str,property,"Larger");
 	}
 }
-std::string input_handler()
+std::string inputHandler()
 {
 	#define KB_TAB		9
 	#define KB_ENTER	10
@@ -119,7 +119,7 @@ std::string input_handler()
 	int tab_ctr = 0;
 	std::string last_match = "";
 	std::vector<char> input;
-	std::vector<std::string> history = get_prog_output("history");
+	std::vector<std::string> history = getAppOutput("history");
 	unsigned long history_len = history.size();
 	unsigned long history_ctr = history_len-1;
 
@@ -221,7 +221,7 @@ std::string input_handler()
 			{
 				tab_comp_scope = Character(false);
 				std::string xref_path = campaigns_dir+
-							get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
+							getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR)+
 							"characters/";
 
 				if(chk_str[1] == '[' &&
@@ -294,7 +294,7 @@ std::string input_handler()
 					   findu(chk_str,'/') > findu(chk_str,']'))//Same campaign
 					{
 						std::string xref_path = campaigns_dir+
-									get_env_variable(CURRENT_CAMPAIGN_SHELL_VAR)+
+									getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR)+
 									"characters/"+
 									right(left(chk_str,findu(chk_str,']')),findu(chk_str,'[')+1)+
 									".char";
@@ -571,7 +571,7 @@ int prompt()
 	for(unsigned int i=0; i<MAX_BUFFER_SIZE; i++)
 		buffer[i] = '\0';
 
-	std::string in = input_handler();
+	std::string in = inputHandler();
 	if(in.length() > MAX_BUFFER_SIZE)
 	{
 		fprintf(stdout,"\n\n");
@@ -599,7 +599,7 @@ int prompt()
 			buffer[i]=tmp_buffer[i];
 
 		padding();
-		(void)run_rpgsh_prog(buffer,false);
+		(void)runRpgshApp(buffer,false);
 		padding();
 
 		//Handle rpgsh history
@@ -677,8 +677,8 @@ int main()
 		c.save();
 	}
 
-	(void)run_rpgsh_prog((char*)"banner",false);
-	(void)run_rpgsh_prog((char*)"version",false);
+	(void)runRpgshApp((char*)"banner",false);
+	(void)runRpgshApp((char*)"version",false);
 
 	if(!stob(config.setting[HIDE_TIPS]))
 	{
