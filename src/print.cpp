@@ -1,4 +1,5 @@
 #include <cstring>
+#include <regex>
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 #include "../headers/text.h"
@@ -23,8 +24,24 @@ void getLongestKey(datamap<T> m, unsigned int* p_current_longest_len)
 }
 const char* printValue(std::string value)
 {
-	if(value != "") return value.c_str();
-	else return empty_str.c_str();
+	if(value == "") return empty_str.c_str();
+
+	std::map<std::string,char> common_esc_char = {
+	{"\\\\a",'\a'}, //Bell
+	{"\\\\b",'\b'}, //Backspace
+	{"\\\\f",'\f'}, //Form feed
+	{"\\\\n",'\n'}, //New line
+	{"\\\\r",'\r'}, //Carriage return
+	{"\\\\t",'\t'}, //Horizontal tab
+	{"\\\\v",'\v'}};//Vertical tab
+
+	for(const auto& [k,v] : common_esc_char)
+		value = std::regex_replace(value,std::regex(k),std::string(1,v));
+
+	for(long unsigned int i=0; i<value.length(); i++)
+		if(value[i] == '\\') value.erase(value.begin()+i);
+
+	return value.c_str();
 }
 void printData(Scope scope)
 {
