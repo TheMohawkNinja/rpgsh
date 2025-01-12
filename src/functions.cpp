@@ -660,7 +660,31 @@ void appendOutput(std::map<std::string,std::string> map, std::string key, std::s
 	}
 }
 
-std::string getSet(VariableInfo vi)
+std::map<std::string,std::string> getSet(std::string set_str)
+{
+	std::map<std::string,std::string> set;
+	std::string key, value;
+
+	while(findu(set_str,DS) != std::string::npos)
+	{
+		key = left(set_str,findu(set_str,DS));
+		set_str = right(set_str,findu(set_str,key)+key.length()+DS.length());
+
+		if(findu(set_str,DS) != std::string::npos)
+		{
+			value = left(set_str,findu(set_str,DS));
+			set_str = right(set_str,findu(set_str,value)+value.length()+DS.length());
+		}
+		else
+		{
+			value = set_str;
+		}
+		set[key] = value;
+	}
+
+	return set;
+}
+std::string getSetStr(VariableInfo vi)
 {
 	std::map<std::string,std::string> c_map;
 	std::map<std::string,std::string> d_map;

@@ -87,7 +87,8 @@ template<typename T>
 void appendMap(Scope scope, std::map<std::string,std::string>* p_map);
 void appendOutput(std::map<std::string,std::string> map, std::string key, std::string* pOutput);
 
-std::string getSet(VariableInfo vi);
+std::map<std::string,std::string> getSet(std::string set_str);
+std::string getSetStr(VariableInfo vi);
 
 template <typename T>
 void sort(std::vector<T>* v)
