@@ -240,26 +240,33 @@ int main(int argc, char** argv)
 		Scope variable;
 		std::string v_str = std::string(argv[1]);
 
-		switch(argv[1][0])
+		try
 		{
-			case(VAR_SIGIL):
-				variable.set<Var>("",Var(v_str));
-				break;
-			case(DICE_SIGIL):
-				variable.set<Dice>("",Dice(v_str));
-				break;
-			case(WALLET_SIGIL):
-				variable.set<Wallet>("",Wallet(v_str));
-				break;
-			case(CURRENCY_SIGIL):
-				variable.set<Currency>("",Currency(v_str));
-				break;
+			switch(argv[1][0])
+			{
+				case(VAR_SIGIL):
+					variable.set<Var>("",Var(v_str));
+					break;
+				case(DICE_SIGIL):
+					variable.set<Dice>("",Dice(v_str));
+					break;
+				case(WALLET_SIGIL):
+					variable.set<Wallet>("",Wallet(v_str));
+					break;
+				case(CURRENCY_SIGIL):
+					variable.set<Currency>("",Currency(v_str));
+					break;
+			}
+		}
+		catch(const std::runtime_error& e)
+		{
+			output(Error,"Unable to pretty-print explicit constructor \"%s\": %s",v_str.c_str(),e.what());
+			exit(-1);
 		}
 		printData(variable);
 	}
 	else if(looksLikeSet(std::string(argv[1])))
 	{
-		std::string set_string = std::string(argv[1]);
 		Scope set;
 
 		for(const auto& [k,v] : getSet(std::string(argv[1])))
