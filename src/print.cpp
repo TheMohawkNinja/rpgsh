@@ -293,7 +293,7 @@ int main(int argc, char** argv)
 		fprintf(stdout,"\tprint %soption%s\t\tSee %sOPTIONS.%s\n\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"OPTIONS:\n");
 		fprintf(stdout,"\t--all\t\t\tEquivalent to entering no arguments.\n");
-		fprintf(stdout,"\t-? | --all\t\tPrints this help text.\n");
+		fprintf(stdout,"\t-? | --help\t\tPrints this help text.\n");
 	}
 	else
 	{
