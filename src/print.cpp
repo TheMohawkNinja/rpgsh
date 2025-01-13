@@ -26,15 +26,6 @@ const char* printValue(std::string value)
 {
 	if(value == "") return empty_str.c_str();
 
-	std::map<std::string,char> common_esc_chars = {
-	{"\\\\a",'\a'}, //Bell
-	{"\\\\b",'\b'}, //Backspace
-	{"\\\\f",'\f'}, //Form feed
-	{"\\\\n",'\n'}, //New line
-	{"\\\\r",'\r'}, //Carriage return
-	{"\\\\t",'\t'}, //Horizontal tab
-	{"\\\\v",'\v'}};//Vertical tab
-
 	std::map<std::string,const char*> ansi_esc_chars = {
 	{"%/%",			TEXT_NORMAL},
 	{"%b%",			TEXT_BOLD},
@@ -114,11 +105,38 @@ const char* printValue(std::string value)
 	{"%bgwhite%",		TEXT_BG_WHITE},
 	{"%/bgwhite%",		TEXT_BG_DEFAULTCOLOR}};
 
-	for(const auto& [k,v] : common_esc_chars)
-		value = std::regex_replace(value,std::regex(k),std::string(1,v));
-
 	for(long unsigned int i=0; i<value.length(); i++)
-		if(value[i] == '\\') value.erase(value.begin()+i);
+	{
+		if(value[i] == '\\' && i == value.length())
+		{
+			value.erase(value.begin()+i);
+		}
+		else if(value[i] == '\\')
+		{
+			switch(value[i+1])
+			{
+				case 'a':
+					value[i+1] = '\a'; //Bell
+					break;
+				case 'b':
+					value[i+1] = '\b'; //Backspace
+					break;
+				case 'f':
+					value[i+1] = '\f'; //Form feed
+					break;
+				case 'n':
+					value[i+1] = '\n'; //Newline
+					break;
+				case 't':
+					value[i+1] = '\t'; //Horizontal tab
+					break;
+				case 'v':
+					value[i+1] = '\v'; //Vertical tab
+					break;
+			}
+			value.erase(value.begin()+i);
+		}
+	}
 
 	for(const auto& [k,v] : ansi_esc_chars)
 		value = std::regex_replace(value,std::regex(k),std::string(v));
