@@ -11,7 +11,7 @@ templates_dir="$root_dir""templates/"
 dice_lists_dir="$root_dir""dice-lists/"
 
 flags="-Wall -Wextra -Wpedantic"
-libs="-lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency"
+libs="-lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency -lcolors"
 
 #debug="-g -fsanitize=address"
 debug="-g"
@@ -21,6 +21,9 @@ if [[ $EUID -eq 0 ]]; then
 	if [ ! -d "$lib_dir" ]; then echo -e "Creating lib directory at:\t$bold_white""$lib_dir$normal"; mkdir "$lib_dir"; fi
 
 	echo "Compiling shared library objects:"
+	echo -e "\tsrc/colors.cpp\t\t->\t$bold_white$lib_dir""libcolors.so"$normal
+	g++ $flags $debug $fs -c -fPIC src/colors.cpp -o "$lib_dir""colors.o"
+	g++ $flags -shared "$lib_dir""colors.o" -o "$lib_dir""libcolors.so"
 	echo -e "\tsrc/config.cpp\t\t->\t$bold_white$lib_dir""libconfig.so"$normal
 	g++ $flags $debug $fs -c -fPIC src/config.cpp -o "$lib_dir""config.o"
 	g++ $flags -shared "$lib_dir""config.o" -o "$lib_dir""libconfig.so"
