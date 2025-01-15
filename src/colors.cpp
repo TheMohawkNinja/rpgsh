@@ -1,12 +1,12 @@
 #include "../headers/colors.h"
 #include "../headers/functions.h"
 
-RGB Colors::asHTML(std::string color)
+RGB Colors::as24Bit(std::string color)
 {
 	for(const auto& [k,v] : color_map)
 		if(!stringcasecmp(k,color)) return v;
 
-	return {0,0,0};
+	return BAD_COLOR;
 }
 
 RGB Colors::asCurses(std::string color)
@@ -17,5 +17,5 @@ RGB Colors::asCurses(std::string color)
 				(unsigned int)((float)v.g*CURSES_COEFFICIENT),
 				(unsigned int)((float)v.b*CURSES_COEFFICIENT)};
 
-	return {0,0,0};
+	return BAD_COLOR;
 }
