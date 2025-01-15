@@ -11,7 +11,7 @@
 #include "../headers/text.h"
 
 Config config = Config();
-Character c = Character(false);
+Character c = Character();
 
 bool containsNonSpaceChar(std::string str)
 {
@@ -219,7 +219,7 @@ std::string inputHandler()
 			}
 			else if(chk_str[0] == CHARACTER_SIGIL)//Character variables
 			{
-				tab_comp_scope = Character(false);
+				tab_comp_scope = Character();
 				std::string xref_path = campaigns_dir+
 							getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR)+
 							"characters/";

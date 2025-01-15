@@ -295,7 +295,7 @@ VariableInfo parseVariable(std::string v)// Derive information about variable fr
 	switch(v[0])
 	{
 		case CHARACTER_SIGIL:
-			vi.scope = Character(false);
+			vi.scope = Character();
 			break;
 		case CAMPAIGN_SIGIL:
 			vi.scope = Campaign();
@@ -367,7 +367,7 @@ void padding()
 
 int runRpgshApp(std::string arg_str, bool redirect_output)
 {
-	Character c = Character(false);
+	Character c = Character();
 	Campaign m = Campaign();
 	Shell s = Shell();
 

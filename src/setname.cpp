@@ -21,7 +21,7 @@ int main(int argc, char** argv)
 
 	if(!strcmp(argv[1],"-l") || !strcmp(argv[1],"--list"))
 	{
-		Character c = Character(false);
+		Character c = Character();
 
 		fprintf(stdout,"Display name character attribute:\t%s%s%s\n",TEXT_WHITE,c.getStr<Var>(CHAR_NAME_ATTR).c_str(),TEXT_NORMAL);
 		fprintf(stdout,"Current value of %s%%%s%s:\t\t\t%s%s%s\n",TEXT_WHITE,c.getStr<Var>(CHAR_NAME_ATTR).c_str(),TEXT_NORMAL,TEXT_WHITE,c.getName().c_str(),TEXT_NORMAL);
@@ -42,7 +42,7 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	Character c = Character(false);
+	Character c = Character();
 
 	if(std::string(argv[1]) == "")
 		output(Warning,"%s is empty.",argv[1]);
