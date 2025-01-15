@@ -160,10 +160,10 @@ std::string escapeSpaces(std::string str)
 
 void confirmEnvVariablesFile()
 {
-	if(std::filesystem::exists(rpgshEnvVariables_path.c_str())) return;
+	if(std::filesystem::exists(rpgsh_env_variables_path.c_str())) return;
 
-	output(Info,"Environment variables file not found, creating file at \"%s\".",rpgshEnvVariables_path.c_str());
-	std::ofstream ofs(rpgshEnvVariables_path.c_str());
+	output(Info,"Environment variables file not found, creating file at \"%s\".",rpgsh_env_variables_path.c_str());
+	std::ofstream ofs(rpgsh_env_variables_path.c_str());
 	ofs.close();
 
 	//Set default values for built-in env variables
@@ -576,7 +576,7 @@ std::string getEnvVariable(std::string v)
 {
 	confirmEnvVariablesFile();
 
-	std::ifstream ifs(rpgshEnvVariables_path.c_str());
+	std::ifstream ifs(rpgsh_env_variables_path.c_str());
 	while(!ifs.eof())
 	{
 		std::string data = "";
@@ -592,9 +592,9 @@ void setEnvVariable(std::string v,std::string value)
 {
 	confirmEnvVariablesFile();
 
-	std::ifstream ifs(rpgshEnvVariables_path.c_str());
-	std::filesystem::remove((rpgshEnvVariables_path+".bak").c_str());
-	std::ofstream ofs((rpgshEnvVariables_path+".bak").c_str());
+	std::ifstream ifs(rpgsh_env_variables_path.c_str());
+	std::filesystem::remove((rpgsh_env_variables_path+".bak").c_str());
+	std::ofstream ofs((rpgsh_env_variables_path+".bak").c_str());
 	bool ReplacedValue = false;
 
 	while(!ifs.eof())
@@ -618,8 +618,8 @@ void setEnvVariable(std::string v,std::string value)
 
 	ifs.close();
 	ofs.close();
-	std::filesystem::remove(rpgshEnvVariables_path.c_str());
-	std::filesystem::rename((rpgshEnvVariables_path+".bak").c_str(),rpgshEnvVariables_path.c_str());
+	std::filesystem::remove(rpgsh_env_variables_path.c_str());
+	std::filesystem::rename((rpgsh_env_variables_path+".bak").c_str(),rpgsh_env_variables_path.c_str());
 }
 
 unsigned int getWalletValue(Wallet w)
