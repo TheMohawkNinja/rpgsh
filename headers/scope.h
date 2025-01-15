@@ -86,7 +86,7 @@ class Character: public Scope
 {
 	public:
 		//Load current character
-		Character(bool backup);
+		Character(bool backup=false);
 
 		//Load other character/template
 		Character(std::string path);
