@@ -27,7 +27,7 @@ const char* printValue(std::string value)
 {
 	if(value == "") return empty_str.c_str();
 
-	std::map<std::string,const char*> ansi_esc_chars = {
+	std::map<std::string,const char*> ansi_esc_seqs = {
 	{"/",			TEXT_NORMAL},
 	{"b",			TEXT_BOLD},
 	{"/b",			TEXT_NOBOLD},
@@ -139,8 +139,79 @@ const char* printValue(std::string value)
 		}
 	}
 
-	for(const auto& [k,v] : ansi_esc_chars)
-		value = std::regex_replace(value,std::regex("%"+k+"%"),std::string(v));
+	for(const auto& [k,v] : ansi_esc_seqs)
+		value = std::regex_replace(value,std::regex("%"+k+"%",std::regex_constants::icase),std::string(v));
+
+	std::regex fg_rgb_color_pattern("%fg=[0-9]{1,3},[0-9]{1,3},[0-9]{1,3}%");
+	std::regex fg_html_color_pattern("%fg=[a-zA-Z]{1,}%");
+	std::regex bg_rgb_color_pattern("%bg=[0-9]{1,3},[0-9]{1,3},[0-9]{1,3}%");
+	std::regex bg_html_color_pattern("%bg=[a-zA-Z]{1,}%");
+
+	std::sregex_iterator fg_rgb_it(value.begin(),value.end(),fg_rgb_color_pattern);
+	std::sregex_iterator fg_html_it(value.begin(),value.end(),fg_html_color_pattern);
+	std::sregex_iterator bg_rgb_it(value.begin(),value.end(),bg_rgb_color_pattern);
+	std::sregex_iterator bg_html_it(value.begin(),value.end(),bg_html_color_pattern);
+
+	std::sregex_iterator it_end;
+
+	std::map<std::string,std::string> string_replacements;
+
+	while(fg_rgb_it != it_end)
+	{
+		std::string rgb_str = fg_rgb_it->str();
+		std::regex color_channels_pattern("[0-9]{1,3}");
+		std::sregex_iterator color_channels_it(rgb_str.begin(),rgb_str.end(),color_channels_pattern);
+		unsigned char r = (char)std::stoi(color_channels_it->str());
+		color_channels_it++;
+		unsigned char g = (char)std::stoi(color_channels_it->str());
+		color_channels_it++;
+		unsigned char b = (char)std::stoi(color_channels_it->str());
+
+		string_replacements[rgb_str] = std::string(TEXT_FG_8BIT_PRE)+std::to_string(r)+";"+std::to_string(g)+";"+std::to_string(b)+"m";
+		//std::string ansi_color_str = std::string(TEXT_FG_8BIT_PRE)+std::to_string(r)+";"+std::to_string(g)+";"+std::to_string(b)+"m";
+		//value = std::regex_replace(value,std::regex(rgb_str),ansi_color_str);
+		fg_rgb_it++;
+	}
+	while(fg_html_it != it_end)
+	{
+		std::string html_str = fg_html_it->str().substr(4,fg_html_it->str().length()-5);//Pull out just the color name
+		Colors colors = Colors();
+		RGB cc = colors.as24Bit(html_str);
+
+		string_replacements[fg_html_it->str()] = std::string(TEXT_FG_8BIT_PRE)+std::to_string(cc.r)+";"+std::to_string(cc.g)+";"+std::to_string(cc.b)+"m";
+		//std::string ansi_color_str = std::string(TEXT_FG_8BIT_PRE)+std::to_string(cc.r)+";"+std::to_string(cc.g)+";"+std::to_string(cc.b)+"m";
+		//value = std::regex_replace(value,std::regex(fg_html_it->str()),ansi_color_str);
+		fg_html_it++;
+	}
+	while(bg_rgb_it != it_end)
+	{
+		std::string rgb_str = bg_rgb_it->str();
+		std::regex color_channels_pattern("[0-9]{1,3}");
+		std::sregex_iterator color_channels_it(rgb_str.begin(),rgb_str.end(),color_channels_pattern);
+		unsigned char r = (char)std::stoi(color_channels_it->str());
+		color_channels_it++;
+		unsigned char g = (char)std::stoi(color_channels_it->str());
+		color_channels_it++;
+		unsigned char b = (char)std::stoi(color_channels_it->str());
+
+		string_replacements[rgb_str] = std::string(TEXT_BG_8BIT_PRE)+std::to_string(r)+";"+std::to_string(g)+";"+std::to_string(b)+"m";
+		//std::string ansi_color_str = std::string(TEXT_BG_8BIT_PRE)+std::to_string(r)+";"+std::to_string(g)+";"+std::to_string(b)+"m";
+		//value = std::regex_replace(value,std::regex(rgb_str),ansi_color_str);
+		bg_rgb_it++;
+	}
+	while(bg_html_it != it_end)
+	{
+		std::string html_str = bg_html_it->str().substr(4,bg_html_it->str().length()-5);//Pull out just the color name
+		Colors colors = Colors();
+		RGB cc = colors.as24Bit(html_str);
+
+		string_replacements[bg_html_it->str()] = std::string(TEXT_BG_8BIT_PRE)+std::to_string(cc.r)+";"+std::to_string(cc.g)+";"+std::to_string(cc.b)+"m";
+		//std::string ansi_color_str = std::string(TEXT_BG_8BIT_PRE)+std::to_string(cc.r)+";"+std::to_string(cc.g)+";"+std::to_string(cc.b)+"m";
+		//value = std::regex_replace(value,std::regex(bg_html_it->str()),ansi_color_str);
+		bg_html_it++;
+	}
+
+	for(const auto& [k,v] : string_replacements) value = std::regex_replace(value,std::regex(k),v);
 
 	value += std::string(TEXT_NORMAL); //Make sure we don't carry over any unterminated formatting
 	return value.c_str();
