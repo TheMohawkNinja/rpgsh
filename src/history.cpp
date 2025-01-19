@@ -25,18 +25,19 @@ int main(int argc, char** argv)
 	{
 		value = rpgsh_history_length;
 	}
-	else if(!strcasecmp(argv[1],"-?") || !strcasecmp(argv[1],"--help"))
+	else if(isRequestingHelp(argv))
 	{
-		fprintf(stdout,"Prints rpgsh history.\n\n");
 		fprintf(stdout,"USAGE:\n");
-		fprintf(stdout,"\thistory\t\t\tPrints all history (max length defined by the \"%s\" setting.\n",HISTORY_LENGTH);
-		fprintf(stdout,"\thistory -c\t\tPrints the current number of lines in the rpgsh history file.\n");
-		fprintf(stdout,"\thistory %sn%s\t\tPrints the %sn%sth line of rpgsh history.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"\thistory -f\t\tPrints the first line of rpgsh history.\n");
-		fprintf(stdout,"\thistory -f %sn%s\t\tPrints the first %sn%s lines of rpgsh history.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"\thistory -l\t\tPrints the last line of rpgsh history.\n");
-		fprintf(stdout,"\thistory -l %sn%s\t\tPrints the last %sn%s lines of rpgsh history.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"\thistory [-?|--help]\tPrints this help text.\n");
+		fprintf(stdout,"\thistory [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\nOPTIONS:\n");
+		fprintf(stdout,"\t%snone%s\t\tPrints all history (max length defined by the \"%s\" setting.\n",TEXT_ITALIC,TEXT_NORMAL,HISTORY_LENGTH);
+		fprintf(stdout,"\t-c\t\tPrints the current number of lines in the rpgsh history file.\n");
+		fprintf(stdout,"\t%sn%s\t\tPrints the %sn%sth line of rpgsh history.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t-f\t\tPrints the first line of rpgsh history.\n");
+		fprintf(stdout,"\t-f %sn%s\t\tPrints the first %sn%s lines of rpgsh history.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t-l\t\tPrints the last line of rpgsh history.\n");
+		fprintf(stdout,"\t-l %sn%s\t\tPrints the last %sn%s lines of rpgsh history.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t%s | %s\tPrints this help text.\n",FLAG_HELPSHORT,FLAG_HELPLONG);
 		return 0;
 	}
 	else if(argc == 2 && (!strcmp(argv[1],"-f") || !strcmp(argv[1],"-l")))

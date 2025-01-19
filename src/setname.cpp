@@ -7,7 +7,7 @@
 
 int main(int argc, char** argv)
 {
-	chkPrntAppDesc(argv,"Changes the variable used for the loaded character's name.");
+	chkPrntAppDesc(argv,"Changes the key used for the loaded character's name.");
 
 	if(argc < 2)
 	{
@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 		output(Warning,"Expected only one argument. All args past \"%s\" will be ignored.",argv[1]);
 	}
 
-	if(!strcmp(argv[1],"-l") || !strcmp(argv[1],"--list"))
+	if(!strcmp(argv[1],"-l"))
 	{
 		Character c = Character();
 
@@ -27,29 +27,24 @@ int main(int argc, char** argv)
 		fprintf(stdout,"Current value of %s%%%s%s:\t\t\t%s%s%s\n",TEXT_WHITE,c.getStr<Var>(CHAR_NAME_ATTR).c_str(),TEXT_NORMAL,TEXT_WHITE,c.getName().c_str(),TEXT_NORMAL);
 		return 0;
 	}
-	else if(!strcmp(argv[1],"-?") || !strcmp(argv[1],"--help"))
+	else if(isRequestingHelp(argv))
 	{
-		fprintf(stdout,"Sets the character attribute to be used when displaying the character's name.\n\n");
 		fprintf(stdout,"USAGE:\n");
-		fprintf(stdout,"\tsetname %sattr%s		Sets the character attribute for their display name to the character attribute %sattr%s. The \'%%\' must be omitted.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"\tsetname [-l|--list]	Lists current display name character attribute and value.\n");
-		fprintf(stdout,"\tsetname [-?|--help]	Displays this help text.\n");
-		fprintf(stdout,"\n");
-		fprintf(stdout,"EXAMPLES:\n");
-		fprintf(stdout,"\tsetname FirstName	Sets the character attribute for their display name to \"FirstName\".\n");
-		fprintf(stdout,"\tsetname --list		Display the current display name attribute and value.\n");
-		fprintf(stdout,"\tsetname -?		Displays help text.\n");
+		fprintf(stdout,"\tsetname %skey%s\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\tsetname [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\nOPTIONS:\n");
+		fprintf(stdout,"\t-l\t\tLists current display name character attribute and value.\n");
+		fprintf(stdout,"\t%s | %s\tPrints this help text.\n",FLAG_HELPSHORT,FLAG_HELPLONG);
 		return 0;
 	}
 
 	Character c = Character();
 
-	if(std::string(argv[1]) == "")
-		output(Warning,"%s is empty.",argv[1]);
+	if(std::string(argv[1]) == "") output(Warning,"%s is empty.",argv[1]);
 
 	c.set<Var>(CHAR_NAME_ATTR,std::string(argv[1]));
 	c.save();
-	output(Info,"Character's display name is now set to the character attribute \"%s\" (Current value: \"%s\")",argv[1],c.getStr<Var>(argv[1]).c_str());
+	output(Info,"Current character's name is now set to the key \"%s\" (Current value: \"%s\")",argv[1],c.getStr<Var>(argv[1]).c_str());
 
 	return 0;
 }

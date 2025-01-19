@@ -9,7 +9,18 @@ int main(int argc, char** argv)
 
 	chkPrntAppDesc(argv,"Prints this helpful list of applications and what they do.");
 
-	bool print_app_help = argv[1] && (!strcasecmp(argv[1],"-a") || !strcasecmp(argv[1],"--all"));
+	if(isRequestingHelp(argv))
+	{
+		fprintf(stdout,"USAGE:\n");
+		fprintf(stdout,"\thelp [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\nOPTIONS:\n");
+		fprintf(stdout,"\t%snone%s\t\tPrints a list of applications and their descriptions.\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t-a\t\tPrints a list of applications along with their descriptions and help text.\n");
+		fprintf(stdout,"\t%s | %s\tPrint this help text.\n",FLAG_HELPSHORT,FLAG_HELPLONG);
+		return 0;
+	}
+
+	bool print_app_help = argv[1] && !strcasecmp(argv[1],"-a");
 
 	//Generate list of apps from cache file
 	std::vector<std::string> applications;

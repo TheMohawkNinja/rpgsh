@@ -9,12 +9,13 @@ int main(int argc, char** argv)
 
 	chkPrntAppDesc(argv,"Clears the screen.");
 
-	if(argv[1] && (!strcasecmp(argv[1],"-?") || !strcasecmp(argv[1],"--help")))
+	if(isRequestingHelp(argv))
 	{
-		fprintf(stdout,"Clears the screen.\n");
 		fprintf(stdout,"USAGE:\n");
-		fprintf(stdout,"\tclear\t\t\tClears the screen.\n");
-		fprintf(stdout,"\tclear [-?|--help]\tPrints this help text.\n");
+		fprintf(stdout,"\tclear [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\nOPTIONS:\n");
+		fprintf(stdout,"\t%snone%s\t\tClears the screen.\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t%s | %s\tPrints this help text.\n",FLAG_HELPSHORT,FLAG_HELPLONG);
 		return 0;
 	}
 

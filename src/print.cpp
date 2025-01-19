@@ -309,7 +309,7 @@ int main(int argc, char** argv)
 	if(argc > 2)
 		output(Warning,"Expected only one argument. All args past \"%s\" will be ignored.",argv[1]);
 
-	if(argc == 1 || !strcmp(argv[1],"--all"))
+	if(argc == 1)
 	{
 		printShellVariables();
 		fprintf(stdout,"\n");
@@ -372,17 +372,14 @@ int main(int argc, char** argv)
 
 		printData(set);
 	}
-	else if(!strcmp(argv[1],"-?") || !strcmp(argv[1],"--help"))
+	else if(isRequestingHelp(argv))
 	{
-		fprintf(stdout,"Pretty prints variables, variable sets, and scopes.\n\n");
 		fprintf(stdout,"USAGE:\n");
-		fprintf(stdout,"\tprint\t\t\tPrints all variables in all scopes.\n");
-		fprintf(stdout,"\tprint %svariable%s\t\tPretty prints information about variable.\n",TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"\tprint %svariable set%s\tPretty prints information about all variables in the set.\n",TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"\tprint %soption%s\t\tSee %sOPTIONS.%s\n\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"OPTIONS:\n");
-		fprintf(stdout,"\t--all\t\t\tEquivalent to entering no arguments.\n");
-		fprintf(stdout,"\t-? | --help\t\tPrints this help text.\n");
+		fprintf(stdout,"\tprint\n");
+		fprintf(stdout,"\tprint [%svariable%s | %svariable set%s] [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\nOPTIONS:\n");
+		fprintf(stdout,"\t%snone%s\t\tPrints all variables in all scopes.\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t%s | %s\tPrints this help text.\n",FLAG_HELPSHORT,FLAG_HELPLONG);
 	}
 	else
 	{
