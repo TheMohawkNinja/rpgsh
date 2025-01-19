@@ -60,6 +60,8 @@
 
 //Universal flags
 #define FLAG_APPDESCRIPTION		"--appdescription"
+#define FLAG_HELPSHORT			"-?"
+#define FLAG_HELPLONG			"--help"
 
 //Custom exceptions
 #define E_INVALID_PROPERTY		"invalid_property"
