@@ -52,6 +52,7 @@ int main(int argc, char** argv)
 		{
 			std::vector<std::string>apphelp = getAppOutput(appname+" --help");
 
+			fprintf(stdout,"\n");
 			for(const auto& line : apphelp)
 				fprintf(stdout,"%s%s\n",addSpaces(longestNameLength+COLUMN_PADDING).c_str(),line.c_str());
 		}
