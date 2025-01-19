@@ -168,8 +168,6 @@ const char* printValue(std::string value)
 		unsigned char b = (char)std::stoi(color_channels_it->str());
 
 		string_replacements[rgb_str] = std::string(TEXT_FG_8BIT_PRE)+std::to_string(r)+";"+std::to_string(g)+";"+std::to_string(b)+"m";
-		//std::string ansi_color_str = std::string(TEXT_FG_8BIT_PRE)+std::to_string(r)+";"+std::to_string(g)+";"+std::to_string(b)+"m";
-		//value = std::regex_replace(value,std::regex(rgb_str),ansi_color_str);
 		fg_rgb_it++;
 	}
 	while(fg_html_it != it_end)
@@ -179,8 +177,6 @@ const char* printValue(std::string value)
 		RGB cc = colors.as24Bit(html_str);
 
 		string_replacements[fg_html_it->str()] = std::string(TEXT_FG_8BIT_PRE)+std::to_string(cc.r)+";"+std::to_string(cc.g)+";"+std::to_string(cc.b)+"m";
-		//std::string ansi_color_str = std::string(TEXT_FG_8BIT_PRE)+std::to_string(cc.r)+";"+std::to_string(cc.g)+";"+std::to_string(cc.b)+"m";
-		//value = std::regex_replace(value,std::regex(fg_html_it->str()),ansi_color_str);
 		fg_html_it++;
 	}
 	while(bg_rgb_it != it_end)
@@ -195,8 +191,6 @@ const char* printValue(std::string value)
 		unsigned char b = (char)std::stoi(color_channels_it->str());
 
 		string_replacements[rgb_str] = std::string(TEXT_BG_8BIT_PRE)+std::to_string(r)+";"+std::to_string(g)+";"+std::to_string(b)+"m";
-		//std::string ansi_color_str = std::string(TEXT_BG_8BIT_PRE)+std::to_string(r)+";"+std::to_string(g)+";"+std::to_string(b)+"m";
-		//value = std::regex_replace(value,std::regex(rgb_str),ansi_color_str);
 		bg_rgb_it++;
 	}
 	while(bg_html_it != it_end)
@@ -206,8 +200,6 @@ const char* printValue(std::string value)
 		RGB cc = colors.as24Bit(html_str);
 
 		string_replacements[bg_html_it->str()] = std::string(TEXT_BG_8BIT_PRE)+std::to_string(cc.r)+";"+std::to_string(cc.g)+";"+std::to_string(cc.b)+"m";
-		//std::string ansi_color_str = std::string(TEXT_BG_8BIT_PRE)+std::to_string(cc.r)+";"+std::to_string(cc.g)+";"+std::to_string(cc.b)+"m";
-		//value = std::regex_replace(value,std::regex(bg_html_it->str()),ansi_color_str);
 		bg_html_it++;
 	}
 
