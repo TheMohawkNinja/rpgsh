@@ -571,6 +571,10 @@ void chkPrntAppDesc(char** _argv, std::string description)
 		exit(0);
 	}
 }
+bool isRequestingHelp(char** _argv)
+{
+	return _argv[1] && (!strcasecmp(_argv[1],FLAG_HELPSHORT) || !strcasecmp(_argv[1],FLAG_HELPLONG));
+}
 
 std::string getEnvVariable(std::string v)
 {

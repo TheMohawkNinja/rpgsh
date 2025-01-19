@@ -77,6 +77,7 @@ int runRpgshApp(std::string args, bool redirect_output);
 std::vector<std::string> getAppOutput(std::string prog);
 
 void chkPrntAppDesc(char** _argv, std::string description);
+bool isRequestingHelp(char** _argv);
 
 std::string getEnvVariable(std::string v);
 void setEnvVariable(std::string v, std::string value);
