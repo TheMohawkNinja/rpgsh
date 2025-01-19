@@ -9,6 +9,8 @@ int main(int argc, char** argv)
 
 	chkPrntAppDesc(argv,"Prints this helpful list of applications and what they do.");
 
+	bool print_app_help = argv[1] && (!strcasecmp(argv[1],"-a") || !strcasecmp(argv[1],"--all"));
+
 	//Generate list of apps from cache file
 	std::vector<std::string> applications;
 	std::ifstream ifs(rpgsh_programs_cache_path);
@@ -23,7 +25,6 @@ int main(int argc, char** argv)
 	//Determine longest name for column formatting
 	long unsigned int longestNameLength = 0;
 	std::string appname;
-	std::vector<std::string> appdescription;
 	for(long unsigned int i=0; i<applications.size(); i++)
 	{
 		std::string app = applications[i];
@@ -36,7 +37,7 @@ int main(int argc, char** argv)
 	for(const auto& app : applications)
 	{
 		appname = right(app,prefix.length());
-		appdescription = getAppOutput(appname+" "+FLAG_APPDESCRIPTION);
+		std::vector<std::string> appdescription = getAppOutput(appname+" "+FLAG_APPDESCRIPTION);
 
 		//Not sure why %*s doesn't work here
 		fprintf(stdout,"%s%s%s%s%s",TEXT_BOLD,TEXT_GREEN,appname.c_str(),TEXT_NORMAL,addSpaces(longestNameLength-appname.length()+COLUMN_PADDING).c_str());
@@ -46,6 +47,17 @@ int main(int argc, char** argv)
 			fprintf(stdout,"%s\n",appdescription[0].c_str());
 		else
 			fprintf(stdout,"%s\n",empty_str.c_str());
+
+		if(print_app_help)
+		{
+			std::vector<std::string>apphelp = getAppOutput(appname+" --help");
+
+			for(const auto& line : apphelp)
+				fprintf(stdout,"%s%s\n",addSpaces(longestNameLength+COLUMN_PADDING).c_str(),line.c_str());
+		}
 	}
+
+	if(print_app_help) fprintf(stdout,"\b"); //Remove extraneous newline
+
 	return 0;
 }
