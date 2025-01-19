@@ -42,12 +42,12 @@
 #define TEXT_MAGENTA			"\033[35m"
 #define TEXT_CYAN			"\033[36m"
 #define TEXT_LIGHTGRAY			"\033[37m"
-#define TEXT_COLOR_4BIT_PRE		"\033[38;5;"
-#define _TEXT_COLOR_4BIT(n)		TEXT_COLOR_4BIT_PRE#n"m"//0-15, 0-7 low intensity, 8-15 high intensity
-#define TEXT_COLOR_4BIT			_TEXT_COLOR_4BIT(%u)
-#define TEXT_COLOR_8BIT_PRE		"\033[38;2;"
-#define _TEXT_COLOR_8BIT(r,g,b)		TEXT_COLOR_8BIT_PRE#r";"#g";"#b"m"
-#define TEXT_COLOR_8BIT			_TEXT_COLOR_8BIT(%u,%u,%u)
+#define TEXT_FG_4BIT_PRE		"\033[38;5;"
+#define _TEXT_FG_4BIT(n)		TEXT_FG_4BIT_PRE#n"m"	//0-15, 0-7 low intensity, 8-15 high intensity
+#define TEXT_FG_4BIT			_TEXT_FG_4BIT(%u)
+#define TEXT_FG_8BIT_PRE		"\033[38;2;"
+#define _TEXT_FG_8BIT(r,g,b)		TEXT_FG_8BIT_PRE#r";"#g";"#b"m"
+#define TEXT_FG_8BIT			_TEXT_FG_8BIT(%u,%u,%u)
 #define TEXT_DEFAULTCOLOR		"\033[39m"		//Implementation-specific
 #define TEXT_BG_BLACK			"\033[40m"
 #define TEXT_BG_RED			"\033[41m"
@@ -57,12 +57,12 @@
 #define TEXT_BG_MAGENTA			"\033[45m"
 #define TEXT_BG_CYAN			"\033[46m"
 #define TEXT_BG_LIGHTGRAY		"\033[47m"
-#define TEXT_BG_COLOR_4BIT_PRE		"\033[48;5;"
-#define _TEXT_BG_COLOR_4BIT(n)		TEXT_BG_COLOR_4BIT_PRE#n"m"//0-15, 0-7 low intensity, 8-15 high intensity
-#define TEXT_BG_COLOR_4BIT		_TEXT_BG_COLOR_4BIT(%u)
-#define TEXT_BG_COLOR_8BIT_PRE		"\033[48;2;"
-#define _TEXT_BG_COLOR_8BIT(r,g,b)	TEXT_BG_COLOR_8BIT_PRE#r";"#g";"#b"m"
-#define TEXT_BG_COLOR_8BIT		_TEXT_BG_COLOR_8BIT(%u,%u,%u)
+#define TEXT_BG_4BIT_PRE		"\033[48;5;"
+#define _TEXT_BG_4BIT(n)		TEXT_BG_4BIT_PRE#n"m"	//0-15, 0-7 low intensity, 8-15 high intensity
+#define TEXT_BG_4BIT			_TEXT_BG_4BIT(%u)
+#define TEXT_BG_8BIT_PRE		"\033[48;2;"
+#define _TEXT_BG_8BIT(r,g,b)		TEXT_BG_8BIT_PRE#r";"#g";"#b"m"
+#define TEXT_BG_8BIT			_TEXT_BG_8BIT(%u,%u,%u)
 #define TEXT_BG_DEFAULTCOLOR		"\033[49m"
 #define TEXT_NOPROPSPACING		"\033[50m"
 #define TEXT_FRAME			"\033[51m"		//Implemented as "emoji variation selector" in mintty
@@ -70,13 +70,13 @@
 #define TEXT_OVERLINE			"\033[53m"
 #define TEXT_NOFRAME_NOENCIRCLE		"\033[54m"		//Resets 52 and 53
 #define TEXT_NOOVERLINE			"\033[55m"
-#define TEXT_UNDERLINECOLOR_4BIT_PRE	"\033[58;5;"
-#define _TEXT_UNDERLINECOLOR_4BIT(n)	TEXT_UNDERLINECOLOR_4BIT_PRE#n"m"//0-15, 0-7 low intensity, 8-15 high intensity
-#define TEXT_UNDERLINECOLOR_4BIT	_TEXT_UNDERLINECOLOR_4BIT(%u)
-#define TEXT_UNDERLINECOLOR_8BIT_PRE	"\033[58;2;"
-#define _TEXT_UNDERLINECOLOR_8BIT(r,g,b)TEXT_UNDERLINECOLOR_8BIT_PRE#r";"#g";"#b"m"
-#define TEXT_UNDERLINECOLOR_8BIT	_TEXT_UNDERLINECOLOR_8BIT(%u,%u,%u)
-#define TEXT_DEFAULTUNDERLINECOLOR	"\033[59m"
+#define TEXT_UL_4BIT_PRE		"\033[58;5;"
+#define _TEXT_UL_4BIT(n)		TEXT_UL_4BIT_PRE#n"m"	//0-15, 0-7 low intensity, 8-15 high intensity
+#define TEXT_UL_4BIT			_TEXT_UL_4BIT(%u)
+#define TEXT_UL_8BIT_PRE		"\033[58;2;"
+#define _TEXT_UL_8BIT(r,g,b)		TEXT_UL_8BIT_PRE#r";"#g";"#b"m"
+#define TEXT_UL_8BIT			_TEXT_UL_8BIT(%u,%u,%u)
+#define TEXT_DEFAULTUL			"\033[59m"
 #define TEXT_IDEO_UNDER			"\033[60m"		//Ideogram underline or right side line
 #define TEXT_IDEO_DOUBLEUNDER		"\033[61m"		//Ideogram double underline or double right side line
 #define TEXT_IDEO_OVER			"\033[62m"		//Ideogram overline or left side line
