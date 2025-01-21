@@ -4,6 +4,7 @@
 #include "../headers/dice.h"
 #include "../headers/functions.h"
 #include "../headers/scope.h"
+#include "../headers/text.h"
 #include "../headers/var.h"
 
 enum Action
@@ -476,6 +477,25 @@ int main(int argc, char** argv)
 	{
 		output(Error,"eval expects at least one argument.");
 		exit(-1);
+	}
+
+	if(isRequestingHelp(argv))
+	{
+		fprintf(stdout,"USAGE:\n");
+		fprintf(stdout,"\teval [%sOPTIONS%s | %sOPERATION%s]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\nOPTIONS:\n");
+		fprintf(stdout,"\t%s | %s\tPrints this help text.\n",FLAG_HELPSHORT,FLAG_HELPLONG);
+		fprintf(stdout,"\nOPERATION:\n");
+		fprintf(stdout,"\tOne operand and at least one operator, seperated by spaces, which may be wrapped in parentheses.\n");
+		fprintf(stdout,"\n\t\te.g. \"2 + 2\", \"@/HitPoints/Current = (16 + 2 - 5)\", \"@/CoinPurse >= @[Store]/Sword/Cost\", \"@/Age ++\"\n");
+		fprintf(stdout,"\n\tCurrently supported operators are as follows:\n\n");
+		fprintf(stdout,"\t\t Unary  Arithmetic       Assignment          Relational    Boolean\n");
+		fprintf(stdout,"\t\t┌─────┐┌───────────┐┌───────────────────┐┌───────────────┐┌───────┐\n");
+		fprintf(stdout,"\t\t│%s %s││%s %s %s %s %s %s││%s %s %s %s %s %s %s││%s %s %s %s %s %s││ %s %s │\n",OP_INC,OP_DEC,OP_ADD,OP_SUB,OP_MUL,OP_DIV,OP_EXP,OP_MOD,OP_ASSIGN,OP_ADDA,OP_SUBA,OP_MULA,OP_DIVA,OP_EXPA,OP_MODA,OP_EQ,OP_NE,OP_LT,OP_GT,OP_LE,OP_GE,OP_AND,OP_OR);
+		fprintf(stdout,"\t\t└─────┘└───────────┘└───────────────────┘└───────────────┘└───────┘\n");
+		fprintf(stdout,"\n\tFor in-depth information on operations, please consult docs/rpgsh-userguide.pdf.\n");
+
+		return 0;
 	}
 
 	if(findu(std::string(argv[1]),'/') == std::string::npos)// If the user only enters the scope sigil
