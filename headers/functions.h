@@ -6,8 +6,8 @@
 #include <string>
 #include <vector>
 #include "define.h"
-#include "output.h"
 #include "scope.h"
+#include "text.h"
 #include "var.h"
 
 struct VariableInfo
@@ -19,6 +19,16 @@ struct VariableInfo
 	std::string key = "";
 	std::string property = "";
 };
+
+
+enum output_level
+{
+	Info,
+	Warning,
+	Error
+};
+
+void output(output_level level, const char* format, ...);
 
 std::string btos(bool b);
 bool stob(std::string s);
