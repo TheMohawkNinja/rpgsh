@@ -2,7 +2,6 @@
 #include "../headers/currency.h"
 #include "../headers/dice.h"
 #include "../headers/functions.h"
-#include "../headers/output.h"
 #include "../headers/text.h"
 #include "../headers/var.h"
 

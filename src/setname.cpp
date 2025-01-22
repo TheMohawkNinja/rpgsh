@@ -1,7 +1,6 @@
 #include <cstring>
 #include "../headers/define.h"
 #include "../headers/functions.h"
-#include "../headers/output.h"
 #include "../headers/scope.h"
 #include "../headers/text.h"
 

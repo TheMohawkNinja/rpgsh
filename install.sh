@@ -11,7 +11,7 @@ templates_dir="$root_dir""templates/"
 dice_lists_dir="$root_dir""dice-lists/"
 
 flags="-Wall -Wextra -Wpedantic"
-libs="-lfunctions -ldefine -lscope -lvar -loutput -lconfig -ldice -lcurrency -lcolors"
+libs="-lfunctions -ldefine -lscope -lvar -lconfig -ldice -lcurrency -lcolors"
 
 #debug="-g -fsanitize=address"
 debug="-g"
@@ -39,9 +39,6 @@ if [[ $EUID -eq 0 ]]; then
 	echo -e "\tsrc/functions.cpp\t->\t$bold_white$lib_dir""libfunctions.so"$normal
 	g++ $flags $debug -std=c++20 -c -fPIC src/functions.cpp -o "$lib_dir""functions.o"
 	g++ $flags -shared "$lib_dir""functions.o" -o "$lib_dir""libfunctions.so"
-	echo -e "\tsrc/output.cpp\t\t->\t$bold_white$lib_dir""liboutput.so"$normal
-	g++ $flags $debug -c -fPIC src/output.cpp -o "$lib_dir""output.o"
-	g++ $flags -shared "$lib_dir""output.o" -o "$lib_dir""liboutput.so"
 	echo -e "\tsrc/scope.cpp\t\t->\t$bold_white$lib_dir""libscope.so"$normal
 	g++ $flags $debug $fs -c -fPIC src/scope.cpp -o "$lib_dir""scope.o"
 	g++ $flags -shared "$lib_dir""scope.o" -o "$lib_dir""libscope.so"
