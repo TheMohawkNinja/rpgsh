@@ -630,7 +630,7 @@ int main(int argc, char** argv)
 			{
 				for(int end=start; end<args_size; end++)
 				{
-					if(args[end].back() == ')')
+					if(args[end].back() == ')' && !isEscaped(args[end],args[end].length()-1))
 					{
 						// Strip parenthesis off args to ensure good parsing
 						std::string rparens = right(args[end],findu(args[end],')')+1);
@@ -655,7 +655,7 @@ int main(int argc, char** argv)
 							parseLHSAndDoOp(&vi,&args,op_pos-1,op_pos,op_pos+1);
 							args[start] += rparens;// Maintain end parens
 						}
-						else
+						else if(op_pos == INT_MAX)
 						{
 							output(Error,"Unknown operator \"%s\"",args[start+1].c_str());
 							exit(-1);
