@@ -111,9 +111,7 @@ Dice::Dice(std::string str)
 			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 
 		// Get number of commas in explicit constructor
-		unsigned int commas = 0;
-		for(long unsigned int i=0; i<str.length(); i++)
-			if(str[i] == ',' && !isEscaped(str,i)) commas++;
+		unsigned int commas = countu(str,',');
 
 		if(commas && commas != 2)
 		{

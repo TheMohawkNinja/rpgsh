@@ -517,15 +517,16 @@ int main(int argc, char** argv)
 	else if(vi.variable.back() != '/')// Perform operation on variable
 	{
 		std::string old_value = getAppOutput(vi.variable)[0];
-
 		std::vector<std::string> args;
-		unsigned int open_paren_ctr = 0;
-		unsigned int close_paren_ctr = 0;
+		long unsigned int open_paren_ctr = 0;
+		long unsigned int close_paren_ctr = 0;
 
 		// Need to know final operation to determine whether we print to screen or not
 		std::string final_op = std::string(argv[2]);
-		if(final_op[0] == '(') final_op = right(final_op,1);
-		if(final_op.back() == ')') final_op = left(final_op,final_op.length()-1);
+		if(final_op[0] == '(')
+			final_op = right(final_op,1);
+		if(final_op.back() == ')' && !isEscaped(final_op,final_op.length()-1))
+			final_op = left(final_op,final_op.length()-1);
 
 		// Generate vector of operators and operands, while also determining number of parentheses
 		for(int i=1; i<argc; i++)
@@ -533,12 +534,8 @@ int main(int argc, char** argv)
 			std::string arg = std::string(argv[i]);
 			long unsigned int open_paren = findu(arg,'(');
 			long unsigned int close_paren = rfindu(arg,')');
-
-			for(const auto& c : arg)
-			{
-				if(c == '(') open_paren_ctr++;
-				else if (c == ')') close_paren_ctr++;
-			}
+			open_paren_ctr += countu(arg,'(');
+			close_paren_ctr += countu(arg,')');
 
 			if(open_paren != std::string::npos && close_paren != std::string::npos)
 				args.push_back(arg.substr(open_paren,close_paren+1-open_paren));

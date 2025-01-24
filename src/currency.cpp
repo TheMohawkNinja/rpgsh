@@ -99,17 +99,12 @@ Currency::Currency(std::string str)
 	//FORMAT
 	//@c/MyCurrency = c{CurrencySystem,Name,SmallerAmount,Smaller,Larger}
 
-	//Get number of commas to determine if we are involving a CurrencySystem
-	int commas = 0;
-	for(long unsigned int i=0; i<str.length(); i++)
-		if(str[i] == ',' && !isEscaped(str,i)) commas++;
-
 	//Make sure explicit constructor is formatted correctly
 	if(str.length() < 8 ||
 	   str[1] != '{' ||
 	   str[0] != CURRENCY_SIGIL ||
 	   findu(str,'}') == std::string::npos ||
-	   commas != 4) throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
+	   countu(str,',') != 4) throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 
 	//Nix the first two characters to make future substrings more intuitive
 	str = str.substr(2,str.length()-2);
