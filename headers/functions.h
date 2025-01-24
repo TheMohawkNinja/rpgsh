@@ -21,14 +21,14 @@ struct VariableInfo
 };
 
 
-enum output_level
+enum OutputLevel
 {
 	Info,
 	Warning,
 	Error
 };
 
-void output(output_level level, const char* format, ...);
+void output(OutputLevel level, const char* format, ...);
 
 std::string btos(bool b);
 bool stob(std::string s);

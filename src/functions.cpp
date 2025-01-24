@@ -11,7 +11,7 @@
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 
-void output(output_level level, const char* format, ...)
+void output(OutputLevel level, const char* format, ...)
 {
 	FILE* stream;
 	std::string prefix = "";
