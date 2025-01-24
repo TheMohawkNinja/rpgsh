@@ -534,6 +534,8 @@ int prompt()
 {
 	#define MAX_BUFFER_SIZE 65535 //Not sure why UINT_MAX segfaults, but hard-coding the value of UINT_MAX works fine
 
+	confirmHistoryFile();
+
 	bool backup = false;
 
 	prompt:
