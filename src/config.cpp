@@ -71,7 +71,7 @@ Config::Config()
 		fs<<"\n";
 		fs<<COMMENT<<" Sets the number of lines to save for rpgsh history.\n";
 		fs<<COMMENT<<" Default: "<<setting[HISTORY_LENGTH]<<"\n";
-		fs<<HIDE_TIPS<<"="<<setting[HISTORY_LENGTH]<<"\n";
+		fs<<HISTORY_LENGTH<<"="<<setting[HISTORY_LENGTH]<<"\n";
 		fs.close();
 	}
 	std::ifstream fs(config_path.c_str());
