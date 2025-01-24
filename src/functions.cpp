@@ -139,11 +139,19 @@ std::string right(std::string str, int n)
 	return str.substr(n,str.length()-n);
 }
 
-std::string addSpaces(int n)
+long unsigned int countu(std::string str, char ch)
+{
+	long unsigned int count = 0;
+	for(long unsigned int i=0; i<str.length(); i++)
+		if(str[i] == ch && !isEscaped(str,i)) count++;
+
+	return count;
+}
+
+std::string addSpaces(unsigned int n)
 {
 	std::string ret = "";
-	for(int i=0; i<n; i++)
-		ret += " ";
+	for(unsigned int i=0; i<n; i++) ret += " ";
 
 	return ret;
 }

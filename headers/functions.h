@@ -59,7 +59,9 @@ long unsigned int rfindu(std::string str, char ch, long unsigned int start=UINT_
 std::string left(std::string str, int n);
 std::string right(std::string str, int n);
 
-std::string addSpaces(int n);
+long unsigned int countu(std::string str, char ch);
+
+std::string addSpaces(unsigned int n);
 
 std::string mergeQuotes(std::string str);
 
