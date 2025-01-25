@@ -670,15 +670,6 @@ int main()
 
 	fprintf(stdout,CLEAR_ENTIRE_LINE);//Delete "Generating..." line from start of main()
 
-	//Generate default character if needed
-	if(!c.confirmDatasource())
-	{
-		c.setDatasource(templates_dir + config.setting[DEFAULT_GAME].c_str());
-		c.load();
-		c.setDatasource(c.getCurrentCharacterFilePath());
-		c.save();
-	}
-
 	(void)runRpgshApp((char*)"banner",false);
 	(void)runRpgshApp((char*)"version",false);
 

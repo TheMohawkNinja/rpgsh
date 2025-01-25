@@ -1,5 +1,7 @@
+#include <cstring>
 #include <filesystem>
 #include <fstream>
+#include "../headers/config.h"
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 
@@ -11,18 +13,10 @@
 template<>
 std::ifstream Scope::tryCreateFileStream<std::ifstream>(std::string path)
 {
-	if(!std::filesystem::exists(path))
-	{
-		output(Error,"File not found at \"%s\"",path.c_str());
-		exit(-1);
-	}
+	if(!std::filesystem::exists(path)) throw std::runtime_error(E_FILE_NOT_FOUND);
 
 	std::ifstream fs(path);
-	if(!fs.good())
-	{
-		output(Error,"Unable to open \"%s\" for reading",path.c_str());
-		exit(-1);
-	}
+	if(!fs.good()) throw std::runtime_error(E_BAD_FS);
 
 	return fs;
 }
@@ -31,11 +25,7 @@ std::ofstream Scope::tryCreateFileStream<std::ofstream>(std::string path)
 {
 	//Open as an appending stream
 	std::ofstream fs(path, std::ios::app);
-	if(!fs.good())
-	{
-		output(Error,"Unable to open \"%s\" for writing",path.c_str());
-		exit(-1);
-	}
+	if(!fs.good()) throw std::runtime_error(E_BAD_FS);
 
 	return fs;
 }
@@ -58,8 +48,18 @@ void Scope::load(std::string path, bool loadVar, bool loadDice, bool loadCurrenc
 	wallets.clear();
 
 	//Open file
-	std::ifstream ifs = tryCreateFileStream<std::ifstream>(datasource);
+	std::ifstream ifs;
 	int linenum = 0;
+
+	try
+	{
+		ifs = tryCreateFileStream<std::ifstream>(datasource);
+	}
+	catch(const std::runtime_error& e)
+	{
+		output(Error,"Exception thrown while attempting to load character: %s",e.what());
+		throw e.what();
+	}
 
 	//Load in the data
 	while(!ifs.eof())
@@ -132,12 +132,14 @@ void Scope::load(std::string path, bool loadVar, bool loadDice, bool loadCurrenc
 }
 void Scope::load()
 {
-	load(datasource, true,true,true,true);
+	try{load(datasource,true,true,true,true);}
+	catch(const std::runtime_error& e){throw e.what();}
 }
 void Scope::load(std::string path)
 {
 	datasource = path;
-	load();
+	try{load();}
+	catch(const std::runtime_error& e){throw e.what();}
 }
 //Save file formatting
 std::string Scope::formatLine(char type, std::string k, std::string v)
@@ -152,7 +154,17 @@ void Scope::save()
 	if(std::filesystem::exists(datasource.c_str()) && right(datasource,4) != ".bak")
 		 std::filesystem::rename(datasource.c_str(),(datasource+".bak").c_str());
 
-	std::ofstream ofs = tryCreateFileStream<std::ofstream>(datasource);
+	std::ofstream ofs;
+
+	try
+	{
+		ofs = tryCreateFileStream<std::ofstream>(datasource);
+	}
+	catch(const std::runtime_error& e)
+	{
+		output(Error,"Exception thrown while attempting to save character: %s",e.what());
+		throw;
+	}
 
 	for(const auto& [k,v] : currencies)
 		ofs<<formatLine(CURRENCY_SIGIL,k,std::string(v));
@@ -492,11 +504,24 @@ Character::Character(bool backup)
 	sigil = CHARACTER_SIGIL;
 	datasource = getCurrentCharacterFilePath();
 	if(backup) datasource += ".bak";
-	load();
+
+	if(confirmDatasource())
+	{
+		load();
+	}
+	else
+	{
+		Config config = Config();
+		load(templates_dir + config.setting[DEFAULT_GAME]);
+		datasource = campaigns_dir + "default/characters/" + getName() + ".char";
+		std::filesystem::copy(templates_dir + config.setting[DEFAULT_GAME],datasource);
+		save();
+	}
 }
 Character::Character(std::string path)
 {
 	sigil = CHARACTER_SIGIL;
+
 	load(path);
 }
 
@@ -529,14 +554,24 @@ void Character::setDatasource(std::string path)
 Campaign::Campaign()
 {
 	sigil = CAMPAIGN_SIGIL;
-	datasource = campaigns_dir+
-		     getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR)+
+	datasource = campaigns_dir +
+		     getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR) +
 		     variable_file_name;
-	load();
+
+	if(confirmDatasource())
+	{
+		load();
+	}
+	else
+	{
+		save();
+		load();
+	}
 }
 Campaign::Campaign(std::string path)
 {
 	sigil = CAMPAIGN_SIGIL;
+
 	load(path);
 }
 
@@ -548,5 +583,6 @@ Shell::Shell()
 {
 	sigil = SHELL_SIGIL;
 	confirmShellVariablesFile();
+
 	load(shell_variables_path);
 }
