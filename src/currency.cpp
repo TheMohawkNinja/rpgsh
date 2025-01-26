@@ -21,9 +21,9 @@ void Currency::tryParseCurrencySystem(std::string* str)
 		System = left(*str,comma_pos);
 		*str = str->substr(comma_pos+1,str->length()-(comma_pos+1));
 	}
-	catch(...)
+	catch(const std::runtime_error& e)
 	{
-		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
+		throw e.what();
 	}
 }
 void Currency::tryParseName(std::string* str)
@@ -34,13 +34,10 @@ void Currency::tryParseName(std::string* str)
 		Name = left(*str,comma_pos);
 		*str = str->substr(comma_pos+1,str->length()-(comma_pos+1));
 	}
-	catch(...)
+	catch(const std::runtime_error& e)
 	{
-		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
+		throw e.what();
 	}
-
-	if(Name == "")
-		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 }
 void Currency::tryParseSmallerAmount(std::string* str)
 {
@@ -55,9 +52,9 @@ void Currency::tryParseSmallerAmount(std::string* str)
 
 		SmallerAmount = std::stoi(SmallerAmountStr);
 	}
-	catch(...)
+	catch(std::runtime_error& e)
 	{
-		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
+		throw e.what();
 	}
 }
 void Currency::tryParseSmaller(std::string* str)
@@ -68,9 +65,9 @@ void Currency::tryParseSmaller(std::string* str)
 		Smaller = left(*str,comma_pos);
 		*str = str->substr(comma_pos+1,str->length()-(comma_pos+1));
 	}
-	catch(...)
+	catch(std::runtime_error& e)
 	{
-		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
+		throw e.what();;
 	}
 }
 void Currency::tryParseLarger(std::string* str)
@@ -79,9 +76,9 @@ void Currency::tryParseLarger(std::string* str)
 	{
 		Larger = left(*str,findu(*str,'}'));
 	}
-	catch(...)
+	catch(std::runtime_error& e)
 	{
-		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
+		throw e.what();
 	}
 }
 
@@ -100,11 +97,12 @@ Currency::Currency(std::string str)
 	//@c/MyCurrency = c{CurrencySystem,Name,SmallerAmount,Smaller,Larger}
 
 	//Make sure explicit constructor is formatted correctly
-	if(str.length() < 8 ||
+	if(str.length() < 7 ||
 	   str[1] != '{' ||
 	   str[0] != CURRENCY_SIGIL ||
 	   findu(str,'}') == std::string::npos ||
-	   countu(str,',') != 4) throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
+	   countu(str,',') > 4 ||
+	   countu(str,',') < 3) throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 
 	//Nix the first two characters to make future substrings more intuitive
 	str = str.substr(2,str.length()-2);
