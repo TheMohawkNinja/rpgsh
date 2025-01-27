@@ -498,15 +498,16 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	if(findu(std::string(argv[1]),'/') == std::string::npos)// If the user only enters the scope sigil
+	if(!looksLikeVariable(std::string(argv[1])) &&
+	   findInVect<std::string>(assignOps,std::string(argv[2])) != -1)
 	{
-		output(Error,"Expected at least one '/' delimiter.");
+		output(Error,"Evaluating non-variable arguments on LHS with assign operations is not supported.");
 		exit(-1);
 	}
 
 	VariableInfo vi;
 
-	if(strlen(argv[1]) > 1 && (isTypeSigil(argv[1][1]) || argv[1][1] == '/' || argv[1][1] == '['))
+	if(looksLikeVariable(std::string(argv[1])))
 		vi = parseVariable(std::string(argv[1]));
 
 	if(argc == 2)// Print data if all the user enters is a variable
@@ -514,9 +515,11 @@ int main(int argc, char** argv)
 		std::string str = doAction(&vi, Read, "");
 		if(str != "") fprintf(stdout,"%s\n",str.c_str());
 	}
-	else if(vi.variable.back() != '/')// Perform operation on variable
+	else if(vi.variable == "" || vi.variable.back() != '/')// Perform operation on variable
 	{
-		std::string old_value = getAppOutput(vi.variable)[0];
+		std::string old_value;
+		if(vi.variable != "") old_value = getAppOutput(vi.variable)[0];
+
 		std::vector<std::string> args;
 		long unsigned int open_paren_ctr = 0;
 		long unsigned int close_paren_ctr = 0;
@@ -607,6 +610,10 @@ int main(int argc, char** argv)
 					else{args[0] = "";}
 			}
 		}
+		else
+		{
+			args[0] = std::string(Var(args[0]));
+		}
 
 		if(open_paren_ctr > close_paren_ctr)
 		{
@@ -691,10 +698,14 @@ int main(int argc, char** argv)
 		}
 
 		// Print result
-		std::string new_value = getAppOutput(vi.variable)[0];
 		if(findInVect<std::string>(assignOps,final_op) == -1 && findInVect<std::string>(unaryOps,final_op) == -1)
+		{
 			fprintf(stdout,"%s\n",args[0].c_str());
-		else if(old_value == "")
+			return 0;
+		}
+
+		std::string new_value = getAppOutput(vi.variable)[0];
+		if(old_value == "")
 			output(Info,"%c%c/%s has been initialized to %s",
 			       vi.scope.sigil,vi.evalType,vi.key.c_str(),new_value.c_str());
 		else if(old_value != new_value)

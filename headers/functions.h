@@ -20,7 +20,6 @@ struct VariableInfo
 	std::string property = "";
 };
 
-
 enum OutputLevel
 {
 	Info,
@@ -37,6 +36,7 @@ bool isScopeSigil(char c);
 bool isTypeSigil(char c);
 
 bool looksLikeSet(std::string s);
+bool looksLikeVariable(std::string s);
 
 bool isEscaped(std::string str, long unsigned int pos);
 

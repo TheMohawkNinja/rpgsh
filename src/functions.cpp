@@ -79,7 +79,21 @@ bool looksLikeSet(std::string s)
 	std::sregex_iterator match_it(s.begin(), s.end(), set_pattern);
 	std::sregex_iterator match_end;
 
-	return match_it->str() == s;
+	if(match_it != match_end)
+		return match_it->str() == s;
+	else
+		return false;
+}
+bool looksLikeVariable(std::string s)
+{
+	std::regex variable_pattern(variable_pattern_str);
+	std::sregex_iterator match_it(s.begin(), s.end(), variable_pattern);
+	std::sregex_iterator match_end;
+
+	if(match_it != match_end)
+		return match_it->str() == s;
+	else
+		return false;
 }
 
 bool isEscaped(std::string str, long unsigned int pos)
