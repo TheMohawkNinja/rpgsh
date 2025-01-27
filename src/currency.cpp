@@ -947,9 +947,9 @@ Wallet::Wallet(std::string str)
 		{
 			Money[currency] += std::stoi(quantity_str);
 		}
-		catch(...)
+		catch(std::runtime_error& e)
 		{
-			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
+			throw e.what();
 		}
 
 		if(delimiter == '}') break;

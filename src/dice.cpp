@@ -131,9 +131,9 @@ Dice::Dice(std::string str)
 			str = str.substr(findu(str,',')+1,str.length()-(findu(str,',')+1));
 			Modifier = std::stoi(left(str,findu(str,',')));
 		}
-		catch(...)
+		catch(std::runtime_error& e)
 		{
-			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
+			throw e.what();
 		}
 	}
 	else if(islower(str[0]) && str[1] == '{')
