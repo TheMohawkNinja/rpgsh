@@ -420,6 +420,7 @@ void padding()
 
 int runRpgshApp(std::string arg_str, bool redirect_output)
 {
+	Config cfg = Config();
 	Character c = Character();
 	Campaign m = Campaign();
 	Shell s = Shell();
@@ -428,9 +429,26 @@ int runRpgshApp(std::string arg_str, bool redirect_output)
 	extern char** environ;
 	pid_t pid;
 
-	if(isScopeSigil(arg_str[0])) //Check if user is operating on a variable
-		arg_str = "eval " + arg_str;
-	bool runningVariables = (left(arg_str,4) == "eval");
+	bool replaced = false;
+	for(const auto& [k,v] : getSet(cfg.setting[ALIASES]))
+	{
+		std::string first_arg = left(arg_str,findu(arg_str," "));
+		std::regex pattern(k);
+		std::sregex_iterator it(first_arg.begin(), first_arg.end(), pattern);
+		std::sregex_iterator end;
+		while(it != end)
+		{
+			if(it->str() == first_arg)
+			{
+				arg_str = v + " " + arg_str;
+				replaced = true;
+				break;
+			}
+			it++;
+		}
+		if(replaced) break;
+	}
+	bool runningVariables = (left(arg_str,4) == "eval"); //TODO: Replace with --modifyvariables flag
 
 	//Push back program we are going to run
 	std::string path = std::string(RPGSH_INSTALL_DIR);
