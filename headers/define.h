@@ -57,6 +57,7 @@
 #define DEFAULT_GAME			"default_game"
 #define HIDE_TIPS			"hide_tips"
 #define HISTORY_LENGTH			"history_length"
+#define ALIASES				"aliases"
 
 //Universal flags
 #define FLAG_APPDESCRIPTION		"--appdescription"
