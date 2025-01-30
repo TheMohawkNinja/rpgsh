@@ -430,9 +430,11 @@ int runRpgshApp(std::string arg_str, bool redirect_output)
 	pid_t pid;
 
 	bool replaced = false;
+	std::string first_arg;
+	if(findu(arg_str," ") != std::string::npos) first_arg = left(arg_str,findu(arg_str," "));
+	else					    first_arg = arg_str;
 	for(const auto& [k,v] : getSet(cfg.setting[ALIASES]))
 	{
-		std::string first_arg = left(arg_str,findu(arg_str," "));
 		std::regex pattern(k);
 		std::sregex_iterator it(first_arg.begin(), first_arg.end(), pattern);
 		std::sregex_iterator end;
@@ -448,7 +450,13 @@ int runRpgshApp(std::string arg_str, bool redirect_output)
 		}
 		if(replaced) break;
 	}
-	bool runningVariables = (left(arg_str,4) == "eval"); //TODO: Replace with --modifyvariables flag
+	bool preserveFirstArg;
+	if(findu(arg_str," ") != std::string::npos) first_arg = left(arg_str,findu(arg_str," "));
+	else					    first_arg = arg_str;
+	if(findu(arg_str,std::string(FLAG_MODIFYVARIABLES)) == std::string::npos)
+		preserveFirstArg = stob(getAppOutput(first_arg + " " + std::string(FLAG_MODIFYVARIABLES))[0]);
+	else
+		preserveFirstArg = false;
 
 	//Push back program we are going to run
 	std::string path = std::string(RPGSH_INSTALL_DIR);
@@ -460,7 +468,7 @@ int runRpgshApp(std::string arg_str, bool redirect_output)
 	std::sregex_iterator v_str_it(arg_str.begin(), arg_str.end(), variable_pattern);
 	std::sregex_iterator v_str_end;
 
-	if(runningVariables && v_str_it != v_str_end) v_str_it++;
+	if(preserveFirstArg && v_str_it != v_str_end) v_str_it++;
 
 	while(v_str_it != v_str_end)
 	{
@@ -644,8 +652,11 @@ void chkFlagAppDesc(char** _argv, std::string description)
 }
 void chkFlagModifyVariables(char** _argv, bool canModify)
 {
-	if(!strcasecmp(_argv[1],FLAG_MODIFYVARIABLES))
+	if(_argv[1] && !strcmp(_argv[1],FLAG_MODIFYVARIABLES))
+	{
 		fprintf(stdout,"%s\n",btos(canModify).c_str());
+		exit(0);
+	}
 }
 bool chkFlagHelp(char** _argv)
 {
