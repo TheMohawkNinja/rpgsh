@@ -61,6 +61,7 @@
 
 //Universal flags
 #define FLAG_APPDESCRIPTION		"--appdescription"
+#define FLAG_MODIFYVARIABLES		"--modifyvariables"
 #define FLAG_HELPSHORT			"-?"
 #define FLAG_HELPLONG			"--help"
 
