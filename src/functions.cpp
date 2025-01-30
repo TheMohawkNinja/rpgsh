@@ -634,7 +634,7 @@ std::vector<std::string> getAppOutput(std::string prog)
 	return output;
 }
 
-void chkPrntAppDesc(char** _argv, std::string description)
+void chkFlagAppDesc(char** _argv, std::string description)
 {
 	if(_argv[1] && !strcmp(_argv[1],FLAG_APPDESCRIPTION))
 	{
@@ -642,7 +642,12 @@ void chkPrntAppDesc(char** _argv, std::string description)
 		exit(0);
 	}
 }
-bool isRequestingHelp(char** _argv)
+void chkFlagModifyVariables(char** _argv, bool canModify)
+{
+	if(!strcasecmp(_argv[1],FLAG_MODIFYVARIABLES))
+		fprintf(stdout,"%s\n",btos(canModify).c_str());
+}
+bool chkFlagHelp(char** _argv)
 {
 	return _argv[1] && (!strcasecmp(_argv[1],FLAG_HELPSHORT) || !strcasecmp(_argv[1],FLAG_HELPLONG));
 }
