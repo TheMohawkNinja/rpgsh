@@ -7,9 +7,9 @@ int main(int argc, char** argv)
 	if(argc > 2)
 		output(Warning,"help only expects 0 or 1 arguments, ignoring all other arguments.");
 
-	chkPrntAppDesc(argv,"Prints this helpful list of applications and what they do.");
+	chkFlagAppDesc(argv,"Prints this helpful list of applications and what they do.");
 
-	if(isRequestingHelp(argv))
+	if(chkFlagHelp(argv))
 	{
 		fprintf(stdout,"USAGE:\n");
 		fprintf(stdout,"\thelp [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL);

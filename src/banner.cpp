@@ -40,12 +40,12 @@ void printSignature()
 }
 int main(int argc, char** argv)
 {
-	chkPrntAppDesc(argv,"Prints pretty banner art and the author's signature.");
+	chkFlagAppDesc(argv,"Prints pretty banner art and the author's signature.");
 
 	bool sword, name, fireball, signature;
 	sword = name = fireball = signature = false;
 
-	if(isRequestingHelp(argv))
+	if(chkFlagHelp(argv))
 	{
 		fprintf(stdout,"USAGE:\n");
 		fprintf(stdout,"\tbanner [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL);

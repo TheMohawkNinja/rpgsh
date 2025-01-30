@@ -6,7 +6,7 @@
 
 int main(int argc, char** argv)
 {
-	chkPrntAppDesc(argv,"Prints rpgsh history.");
+	chkFlagAppDesc(argv,"Prints rpgsh history.");
 
 	Config config = Config();
 	long rpgsh_history_length;
@@ -25,7 +25,7 @@ int main(int argc, char** argv)
 	{
 		value = rpgsh_history_length;
 	}
-	else if(isRequestingHelp(argv))
+	else if(chkFlagHelp(argv))
 	{
 		fprintf(stdout,"USAGE:\n");
 		fprintf(stdout,"\thistory [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL);

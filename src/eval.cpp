@@ -471,7 +471,7 @@ int main(int argc, char** argv)
 	boolOps.insert(boolOps.end(),operations[6].begin(),operations[6].end());
 	assignOps.insert(assignOps.end(),operations[7].begin(),operations[7].end());
 
-	chkPrntAppDesc(argv,"Prints values and evaluates operations. Implicitly called when modifying variables.");
+	chkFlagAppDesc(argv,"Prints values and evaluates operations. Implicitly called when modifying variables.");
 
 	if(argc == 1)
 	{
@@ -479,7 +479,7 @@ int main(int argc, char** argv)
 		exit(-1);
 	}
 
-	if(isRequestingHelp(argv))
+	if(chkFlagHelp(argv))
 	{
 		fprintf(stdout,"USAGE:\n");
 		fprintf(stdout,"\teval [%sOPTIONS%s | %sOPERATION%s]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);

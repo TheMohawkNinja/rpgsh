@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 	std::string dice_str, current_arg;
 	std::string count_expr = "";
 
-	chkPrntAppDesc(argv,"A simple, yet featureful dice rolling program.");
+	chkFlagAppDesc(argv,"A simple, yet featureful dice rolling program.");
 
 	if(argc == 1)
 	{
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 	for(int arg=1; arg<argc; arg++)
 	{
 		current_arg = std::string(argv[arg]);
-		if(isRequestingHelp(argv))
+		if(chkFlagHelp(argv))
 		{
 			fprintf(stdout,"USAGE:\n");
 			fprintf(stdout,"\troll %sdice%s [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);

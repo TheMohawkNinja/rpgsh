@@ -304,7 +304,7 @@ void printShellVariables()
 }
 int main(int argc, char** argv)
 {
-	chkPrntAppDesc(argv,"Pretty prints variables, variable sets, and scopes.");
+	chkFlagAppDesc(argv,"Pretty prints variables, variable sets, and scopes.");
 
 	if(argc > 2)
 		output(Warning,"Expected only one argument. All args past \"%s\" will be ignored.",argv[1]);
@@ -372,7 +372,7 @@ int main(int argc, char** argv)
 
 		printData(set);
 	}
-	else if(isRequestingHelp(argv))
+	else if(chkFlagHelp(argv))
 	{
 		fprintf(stdout,"USAGE:\n");
 		fprintf(stdout,"\tprint\n");

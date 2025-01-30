@@ -6,7 +6,7 @@
 
 int main(int argc, char** argv)
 {
-	chkPrntAppDesc(argv,"Changes the key used for the loaded character's name.");
+	chkFlagAppDesc(argv,"Changes the key used for the loaded character's name.");
 
 	if(argc < 2)
 	{
@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 		fprintf(stdout,"Current value of %s%%%s%s:\t\t\t%s%s%s\n",TEXT_WHITE,c.getStr<Var>(CHAR_NAME_ATTR).c_str(),TEXT_NORMAL,TEXT_WHITE,c.getName().c_str(),TEXT_NORMAL);
 		return 0;
 	}
-	else if(isRequestingHelp(argv))
+	else if(chkFlagHelp(argv))
 	{
 		fprintf(stdout,"USAGE:\n");
 		fprintf(stdout,"\tsetname %skey%s\n",TEXT_ITALIC,TEXT_NORMAL);

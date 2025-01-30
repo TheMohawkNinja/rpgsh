@@ -9,9 +9,9 @@ int main(int argc, char** argv)
 	if(argc > 2)
 		output(Warning,"version only expects 0 or 1 arguments, ignoring all other arguments.");
 
-	chkPrntAppDesc(argv,"Prints version information.");
+	chkFlagAppDesc(argv,"Prints version information.");
 
-	if(isRequestingHelp(argv))
+	if(chkFlagHelp(argv))
 	{
 		fprintf(stdout,"USAGE:\n");
 		fprintf(stdout,"\tversion [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL);

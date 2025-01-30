@@ -7,9 +7,9 @@ int main(int argc, char** argv)
 	if(argc > 2)
 		output(Warning,"clear only expects 0 or 1 arguments, ignoring all other arguments.");
 
-	chkPrntAppDesc(argv,"Clears the screen.");
+	chkFlagAppDesc(argv,"Clears the screen.");
 
-	if(isRequestingHelp(argv))
+	if(chkFlagHelp(argv))
 	{
 		fprintf(stdout,"USAGE:\n");
 		fprintf(stdout,"\tclear [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL);
