@@ -7,6 +7,7 @@
 int main(int argc, char** argv)
 {
 	chkFlagAppDesc(argv,"Prints rpgsh history.");
+	chkFlagModifyVariables(argv,false);
 
 	Config config = Config();
 	long rpgsh_history_length;

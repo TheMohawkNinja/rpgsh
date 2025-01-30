@@ -35,6 +35,7 @@ int main(int argc, char** argv)
 	std::string count_expr = "";
 
 	chkFlagAppDesc(argv,"A simple, yet featureful dice rolling program.");
+	chkFlagModifyVariables(argv,false);
 
 	if(argc == 1)
 	{

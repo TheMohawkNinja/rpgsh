@@ -8,6 +8,7 @@ int main(int argc, char** argv)
 		output(Warning,"clear only expects 0 or 1 arguments, ignoring all other arguments.");
 
 	chkFlagAppDesc(argv,"Clears the screen.");
+	chkFlagModifyVariables(argv,false);
 
 	if(chkFlagHelp(argv))
 	{

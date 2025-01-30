@@ -305,6 +305,7 @@ void printShellVariables()
 int main(int argc, char** argv)
 {
 	chkFlagAppDesc(argv,"Pretty prints variables, variable sets, and scopes.");
+	chkFlagModifyVariables(argv,false);
 
 	if(argc > 2)
 		output(Warning,"Expected only one argument. All args past \"%s\" will be ignored.",argv[1]);
