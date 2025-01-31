@@ -44,14 +44,7 @@ void output(OutputLevel level, const char* format, ...)
 
 bool stob(std::string s)
 {
-	if(!stringcasecmp(s,"true"))
-		return true;
-	else if(!stringcasecmp(s,"false"))
-		return false;
-	else
-		throw;
-
-	return false;
+	return !stringcasecmp(s,"true");
 }
 std::string btos(bool b)
 {
