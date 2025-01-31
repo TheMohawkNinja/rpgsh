@@ -58,6 +58,7 @@
 #define HIDE_TIPS			"hide_tips"
 #define HISTORY_LENGTH			"history_length"
 #define ALIASES				"aliases"
+#define STARTUP_APPS			"startup_apps"
 
 //Universal flags
 #define FLAG_APPDESCRIPTION		"--appdescription"
