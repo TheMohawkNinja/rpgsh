@@ -51,6 +51,7 @@ Config::Config()
 	setting[HIDE_TIPS]	=	"false";
 	setting[HISTORY_LENGTH]	=	"100";
 	setting[ALIASES]	=	"[0-9]{1,}|"+variable_pattern_str+"::"+"eval";
+	setting[STARTUP_APPS]	=	"banner,version";
 
 	// Create default config file if one does not exist
 	if(!std::filesystem::exists(config_path.c_str()))
@@ -78,6 +79,10 @@ Config::Config()
 		fs<<COMMENT<<" Formatted like a variable set where the keys are patterns and the values are the commands to run when the pattern is matched.\n";
 		fs<<COMMENT<<" Default: "<<setting[ALIASES]<<"\n";
 		fs<<ALIASES<<"="<<setting[ALIASES]<<"\n";
+		fs<<"\n";
+		fs<<COMMENT<<" Comma-delimited list of programs to run when rpgsh launches.\n";
+		fs<<COMMENT<<" Default: "<<setting[STARTUP_APPS]<<"\n";
+		fs<<STARTUP_APPS<<"="<<setting[STARTUP_APPS]<<"\n";
 		fs.close();
 	}
 	std::ifstream fs(config_path.c_str());
