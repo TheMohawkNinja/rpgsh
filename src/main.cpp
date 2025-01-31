@@ -10,7 +10,7 @@
 #include "../headers/scope.h"
 #include "../headers/text.h"
 
-Config config = Config();
+Config cfg = Config();
 Character c = Character();
 
 bool containsNonSpaceChar(std::string str)
@@ -622,11 +622,11 @@ int prompt()
 		unsigned long history_len = 0;
 		try
 		{
-			history_len = std::stol(config.setting[HISTORY_LENGTH]);
+			history_len = std::stol(cfg.setting[HISTORY_LENGTH]);
 		}
 		catch(...)
 		{
-			output(Error,"Invalid value for \"%s\" setting: %s\n",HISTORY_LENGTH,config.setting[HISTORY_LENGTH].c_str());
+			output(Error,"Invalid value for \"%s\" setting: %s\n",HISTORY_LENGTH,cfg.setting[HISTORY_LENGTH].c_str());
 			exit(-1);
 		}
 
@@ -670,10 +670,22 @@ int main()
 
 	fprintf(stdout,CLEAR_ENTIRE_LINE);//Delete "Generating..." line from start of main()
 
-	(void)runRpgshApp((char*)"banner",false);
-	(void)runRpgshApp((char*)"version",false);
+	std::string startup_apps = cfg.setting[STARTUP_APPS];
+	while(true)
+	{
+		if(findu(startup_apps,',') == std::string::npos)
+		{
+			(void)runRpgshApp(startup_apps.c_str(),false);
+			break;
+		}
+		else
+		{
+			(void)runRpgshApp(left(startup_apps,findu(startup_apps,',')).c_str(),false);
+			startup_apps = right(startup_apps,findu(startup_apps,',')+1);
+		}
+	}
 
-	if(!stob(config.setting[HIDE_TIPS]))
+	if(!stob(cfg.setting[HIDE_TIPS]))
 	{
 		fprintf(stdout,"\n");
 		fprintf(stdout,"%s%sTIP: %sType %s%shelp%s for a list of currently supported commands.\n",TEXT_BOLD,TEXT_CYAN,TEXT_NORMAL,TEXT_BOLD,TEXT_GREEN,TEXT_NORMAL);
