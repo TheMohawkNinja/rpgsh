@@ -558,15 +558,9 @@ Campaign::Campaign()
 		     getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR) +
 		     variable_file_name;
 
-	if(confirmDatasource())
-	{
-		load();
-	}
-	else
-	{
-		save();
-		load();
-	}
+	if(!confirmDatasource()) save();
+
+	load();
 }
 Campaign::Campaign(std::string path)
 {
