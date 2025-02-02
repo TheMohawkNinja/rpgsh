@@ -31,12 +31,6 @@ class Scope
 		//Confirm datasource exists
 		bool confirmDatasource();
 
-		//Load/save data
-		void load(std::string path, bool loadVar, bool loadDice, bool loadCurrency, bool loadWallet);
-		void load();
-		void load(std::string path);
-		void save();
-
 		//Get datasource
 		std::string getDatasource();
 
@@ -79,6 +73,12 @@ class Scope
 		//Delete single variable
 		template <typename T>
 		bool remove(std::string key);
+
+		//Load/save data
+		void load(std::string path, bool loadVar, bool loadDice, bool loadCurrency, bool loadWallet);
+		void load();
+		void load(std::string path);
+		void save();
 };
 
 class Character: public Scope
