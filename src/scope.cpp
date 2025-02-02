@@ -36,148 +36,6 @@ bool Scope::confirmDatasource()
 	return std::filesystem::exists(datasource);
 }
 
-//Load all data in from file
-void Scope::load(std::string path, bool loadVar, bool loadDice, bool loadCurrency, bool loadWallet)
-{
-	datasource = path;
-
-	//Start from a clean slate
-	currencies.clear();
-	dice.clear();
-	vars.clear();
-	wallets.clear();
-
-	//Open file
-	std::ifstream ifs;
-	int linenum = 0;
-
-	try
-	{
-		ifs = tryCreateFileStream<std::ifstream>(datasource);
-	}
-	catch(const std::runtime_error& e)
-	{
-		output(Error,"Exception thrown while attempting to load character: %s",e.what());
-		throw e.what();
-	}
-
-	//Load in the data
-	while(!ifs.eof())
-	{
-		linenum++;
-		std::string data = "";
-		char type = '\0';
-		std::string key = "";
-		std::string value = "";
-
-		std::getline(ifs,data);
-
-		if(ifs.eof()) break;
-
-		/*
-		Handle multi-character type specifiers.
-		This is neccessarily an error with the Scope file formatting,
-		but it is not neccessarily a fatal error, so just print a warning and keep going.
-		*/
-		if(findu(data,DS) > 1)
-		{
-			output(Warning,"Multi-character type specifier \"%s\" at \"%s:%d\", skipping line...",left(data,findu(data,DS)).c_str(),datasource.c_str(),linenum);
-			continue;
-		}
-
-		if(data != "" && data[0] != COMMENT)//TODO Left-shift this
-		{
-			type = data[0];
-			try
-			{
-				key = data.substr(1+DS.length(),(rfindu(data,DS)-(1+DS.length())));
-			}
-			catch(...)
-			{
-				output(Warning,"Unable to get variable key at \"%s:%d\", skipping line...",datasource.c_str(),linenum);
-				break;
-			}
-
-			try
-			{
-				value = right(data,rfindu(data,DS)+DS.length());
-			}
-			catch(...)
-			{
-				output(Warning,"Unable to get variable value at \"%s:%d\", skipping line...",datasource.c_str(),linenum);
-				break;
-			}
-
-			try
-			{
-				if(type == CURRENCY_SIGIL && loadCurrency)
-					currencies[key] = Currency(value);
-				else if(type == DICE_SIGIL && loadDice)
-					dice[key] = Dice(value);
-				else if(type == VAR_SIGIL && loadVar)
-					vars[key] = Var(value);
-				else if(type == WALLET_SIGIL && loadWallet)
-					wallets[key] = Wallet(value);
-				else if(!isTypeSigil(type))
-					output(Warning,"Unknown type specifier \'%c\' in \"%s:%d\"",type,datasource.c_str(),linenum);
-			}
-			catch(const std::runtime_error& e)
-			{
-				output(Error,"Unable to load \"%s\" into the character at \"%s:%d\": %s.",data.c_str(),datasource.c_str(),linenum,e.what());
-				exit(-1);
-			}
-		}
-	}
-	ifs.close();
-}
-void Scope::load()
-{
-	try{load(datasource,true,true,true,true);}
-	catch(const std::runtime_error& e){throw e.what();}
-}
-void Scope::load(std::string path)
-{
-	datasource = path;
-	try{load();}
-	catch(const std::runtime_error& e){throw e.what();}
-}
-//Save file formatting
-std::string Scope::formatLine(char type, std::string k, std::string v)
-{
-	std::string type_str(1,type);
-	return (type_str + DS + k + DS + v + "\n");
-}
-//Save all data to file
-void Scope::save()
-{
-	//Make backup first
-	if(std::filesystem::exists(datasource.c_str()) && right(datasource,4) != ".bak")
-		 std::filesystem::rename(datasource.c_str(),(datasource+".bak").c_str());
-
-	std::ofstream ofs;
-
-	try
-	{
-		ofs = tryCreateFileStream<std::ofstream>(datasource);
-	}
-	catch(const std::runtime_error& e)
-	{
-		output(Error,"Exception thrown while attempting to save character: %s",e.what());
-		throw;
-	}
-
-	for(const auto& [k,v] : currencies)
-		ofs<<formatLine(CURRENCY_SIGIL,k,std::string(v));
-	for(const auto& [k,v] : dice)
-		ofs<<formatLine(DICE_SIGIL,k,std::string(v));
-	for(const auto& [k,v] : vars)
-		ofs<<formatLine(VAR_SIGIL,k,std::string(v));
-	for(const auto& [k,v] : wallets)
-		ofs<<formatLine(WALLET_SIGIL,k,std::string(v));
-
-	ofs.close();
-}
-
 //Get datasource
 std::string Scope::getDatasource()
 {
@@ -495,6 +353,165 @@ bool Scope::remove<Wallet>(std::string key)
 	return wallets.erase(getExistingKey<Wallet>(key));
 }
 
+//Save file formatting
+std::string Scope::formatLine(char type, std::string k, std::string v)
+{
+	std::string type_str(1,type);
+	return (type_str + DS + k + DS + v + "\n");
+}
+
+//Load all data in from file
+void Scope::load(std::string path, bool loadVar, bool loadDice, bool loadCurrency, bool loadWallet)
+{
+	//Start from a clean slate
+	currencies.clear();
+	dice.clear();
+	vars.clear();
+	wallets.clear();
+
+	//Open file
+	std::ifstream ifs;
+	try
+	{
+		ifs = tryCreateFileStream<std::ifstream>(path);
+	}
+	catch(const std::runtime_error& e)
+	{
+		throw;
+	}
+
+	//Load in the data
+	int linenum = 0;
+	while(!ifs.eof())
+	{
+		linenum++;
+		std::string data = "";
+		char type = '\0';
+		std::string key = "";
+		std::string value = "";
+
+		std::getline(ifs,data);
+
+		if(ifs.eof()) break;
+
+		/*
+		Handle multi-character type specifiers.
+		This is neccessarily an error with the Scope file formatting,
+		but it is not neccessarily a fatal error, so just print a warning and keep going.
+		*/
+		if(findu(data,DS) > 1)
+		{
+			output(Warning,"Multi-character type specifier \"%s\" at \"%s:%d\", skipping line...",left(data,findu(data,DS)).c_str(),path.c_str(),linenum);
+			continue;
+		}
+
+		if(data == "" || data[0] == COMMENT) continue;
+
+		type = data[0];
+		try
+		{
+			key = data.substr(1+DS.length(),(rfindu(data,DS)-(1+DS.length())));
+		}
+		catch(...)
+		{
+			output(Warning,"Unable to get variable key at \"%s:%d\", skipping line...",path.c_str(),linenum);
+			break;
+		}
+
+		try
+		{
+			value = right(data,rfindu(data,DS)+DS.length());
+		}
+		catch(...)
+		{
+			output(Warning,"Unable to get variable value at \"%s:%d\", skipping line...",path.c_str(),linenum);
+			break;
+		}
+
+		try
+		{
+			if(type == CURRENCY_SIGIL && loadCurrency)
+				currencies[key] = Currency(value);
+			else if(type == DICE_SIGIL && loadDice)
+				dice[key] = Dice(value);
+			else if(type == VAR_SIGIL && loadVar)
+				vars[key] = Var(value);
+			else if(type == WALLET_SIGIL && loadWallet)
+				wallets[key] = Wallet(value);
+			else if(!isTypeSigil(type))
+				output(Warning,"Unknown type specifier \'%c\' in \"%s:%d\"",type,path.c_str(),linenum);
+		}
+		catch(const std::runtime_error& e)
+		{
+			output(Error,"Unable to load \"%s\" into the character at \"%s:%d\": %s.",data.c_str(),path.c_str(),linenum,e.what());
+			exit(-1);
+		}
+	}
+	ifs.close();
+}
+void Scope::load()
+{
+	try
+	{
+		load(datasource,true,true,true,true);
+	}
+	catch(const std::runtime_error& e)
+	{
+		throw;
+	}
+}
+void Scope::load(std::string path)
+{
+	datasource = path;
+	try{load();}
+	catch(const std::runtime_error& e){throw;}
+}
+
+//Save all data to file
+void Scope::save()
+{
+	//Make backup first
+	if(std::filesystem::exists(datasource.c_str()) && right(datasource,4) != ".bak")
+		 std::filesystem::rename(datasource.c_str(),(datasource+".bak").c_str());
+
+	//Check for name change with character scopes
+	if(datasource.substr(datasource.length()-5,5) == ".char" || datasource.substr(datasource.length()-9,9) == ".char.bak")
+	{
+		std::string old_name = right(left(datasource,rfindu(datasource,".char")),rfindu(datasource,'/')+1);
+		std::string new_name = getProperty<Var>(getProperty<Var>(std::string(CHAR_NAME_ATTR),"Value"),"Value");
+		if(old_name != new_name)
+		{
+			std::filesystem::remove(datasource);
+			std::filesystem::remove(datasource+".bak");
+			datasource = left(datasource,rfindu(datasource,'/')+1) + new_name + ".char";
+			setEnvVariable(CURRENT_CHAR_SHELL_VAR,new_name);
+		}
+	}
+
+	std::ofstream ofs;
+
+	try
+	{
+		ofs = tryCreateFileStream<std::ofstream>(datasource);
+	}
+	catch(const std::runtime_error& e)
+	{
+		output(Error,"Exception thrown while attempting to save character: %s",e.what());
+		throw;
+	}
+
+	for(const auto& [k,v] : currencies)
+		ofs<<formatLine(CURRENCY_SIGIL,k,std::string(v));
+	for(const auto& [k,v] : dice)
+		ofs<<formatLine(DICE_SIGIL,k,std::string(v));
+	for(const auto& [k,v] : vars)
+		ofs<<formatLine(VAR_SIGIL,k,std::string(v));
+	for(const auto& [k,v] : wallets)
+		ofs<<formatLine(WALLET_SIGIL,k,std::string(v));
+
+	ofs.close();
+}
+
 //			//
 //	CHARACTER	//
 //			//
@@ -514,7 +531,9 @@ Character::Character(bool backup)
 		Config config = Config();
 		load(templates_dir + config.setting[DEFAULT_GAME]);
 		datasource = campaigns_dir + "default/characters/" + getName() + ".char";
-		std::filesystem::copy(templates_dir + config.setting[DEFAULT_GAME],datasource);
+		std::filesystem::copy_options co = std::filesystem::copy_options::update_existing;
+		std::filesystem::copy(templates_dir + config.setting[DEFAULT_GAME],datasource,co);
+		setEnvVariable(CURRENT_CHAR_SHELL_VAR,getName());
 		save();
 	}
 }
