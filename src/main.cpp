@@ -539,7 +539,7 @@ int prompt()
 	bool backup = false;
 
 	prompt:
-	c.load();
+	c = Character();
 
 	try
 	{
