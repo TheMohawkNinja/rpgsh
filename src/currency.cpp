@@ -67,7 +67,7 @@ void Currency::tryParseSmaller(std::string* str)
 	}
 	catch(std::runtime_error& e)
 	{
-		throw e.what();;
+		throw e.what();
 	}
 }
 void Currency::tryParseLarger(std::string* str)
