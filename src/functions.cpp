@@ -422,6 +422,7 @@ int runRpgshApp(std::string arg_str, bool redirect_output)
 	extern char** environ;
 	pid_t pid;
 
+	//Check aliases
 	bool replaced = false;
 	std::string first_arg;
 	if(findu(arg_str," ") != std::string::npos) first_arg = left(arg_str,findu(arg_str," "));
@@ -443,25 +444,35 @@ int runRpgshApp(std::string arg_str, bool redirect_output)
 		}
 		if(replaced) break;
 	}
-	bool preserveFirstArg;
+
+	//See if we need to preserve the argv[1] if it is a variable
 	if(findu(arg_str," ") != std::string::npos) first_arg = left(arg_str,findu(arg_str," "));
 	else					    first_arg = arg_str;
+
+	bool preserveSecondArg;
 	if(findu(arg_str,std::string(FLAG_MODIFYVARIABLES)) == std::string::npos)
-		preserveFirstArg = stob(getAppOutput(first_arg + " " + std::string(FLAG_MODIFYVARIABLES))[0]);
+		preserveSecondArg = stob(getAppOutput(first_arg + " " + std::string(FLAG_MODIFYVARIABLES))[0]);
 	else
-		preserveFirstArg = false;
+		preserveSecondArg = false;
 
 	//Push back program we are going to run
 	std::string path = std::string(RPGSH_INSTALL_DIR);
 	args.push_back(path+prefix+left(arg_str,findu(arg_str," ")));
 
 	//Replaces all instances of variables with their respective value
-	//Except for the first arg if it is a variable
 	std::regex variable_pattern(variable_pattern_str);
 	std::sregex_iterator v_str_it(arg_str.begin(), arg_str.end(), variable_pattern);
 	std::sregex_iterator v_str_end;
 
-	if(preserveFirstArg && v_str_it != v_str_end) v_str_it++;
+	long unsigned int first_space = findu(arg_str," ");
+	long unsigned int second_space = findu(arg_str," ",findu(arg_str," ")+1);
+	std::string second_arg;
+	if(second_space != std::string::npos)
+		second_arg = right(left(arg_str,second_space),first_space+1);
+	else
+		second_arg = right(arg_str,first_space+1);
+
+	if(preserveSecondArg && v_str_it->str() == second_arg && v_str_it != v_str_end) v_str_it++;
 
 	while(v_str_it != v_str_end)
 	{
