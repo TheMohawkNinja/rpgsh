@@ -394,8 +394,11 @@ std::string parseRHSAndDoOp(std::vector<std::string> v, unsigned int lhs_pos, un
 	// Exceptions to the "return type is always LHS"
 	try
 	{
+		//TODO: Handle exceptions on constructors
 		if(std::is_same_v<TL,Currency> && (left(v[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{" || v[rhs_pos][1] != '{') && Var(v[rhs_pos]).isInt() && v[op_pos] == OP_MUL)
 			return escapeSpaces(std::string(Currency(v[lhs_pos]) * Var(v[rhs_pos])));
+		else if(std::is_same_v<TL,Var> && left(v[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{" && Var(v[lhs_pos]).isInt() && v[op_pos] == OP_MUL)
+			return escapeSpaces(std::string(Currency(v[rhs_pos]) * Var(v[lhs_pos])));
 		else if(std::is_same_v<TL,Currency> && left(v[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{" && v[op_pos] == OP_ADD)
 			return escapeSpaces(std::string(Currency(v[lhs_pos]) + Currency(v[rhs_pos])));
 		else if(std::is_same_v<TL,Currency> && left(v[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{" && v[op_pos] == OP_ADD)
@@ -488,7 +491,7 @@ int main(int argc, char** argv)
 		fprintf(stdout,"\t%s | %s\tPrints this help text.\n",FLAG_HELPSHORT,FLAG_HELPLONG);
 		fprintf(stdout,"\nOPERATION:\n");
 		fprintf(stdout,"\tOne operand and at least one operator, seperated by spaces, which may be wrapped in parentheses.\n");
-		fprintf(stdout,"\n\t\te.g. \"2 + 2\", \"@/HitPoints/Current = (16 + 2 - 5)\", \"@/CoinPurse >= @[Store]/Sword/Cost\", \"@/Age ++\"\n");
+		fprintf(stdout,"\n\t\te.g. \"2 + 2\", \"@v/HitPoints/Current = (16 + 2 - 5)\", \"@/CoinPurse >= @[Store]/Sword/Cost\", \"@/Age ++\"\n");
 		fprintf(stdout,"\n\tCurrently supported operators are as follows:\n\n");
 		fprintf(stdout,"\t\t Unary  Arithmetic       Assignment          Relational    Boolean\n");
 		fprintf(stdout,"\t\t┌─────┐┌───────────┐┌───────────────────┐┌───────────────┐┌───────┐\n");
