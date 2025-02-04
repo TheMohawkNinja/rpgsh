@@ -10,6 +10,12 @@
 #include "text.h"
 #include "var.h"
 
+enum OutputLevel
+{
+	Info,
+	Warning,
+	Error
+};
 struct VariableInfo
 {
 	Scope scope = Scope();
@@ -19,12 +25,10 @@ struct VariableInfo
 	std::string key = "";
 	std::string property = "";
 };
-
-enum OutputLevel
+struct GetAppOutputInfo
 {
-	Info,
-	Warning,
-	Error
+	int status = 0;
+	std::vector<std::string> output;
 };
 
 void output(OutputLevel level, const char* format, ...);
@@ -84,7 +88,7 @@ void printBadOpAndThrow(std::string bad_op);
 
 void padding();
 
-int runRpgshApp(std::string args, bool redirect_output);
+int runApp(std::string args, bool redirect_output);
 
 std::vector<std::string> getAppOutput(std::string prog);
 

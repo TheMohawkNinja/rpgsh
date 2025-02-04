@@ -411,7 +411,7 @@ void padding()
 	}
 }
 
-int runRpgshApp(std::string arg_str, bool redirect_output)
+int runApp(std::string arg_str, bool redirect_output)
 {
 	Config cfg = Config();
 	Character c = Character();
@@ -477,7 +477,7 @@ int runRpgshApp(std::string arg_str, bool redirect_output)
 	while(v_str_it != v_str_end)
 	{
 		std::string v_str = v_str_it->str();
-		if(runRpgshApp(v_str,true))
+		if(runApp(v_str,true))
 		{
 			output(Error,"%s is not a valid variable string.",v_str.c_str());
 			return -1;
@@ -632,7 +632,7 @@ std::vector<std::string> getAppOutput(std::string prog)
 {
 	std::vector<std::string> output;
 
-	(void)runRpgshApp(prog,true);
+	(void)runApp(prog,true);
 
 	std::ifstream ifs(rpgsh_output_redirect_path);
 	while(!ifs.eof())

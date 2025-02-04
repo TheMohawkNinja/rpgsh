@@ -601,7 +601,7 @@ int prompt()
 			buffer[i]=tmp_buffer[i];
 
 		padding();
-		(void)runRpgshApp(buffer,false);
+		(void)runApp(buffer,false);
 		padding();
 
 		//Handle rpgsh history
@@ -675,12 +675,12 @@ int main()
 	{
 		if(findu(startup_apps,',') == std::string::npos)
 		{
-			(void)runRpgshApp(startup_apps.c_str(),false);
+			(void)runApp(startup_apps.c_str(),false);
 			break;
 		}
 		else
 		{
-			(void)runRpgshApp(left(startup_apps,findu(startup_apps,',')).c_str(),false);
+			(void)runApp(left(startup_apps,findu(startup_apps,',')).c_str(),false);
 			startup_apps = right(startup_apps,findu(startup_apps,',')+1);
 		}
 	}
