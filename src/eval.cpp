@@ -522,7 +522,7 @@ int main(int argc, char** argv)
 	else if(vi.variable == "" || vi.variable.back() != '/')// Perform operation on variable
 	{
 		std::string old_value;
-		if(vi.variable != "") old_value = getAppOutput(vi.variable)[0];
+		if(vi.variable != "") old_value = getAppOutput(vi.variable).output[0];
 
 		std::vector<std::string> args;
 		long unsigned int open_paren_ctr = 0;
@@ -708,7 +708,7 @@ int main(int argc, char** argv)
 			return 0;
 		}
 
-		std::string new_value = getAppOutput(vi.variable)[0];
+		std::string new_value = getAppOutput(vi.variable).output[0];
 		if(old_value == "")
 			output(Info,"%c%c/%s has been initialized to %s",
 			       vi.scope.sigil,vi.evalType,vi.key.c_str(),new_value.c_str());

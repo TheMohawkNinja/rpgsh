@@ -119,7 +119,7 @@ std::string inputHandler()
 	int tab_ctr = 0;
 	std::string last_match = "";
 	std::vector<char> input;
-	std::vector<std::string> history = getAppOutput("history");
+	std::vector<std::string> history = getAppOutput("history").output;
 	unsigned long history_len = history.size();
 	unsigned long history_ctr = history_len-1;
 

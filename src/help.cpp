@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 	for(const auto& app : applications)
 	{
 		appname = right(app,prefix.length());
-		std::vector<std::string> appdescription = getAppOutput(appname+" "+FLAG_APPDESCRIPTION);
+		std::vector<std::string> appdescription = getAppOutput(appname+" "+FLAG_APPDESCRIPTION).output;
 
 		//Not sure why %*s doesn't work here
 		fprintf(stdout,"%s%s%s%s%s",TEXT_BOLD,TEXT_GREEN,appname.c_str(),TEXT_NORMAL,addSpaces(longestNameLength-appname.length()+COLUMN_PADDING).c_str());
@@ -62,7 +62,7 @@ int main(int argc, char** argv)
 
 		if(print_app_help)
 		{
-			std::vector<std::string>apphelp = getAppOutput(appname+" --help");
+			std::vector<std::string>apphelp = getAppOutput(appname+" --help").output;
 
 			fprintf(stdout,"\n");
 			for(const auto& line : apphelp)

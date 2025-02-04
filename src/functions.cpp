@@ -451,9 +451,16 @@ int runApp(std::string arg_str, bool redirect_output)
 
 	bool preserveSecondArg;
 	if(findu(arg_str,std::string(FLAG_MODIFYVARIABLES)) == std::string::npos)
-		preserveSecondArg = stob(getAppOutput(first_arg + " " + std::string(FLAG_MODIFYVARIABLES))[0]);
+	{
+		GetAppOutputInfo info = getAppOutput(first_arg + " " + std::string(FLAG_MODIFYVARIABLES));
+
+		if(!info.status) preserveSecondArg = stob(info.output[0]);
+		else return info.status;
+	}
 	else
+	{
 		preserveSecondArg = false;
+	}
 
 	//Push back program we are going to run
 	std::string path = std::string(RPGSH_INSTALL_DIR);
@@ -482,7 +489,7 @@ int runApp(std::string arg_str, bool redirect_output)
 			output(Error,"%s is not a valid variable string.",v_str.c_str());
 			return -1;
 		}
-		arg_str = std::regex_replace(arg_str,std::regex(v_str),getAppOutput(v_str)[0]);
+		arg_str = std::regex_replace(arg_str,std::regex(v_str),getAppOutput(v_str).output[0]);
 		v_str_it++;
 	}
 
@@ -627,23 +634,22 @@ int runApp(std::string arg_str, bool redirect_output)
 
 	return exit_code;
 }
-
-std::vector<std::string> getAppOutput(std::string prog)
+GetAppOutputInfo getAppOutput(std::string prog)
 {
-	std::vector<std::string> output;
+	GetAppOutputInfo info;
 
-	(void)runApp(prog,true);
+	info.status = runApp(prog,true);
 
 	std::ifstream ifs(rpgsh_output_redirect_path);
 	while(!ifs.eof())
 	{
 		std::string data = "";
 		std::getline(ifs,data);
-		output.push_back(data);
+		info.output.push_back(data);
 	}
 	ifs.close();
 
-	return output;
+	return info;
 }
 
 void chkFlagAppDesc(char** _argv, std::string description)
