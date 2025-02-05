@@ -479,7 +479,7 @@ int runApp(std::string arg_str, bool redirect_output)
 	else
 		second_arg = right(arg_str,first_space+1);
 
-	if(preserveSecondArg && v_str_it->str() == second_arg && v_str_it != v_str_end) v_str_it++;
+	if(preserveSecondArg && v_str_it != v_str_end && v_str_it->str() == second_arg) v_str_it++;
 
 	while(v_str_it != v_str_end)
 	{
