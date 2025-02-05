@@ -1,4 +1,5 @@
 #include <cstring>
+#include "../headers/config.h"
 #include "../headers/functions.h"
 #include "../headers/text.h"
 
@@ -34,8 +35,10 @@ int main(int argc, char** argv)
 	}
 	ifs.close();
 
-	//Determine longest name for column formatting
+	//Determine longest app and alias names for column formatting
+	Config cfg = Config();
 	long unsigned int longestNameLength = 0;
+	long unsigned int longestAliasLength = 0;
 	std::string appname;
 	for(long unsigned int i=0; i<applications.size(); i++)
 	{
@@ -43,20 +46,37 @@ int main(int argc, char** argv)
 		appname = right(app,prefix.length());
 		if(appname.length() > longestNameLength)
 			longestNameLength = appname.length();
+
+		std::string aliases = "";
+		for(const auto& [k,v] : getSet(cfg.setting[ALIASES]))
+			if(!stringcasecmp(v,appname)) aliases += k;
+
+		if(aliases.length() > longestAliasLength)
+			longestAliasLength = aliases.length();
 	}
 
 	//Print results
+	fprintf(stdout,"%s%sName%s%sAlias Pattern%s%sDescription\n",TEXT_BOLD,TEXT_GREEN,TEXT_MAGENTA,addSpaces(longestNameLength-4+COLUMN_PADDING).c_str(),TEXT_NORMAL,addSpaces(longestAliasLength-13+COLUMN_PADDING).c_str());
+	fprintf(stdout,"%s%s",TEXT_BOLD,TEXT_WHITE);
+	for(unsigned long int i=0; i<longestNameLength+longestAliasLength+(2*COLUMN_PADDING)+25; i++) fprintf(stdout,"─");//25 is arbitrary, just looks fine
+	fprintf(stdout,"%s\n",TEXT_NORMAL);
 	for(const auto& app : applications)
 	{
 		appname = right(app,prefix.length());
-		std::vector<std::string> appdescription = getAppOutput(appname+" "+FLAG_APPDESCRIPTION).output;
+		std::string appdescription = getAppOutput(appname+" "+FLAG_APPDESCRIPTION).output[0];
 
-		//Not sure why %*s doesn't work here
-		fprintf(stdout,"%s%s%s%s%s",TEXT_BOLD,TEXT_GREEN,appname.c_str(),TEXT_NORMAL,addSpaces(longestNameLength-appname.length()+COLUMN_PADDING).c_str());
+		//Print application name, aliases (if applicable), and the description
+		fprintf(stdout,"%s%s%s%s",TEXT_BOLD,TEXT_GREEN,appname.c_str(),TEXT_NORMAL);
+		std::string aliases = "";
+		for(const auto& [k,v] : getSet(cfg.setting[ALIASES]))
+			if(!stringcasecmp(v,appname)) aliases += (k+",");
+		if(aliases != "") aliases = left(aliases,aliases.length()-1);
+		fprintf(stdout,"%s%s%s%s%s",TEXT_BOLD,TEXT_MAGENTA,addSpaces(longestNameLength-appname.length()+COLUMN_PADDING).c_str(),aliases.c_str(),TEXT_NORMAL);
+		fprintf(stdout,"%s",addSpaces(longestAliasLength-aliases.length()+COLUMN_PADDING).c_str());
 
-		//Description should really be just one line, so just print the first line
-		if(appdescription[0] != "")
-			fprintf(stdout,"%s\n",appdescription[0].c_str());
+		//Description should really be just one line anyways
+		if(appdescription != "")
+			fprintf(stdout,"%s\n",appdescription.c_str());
 		else
 			fprintf(stdout,"%s\n",empty_str.c_str());
 
