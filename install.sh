@@ -74,6 +74,8 @@ if [[ $EUID -eq 0 ]]; then
 	g++ $flags src/clear.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-clear
 	echo -e "\tsrc/history.cpp\t\t->\t$bold_white""/bin/rpgsh-history"$normal
 	g++ $flags src/history.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-history
+	echo -e "\tsrc/del.cpp\t\t->\t$bold_white""/bin/rpgsh-del"$normal
+	g++ $flags src/del.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-del
 
 	echo "Done!"
 else
