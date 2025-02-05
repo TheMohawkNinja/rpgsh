@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 		fprintf(stdout,"USAGE:\n");
 		fprintf(stdout,"\tdel [%sOPTIONS%s] %svalue%s\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\nOPTIONS:\n");
-		fprintf(stdout,"\t%snone%s\t\tChecks %svalue%s against variables, variable sets, characters, and campaigns (in that order) and deletes the first match.\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t%snone%s\t\tChecks %svalue%s against variables, variable sets, characters, and campaigns (in that order) and deletes the first match.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\t-c\t\tDeletes character matching %svalue%s",TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\t-m\t\tDeletes campaign matching %svalue%s",TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\t%s | %s\t\tPrints this help text",FLAG_HELPSHORT,FLAG_HELPLONG);
@@ -69,7 +69,7 @@ int main(int argc, char** argv)
 		}
 
 		vi.scope.save();
-		if(ri.type)	output(Warning,"Variable %s has been deleted.",vi.key.c_str());
+		if(rv.type)	output(Warning,"Variable %s has been deleted.",vi.key.c_str());
 		else		output(Error,"Variable %s does not exist to be deleted.",vi.key.c_str());
 	}
 	else if(!onlyChkC && !onlyChkM && looksLikeSet(value))
@@ -131,7 +131,7 @@ int main(int argc, char** argv)
 		std::string path = root_dir + value;
 		if(std::filesystem::exists(path))
 		{
-			std::filesystem::remove(path);
+			std::filesystem::remove_all(path);
 			output(Warning,"Campaign directory \"%s\" has been deleted.",path.c_str());
 		}
 		else
