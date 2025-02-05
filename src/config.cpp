@@ -50,7 +50,7 @@ Config::Config()
 	setting[DEFAULT_GAME]	=	"dnd5e";
 	setting[HIDE_TIPS]	=	"false";
 	setting[HISTORY_LENGTH]	=	"100";
-	setting[ALIASES]	=	"[0-9]{1,}|"+variable_pattern_str+"::"+"eval";
+	setting[ALIASES]	=	"[0-9]{1,}|"+variable_pattern_str+"::"+"eval::\\?::help";
 	setting[STARTUP_APPS]	=	"banner,version";
 
 	// Create default config file if one does not exist
