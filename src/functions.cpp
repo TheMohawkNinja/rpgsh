@@ -423,27 +423,22 @@ int runApp(std::string arg_str, bool redirect_output)
 	pid_t pid;
 
 	//Check aliases
-	bool replaced = false;
 	std::string first_arg;
 	if(findu(arg_str," ") != std::string::npos) first_arg = left(arg_str,findu(arg_str," "));
 	else					    first_arg = arg_str;
 	for(const auto& [k,v] : getSet(cfg.setting[ALIASES]))
 	{
-		std::regex pattern(k);
-		std::sregex_iterator it(first_arg.begin(), first_arg.end(), pattern);
-		std::sregex_iterator end;
-		while(it != end)
+		if(k == first_arg)
 		{
-			if(it->str() == first_arg)
-			{
-				arg_str = v + " " + arg_str;
-				replaced = true;
-				break;
-			}
-			it++;
+			arg_str = v + " " + right(arg_str,first_arg.length());
+			break;
 		}
-		if(replaced) break;
 	}
+
+	std::regex variable_pattern(variable_pattern_str);
+	std::sregex_iterator v_str_it(first_arg.begin(),first_arg.end(),variable_pattern);
+	std::sregex_iterator v_str_end;
+	if(v_str_it != v_str_end) arg_str = "eval " + arg_str;
 
 	//See if we need to preserve the argv[1] if it is a variable
 	if(findu(arg_str," ") != std::string::npos) first_arg = left(arg_str,findu(arg_str," "));
@@ -467,9 +462,7 @@ int runApp(std::string arg_str, bool redirect_output)
 	args.push_back(path+prefix+left(arg_str,findu(arg_str," ")));
 
 	//Replaces all instances of variables with their respective value
-	std::regex variable_pattern(variable_pattern_str);
-	std::sregex_iterator v_str_it(arg_str.begin(), arg_str.end(), variable_pattern);
-	std::sregex_iterator v_str_end;
+	v_str_it = std::sregex_iterator(arg_str.begin(), arg_str.end(), variable_pattern);
 
 	long unsigned int first_space = findu(arg_str," ");
 	long unsigned int second_space = findu(arg_str," ",findu(arg_str," ")+1);
