@@ -56,7 +56,9 @@ int main(int argc, char** argv)
 	}
 
 	//Print results
-	fprintf(stdout,"%s%sName%s%sAlias Pattern%s%sDescription\n",TEXT_BOLD,TEXT_GREEN,TEXT_MAGENTA,addSpaces(longestNameLength-4+COLUMN_PADDING).c_str(),TEXT_NORMAL,addSpaces(longestAliasLength-13+COLUMN_PADDING).c_str());
+	unsigned char name_spacing = (longestNameLength > 4 ? longestNameLength-4 : longestNameLength);
+	unsigned char alias_spacing = (longestAliasLength > 9 ? longestAliasLength-9 : longestAliasLength);
+	fprintf(stdout,"%s%sName%s%sAlias(es)%s%sDescription\n",TEXT_BOLD,TEXT_GREEN,TEXT_MAGENTA,addSpaces(name_spacing+COLUMN_PADDING).c_str(),TEXT_NORMAL,addSpaces(alias_spacing+COLUMN_PADDING).c_str());
 	fprintf(stdout,"%s%s",TEXT_BOLD,TEXT_WHITE);
 	for(unsigned long int i=0; i<longestNameLength+longestAliasLength+(2*COLUMN_PADDING)+25; i++) fprintf(stdout,"─");//25 is arbitrary, just looks fine
 	fprintf(stdout,"%s\n",TEXT_NORMAL);
@@ -71,8 +73,8 @@ int main(int argc, char** argv)
 		for(const auto& [k,v] : getSet(cfg.setting[ALIASES]))
 			if(!stringcasecmp(v,appname)) aliases += (k+",");
 		if(aliases != "") aliases = left(aliases,aliases.length()-1);
-		fprintf(stdout,"%s%s%s%s%s",TEXT_BOLD,TEXT_MAGENTA,addSpaces(longestNameLength-appname.length()+COLUMN_PADDING).c_str(),aliases.c_str(),TEXT_NORMAL);
-		fprintf(stdout,"%s",addSpaces(longestAliasLength-aliases.length()+COLUMN_PADDING).c_str());
+		fprintf(stdout,"%s%s%s%s%s",TEXT_BOLD,TEXT_MAGENTA,addSpaces(name_spacing-appname.length()+COLUMN_PADDING+4).c_str(),aliases.c_str(),TEXT_NORMAL);
+		fprintf(stdout,"%s",addSpaces(alias_spacing-aliases.length()+COLUMN_PADDING+9).c_str());
 
 		//Description should really be just one line anyways
 		if(appdescription != "")
