@@ -24,7 +24,7 @@ std::string prefix =				"rpgsh-";
 
 //RegEx patterns
 std::string arg_pattern_str =			"[^\\s]{1,}";
-std::string variable_pattern_str =		"["+
+std::string variable_pattern_str =		"[0-9]{1,}|["+
 						std::string(1,CHARACTER_SIGIL)+
 						std::string(1,CAMPAIGN_SIGIL)+
 						std::string(1,SHELL_SIGIL)+
