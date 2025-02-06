@@ -480,7 +480,7 @@ int main(int argc, char** argv)
 	if(argc == 1)
 	{
 		output(Error,"eval expects at least one argument.");
-		exit(-1);
+		return -1;
 	}
 
 	if(chkFlagHelp(argv))
@@ -502,11 +502,11 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	if(!looksLikeVariable(std::string(argv[1])) &&
+	if(!looksLikeVariable(std::string(argv[1])) && argv[2] &&
 	   findInVect<std::string>(assignOps,std::string(argv[2])) != -1)
 	{
 		output(Error,"Evaluating non-variable arguments on LHS with assign operations is not supported.");
-		exit(-1);
+		return -1;
 	}
 
 	VariableInfo vi;
@@ -516,6 +516,29 @@ int main(int argc, char** argv)
 
 	if(argc == 2)// Print data if all the user enters is a variable
 	{
+		if(vi.type == '\0')//argv[1] is a constant
+		{
+			try
+			{
+				Dice d = Dice(argv[1]);
+				if(d.List == "")
+					fprintf(stdout,"%s\n",d.c_str());
+				else
+					fprintf(stdout,"%s\n",Var(argv[1]).c_str());
+
+				return 0;
+			}
+			catch(std::runtime_error& e)
+			{
+				if(!strcmp(e.what(),E_INVALID_EXPLICIT_CONSTRUCTOR))
+					fprintf(stdout,"%s\n",Var(argv[1]).c_str());
+				else
+					output(Error,"An error occured while attempting to see if %s was a valid Dice constructor: %s",argv[1],e.what());
+
+				return 0;
+			}
+		}
+
 		std::string str = doAction(&vi, Read, "");
 		if(str != "") fprintf(stdout,"%s\n",str.c_str());
 	}
@@ -583,7 +606,7 @@ int main(int argc, char** argv)
 					try{args[0] = vi.scope.getProperty<Currency>(vi.key,vi.property);break;}
 					catch(...){}
 					output(Error,"%s is not a valid property of %s.",vi.property.c_str(),vi.key.c_str());
-					exit(-1);
+					return -1;
 			}
 		}
 		else if(vi.key != "")
@@ -622,12 +645,12 @@ int main(int argc, char** argv)
 		if(open_paren_ctr > close_paren_ctr)
 		{
 			output(Error,"Missing close parenthesis to match open parenthesis.");
-			exit(-1);
+			return -1;
 		}
 		else if(open_paren_ctr < close_paren_ctr)
 		{
 			output(Error,"Missing open parenthesis to match close parenthesis.");
-			exit(-1);
+			return -1;
 		}
 
 		// Wrap everything in parenthesis just to make below code simpler
@@ -669,7 +692,7 @@ int main(int argc, char** argv)
 						else if(op_pos == INT_MAX)
 						{
 							output(Error,"Unknown operator \"%s\"",args[start+1].c_str());
-							exit(-1);
+							return -1;
 						}
 
 						start = -1;
