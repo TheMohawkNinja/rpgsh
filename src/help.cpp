@@ -37,30 +37,41 @@ int main(int argc, char** argv)
 
 	//Determine longest app and alias names for column formatting
 	Config cfg = Config();
-	long unsigned int longestNameLength = 0;
-	long unsigned int longestAliasLength = 0;
+	long unsigned int longest_name_ln = 0;
+	long unsigned int longest_alias_ln = 0;
 	std::string appname;
 	for(long unsigned int i=0; i<applications.size(); i++)
 	{
 		std::string app = applications[i];
 		appname = right(app,prefix.length());
-		if(appname.length() > longestNameLength)
-			longestNameLength = appname.length();
+		if(appname.length() > longest_name_ln)
+			longest_name_ln = appname.length();
 
 		std::string aliases = "";
 		for(const auto& [k,v] : getSet(cfg.setting[ALIASES]))
 			if(!stringcasecmp(v,appname)) aliases += k;
 
-		if(aliases.length() > longestAliasLength)
-			longestAliasLength = aliases.length();
+		if(aliases.length() > longest_alias_ln)
+			longest_alias_ln = aliases.length();
 	}
 
 	//Print results
-	unsigned char name_spacing = (longestNameLength > 4 ? longestNameLength-4 : longestNameLength);
-	unsigned char alias_spacing = (longestAliasLength > 9 ? longestAliasLength-9 : longestAliasLength);
-	fprintf(stdout,"%s%sName%s%sAlias(es)%s%sDescription\n",TEXT_BOLD,TEXT_GREEN,TEXT_MAGENTA,addSpaces(name_spacing+COLUMN_PADDING).c_str(),TEXT_NORMAL,addSpaces(alias_spacing+COLUMN_PADDING).c_str());
+	std::string name_header_str = "Name";
+	std::string aliases_header_str = "Alias(es)";
+	unsigned char name_spacing = (longest_name_ln > name_header_str.length() ? longest_name_ln-name_header_str.length() : longest_name_ln);
+	unsigned char alias_spacing = (longest_alias_ln > aliases_header_str.length() ? longest_alias_ln-aliases_header_str.length() : longest_alias_ln);
+	fprintf(stdout,"%s%s%s%s%s%s%s%sDescription\n",
+		TEXT_BOLD,
+		TEXT_GREEN,
+		name_header_str.c_str(),
+		TEXT_MAGENTA,
+		addSpaces(name_spacing+COLUMN_PADDING).c_str(),
+		aliases_header_str.c_str(),
+		TEXT_NORMAL,
+		addSpaces(alias_spacing+COLUMN_PADDING).c_str());
 	fprintf(stdout,"%s%s",TEXT_BOLD,TEXT_WHITE);
-	for(unsigned long int i=0; i<longestNameLength+longestAliasLength+(2*COLUMN_PADDING)+25; i++) fprintf(stdout,"─");//25 is arbitrary, just looks fine
+	for(unsigned long int i=0; i<longest_name_ln+longest_alias_ln+(2*COLUMN_PADDING)+25; i++)//25 is arbitrary, just looks fine
+		fprintf(stdout,"─");
 	fprintf(stdout,"%s\n",TEXT_NORMAL);
 	for(const auto& app : applications)
 	{
@@ -73,8 +84,8 @@ int main(int argc, char** argv)
 		for(const auto& [k,v] : getSet(cfg.setting[ALIASES]))
 			if(!stringcasecmp(v,appname)) aliases += (k+",");
 		if(aliases != "") aliases = left(aliases,aliases.length()-1);
-		fprintf(stdout,"%s%s%s%s%s",TEXT_BOLD,TEXT_MAGENTA,addSpaces(name_spacing-appname.length()+COLUMN_PADDING+4).c_str(),aliases.c_str(),TEXT_NORMAL);
-		fprintf(stdout,"%s",addSpaces(alias_spacing-aliases.length()+COLUMN_PADDING+9).c_str());
+		fprintf(stdout,"%s%s%s%s%s",TEXT_BOLD,TEXT_MAGENTA,addSpaces(name_spacing-appname.length()+COLUMN_PADDING+name_header_str.length()).c_str(),aliases.c_str(),TEXT_NORMAL);
+		fprintf(stdout,"%s",addSpaces(alias_spacing-aliases.length()+COLUMN_PADDING+aliases_header_str.length()).c_str());
 
 		//Description should really be just one line anyways
 		if(appdescription != "")
@@ -88,7 +99,7 @@ int main(int argc, char** argv)
 
 			fprintf(stdout,"\n");
 			for(const auto& line : apphelp)
-				fprintf(stdout,"%s%s\n",addSpaces(longestNameLength+COLUMN_PADDING).c_str(),line.c_str());
+				fprintf(stdout,"%s%s\n",addSpaces(longest_name_ln+COLUMN_PADDING).c_str(),line.c_str());
 		}
 	}
 
