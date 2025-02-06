@@ -50,7 +50,7 @@ Config::Config()
 	setting[DEFAULT_GAME]	=	"dnd5e";
 	setting[HIDE_TIPS]	=	"false";
 	setting[HISTORY_LENGTH]	=	"100";
-	setting[ALIASES]	=	"[0-9]{1,}|"+variable_pattern_str+"::"+"eval::\\?::help";
+	setting[ALIASES]	=	"?::help";
 	setting[STARTUP_APPS]	=	"banner,version";
 
 	// Create default config file if one does not exist
@@ -75,8 +75,8 @@ Config::Config()
 		fs<<COMMENT<<" Default: "<<setting[HISTORY_LENGTH]<<"\n";
 		fs<<HISTORY_LENGTH<<"="<<setting[HISTORY_LENGTH]<<"\n";
 		fs<<"\n";
-		fs<<COMMENT<<" Sets the pattern to match as an alias to run a given command.\n";
-		fs<<COMMENT<<" Formatted like a variable set where the keys are patterns and the values are the commands to run when the pattern is matched.\n";
+		fs<<COMMENT<<" Sets the alias(es) to run a given command.\n";
+		fs<<COMMENT<<" Formatted like a variable set where the keys are the aliases and the values are the commands to run when the alias is ran.\n";
 		fs<<COMMENT<<" Default: "<<setting[ALIASES]<<"\n";
 		fs<<ALIASES<<"="<<setting[ALIASES]<<"\n";
 		fs<<"\n";
