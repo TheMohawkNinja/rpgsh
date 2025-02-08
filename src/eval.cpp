@@ -505,7 +505,7 @@ int main(int argc, char** argv)
 	if(!looksLikeVariable(std::string(argv[1])) && argv[2] &&
 	   findInVect<std::string>(assignOps,std::string(argv[2])) != -1)
 	{
-		output(Error,"Evaluating non-variable arguments on LHS with assign operations is not supported.");
+		output(Error,"Values cannot be assigned to constants.");
 		return -1;
 	}
 
