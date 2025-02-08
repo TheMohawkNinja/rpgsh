@@ -422,30 +422,30 @@ int runApp(std::string arg_str, bool redirect_output)
 	extern char** environ;
 	pid_t pid;
 
-	//Check aliases
 	std::string first_arg;
 	if(findu(arg_str," ") != std::string::npos) first_arg = left(arg_str,findu(arg_str," "));
 	else					    first_arg = arg_str;
+
+	//Check aliases
 	for(const auto& [k,v] : getSet(cfg.setting[ALIASES]))
 	{
-		if(k == first_arg)
-		{
-			arg_str = v + " " + right(arg_str,first_arg.length());
-			break;
-		}
+		if(k != first_arg) continue;
+		arg_str = v + right(arg_str,first_arg.length());
+		break;
 	}
 
 	//Check if implicitly running eval
+	//This is "Dice implicit w/ modifier OR Dice implicit w/o modifier OR integer OR variable"
 	std::regex variable_pattern("[0-9]{1,}d[0-9]{1,}[+,-]?[0-9]{1,}?|[0-9]{1,}d[0-9]{1,}|[0-9]{1,}|"+variable_pattern_str);
 	std::sregex_iterator v_str_it(first_arg.begin(),first_arg.end(),variable_pattern);
 	std::sregex_iterator v_str_end;
 	if(v_str_it != v_str_end) arg_str = "eval " + arg_str;
 
-	//See if we need to preserve the argv[1] if it is a variable
 	if(findu(arg_str," ") != std::string::npos) first_arg = left(arg_str,findu(arg_str," "));
 	else					    first_arg = arg_str;
 
-	bool preserveSecondArg;
+	//See if we need to preserve the argv[1] if it is a variable
+	bool preserveSecondArg = false;
 	if(findu(arg_str,std::string(FLAG_MODIFYVARIABLES)) == std::string::npos)
 	{
 		GetAppOutputInfo info = getAppOutput(first_arg + " " + std::string(FLAG_MODIFYVARIABLES));
@@ -453,20 +453,16 @@ int runApp(std::string arg_str, bool redirect_output)
 		if(!info.status) preserveSecondArg = stob(info.output[0]);
 		else return info.status;
 	}
-	else
-	{
-		preserveSecondArg = false;
-	}
 
 	//Push back program we are going to run
 	std::string path = std::string(RPGSH_INSTALL_DIR);
 	args.push_back(path+prefix+left(arg_str,findu(arg_str," ")));
 
-	//Replaces all instances of variables with their respective value
+	//Replaces all instances of variables with their respective valuea
 	v_str_it = std::sregex_iterator(arg_str.begin(), arg_str.end(), variable_pattern);
 
 	long unsigned int first_space = findu(arg_str," ");
-	long unsigned int second_space = findu(arg_str," ",findu(arg_str," ")+1);
+	long unsigned int second_space = findu(arg_str," ",findu(arg_str," ")+1);//TODO: A user double-spacing between the first and second arg with break this.
 	std::string second_arg;
 	if(second_space != std::string::npos)
 		second_arg = right(left(arg_str,second_space),first_space+1);
@@ -486,7 +482,6 @@ int runApp(std::string arg_str, bool redirect_output)
 		arg_str = std::regex_replace(arg_str,std::regex(v_str),getAppOutput(v_str).output[0]);
 		v_str_it++;
 	}
-
 	//Get args for program
 	std::regex arg_pattern(arg_pattern_str);
 	std::sregex_iterator arg_str_it(arg_str.begin(), arg_str.end(), arg_pattern);
