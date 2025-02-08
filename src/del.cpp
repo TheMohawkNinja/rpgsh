@@ -11,9 +11,9 @@ int main(int argc, char** argv)
 	}
 	if(argc > 3)
 		output(Warning,"del only expects 1, 2, or 3 arguments, ignoring all other arguments");
+
 	chkFlagAppDesc(argv,"Deletes a variable, variable set, character, or campaign.");
 	chkFlagModifyVariables(argv,true);
-
 	if(chkFlagHelp(argv))
 	{
 		fprintf(stdout,"USAGE:\n");
@@ -29,18 +29,13 @@ int main(int argc, char** argv)
 	bool onlyChkC = !strcmp(argv[1],"-c");
 	bool onlyChkM = !strcmp(argv[1],"-m");
 
-	std::string value = std::string(argv[argc]);
+	std::string obj_to_be_deleted = std::string(argv[argc-1]);
 
-	if(!onlyChkC && !onlyChkM && looksLikeVariable(value))
+	if(!onlyChkC && !onlyChkM && looksLikeVariable(obj_to_be_deleted))
 	{
-		struct RemovedVariable
-		{
-			char type = '\0';
-			std::string name = "";
-		};
-
-		VariableInfo vi = parseVariable(value);
-		RemovedVariable rv;
+		VariableInfo vi = parseVariable(obj_to_be_deleted);
+		std::string value = getAppOutput(obj_to_be_deleted).output[0];
+		bool deleted = false;
 
 		if(vi.property != "")
 		{
@@ -51,35 +46,31 @@ int main(int argc, char** argv)
 		switch(vi.evalType)
 		{
 			case VAR_SIGIL:
-				if(vi.scope.remove<Var>(vi.key))
-					rv = {VAR_SIGIL,value};
+				if(vi.scope.remove<Var>(vi.key)) deleted = true;
 				break;
 			case DICE_SIGIL:
-				if(vi.scope.remove<Dice>(vi.key))
-					rv = {DICE_SIGIL,value};
+				if(vi.scope.remove<Dice>(vi.key)) deleted = true;
 				break;
 			case WALLET_SIGIL:
-				if(vi.scope.remove<Wallet>(vi.key))
-					rv = {WALLET_SIGIL,value};
+				if(vi.scope.remove<Wallet>(vi.key)) deleted = true;
 				break;
 			case CURRENCY_SIGIL:
-				if(vi.scope.remove<Currency>(vi.key))
-					rv = {CURRENCY_SIGIL,value};
+				if(vi.scope.remove<Currency>(vi.key)) deleted = true;
 				break;
 		}
 
 		vi.scope.save();
-		if(rv.type)	output(Warning,"Variable %s has been deleted.",vi.key.c_str());
-		else		output(Error,"Variable %s does not exist to be deleted.",vi.key.c_str());
+		if(deleted)	output(Warning,"Variable \"%s\" (value: \"%s\") has been deleted.",vi.variable.c_str(),value.c_str());
+		else		output(Error,"Variable \"%s\" does not exist to be deleted.",vi.variable.c_str());
 	}
-	else if(!onlyChkC && !onlyChkM && looksLikeSet(value))
+	else if(!onlyChkC && !onlyChkM && looksLikeSet(obj_to_be_deleted))
 	{
 		struct RemovedKey
 		{
 			bool isRemoved = false;
 			char type = 0;
 		};
-		VariableInfo vi = parseVariable(value);
+		VariableInfo vi = parseVariable(obj_to_be_deleted);
 		for(const auto& [k,v] : getSet(getSetStr(vi)))
 		{
 			RemovedKey rk;
@@ -113,8 +104,8 @@ int main(int argc, char** argv)
 	else if(onlyChkC || !onlyChkM)
 	{
 		Character c = Character();
-		std::string campaign_path = left(c.getDatasource(),rfindu(c.getDatasource(),'/'));
-		std::string path = campaign_path + value;
+		std::string campaign_path = left(c.getDatasource(),rfindu(c.getDatasource(),'/')+1);
+		std::string path = campaign_path + obj_to_be_deleted;
 		if(std::filesystem::exists(path))
 		{
 			std::filesystem::remove(path);
@@ -128,7 +119,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		std::string path = root_dir + value;
+		std::string path = root_dir + obj_to_be_deleted;
 		if(std::filesystem::exists(path))
 		{
 			std::filesystem::remove_all(path);
