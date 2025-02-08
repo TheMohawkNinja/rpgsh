@@ -436,7 +436,7 @@ int runApp(std::string arg_str, bool redirect_output)
 	}
 
 	//Check if implicitly running eval
-	std::regex variable_pattern("[0-9]{1,}|"+variable_pattern_str);
+	std::regex variable_pattern("[0-9]{1,}d[0-9]{1,}[+,-]?[0-9]{1,}?|[0-9]{1,}d[0-9]{1,}|[0-9]{1,}|"+variable_pattern_str);
 	std::sregex_iterator v_str_it(first_arg.begin(),first_arg.end(),variable_pattern);
 	std::sregex_iterator v_str_end;
 	if(v_str_it != v_str_end) arg_str = "eval " + arg_str;
