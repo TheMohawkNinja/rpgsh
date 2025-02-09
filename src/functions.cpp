@@ -460,16 +460,16 @@ int runApp(std::string arg_str, bool redirect_output)
 
 	//Replaces all instances of variables with their respective valuea
 	v_str_it = std::sregex_iterator(arg_str.begin(), arg_str.end(), variable_pattern);
+	std::regex arg_pattern(arg_pattern_str);
+	std::sregex_iterator arg_str_it(arg_str.begin(), arg_str.end(), arg_pattern);
+	std::sregex_iterator arg_str_end;
 
-	long unsigned int first_space = findu(arg_str," ");
-	long unsigned int second_space = findu(arg_str," ",findu(arg_str," ")+1);//TODO: A user double-spacing between the first and second arg with break this.
-	std::string second_arg;
-	if(second_space != std::string::npos)
-		second_arg = right(left(arg_str,second_space),first_space+1);
-	else
-		second_arg = right(arg_str,first_space+1);
+	if(arg_str_it != arg_str_end) arg_str_it++;
 
-	if(preserveSecondArg && v_str_it != v_str_end && v_str_it->str() == second_arg) v_str_it++;
+	if(preserveSecondArg &&
+	   v_str_it != v_str_end &&
+	   arg_str_it != arg_str_end &&
+	   v_str_it->str() == arg_str_it->str()) v_str_it++;
 
 	while(v_str_it != v_str_end)
 	{
@@ -483,9 +483,7 @@ int runApp(std::string arg_str, bool redirect_output)
 		v_str_it++;
 	}
 	//Get args for program
-	std::regex arg_pattern(arg_pattern_str);
-	std::sregex_iterator arg_str_it(arg_str.begin(), arg_str.end(), arg_pattern);
-	std::sregex_iterator arg_str_end;
+	arg_str_it = std::sregex_iterator(arg_str.begin(), arg_str.end(), arg_pattern);
 	arg_str_it++;
 
 	while(arg_str_it != arg_str_end)
