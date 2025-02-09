@@ -29,12 +29,14 @@ int main(int argc, char** argv)
 	bool onlyChkC = !strcmp(argv[1],"-c");
 	bool onlyChkM = !strcmp(argv[1],"-m");
 
-	std::string obj_to_be_deleted = std::string(argv[argc-1]);
+	std::string obj_to_be_deleted = std::string(argv[1]);
 
-	if(!onlyChkC && !onlyChkM && looksLikeVariable(obj_to_be_deleted))
+	VariableInfo vi;
+	if(looksLikeVariable(obj_to_be_deleted)) vi = parseVariable(obj_to_be_deleted);
+
+	if(!onlyChkC && !onlyChkM && !looksLikeSet(getSetStr(vi)) && looksLikeVariable(obj_to_be_deleted))
 	{
-		VariableInfo vi = parseVariable(obj_to_be_deleted);
-		std::string value = getAppOutput(obj_to_be_deleted).output[0];
+		std::string value = getAppOutput(vi.variable).output[0];
 		bool deleted = false;
 
 		if(vi.property != "")
@@ -63,14 +65,13 @@ int main(int argc, char** argv)
 		if(deleted)	output(Warning,"Variable \"%s\" (value: \"%s\") has been deleted.",vi.variable.c_str(),value.c_str());
 		else		output(Error,"Variable \"%s\" does not exist to be deleted.",vi.variable.c_str());
 	}
-	else if(!onlyChkC && !onlyChkM && looksLikeSet(obj_to_be_deleted))
+	else if(!onlyChkC && !onlyChkM && looksLikeSet(getSetStr(vi)))
 	{
 		struct RemovedKey
 		{
 			bool isRemoved = false;
 			char type = 0;
 		};
-		VariableInfo vi = parseVariable(obj_to_be_deleted);
 		for(const auto& [k,v] : getSet(getSetStr(vi)))
 		{
 			RemovedKey rk;
@@ -96,7 +97,7 @@ int main(int argc, char** argv)
 			}
 
 			if(rk.isRemoved)
-				output(Warning,"Removed \"%c%c/%s\"",vi.scope.sigil,rk.type,k.c_str());
+				output(Warning,"Variable \"%c%c/%s\" (value: \"%s\") has been deleted.",vi.scope.sigil,rk.type,k.c_str(),v.c_str());
 		}
 
 		vi.scope.save();
