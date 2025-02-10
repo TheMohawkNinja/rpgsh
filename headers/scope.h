@@ -25,6 +25,9 @@ class Scope
 		//Save formatting
 		std::string formatLine(char type, std::string k, std::string v);
 
+		//Default campaign/character loader
+		void confirmDefaultCampaign();
+
 	public:
 		char sigil = '/';
 
