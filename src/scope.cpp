@@ -9,6 +9,18 @@
 //	BASE CLASS	//
 //			//
 
+void Scope::confirmDefaultCampaign()
+{
+	if(!std::filesystem::exists(campaigns_dir))
+		std::filesystem::create_directory(campaigns_dir);
+	if(!std::filesystem::exists(campaigns_dir + "default"))
+		std::filesystem::create_directory(campaigns_dir + "default");
+	if(!std::filesystem::exists(campaigns_dir + "default/characters"))
+		std::filesystem::create_directory(campaigns_dir + "default/characters");
+
+	return;
+}
+
 //Try to create a filestream
 template<>
 std::ifstream Scope::tryCreateFileStream<std::ifstream>(std::string path)
@@ -528,6 +540,7 @@ Character::Character(bool backup)
 	}
 	else
 	{
+		confirmDefaultCampaign();
 		Config config = Config();
 		load(templates_dir + config.setting[DEFAULT_GAME]);
 		datasource = campaigns_dir + "default/characters/" + getName() + ".char";
@@ -572,6 +585,7 @@ void Character::setDatasource(std::string path)
 
 Campaign::Campaign()
 {
+	confirmDefaultCampaign();
 	sigil = CAMPAIGN_SIGIL;
 	datasource = campaigns_dir +
 		     getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR) +

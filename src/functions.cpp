@@ -439,7 +439,7 @@ int runApp(std::string arg_str, bool redirect_output)
 	std::regex variable_pattern("[0-9]{1,}d[0-9]{1,}[+,-]?[0-9]{1,}?|[0-9]{1,}d[0-9]{1,}|[0-9]{1,}|"+variable_pattern_str);
 	std::sregex_iterator v_str_it(first_arg.begin(),first_arg.end(),variable_pattern);
 	std::sregex_iterator v_str_end;
-	if(v_str_it != v_str_end) arg_str = "eval " + arg_str;
+	if(v_str_it != v_str_end && v_str_it->str() == first_arg) arg_str = "eval " + arg_str;
 
 	if(findu(arg_str," ") != std::string::npos) first_arg = left(arg_str,findu(arg_str," "));
 	else					    first_arg = arg_str;
@@ -458,7 +458,8 @@ int runApp(std::string arg_str, bool redirect_output)
 	std::string path = std::string(RPGSH_INSTALL_DIR);
 	args.push_back(path+prefix+left(arg_str,findu(arg_str," ")));
 
-	//Replaces all instances of variables with their respective valuea
+	//Replaces all instances of variables with their respective value
+	variable_pattern = std::regex(variable_pattern_str);
 	v_str_it = std::sregex_iterator(arg_str.begin(), arg_str.end(), variable_pattern);
 	std::regex arg_pattern(arg_pattern_str);
 	std::sregex_iterator arg_str_it(arg_str.begin(), arg_str.end(), arg_pattern);
