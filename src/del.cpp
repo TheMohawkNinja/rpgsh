@@ -17,7 +17,7 @@ int main(int argc, char** argv)
 	if(chkFlagHelp(argv))
 	{
 		fprintf(stdout,"USAGE:\n");
-		fprintf(stdout,"\tdel [%sOPTIONS%s] %svalue%s\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\tdel %svalue%s [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\nOPTIONS:\n");
 		fprintf(stdout,"\t%snone%s\t\tChecks %svalue%s against variables, variable sets, characters, and campaigns (in that order) and deletes the first match.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\t-c\t\tDeletes character matching %svalue%s",TEXT_ITALIC,TEXT_NORMAL);
@@ -26,15 +26,15 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	bool onlyChkC = !strcmp(argv[1],"-c");
-	bool onlyChkM = !strcmp(argv[1],"-m");
+	bool onlyChkC = !strcmp(argv[2],"-c");
+	bool onlyChkM = !strcmp(argv[2],"-m");
 
 	std::string obj_to_be_deleted = std::string(argv[1]);
 
 	VariableInfo vi;
 	if(looksLikeVariable(obj_to_be_deleted)) vi = parseVariable(obj_to_be_deleted);
 
-	if(!onlyChkC && !onlyChkM && !looksLikeSet(getSetStr(vi)) && looksLikeVariable(obj_to_be_deleted))
+	if(!onlyChkC && !onlyChkM && vi.key != "" && !looksLikeSet(getSetStr(vi)) && looksLikeVariable(vi.variable))
 	{
 		std::string value = getAppOutput(vi.variable).output[0];
 		bool deleted = false;
@@ -65,7 +65,7 @@ int main(int argc, char** argv)
 		if(deleted)	output(Warning,"Variable \"%s\" (value: \"%s\") has been deleted.",vi.variable.c_str(),value.c_str());
 		else		output(Error,"Variable \"%s\" does not exist to be deleted.",vi.variable.c_str());
 	}
-	else if(!onlyChkC && !onlyChkM && looksLikeSet(getSetStr(vi)))
+	else if(!onlyChkC && !onlyChkM && vi.key != "" && looksLikeSet(getSetStr(vi)))
 	{
 		struct RemovedKey
 		{
@@ -102,35 +102,35 @@ int main(int argc, char** argv)
 
 		vi.scope.save();
 	}
-	else if(onlyChkC || !onlyChkM)
+	else if(onlyChkC || !onlyChkM) //TODO: Handle "campaign/character" format
 	{
 		Character c = Character();
 		std::string campaign_path = left(c.getDatasource(),rfindu(c.getDatasource(),'/')+1);
-		std::string path = campaign_path + obj_to_be_deleted;
-		if(std::filesystem::exists(path))
+		for(const auto& entry : getDirectoryListing(campaign_path))
 		{
-			std::filesystem::remove(path);
-			output(Warning,"Character file \"%s\" has been deleted.",path.c_str());
+			if(stringcasecmp(entry,obj_to_be_deleted+".char") || std::filesystem::is_directory(campaign_path+entry)) continue;
+
+			std::filesystem::remove(campaign_path+entry);
+			if(std::filesystem::exists(campaign_path+entry+".bak")) std::filesystem::remove(campaign_path+entry+".bak");
+			output(Warning,"Character file \"%s\" has been deleted.",(campaign_path+entry).c_str());
+			return 0;
 		}
-		else
-		{
-			output(Error,"Character file \"%s\" does not exist to be deleted.",path.c_str());
-			exit(-1);
-		}
+
+		output(Error,"Character file \"%s.char\" does not exist to be deleted.",(campaign_path+obj_to_be_deleted).c_str());
+		return -1;
 	}
 	else
 	{
-		std::string path = root_dir + obj_to_be_deleted;
-		if(std::filesystem::exists(path))
+		for(const auto& entry : getDirectoryListing(campaigns_dir))
 		{
-			std::filesystem::remove_all(path);
-			output(Warning,"Campaign directory \"%s\" has been deleted.",path.c_str());
+			if(stringcasecmp(entry,obj_to_be_deleted) || !std::filesystem::is_directory(campaigns_dir+entry)) continue;
+			std::filesystem::remove_all(campaigns_dir+entry);
+			output(Warning,"Campaign directory \"%s\" has been deleted.",(campaigns_dir+entry).c_str());
+			return 0;
 		}
-		else
-		{
-			output(Error,"Campaign directory \"%s\" does not exist to be deleted.",path.c_str());
-			exit(-1);
-		}
+
+		output(Error,"Campaign directory \"%s\" does not exist to be deleted.",(campaigns_dir+obj_to_be_deleted).c_str());
+		return -1;
 	}
 
 	return 0;
