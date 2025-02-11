@@ -192,9 +192,9 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 			}
 
 			if(action == SetAddA)
-				output(Info,"Set \"%c%c/%s\" to \"%s\"",p_vi->scope.sigil,p_vi->evalType,(p_vi->key+k).c_str(),v.c_str());
+				output(Info,"Set \"%c[%s]%c/%s\" to \"%s\"",p_vi->scope.sigil,p_vi->xref.c_str(),p_vi->evalType,(p_vi->key+k).c_str(),v.c_str());
 			else if(action == SetRemoveA && rk.isRemoved)
-				output(Warning,"Removed \"%c%c/%s\"",p_vi->scope.sigil,rk.type,k.c_str());
+				output(Warning,"Removed \"%c[%s]%c/%s\"",p_vi->scope.sigil,p_vi->xref.c_str(),rk.type,k.c_str());
 		}
 
 		if (action == SetAdd || action == SetRemove) return getSetStr(*p_vi);
@@ -731,16 +731,16 @@ int main(int argc, char** argv)
 			return 0;
 		}
 
-		std::string new_value = getAppOutput(vi.variable).output[0];
+		std::string new_value = getAppOutput(std::string(argv[1])).output[0];
 		if(old_value == "")
-			output(Info,"%c%c/%s has been initialized to %s",
-			       vi.scope.sigil,vi.evalType,vi.key.c_str(),new_value.c_str());
+			output(Info,"%c[%s]%c/%s has been initialized to %s",
+			       vi.scope.sigil,vi.xref.c_str(),vi.evalType,vi.key.c_str(),new_value.c_str());
 		else if(old_value != new_value)
-			output(Info,"%c%c/%s has changed from %s to %s",
-			       vi.scope.sigil,vi.evalType,vi.key.c_str(),old_value.c_str(),new_value.c_str());
+			output(Info,"%c[%s]%c/%s has changed from %s to %s",
+			       vi.scope.sigil,vi.xref.c_str(),vi.evalType,vi.key.c_str(),old_value.c_str(),new_value.c_str());
 		else
-			output(Info,"%c%c/%s is unchanged, current value: %s",
-			       vi.scope.sigil,vi.evalType,vi.key.c_str(),old_value.c_str());
+			output(Info,"%c[%s]%c/%s is unchanged, current value: %s",
+			       vi.scope.sigil,vi.xref.c_str(),vi.evalType,vi.key.c_str(),old_value.c_str());
 	}
 	else// Perform operation on set
 	{
