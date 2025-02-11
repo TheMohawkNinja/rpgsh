@@ -20,9 +20,9 @@ int main(int argc, char** argv)
 		fprintf(stdout,"\tdel %svalue%s [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\nOPTIONS:\n");
 		fprintf(stdout,"\t%snone%s\t\tChecks %svalue%s against variables, variable sets, characters, and campaigns (in that order) and deletes the first match.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"\t-c\t\tDeletes character matching %svalue%s",TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"\t-m\t\tDeletes campaign matching %svalue%s",TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"\t%s | %s\t\tPrints this help text",FLAG_HELPSHORT,FLAG_HELPLONG);
+		fprintf(stdout,"\t-c\t\tDeletes character matching %svalue%s\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t-m\t\tDeletes campaign matching %svalue%s\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t%s | %s\tPrints this help text\n",FLAG_HELPSHORT,FLAG_HELPLONG);
 		return 0;
 	}
 
@@ -62,8 +62,8 @@ int main(int argc, char** argv)
 		}
 
 		vi.scope.save();
-		if(deleted)	output(Warning,"Variable \"%s\" (value: \"%s\") has been deleted.",vi.variable.c_str(),value.c_str());
-		else		output(Error,"Variable \"%s\" does not exist to be deleted.",vi.variable.c_str());
+		if(deleted)	output(Warning,"Variable \"%c[%s]%c/%s\" (value: \"%s\") has been deleted.",vi.scope.sigil,vi.xref.c_str(),vi.evalType,vi.key,value.c_str());
+		else		output(Error,"Variable \"%c[%s]%c/%s\" does not exist to be deleted.",vi.scope.sigil,vi.xref.c_str(),vi.evalType,vi.key);
 	}
 	else if(!onlyChkC && !onlyChkM && vi.key != "" && looksLikeSet(getSetStr(vi)))
 	{
@@ -97,15 +97,19 @@ int main(int argc, char** argv)
 			}
 
 			if(rk.isRemoved)
-				output(Warning,"Variable \"%c%c/%s\" (value: \"%s\") has been deleted.",vi.scope.sigil,rk.type,k.c_str(),v.c_str());
+				output(Warning,"Variable \"%c[%s]%c/%s\" (value: \"%s\") has been deleted.",vi.scope.sigil,vi.xref.c_str(),rk.type,k.c_str(),v.c_str());
 		}
 
 		vi.scope.save();
 	}
-	else if(onlyChkC || !onlyChkM) //TODO: Handle "campaign/character" format
+	else if(onlyChkC || !onlyChkM)
 	{
 		Character c = Character();
-		std::string campaign_path = left(c.getDatasource(),rfindu(c.getDatasource(),'/')+1);
+		std::string campaign_path;
+		if(findu(obj_to_be_deleted,'/') == std::string::npos)
+			campaign_path = left(c.getDatasource(),rfindu(c.getDatasource(),'/')+1);
+		else
+			campaign_path = campaigns_dir + right(obj_to_be_deleted,findu(obj_to_be_deleted,'/')+1);
 		for(const auto& entry : getDirectoryListing(campaign_path))
 		{
 			if(stringcasecmp(entry,obj_to_be_deleted+".char") || std::filesystem::is_directory(campaign_path+entry)) continue;
