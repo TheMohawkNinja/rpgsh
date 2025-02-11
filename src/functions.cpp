@@ -285,7 +285,7 @@ std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir
 	output(Error,"Invalid xref \"%s\".",xref.c_str());
 	exit(-1);
 }
-void loadXRef(std::string* arg, Scope* p_scope)
+void loadXRef(std::string* arg, VariableInfo* p_vi)
 {
 	// Ending square bracket not found
 	if(findu(*arg,']') == std::string::npos)
@@ -295,35 +295,35 @@ void loadXRef(std::string* arg, Scope* p_scope)
 	}
 
 	// Get string between the square brackets
-	std::string xref = arg->substr(findu(*arg,'[')+1,findu(*arg,']')-(findu(*arg,'[')+1));
+	p_vi->xref = arg->substr(findu(*arg,'[')+1,findu(*arg,']')-(findu(*arg,'[')+1));
 
 	// Actually load the xref into the scope
 	std::vector<std::string> campaigns;
 	std::string xref_dir = campaigns_dir+
 			       getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR)+
 			       "characters/";
-	std::string xref_char = xref;
+	std::string xref_char = p_vi->xref;
 	std::string campaign = "";
 	switch((*arg)[0])
 	{
 		case CHARACTER_SIGIL:
-			if(findu(xref,'/') != std::string::npos)// Attempting to get a character from another campaign
+			if(findu(p_vi->xref,'/') != std::string::npos)// Attempt to load character from another campaign
 			{
-				campaign = left(xref,findu(xref,'/'));
-				xref_char = right(xref,findu(xref,'/')+1);
+				campaign = left(p_vi->xref,findu(p_vi->xref,'/'));
+				xref_char = right(p_vi->xref,findu(p_vi->xref,'/')+1);
 				xref_dir = campaigns_dir+
-					   getLikeFileName(campaign,campaigns_dir,true,xref)+
+					   getLikeFileName(campaign,campaigns_dir,true,p_vi->xref)+
 					   "/characters/";
 			}
 
-			p_scope->load(xref_dir+
-				      getLikeFileName(xref_char+".char",xref_dir,false,xref));
+			p_vi->scope.load(xref_dir+
+					 getLikeFileName(xref_char+".char",xref_dir,false,p_vi->xref));
 			break;
 		case CAMPAIGN_SIGIL:
-			p_scope->load(campaigns_dir+
-				      getLikeFileName(xref,campaigns_dir,true,xref)+
-				      "/"+
-				      variable_file_name);
+			p_vi->scope.load(campaigns_dir+
+					 getLikeFileName(p_vi->xref,campaigns_dir,true,p_vi->xref)+
+					 "/"+
+					 variable_file_name);
 			break;
 		case SHELL_SIGIL:
 			output(Error,"Cannot use xref with shell scope.");
@@ -355,10 +355,10 @@ VariableInfo parseVariable(std::string v)// Derive information about variable fr
 	}
 
 	// Check for external references
-	if(v[1] == '[') loadXRef(&v,&vi.scope);
+	if(v[1] == '[') loadXRef(&v,&vi);
 
 	// Check type sigil
-	if(!isTypeSigil(v[1]) && v[1] != '/')
+	if(!isTypeSigil(v[1]) && v[1] != '/' && v[1] != '[')
 	{
 		output(Error,"Unknown type sigil \'%c\'.",v[1]);
 		exit(-1);
@@ -369,11 +369,11 @@ VariableInfo parseVariable(std::string v)// Derive information about variable fr
 	vi.key = right(v,findu(v,'/')+1);
 	if(findu(v,'.') > rfindu(v,'/') && rfindu(v,'.') < UINT_MAX)
 	{
-		vi.key = left(vi.key,findu(vi.key,'.'));
-		vi.property = right(v,findu(v,'.')+1);
+		vi.key = left(vi.key,rfindu(vi.key,'.'));
+		vi.property = right(v,rfindu(v,'.')+1);
 	}
 
-	if(isTypeSigil(v[1]))
+	if(isTypeSigil(vi.type))
 	{
 		vi.evalType = vi.type;
 	}
