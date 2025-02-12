@@ -481,7 +481,14 @@ int runApp(std::string arg_str, bool redirect_output)
 			output(Error,"%s is not a valid variable string.",v_str.c_str());
 			return -1;
 		}
-		arg_str = std::regex_replace(arg_str,std::regex(v_str),getAppOutput(v_str).output[0]);
+		std::string v_str_it_pattern = v_str;
+		v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\["),"\\[");
+		v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\]"),"\\]");
+		v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\("),"\\(");
+		v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\)"),"\\)");
+		v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\{"),"\\{");
+		v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\}"),"\\}");
+		arg_str = std::regex_replace(arg_str,std::regex(v_str_it_pattern),getAppOutput(v_str).output[0]);
 		v_str_it++;
 	}
 	//Get args for program
