@@ -243,9 +243,10 @@ std::string inputHandler()
 					for(auto& m : getDirectoryListing(campaigns_dir))
 					{
 						std::string chk_str_xref = right(chk_str,2);
-						if(chk_str.length() == 2 ||
+						if(std::filesystem::is_directory(campaigns_dir+m) &&
+						   (chk_str.length() == 2 ||
 						   (!stringcasecmp(chk_str_xref,left(m,chk_str.length()-2)) &&
-						   m.length() > chk_str_xref.length()))
+						   m.length() > chk_str_xref.length())))
 							matches.push_back("  "+m+"/");//Two spaces are sacrificial for formatting
 					}
 				}
@@ -339,7 +340,7 @@ std::string inputHandler()
 				{
 					std::string xref_path = campaigns_dir+
 								right(left(chk_str,findu(chk_str,']')),findu(chk_str,'[')+1)+
-								".variables";
+								variable_file_name;
 
 					if(std::filesystem::exists(xref_path) && !std::filesystem::is_directory(xref_path))
 						tab_comp_scope.load(xref_path);
