@@ -221,7 +221,7 @@ std::string inputHandler()
 			{
 				tab_comp_scope = Character();
 				std::string xref_path = campaigns_dir+
-							getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR)+
+							getEnvVariable(ENV_CURRENT_CAMPAIGN)+
 							"characters/";
 
 				if(chk_str[1] == '[' &&
@@ -294,7 +294,7 @@ std::string inputHandler()
 					   findu(chk_str,'/') > findu(chk_str,']'))//Same campaign
 					{
 						std::string xref_path = campaigns_dir+
-									getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR)+
+									getEnvVariable(ENV_CURRENT_CAMPAIGN)+
 									"characters/"+
 									right(left(chk_str,findu(chk_str,']')),findu(chk_str,'[')+1)+
 									".char";

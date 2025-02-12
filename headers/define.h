@@ -47,9 +47,11 @@
 #define OP_EXPA				"^="
 #define OP_MODA				"%="
 
-//Built-in variables
-#define CURRENT_CHAR_SHELL_VAR		".CURRENT_CHAR"
-#define CURRENT_CAMPAIGN_SHELL_VAR	".CURRENT_CAMPAIGN"
+//Environment variables
+#define ENV_CURRENT_CHAR		"CURRENT_CHAR"
+#define ENV_CURRENT_CAMPAIGN		"CURRENT_CAMPAIGN"
+
+//Hidden Character variables
 #define CHAR_NAME_ATTR			".NAME"
 
 //Setting names

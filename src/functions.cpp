@@ -215,8 +215,8 @@ void confirmEnvVariablesFile()
 	//Set default values for built-in env variables
 	Config config = Config();
 	Character c = Character(templates_dir + config.setting[DEFAULT_GAME].c_str());
-	setEnvVariable(CURRENT_CHAR_SHELL_VAR,c.getName());
-	setEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR,"default/");
+	setEnvVariable(ENV_CURRENT_CHAR,c.getName());
+	setEnvVariable(ENV_CURRENT_CAMPAIGN,"default/");
 }
 
 void confirmShellVariablesFile()
@@ -231,7 +231,7 @@ void confirmShellVariablesFile()
 void confirmCampaignVariablesFile()
 {
 	std::string campaign_variables_file = campaigns_dir +
-					      getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR) +
+					      getEnvVariable(ENV_CURRENT_CAMPAIGN) +
 					      variable_file_name;
 
 	if(std::filesystem::exists(campaign_variables_file.c_str())) return;
@@ -300,7 +300,7 @@ void loadXRef(std::string* arg, VariableInfo* p_vi)
 	// Actually load the xref into the scope
 	std::vector<std::string> campaigns;
 	std::string xref_dir = campaigns_dir+
-			       getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR)+
+			       getEnvVariable(ENV_CURRENT_CAMPAIGN)+
 			       "characters/";
 	std::string xref_char = p_vi->xref;
 	std::string campaign = "";
@@ -822,8 +822,8 @@ void sort(std::vector<std::string>* v);
 template <>
 datamap<Currency> getDatamapFromAllScopes()
 {
-	std::string character = getEnvVariable(CURRENT_CHAR_SHELL_VAR);
-	std::string campaign = getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR);
+	std::string character = getEnvVariable(ENV_CURRENT_CHAR);
+	std::string campaign = getEnvVariable(ENV_CURRENT_CAMPAIGN);
 	std::string current_campaign_dir = campaigns_dir+campaign;
 	std::string current_campaign_path = current_campaign_dir+variable_file_name;
 	std::string current_character_path = current_campaign_dir+"characters/"+character+".char";

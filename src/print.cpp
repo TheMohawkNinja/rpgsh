@@ -291,7 +291,7 @@ void printCampaignVariables()
 	confirmCampaignVariablesFile();
 	Campaign m = Campaign();
 	std::string sigil(1,CAMPAIGN_SIGIL);
-	std::string m_name = getEnvVariable(CURRENT_CAMPAIGN_SHELL_VAR);
+	std::string m_name = getEnvVariable(ENV_CURRENT_CAMPAIGN);
 	printHeader("("+sigil+") "+left(m_name,m_name.length()-1));// Omit trailing '/'
 	printData(m);
 }
