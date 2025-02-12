@@ -364,7 +364,8 @@ VariableInfo parseVariable(std::string v)// Derive information about variable fr
 		exit(-1);
 	}
 
-	vi.type = v[1];
+	if(vi.xref == "") vi.type = v[1];
+	else	       vi.type = v[findu(v,']')+1];
 	vi.variable = v;
 	vi.key = right(v,findu(v,'/')+1);
 	if(findu(v,'.') > rfindu(v,'/') && rfindu(v,'.') < UINT_MAX)
