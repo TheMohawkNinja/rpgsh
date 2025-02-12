@@ -582,7 +582,7 @@ int main(int argc, char** argv)
 		// Replace first arg with value if it's a variable
 		if(vi.key != "" && vi.property != "")
 		{
-			switch(args[0][1])
+			switch(vi.evalType)
 			{
 				case VAR_SIGIL:
 					args[0] = vi.scope.getProperty<Var>(vi.key,vi.property);
@@ -596,22 +596,11 @@ int main(int argc, char** argv)
 				case CURRENCY_SIGIL:
 					args[0] = vi.scope.getProperty<Currency>(vi.key,vi.property);
 					break;
-				case '/':
-					try{args[0] = vi.scope.getProperty<Var>(vi.key,vi.property);break;}
-					catch(...){}
-					try{args[0] = vi.scope.getProperty<Dice>(vi.key,vi.property);break;}
-					catch(...){}
-					try{args[0] = vi.scope.getProperty<Wallet>(vi.key,vi.property);break;}
-					catch(...){}
-					try{args[0] = vi.scope.getProperty<Currency>(vi.key,vi.property);break;}
-					catch(...){}
-					output(Error,"%s is not a valid property of %s.",vi.property.c_str(),vi.key.c_str());
-					return -1;
 			}
 		}
 		else if(vi.key != "")
 		{
-			switch(args[0][1])
+			switch(vi.evalType)
 			{
 				case VAR_SIGIL:
 					args[0] = vi.scope.getStr<Var>(vi.key);
@@ -625,16 +614,6 @@ int main(int argc, char** argv)
 				case CURRENCY_SIGIL:
 					args[0] = vi.scope.getStr<Currency>(vi.key);
 					break;
-				case '/':
-					if(vi.scope.keyExists<Var>(vi.key))
-					{args[0] = vi.scope.getStr<Var>(vi.key);break;}
-					else if(vi.scope.keyExists<Dice>(vi.key))
-					{args[0] = vi.scope.getStr<Dice>(vi.key);break;}
-					else if(vi.scope.keyExists<Wallet>(vi.key))
-					{args[0] = vi.scope.getStr<Wallet>(vi.key);break;}
-					else if(vi.scope.keyExists<Currency>(vi.key))
-					{args[0] = vi.scope.getStr<Currency>(vi.key);break;}
-					else{args[0] = "";}
 			}
 		}
 		else
