@@ -419,9 +419,12 @@ std::string inputHandler()
 				fprintf(stdout,"%c",input[i]);
 
 			//CURSOR_LEFT_N(0) still pushes cursor to the left, so we need to check
-			unsigned char offset = match.length()-(left(match,2) == "  " ? 2 : 0);
+			unsigned int spaces = 0;
+			for(const auto& i : match) if(i == ' ') spaces++;
+			unsigned int offset = match.length()-spaces;
+			char base_char = (rfindu(chk_str,'/') == std::string::npos ? '[' : '/');
 			if(cur_pos+offset < input.size())
-				fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos-offset+(chk_str.length()-(findu(chk_str,'/')+1)));
+				fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos-offset+(chk_str.length()-(rfindu(chk_str,base_char)+1)));
 
 			last_match = match;
 		}
