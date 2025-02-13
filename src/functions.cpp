@@ -316,14 +316,15 @@ void loadXRef(std::string* arg, VariableInfo* p_vi)
 					   "/characters/";
 			}
 
-			p_vi->scope.load(xref_dir+
-					 getLikeFileName(xref_char+".char",xref_dir,false,p_vi->xref));
+			p_vi->scope.setDatasource(xref_dir+getLikeFileName(xref_char+".char",xref_dir,false,p_vi->xref));
+			p_vi->scope.load();
 			break;
 		case CAMPAIGN_SIGIL:
-			p_vi->scope.load(campaigns_dir+
-					 getLikeFileName(p_vi->xref,campaigns_dir,true,p_vi->xref)+
-					 "/"+
-					 variable_file_name);
+			p_vi->scope.setDatasource(campaigns_dir+
+						  getLikeFileName(p_vi->xref,campaigns_dir,true,p_vi->xref)+
+						  "/"+
+						  variable_file_name);
+			p_vi->scope.load();
 			break;
 		case SHELL_SIGIL:
 			output(Error,"Cannot use xref with shell scope.");
@@ -358,14 +359,13 @@ VariableInfo parseVariable(std::string v)// Derive information about variable fr
 	if(v[1] == '[') loadXRef(&v,&vi);
 
 	// Check type sigil
-	if(!isTypeSigil(v[1]) && v[1] != '/' && v[1] != '[')
+	if(!isTypeSigil(v[1]) && v[1] != '/')
 	{
 		output(Error,"Unknown type sigil \'%c\'.",v[1]);
 		exit(-1);
 	}
 
-	if(vi.xref == "") vi.type = v[1];
-	else	       vi.type = v[findu(v,']')+1];
+	vi.type = v[1];
 	vi.variable = v;
 	vi.key = right(v,findu(v,'/')+1);
 	if(findu(v,'.') > rfindu(v,'/') && rfindu(v,'.') < UINT_MAX)
