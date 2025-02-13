@@ -48,11 +48,16 @@ bool Scope::confirmDatasource()
 	return std::filesystem::exists(datasource);
 }
 
-//Get datasource
+//Get/set datasource
 std::string Scope::getDatasource()
 {
 	return datasource;
 }
+void Scope::setDatasource(std::string path)
+{
+	datasource = path;
+}
+
 
 //Check if key exists
 template<>
@@ -571,12 +576,6 @@ std::string Character::getCurrentCharacterFilePath()
 std::string Character::getName()
 {
 	return getProperty<Var>(getProperty<Var>(std::string(CHAR_NAME_ATTR),"Value"),"Value");
-}
-
-//Set datasource to save, mainly to ensure new characters don't save back to template file
-void Character::setDatasource(std::string path)
-{
-	datasource = path;
 }
 
 //			//
