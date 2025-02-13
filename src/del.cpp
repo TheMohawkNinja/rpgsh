@@ -26,8 +26,14 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	bool onlyChkC = !strcmp(argv[2],"-c");
-	bool onlyChkM = !strcmp(argv[2],"-m");
+	bool onlyChkC = false;
+	bool onlyChkM = false;
+
+	if(argv[2])
+	{
+		onlyChkC = !strcmp(argv[2],"-c");
+		onlyChkM = !strcmp(argv[2],"-m");
+	}
 
 	std::string obj_to_be_deleted = std::string(argv[1]);
 
@@ -62,8 +68,9 @@ int main(int argc, char** argv)
 		}
 
 		vi.scope.save();
-		if(deleted)	output(Warning,"Variable \"%c[%s]%c/%s\" (value: \"%s\") has been deleted.",vi.scope.sigil,vi.xref.c_str(),vi.evalType,vi.key,value.c_str());
-		else		output(Error,"Variable \"%c[%s]%c/%s\" does not exist to be deleted.",vi.scope.sigil,vi.xref.c_str(),vi.evalType,vi.key);
+		std::string xref = (vi.xref != "" ? "["+vi.xref+"]" : "");
+		if(deleted)	output(Warning,"Variable \"%c%s%c/%s\" (value: \"%s\") has been deleted.",vi.scope.sigil,xref.c_str(),vi.evalType,vi.key,value.c_str());
+		else		output(Error,"Variable \"%c%s%c/%s\" does not exist to be deleted.",vi.scope.sigil,xref.c_str(),vi.evalType,vi.key);
 	}
 	else if(!onlyChkC && !onlyChkM && vi.key != "" && looksLikeSet(getSetStr(vi)))
 	{
@@ -96,8 +103,9 @@ int main(int argc, char** argv)
 					break;
 			}
 
+			std::string xref = (vi.xref != "" ? "["+vi.xref+"]" : "");
 			if(rk.isRemoved)
-				output(Warning,"Variable \"%c[%s]%c/%s\" (value: \"%s\") has been deleted.",vi.scope.sigil,vi.xref.c_str(),rk.type,k.c_str(),v.c_str());
+				output(Warning,"Variable \"%c%s%c/%s\" (value: \"%s\") has been deleted.",vi.scope.sigil,xref.c_str(),rk.type,k.c_str(),v.c_str());
 		}
 
 		vi.scope.save();
