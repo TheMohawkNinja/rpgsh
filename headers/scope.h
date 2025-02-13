@@ -34,8 +34,9 @@ class Scope
 		//Confirm datasource exists
 		bool confirmDatasource();
 
-		//Get datasource
+		//Get/set datasource
 		std::string getDatasource();
+		void setDatasource(std::string path);
 
 		//Check if key exists
 		template <typename T>
@@ -98,10 +99,7 @@ class Character: public Scope
 
 		//Get character name
 		std::string getName();
-
-		//Set datasource to save, mainly to ensure new characters don't save back to template file
-		void setDatasource(std::string path);
-};
+		};
 
 class Campaign: public Scope
 {
