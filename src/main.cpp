@@ -452,25 +452,19 @@ std::string inputHandler()
 					cur_pos = input.size();
 					break;
 				case 'C':	//Right
-					if(cur_pos < input.size())
-					{
-						fprintf(stdout,CURSOR_RIGHT);
-						cur_pos++;
-					}
+					if(cur_pos >= input.size()) continue;
+					fprintf(stdout,CURSOR_RIGHT);
+					cur_pos++;
 					break;
 				case 'D':	//Left
-					if(cur_pos > 0)
-					{
-						fprintf(stdout,CURSOR_LEFT);
-						cur_pos--;
-					}
+					if(cur_pos == 0) continue;
+					fprintf(stdout,CURSOR_LEFT);
+					cur_pos--;
 					break;
 				case 'H':	//Home
-					if(cur_pos > 0)
-					{
-						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
-						cur_pos = 0;
-					}
+					if(cur_pos == 0) continue;
+					fprintf(stdout,CURSOR_LEFT_N,cur_pos);
+					cur_pos = 0;
 					break;
 				case '5':	//PgUp
 				case '6':	//PgDown
@@ -488,41 +482,31 @@ std::string inputHandler()
 					cur_pos = input.size();
 					break;
 				case '7':	//Home
-					if(getchar() == '~' && cur_pos > 0)
-					{
-						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
-						cur_pos = 0;
-					}
+					if(getchar() != '~' || cur_pos <= 0) continue;
+					fprintf(stdout,CURSOR_LEFT_N,cur_pos);
+					cur_pos = 0;
 					break;
 				case 'F':	//End
-					if(cur_pos < input.size())
-					{
-						fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
-						cur_pos = input.size();
-					}
+					if(cur_pos >= input.size()) continue;
+					fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
+					cur_pos = input.size();
 					break;
 				case '8':	//End
-					if(getchar() == '~' && cur_pos < input.size())
-					{
-						fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
-						cur_pos = input.size();
-					}
+					if(getchar() != '~' || cur_pos >= input.size()) continue;
+					fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
+					cur_pos = input.size();
 					break;
 				case '2':	//Insert
-					if(getchar() == '~')
-						insert_mode = !insert_mode;
+					if(getchar() == '~') insert_mode = !insert_mode;
 					break;
 				case '3':	//Delete
-					if(getchar() == '~' && cur_pos < input.size())
-					{
-						fprintf(stdout,CLEAR_LINE);
-						input.erase(input.begin()+cur_pos);
-
-						for(long unsigned int i=cur_pos; i<input.size(); i++)
-							fprintf(stdout,"%c",input[i]);
-						if(cur_pos < input.size())
-							fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
-					}
+					if(getchar() != '~' || cur_pos >= input.size()) continue;
+					fprintf(stdout,CLEAR_LINE);
+					input.erase(input.begin()+cur_pos);
+					for(long unsigned int i=cur_pos; i<input.size(); i++)
+						fprintf(stdout,"%c",input[i]);
+					if(cur_pos < input.size())
+						fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
 					break;
 			}
 		}
