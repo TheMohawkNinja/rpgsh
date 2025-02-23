@@ -482,7 +482,7 @@ std::string inputHandler()
 					cur_pos = input.size();
 					break;
 				case '7':	//Home
-					if(getchar() != '~' || cur_pos <= 0) continue;
+					if(getchar() != '~' || cur_pos == 0) continue;
 					fprintf(stdout,CURSOR_LEFT_N,cur_pos);
 					cur_pos = 0;
 					break;
