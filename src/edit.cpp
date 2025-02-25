@@ -36,6 +36,9 @@ int main(int argc, char** argv)
 	struct termios t_old, t_new;
 
 	std::vector<char> input;
+	input.push_back('v');//
+	input.push_back('{');//TODO: Don't include this if specifying a variable to edit
+	input.push_back('}');//
 	bool insert_mode = false;
 	char k = 0;
 	char esc_char = 0;
@@ -46,6 +49,9 @@ int main(int argc, char** argv)
 		fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
 	fprintf(stdout,"%s\n\n",TEXT_NORMAL);
 	fprintf(stdout,CURSOR_UP_N,(long unsigned int)4);
+	for(const auto& ch : input) fprintf(stdout,"%c",ch);
+	fprintf(stdout,CURSOR_LEFT_N,(long unsigned int)1);//TODO: Derive this number from any arguments provided
+	cur_pos = 2;
 
 	while(true)
 	{
@@ -194,6 +200,24 @@ int main(int argc, char** argv)
 					break;
 			}
 		}
+
+		if(cur_pos-input.size()) fprintf(stdout,CURSOR_RIGHT_N,cur_pos-input.size());
+		input[input.size()] = '\0';
+		std::vector<std::string> output = getAppOutput(("print \""+std::string(input.data())+"\"").c_str()).output;
+		fprintf(stdout,CLEAR_TO_SCREEN_END);
+		fprintf(stdout,"\n\n");
+		for(int i=0; i<w.ws_col; i++)
+			fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
+		fprintf(stdout,"%s\n\n",TEXT_NORMAL);
+		unsigned long int output_length = 0;
+		for(const auto& line : output)
+		{
+			fprintf(stdout,line.c_str());
+			output_length += line.length();
+		}
+		fprintf(stdout,CURSOR_LEFT_N,output_length);
+		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4);
+		fprintf(stdout,CURSOR_RIGHT_N,cur_pos);
 
 		//Reset terminal flags in-case of sudden program termination
 		tcsetattr(fileno(stdin), TCSANOW, &t_old);
