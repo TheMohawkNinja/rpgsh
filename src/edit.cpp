@@ -143,7 +143,7 @@ int main(int argc, char** argv)
 			switch(esc_char)
 			{
 				case 'A':	//Up
-					//TODO: Cursor up
+					fprintf(stdout,CURSOR_UP_N,cur_pos/w.ws_col);
 					break;
 				case 'B':	//Down
 					//TODO: Cursor down
@@ -203,20 +203,18 @@ int main(int argc, char** argv)
 
 		if(cur_pos-input.size()) fprintf(stdout,CURSOR_RIGHT_N,cur_pos-input.size());
 		input[input.size()] = '\0';
-		std::vector<std::string> output = getAppOutput(("print \""+std::string(input.data())+"\"").c_str()).output;
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
 		fprintf(stdout,"\n\n");
 		for(int i=0; i<w.ws_col; i++)
 			fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
 		fprintf(stdout,"%s\n\n",TEXT_NORMAL);
-		unsigned long int output_length = 0;
-		for(const auto& line : output)
-		{
-			fprintf(stdout,line.c_str());
-			output_length += line.length();
-		}
-		fprintf(stdout,CURSOR_LEFT_N,output_length);
-		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4);
+		std::string value;
+		for(unsigned long int i=2; i<input.size()-1; i++)//Remove the start and end bits of explicit constructor
+			value += input[i];
+		std::string output = makePretty(value);
+		fprintf(stdout,output.c_str());
+		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
+		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4+countu(output,'\n'));
 		fprintf(stdout,CURSOR_RIGHT_N,cur_pos);
 
 		//Reset terminal flags in-case of sudden program termination
