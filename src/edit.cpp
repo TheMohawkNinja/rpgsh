@@ -204,7 +204,8 @@ int main(int argc, char** argv)
 		if(cur_pos-input.size()) fprintf(stdout,CURSOR_RIGHT_N,cur_pos-input.size());
 		input[input.size()] = '\0';
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
-		fprintf(stdout,"\n\n");
+		for(long unsigned int i=0; i<2+(input.size()/w.ws_col); i++)
+			fprintf(stdout,"\n");
 		for(int i=0; i<w.ws_col; i++)
 			fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
 		fprintf(stdout,"%s\n\n",TEXT_NORMAL);
@@ -214,7 +215,7 @@ int main(int argc, char** argv)
 		std::string output = makePretty(value);
 		fprintf(stdout,output.c_str());
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
-		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4+countu(output,'\n'));
+		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4+countu(output,'\n')+(input.size()/w.ws_col));
 		fprintf(stdout,CURSOR_RIGHT_N,cur_pos);
 
 		//Reset terminal flags in-case of sudden program termination
