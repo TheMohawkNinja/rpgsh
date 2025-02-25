@@ -34,6 +34,8 @@ struct GetAppOutputInfo
 
 void output(OutputLevel level, const char* format, ...);
 
+const char* makePretty(std::string value);
+
 std::string btos(bool b);
 bool stob(std::string s);
 
