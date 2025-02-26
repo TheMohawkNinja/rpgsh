@@ -36,22 +36,20 @@ int main(int argc, char** argv)
 	struct termios t_old, t_new;
 
 	std::vector<char> input;
-	input.push_back('v');//
-	input.push_back('{');//TODO: Don't include this if specifying a variable to edit
-	input.push_back('}');//
+	input.push_back('v'); //
+	input.push_back('{'); //TODO: Don't include this if specifying a variable to edit
+	input.push_back('}'); //
+	input.push_back('\0');//
 	bool insert_mode = false;
 	char k = 0;
 	char esc_char = 0;
-	long unsigned int cur_pos = 0;
+	long unsigned int cur_pos = input.size()-1;
 
 	fprintf(stdout,"%s%sCTRL+ALT+ESC or double-tap ESC to quit.%s\n\n\n\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
 	for(int i=0; i<w.ws_col; i++)
 		fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
 	fprintf(stdout,"%s\n\n",TEXT_NORMAL);
 	fprintf(stdout,CURSOR_UP_N,(long unsigned int)4);
-	for(const auto& ch : input) fprintf(stdout,"%c",ch);
-	fprintf(stdout,CURSOR_LEFT_N,(long unsigned int)1);//TODO: Derive this number from any arguments provided
-	cur_pos = 2;
 
 	while(true)
 	{
@@ -60,6 +58,9 @@ int main(int argc, char** argv)
 		t_new = t_old;
 		t_new.c_lflag &= ~(ICANON | ECHO);
 		tcsetattr(fileno(stdin), TCSANOW, &t_new);
+
+		fprintf(stdout,input.data());
+		fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
 
 		esc_char = 0;
 		k = getchar();
@@ -77,21 +78,15 @@ int main(int argc, char** argv)
 		if(isprint(k))//Printable characters
 		{
 			if(insert_mode)	//If the "Insert" key is toggled
-			{
-				if(cur_pos < input.size()) input[cur_pos] = k;
-				else input.push_back(k);
-			}
+				input[cur_pos-1] = k;
 			else
-			{
-				input.insert(input.begin()+cur_pos,k);
-			}
+				input.insert(input.begin()+cur_pos-1,k);
 
+			if((input.size()-2)/w.ws_col)
+				fprintf(stdout,CURSOR_UP_N,(input.size()-2)/w.ws_col);
+			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)0);
 			fprintf(stdout,CLEAR_LINE);
-
-			for(long unsigned int i=cur_pos; i<input.size(); i++)
-				fprintf(stdout,"%c",input[i]);
-			if(cur_pos < input.size()-1)
-				fprintf(stdout,CURSOR_LEFT_N,input.size()-1-cur_pos);
+			fprintf(stdout,input.data());
 
 			cur_pos++;
 		}
@@ -201,22 +196,19 @@ int main(int argc, char** argv)
 			}
 		}
 
-		if(cur_pos-input.size()) fprintf(stdout,CURSOR_RIGHT_N,cur_pos-input.size());
-		input[input.size()] = '\0';
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
-		for(long unsigned int i=0; i<2+(input.size()/w.ws_col); i++)
+		for(long unsigned int i=0; i<2; i++)
 			fprintf(stdout,"\n");
 		for(int i=0; i<w.ws_col; i++)
 			fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
 		fprintf(stdout,"%s\n\n",TEXT_NORMAL);
 		std::string value;
-		for(unsigned long int i=2; i<input.size()-1; i++)//Remove the start and end bits of explicit constructor
+		for(unsigned long int i=2; i<input.size()-2; i++)//Remove the start and end bits of explicit constructor
 			value += input[i];
 		std::string output = makePretty(value);
 		fprintf(stdout,output.c_str());
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
-		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4+countu(output,'\n')+(input.size()/w.ws_col));
-		fprintf(stdout,CURSOR_RIGHT_N,cur_pos);
+		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4+countu(output,'\n')+((input.size()-2)/w.ws_col)+((output.length()-2)/w.ws_col));
 
 		//Reset terminal flags in-case of sudden program termination
 		tcsetattr(fileno(stdin), TCSANOW, &t_old);
