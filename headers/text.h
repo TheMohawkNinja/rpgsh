@@ -128,6 +128,8 @@
 #define _CURSOR_SET_COL_N(n)		"\033["#n"G"
 #define CURSOR_SET_COL_N		_CURSOR_SET_COL_N(%lu)
 #define CURSOR_SET_HOME			"\033[H"
+#define CURSOR_HIDE			"\033[?25l"
+#define CURSOR_SHOW			"\033[?25h"
 
 //Screen and line clearing
 #define CLEAR_TO_SCREEN_END		"\033[J"	//Clears to screen end

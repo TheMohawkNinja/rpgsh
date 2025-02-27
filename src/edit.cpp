@@ -70,8 +70,11 @@ int main(int argc, char** argv)
 		t_new.c_lflag &= ~(ICANON | ECHO);
 		tcsetattr(fileno(stdin), TCSANOW, &t_new);
 
+		if((input.size()-3)/w.ws_col && !((input.size()-3)%w.ws_col))
+			fprintf(stdout,CURSOR_UP);
 		for(const auto& ch : input) fprintf(stdout,"%c",ch);
-		fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
+		fprintf(stdout," ");
+		fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos+1);
 
 		esc_char = 0;
 		k = getchar();
@@ -93,11 +96,11 @@ int main(int argc, char** argv)
 			else
 				input.insert(input.begin()+cur_pos-1,k);
 
-			if((input.size()-2)/w.ws_col)
-				fprintf(stdout,CURSOR_UP_N,(input.size()-2)/w.ws_col);
+			if((input.size()-3)/w.ws_col)
+				fprintf(stdout,CURSOR_UP_N,(input.size()-3)/w.ws_col);
 			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)0);
-			fprintf(stdout,CLEAR_LINE);
 			for(const auto& ch : input) fprintf(stdout,"%c",ch);
+			fprintf(stdout," ");
 
 			cur_pos++;
 		}
@@ -155,7 +158,7 @@ int main(int argc, char** argv)
 					//TODO: Cursor down
 					break;
 				case 'C':	//Right
-					if(cur_pos == input.size()-1) break;
+					if(cur_pos == input.size()) break;
 					fprintf(stdout,CURSOR_RIGHT);
 					cur_pos++;
 					break;
@@ -207,6 +210,7 @@ int main(int argc, char** argv)
 			}
 		}
 
+		fprintf(stdout,"\033[?25l");
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
 		for(long unsigned int i=0; i<2; i++)
 			fprintf(stdout,"\n");
@@ -220,7 +224,8 @@ int main(int argc, char** argv)
 		//fprintf(stdout,"%lu, %d, %lu ",input.size(),w.ws_col,output.length());
 		fprintf(stdout,output.c_str());
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
-		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4+countu(output,'\n')+((input.size()-2)/w.ws_col)+((output.length()-2)/w.ws_col));
+		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4+countu(output,'\n')+((input.size()-3)/w.ws_col)+((output.length()-3)/w.ws_col));
+		printf("\033[?25h");
 
 		//Reset terminal flags in-case of sudden program termination
 		tcsetattr(fileno(stdin), TCSANOW, &t_old);
