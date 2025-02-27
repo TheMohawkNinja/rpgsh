@@ -210,7 +210,7 @@ int main(int argc, char** argv)
 			}
 		}
 
-		fprintf(stdout,"\033[?25l");
+		fprintf(stdout,CURSOR_HIDE);
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
 		for(long unsigned int i=0; i<2; i++)
 			fprintf(stdout,"\n");
@@ -225,7 +225,7 @@ int main(int argc, char** argv)
 		fprintf(stdout,output.c_str());
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
 		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4+countu(output,'\n')+((input.size()-3)/w.ws_col)+((output.length()-3)/w.ws_col));
-		printf("\033[?25h");
+		fprintf(stdout,CURSOR_SHOW);
 
 		//Reset terminal flags in-case of sudden program termination
 		tcsetattr(fileno(stdin), TCSANOW, &t_old);
