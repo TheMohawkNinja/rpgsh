@@ -224,6 +224,7 @@ const char* makePretty(std::string value)
 	}
 
 	for(const auto& [k,v] : string_replacements) value = std::regex_replace(value,std::regex(k),v);
+	value = std::regex_replace(value,std::regex("%"),"%%");//Prevent printf() parsing '%' as format specifiers
 
 	value += std::string(TEXT_NORMAL); //Make sure we don't carry over any unterminated formatting
 	return value.c_str();
