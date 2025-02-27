@@ -6,6 +6,17 @@
 //#include "../headers/scope.h"
 #include "../headers/text.h"
 
+unsigned long int getPrintLength(std::string str)//std::string.length() returns character count, not the apparent length
+{
+	unsigned long int length = 0;
+	for(const auto& ch : str)
+	{
+		if     (ch == '\t')  length += 8-(length%8);
+		else if(isprint(ch)) length++;//TODO: Determine correct values for other common escape sequences
+	}
+	return length;
+}
+
 int main(int argc, char** argv)
 {
 	if(argc > 2)
@@ -59,7 +70,7 @@ int main(int argc, char** argv)
 		t_new.c_lflag &= ~(ICANON | ECHO);
 		tcsetattr(fileno(stdin), TCSANOW, &t_new);
 
-		fprintf(stdout,input.data());
+		for(const auto& ch : input) fprintf(stdout,"%c",ch);
 		fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
 
 		esc_char = 0;
@@ -86,7 +97,7 @@ int main(int argc, char** argv)
 				fprintf(stdout,CURSOR_UP_N,(input.size()-2)/w.ws_col);
 			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)0);
 			fprintf(stdout,CLEAR_LINE);
-			fprintf(stdout,input.data());
+			for(const auto& ch : input) fprintf(stdout,"%c",ch);
 
 			cur_pos++;
 		}
@@ -144,40 +155,40 @@ int main(int argc, char** argv)
 					//TODO: Cursor down
 					break;
 				case 'C':	//Right
-					if(cur_pos >= input.size()) continue;
+					if(cur_pos == input.size()-1) break;
 					fprintf(stdout,CURSOR_RIGHT);
 					cur_pos++;
 					break;
 				case 'D':	//Left
-					if(cur_pos == 0) continue;
+					if(cur_pos == 0) break;
 					fprintf(stdout,CURSOR_LEFT);
 					cur_pos--;
 					break;
 				case 'H':	//Home
-					if(cur_pos == 0) continue;
+					if(cur_pos == 0) break;
 					fprintf(stdout,CURSOR_LEFT_N,cur_pos);
 					cur_pos = 0;
 					break;
 				case '5':	//PgUp
-					if(getchar() != '~' || cur_pos == 0) continue;
+					if(getchar() != '~' || cur_pos == 0) break;
 					//TODO: Go to beginning of input
 					break;
 				case '6':	//PgDown
-					if(getchar() != '~' || cur_pos == input.size()) continue;
+					if(getchar() != '~' || cur_pos == input.size()) break;
 					//TODO: Go to end of input
 					break;
 				case '7':	//Home
-					if(getchar() != '~' || cur_pos == 0) continue;
+					if(getchar() != '~' || cur_pos == 0) break;
 					fprintf(stdout,CURSOR_LEFT_N,cur_pos);
 					cur_pos = 0;
 					break;
 				case 'F':	//End
-					if(cur_pos >= input.size()) continue;
+					if(cur_pos == input.size()) break;
 					fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
 					cur_pos = input.size();
 					break;
 				case '8':	//End
-					if(getchar() != '~' || cur_pos >= input.size()) continue;
+					if(getchar() != '~' || cur_pos >= input.size()) break;
 					fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
 					cur_pos = input.size();
 					break;
@@ -185,7 +196,7 @@ int main(int argc, char** argv)
 					if(getchar() == '~') insert_mode = !insert_mode;
 					break;
 				case '3':	//Delete
-					if(getchar() != '~' || cur_pos >= input.size()) continue;
+					if(getchar() != '~' || cur_pos >= input.size()) break;
 					fprintf(stdout,CLEAR_LINE);
 					input.erase(input.begin()+cur_pos);
 					for(long unsigned int i=cur_pos; i<input.size(); i++)
@@ -206,6 +217,7 @@ int main(int argc, char** argv)
 		for(unsigned long int i=2; i<input.size()-2; i++)//Remove the start and end bits of explicit constructor
 			value += input[i];
 		std::string output = makePretty(value);
+		//fprintf(stdout,"%lu, %d, %lu ",input.size(),w.ws_col,output.length());
 		fprintf(stdout,output.c_str());
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
 		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4+countu(output,'\n')+((input.size()-2)/w.ws_col)+((output.length()-2)/w.ws_col));
