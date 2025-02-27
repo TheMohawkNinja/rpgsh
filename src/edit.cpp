@@ -49,6 +49,7 @@ int main(int argc, char** argv)
 	std::vector<char> input;
 	input.push_back('v'); //
 	input.push_back('{'); //TODO: Don't include this if specifying a variable to edit
+	for(int i=0; i<w.ws_col-4; i++) input.push_back('a');
 	input.push_back('}'); //
 	input.push_back('\0');//
 	bool insert_mode = false;
