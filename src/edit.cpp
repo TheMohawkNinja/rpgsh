@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 	std::vector<char> input;
 	input.push_back('v'); //
 	input.push_back('{'); //TODO: Don't include this if specifying a variable to edit
-	for(int i=0; i<w.ws_col-4; i++) input.push_back('a');
+	for(int i=0; i<w.ws_col-6; i++) input.push_back('a');
 	input.push_back('}'); //
 	input.push_back('\0');//
 	bool insert_mode = false;
@@ -75,7 +75,8 @@ int main(int argc, char** argv)
 			fprintf(stdout,CURSOR_UP);
 		for(const auto& ch : input) fprintf(stdout,"%c",ch);
 		fprintf(stdout," ");
-		fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos+1);
+		if(cur_pos%w.ws_col)
+			fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos+1);
 
 		esc_char = 0;
 		k = getchar();
@@ -222,7 +223,6 @@ int main(int argc, char** argv)
 		for(unsigned long int i=2; i<input.size()-2; i++)//Remove the start and end bits of explicit constructor
 			value += input[i];
 		std::string output = makePretty(value);
-		//fprintf(stdout,"%lu, %d, %lu ",input.size(),w.ws_col,output.length());
 		fprintf(stdout,output.c_str());
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
 		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4+countu(output,'\n')+((input.size()-3)/w.ws_col)+((output.length()-3)/w.ws_col));
