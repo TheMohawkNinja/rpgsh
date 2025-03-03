@@ -57,11 +57,7 @@ int main(int argc, char** argv)
 	char esc_char = 0;
 	long unsigned int cur_pos = input.size()-1;
 
-	fprintf(stdout,"%s%sCTRL+ALT+ESC or double-tap ESC to quit.%s\n\n\n\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
-	for(int i=0; i<w.ws_col; i++)
-		fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
-	fprintf(stdout,"%s\n\n",TEXT_NORMAL);
-	fprintf(stdout,CURSOR_UP_N,(long unsigned int)4);
+	fprintf(stdout,"%s%sCTRL+ALT+ESC or double-tap ESC to quit.%s\n\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
 
 	while(true)
 	{
@@ -71,15 +67,29 @@ int main(int argc, char** argv)
 		t_new.c_lflag &= ~(ICANON | ECHO);
 		tcsetattr(fileno(stdin), TCSANOW, &t_new);
 
-		if((input.size()-3)/w.ws_col && !((input.size()-3)%w.ws_col))
-			fprintf(stdout,CURSOR_UP);
+		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
+		fprintf(stdout,CLEAR_TO_SCREEN_END);
 		for(const auto& ch : input) fprintf(stdout,"%c",ch);
 		fprintf(stdout," ");
-		if(cur_pos%w.ws_col)
-			fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos+1);
+
+		fprintf(stdout,"\n\n");
+		for(int i=0; i<w.ws_col; i++)
+			fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
+		fprintf(stdout,"%s\n\n",TEXT_NORMAL);
+
+		std::string value;
+		for(unsigned long int i=2; i<input.size()-2; i++)//Remove the start and end bits of explicit constructor
+			value += input[i];
+		std::string output = makePretty(value);
+		fprintf(stdout,output.c_str());
+		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
+		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4+countu(output,'\n')+(long unsigned int)((input.size()-1)/w.ws_col)+(long unsigned int)((output.length()-1)/w.ws_col));
+		fprintf(stdout,CURSOR_RIGHT_N,cur_pos-1);
+		fprintf(stdout,CURSOR_SHOW);
 
 		esc_char = 0;
 		k = getchar();
+		fprintf(stdout,CURSOR_HIDE);
 
 		if(k == ESC_SEQ)
 		{
@@ -97,13 +107,6 @@ int main(int argc, char** argv)
 				input[cur_pos-1] = k;
 			else
 				input.insert(input.begin()+cur_pos-1,k);
-
-			if((input.size()-3)/w.ws_col)
-				fprintf(stdout,CURSOR_UP_N,(input.size()-3)/w.ws_col);
-			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)0);
-			for(const auto& ch : input) fprintf(stdout,"%c",ch);
-			fprintf(stdout," ");
-
 			cur_pos++;
 		}
 		else if(k == KB_BACKSPACE && cur_pos > 0)//Backspace
@@ -160,13 +163,11 @@ int main(int argc, char** argv)
 					//TODO: Cursor down
 					break;
 				case 'C':	//Right
-					if(cur_pos == input.size()) break;
-					fprintf(stdout,CURSOR_RIGHT);
+					if(cur_pos == input.size()-1) break;
 					cur_pos++;
 					break;
 				case 'D':	//Left
 					if(cur_pos == 0) break;
-					fprintf(stdout,CURSOR_LEFT);
 					cur_pos--;
 					break;
 				case 'H':	//Home
@@ -211,22 +212,6 @@ int main(int argc, char** argv)
 					break;
 			}
 		}
-
-		fprintf(stdout,CURSOR_HIDE);
-		fprintf(stdout,CLEAR_TO_SCREEN_END);
-		for(long unsigned int i=0; i<2; i++)
-			fprintf(stdout,"\n");
-		for(int i=0; i<w.ws_col; i++)
-			fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
-		fprintf(stdout,"%s\n\n",TEXT_NORMAL);
-		std::string value;
-		for(unsigned long int i=2; i<input.size()-2; i++)//Remove the start and end bits of explicit constructor
-			value += input[i];
-		std::string output = makePretty(value);
-		fprintf(stdout,output.c_str());
-		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
-		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4+countu(output,'\n')+((input.size()-3)/w.ws_col)+((output.length()-3)/w.ws_col));
-		fprintf(stdout,CURSOR_SHOW);
 
 		//Reset terminal flags in-case of sudden program termination
 		tcsetattr(fileno(stdin), TCSANOW, &t_old);
