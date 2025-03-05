@@ -51,6 +51,7 @@ int main(int argc, char** argv)
 	input.push_back('{'); //TODO: Don't include this if specifying a variable to edit
 	for(int i=0; i<w.ws_col-6; i++) input.push_back('a');
 	input.push_back('}'); //
+	input.push_back(' ');
 	input.push_back('\0');//
 	bool insert_mode = false;
 	char k = 0;
@@ -68,38 +69,40 @@ int main(int argc, char** argv)
 		tcsetattr(fileno(stdin), TCSANOW, &t_new);
 
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
-		fprintf(stdout,CURSOR_UP_N,((cur_pos-1)/w.ws_col));
+		if((cur_pos-3)/w.ws_col)
+			fprintf(stdout,CURSOR_UP_N,((cur_pos-3)/w.ws_col));
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
 		for(const auto& ch : input) fprintf(stdout,"%c",ch);
-		fprintf(stdout," ");
 
 		fprintf(stdout,"\n\n");
-		for(int i=0; i<w.ws_col; i++)
+		/*for(int i=0; i<w.ws_col; i++)
 			fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
 		fprintf(stdout,"%s\n\n",TEXT_NORMAL);
 
 		std::string value;
-		for(unsigned long int i=2; i<input.size()-2; i++)//Remove the start and end bits of explicit constructor
+		for(unsigned long int i=2; i<input.size()-3; i++)//Remove the start and end bits of explicit constructor, and space
 			value += input[i];
 		std::string output = makePretty(value);
 		fprintf(stdout,output.c_str());
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
-		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4+countu(output,'\n')+(long unsigned int)((input.size()-1)/w.ws_col)+(long unsigned int)((output.length()-3)/w.ws_col));
-		if(cur_pos > 0 && cur_pos <= w.ws_col)
+		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4+countu(output,'\n')+(long unsigned int)((input.size()-3)/w.ws_col)+(long unsigned int)((output.length()-1)/w.ws_col));
+		*/
+		fprintf(stdout,CURSOR_UP_N,(unsigned long int)2+(long unsigned int)((input.size()-2)/w.ws_col));
+		if(cur_pos > 0 && cur_pos-1 <= w.ws_col)
 		{
-			fprintf(stdout,CURSOR_RIGHT_N,cur_pos-1);
+			fprintf(stdout,CURSOR_RIGHT_N,cur_pos-2);
 		}
 		else if(cur_pos > 0)
 		{
 			fprintf(stdout,CURSOR_DOWN_N,(cur_pos-1)/w.ws_col);
-			if((cur_pos-1)%w.ws_col)
-				fprintf(stdout,CURSOR_RIGHT_N,(cur_pos-1)%w.ws_col);
+			if((cur_pos-2)%w.ws_col)
+				fprintf(stdout,CURSOR_RIGHT_N,(cur_pos-2)%w.ws_col);
 		}
 		fprintf(stdout,CURSOR_SHOW);
 
 		esc_char = 0;
 		k = getchar();
-		fprintf(stdout,CURSOR_HIDE);
+		//fprintf(stdout,CURSOR_HIDE);
 
 		if(k == ESC_SEQ)
 		{
@@ -114,9 +117,9 @@ int main(int argc, char** argv)
 		if(isprint(k))//Printable characters
 		{
 			if(insert_mode)	//If the "Insert" key is toggled
-				input[cur_pos-1] = k;
+				input[cur_pos-2] = k;
 			else
-				input.insert(input.begin()+cur_pos-1,k);
+				input.insert(input.begin()+cur_pos-2,k);
 			cur_pos++;
 		}
 		else if(k == KB_BACKSPACE && cur_pos > 0)//Backspace
@@ -173,7 +176,7 @@ int main(int argc, char** argv)
 					//TODO: Cursor down
 					break;
 				case 'C':	//Right
-					if(cur_pos == input.size()-1) break;
+					if(cur_pos == input.size()) break;
 					cur_pos++;
 					break;
 				case 'D':	//Left
