@@ -78,7 +78,7 @@ int main(int argc, char** argv)
 		fprintf(stdout," ");
 
 		fprintf(stdout,"\n\n");
-		fprintf(stdout,"input.size() = %ld, w.ws_col = %d, cur_pos = %lu",input.size(),w.ws_col,cur_pos);
+		fprintf(stdout,"input.size() = %ld, w.ws_col = %d, prev_cur_pos = %ld, cur_pos = %lu",input.size(),w.ws_col,prev_cur_pos,cur_pos);
 		/*for(int i=0; i<w.ws_col; i++)
 			fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
 		fprintf(stdout,"%s\n\n",TEXT_NORMAL);
@@ -132,15 +132,8 @@ int main(int argc, char** argv)
 		}
 		else if(k == KB_BACKSPACE && cur_pos > 0)//Backspace
 		{
-			fprintf(stdout,"\b%s",CLEAR_TO_LINE_END);
-
 			cur_pos--;
 			input.erase(input.begin()+cur_pos);
-
-			for(long unsigned int i=cur_pos; i<input.size(); i++)
-				fprintf(stdout,"%c",input[i]);
-			if(cur_pos < input.size())
-				fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
 		}
 		else if(k == KB_TAB || k == KB_ENTER)
 		{
@@ -178,10 +171,18 @@ int main(int argc, char** argv)
 			switch(esc_char)
 			{
 				case 'A':	//Up
-					fprintf(stdout,CURSOR_UP_N,cur_pos/w.ws_col);
+					if(cur_pos >= w.ws_col)
+					{
+						cur_pos -= w.ws_col;
+						fprintf(stdout,CURSOR_UP);
+					}
 					break;
 				case 'B':	//Down
-					//TODO: Cursor down
+					if(cur_pos+w.ws_col <= input.size())
+					{
+						cur_pos += w.ws_col;
+						fprintf(stdout,CURSOR_DOWN);
+					}
 					break;
 				case 'C':	//Right
 					if(cur_pos == input.size()) break;
