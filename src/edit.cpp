@@ -70,6 +70,8 @@ int main(int argc, char** argv)
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
 		if(cur_pos / w.ws_col && (cur_pos > (unsigned long int)w.ws_col || prev_cur_pos > cur_pos))
 			fprintf(stdout,CURSOR_UP_N,(cur_pos/w.ws_col));
+		else if(cur_pos == w.ws_col && prev_cur_pos != cur_pos-1)
+			fprintf(stdout,CURSOR_UP);
 		if((int)cur_pos == w.ws_col-1 && (int)prev_cur_pos == w.ws_col)
 			fprintf(stdout,CURSOR_UP);
 
