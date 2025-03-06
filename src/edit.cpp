@@ -51,12 +51,11 @@ int main(int argc, char** argv)
 	input.push_back('{'); //TODO: Don't include this if specifying a variable to edit
 	for(int i=0; i<w.ws_col-6; i++) input.push_back('a');
 	input.push_back('}'); //
-	input.push_back(' ');
-	input.push_back('\0');//
 	bool insert_mode = false;
 	char k = 0;
 	char esc_char = 0;
 	long unsigned int cur_pos = input.size()-1;
+	long unsigned int prev_cur_pos = cur_pos;
 
 	fprintf(stdout,"%s%sCTRL+ALT+ESC or double-tap ESC to quit.%s\n\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
 
@@ -69,12 +68,17 @@ int main(int argc, char** argv)
 		tcsetattr(fileno(stdin), TCSANOW, &t_new);
 
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
-		if((cur_pos-3)/w.ws_col)
-			fprintf(stdout,CURSOR_UP_N,((cur_pos-3)/w.ws_col));
+		if((cur_pos) / w.ws_col && (cur_pos > (unsigned long int)w.ws_col || prev_cur_pos > cur_pos))
+			fprintf(stdout,CURSOR_UP_N,((cur_pos)/w.ws_col));
+		if((int)cur_pos == w.ws_col-1 && (int)prev_cur_pos == w.ws_col)
+			fprintf(stdout,CURSOR_UP);
+
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
 		for(const auto& ch : input) fprintf(stdout,"%c",ch);
+		fprintf(stdout," ");
 
 		fprintf(stdout,"\n\n");
+		fprintf(stdout,"input.size() = %ld, w.ws_col = %d, cur_pos = %lu",input.size(),w.ws_col,cur_pos);
 		/*for(int i=0; i<w.ws_col; i++)
 			fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
 		fprintf(stdout,"%s\n\n",TEXT_NORMAL);
@@ -87,16 +91,18 @@ int main(int argc, char** argv)
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
 		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4+countu(output,'\n')+(long unsigned int)((input.size()-3)/w.ws_col)+(long unsigned int)((output.length()-1)/w.ws_col));
 		*/
-		fprintf(stdout,CURSOR_UP_N,(unsigned long int)2+(long unsigned int)((input.size()-2)/w.ws_col));
-		if(cur_pos > 0 && cur_pos-1 <= w.ws_col)
+		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
+		fprintf(stdout,CURSOR_UP_N,(long unsigned int)2+(long unsigned int)((input.size())/w.ws_col));
+		if(cur_pos > 0 && cur_pos < w.ws_col)
 		{
-			fprintf(stdout,CURSOR_RIGHT_N,cur_pos-2);
+			fprintf(stdout,CURSOR_RIGHT_N,cur_pos);
 		}
 		else if(cur_pos > 0)
 		{
-			fprintf(stdout,CURSOR_DOWN_N,(cur_pos-1)/w.ws_col);
-			if((cur_pos-2)%w.ws_col)
-				fprintf(stdout,CURSOR_RIGHT_N,(cur_pos-2)%w.ws_col);
+			if((cur_pos)/w.ws_col)
+				fprintf(stdout,CURSOR_DOWN_N,(cur_pos)/w.ws_col);
+			if((cur_pos)%w.ws_col)
+				fprintf(stdout,CURSOR_RIGHT_N,(cur_pos)%w.ws_col);
 		}
 		fprintf(stdout,CURSOR_SHOW);
 
@@ -114,12 +120,14 @@ int main(int argc, char** argv)
 			esc_char = getchar();
 		}
 
+		prev_cur_pos = cur_pos;
+
 		if(isprint(k))//Printable characters
 		{
 			if(insert_mode)	//If the "Insert" key is toggled
-				input[cur_pos-2] = k;
+				input[cur_pos] = k;
 			else
-				input.insert(input.begin()+cur_pos-2,k);
+				input.insert(input.begin()+cur_pos,k);
 			cur_pos++;
 		}
 		else if(k == KB_BACKSPACE && cur_pos > 0)//Backspace
