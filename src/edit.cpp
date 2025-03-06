@@ -68,8 +68,8 @@ int main(int argc, char** argv)
 		tcsetattr(fileno(stdin), TCSANOW, &t_new);
 
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
-		if((cur_pos) / w.ws_col && (cur_pos > (unsigned long int)w.ws_col || prev_cur_pos > cur_pos))
-			fprintf(stdout,CURSOR_UP_N,((cur_pos)/w.ws_col));
+		if(cur_pos / w.ws_col && (cur_pos > (unsigned long int)w.ws_col || prev_cur_pos > cur_pos))
+			fprintf(stdout,CURSOR_UP_N,(cur_pos/w.ws_col));
 		if((int)cur_pos == w.ws_col-1 && (int)prev_cur_pos == w.ws_col)
 			fprintf(stdout,CURSOR_UP);
 
@@ -92,17 +92,17 @@ int main(int argc, char** argv)
 		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4+countu(output,'\n')+(long unsigned int)((input.size()-3)/w.ws_col)+(long unsigned int)((output.length()-1)/w.ws_col));
 		*/
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
-		fprintf(stdout,CURSOR_UP_N,(long unsigned int)2+(long unsigned int)((input.size())/w.ws_col));
+		fprintf(stdout,CURSOR_UP_N,(long unsigned int)2+(long unsigned int)(input.size()/w.ws_col));
 		if(cur_pos > 0 && cur_pos < w.ws_col)
 		{
 			fprintf(stdout,CURSOR_RIGHT_N,cur_pos);
 		}
 		else if(cur_pos > 0)
 		{
-			if((cur_pos)/w.ws_col)
-				fprintf(stdout,CURSOR_DOWN_N,(cur_pos)/w.ws_col);
-			if((cur_pos)%w.ws_col)
-				fprintf(stdout,CURSOR_RIGHT_N,(cur_pos)%w.ws_col);
+			if(cur_pos / w.ws_col)
+				fprintf(stdout,CURSOR_DOWN_N,cur_pos/w.ws_col);
+			if(cur_pos % w.ws_col)
+				fprintf(stdout,CURSOR_RIGHT_N,cur_pos%w.ws_col);
 		}
 		fprintf(stdout,CURSOR_SHOW);
 
