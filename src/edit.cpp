@@ -57,7 +57,11 @@ int main(int argc, char** argv)
 	long unsigned int cur_pos = input.size()-1;
 	long unsigned int prev_cur_pos = cur_pos;
 
-	fprintf(stdout,"%s%sCTRL+ALT+ESC or double-tap ESC to quit.%s\n\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
+	fprintf(stdout,"%s%sCTRL+ALT+ESC or ESC+ESC Exit              %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
+	fprintf(stdout,"%s%sHome                    Beginning of line %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
+	fprintf(stdout,"%s%sEnd                     End of line       %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
+	fprintf(stdout,"%s%sPgUp                    Beginning of input%s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
+	fprintf(stdout,"%s%sPgDown                  End of line       %s\n\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
 
 	while(true)
 	{
@@ -84,7 +88,6 @@ int main(int argc, char** argv)
 		fprintf(stdout," ");
 
 		fprintf(stdout,"\n\n");
-		fprintf(stdout,"input.size() = %ld, w.ws_col = %d, prev_cur_pos = %ld, cur_pos = %lu",input.size(),w.ws_col,prev_cur_pos,cur_pos);
 		/*for(int i=0; i<w.ws_col; i++)
 			fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
 		fprintf(stdout,"%s\n\n",TEXT_NORMAL);
@@ -197,6 +200,16 @@ int main(int argc, char** argv)
 				case 'D':	//Left
 					if(cur_pos == 0) break;
 					cur_pos--;
+					break;
+				case 'c':	//Shift+Right
+					if(cur_pos == input.size()) break;
+					if((long unsigned int)findInVect<char>(input,' ',cur_pos) != std::string::npos)
+						cur_pos=findInVect<char>(input,' ',cur_pos);
+					break;
+				case 'd':	//Shift+Left
+					if(cur_pos == 0) break;
+					for(int i=cur_pos-1; input[i]!=' ' && i>0; i--)
+						cur_pos--;
 					break;
 				case 'H':	//Home
 					if(cur_pos == 0) break;
