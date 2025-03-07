@@ -203,12 +203,16 @@ int main(int argc, char** argv)
 					break;
 				case 'c':	//Shift+Right
 					if(cur_pos == input.size()) break;
-					if((long unsigned int)findInVect<char>(input,' ',cur_pos) != std::string::npos)
-						cur_pos=findInVect<char>(input,' ',cur_pos);
+					for(long unsigned int i=cur_pos; input[i]!=' ' && i<input.size(); i++)
+						cur_pos++;
+					for(long unsigned int i=cur_pos; input[i]==' ' && i<input.size(); i++)
+						cur_pos++;
 					break;
 				case 'd':	//Shift+Left
 					if(cur_pos == 0) break;
-					for(int i=cur_pos-1; input[i]!=' ' && i>0; i--)
+					for(long unsigned int i=cur_pos; input[i]!=' ' && i>0; i--)
+						cur_pos--;
+					for(long unsigned int i=cur_pos; input[i]==' ' && i>0; i--)
 						cur_pos--;
 					break;
 				case 'H':	//Home
