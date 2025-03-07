@@ -74,9 +74,9 @@ int main(int argc, char** argv)
 			fprintf(stdout,CURSOR_UP_N,(cur_pos/w.ws_col));
 		else if(cur_pos == w.ws_col && prev_cur_pos != cur_pos-1)
 			fprintf(stdout,CURSOR_UP);
-		if((int)cur_pos == w.ws_col-1 && (int)prev_cur_pos == w.ws_col)
+		if(cur_pos == (unsigned long int)w.ws_col-1 && prev_cur_pos == (unsigned long int)w.ws_col)
 			fprintf(stdout,CURSOR_UP);
-		if(prev_cur_pos < cur_pos && cur_pos == input.size() && input.size() > w.ws_col)
+		if((unsigned long int)(prev_cur_pos/w.ws_col) < (unsigned long int)(cur_pos/w.ws_col) && cur_pos == input.size() && input.size() > w.ws_col)
 			fprintf(stdout,CURSOR_DOWN);
 
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
@@ -257,40 +257,30 @@ int main(int argc, char** argv)
 						cur_pos -= cur_pos%w.ws_col;
 					}
 					break;
-				case 'F':	//End TODO: Needs work on multi-line inputs
+				case 'F':	//End
 					if(cur_pos == input.size()) break;
-					if((int)cur_pos < w.ws_col-1 && (int)input.size() >= w.ws_col-1)
+					if((int)cur_pos < w.ws_col && (int)input.size() >= w.ws_col-1)
 					{
 						fprintf(stdout,CURSOR_RIGHT_N,w.ws_col-cur_pos-1);
 						cur_pos = w.ws_col-1;
 					}
-					else if((int)cur_pos < w.ws_col-1)
+					else if((long unsigned int)(cur_pos+w.ws_col) > input.size())
 					{
-						fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos-1);
-						cur_pos += input.size()-cur_pos-1;
-					}
-					else if(cur_pos % w.ws_col)
-					{
-						fprintf(stdout,CURSOR_RIGHT_N,w.ws_col-(cur_pos%w.ws_col)-1);
-						cur_pos += w.ws_col-(cur_pos%w.ws_col)-1;
+						fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
+						cur_pos += input.size()-cur_pos;
 					}
 					break;
-				case '8':	//End TODO: Needs work on multi-line inputs
+				case '8':	//End
 					if(getchar() != '~' || cur_pos == input.size()) break;
-					if((int)cur_pos < w.ws_col-1 && (int)input.size() >= w.ws_col-1)
+					if((int)cur_pos < w.ws_col && (int)input.size() >= w.ws_col-1)
 					{
 						fprintf(stdout,CURSOR_RIGHT_N,w.ws_col-cur_pos-1);
 						cur_pos = w.ws_col-1;
 					}
-					else if((int)cur_pos < w.ws_col-1)
+					else if((long unsigned int)(cur_pos+w.ws_col) > input.size())
 					{
-						fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos-1);
-						cur_pos += input.size()-cur_pos-1;
-					}
-					else if(cur_pos % w.ws_col)
-					{
-						fprintf(stdout,CURSOR_RIGHT_N,w.ws_col-(cur_pos%w.ws_col));
-						cur_pos += w.ws_col-(cur_pos%w.ws_col)-1;
+						fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
+						cur_pos += input.size()-cur_pos;
 					}
 					break;
 				case '2':	//Insert
