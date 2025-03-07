@@ -68,12 +68,16 @@ int main(int argc, char** argv)
 		tcsetattr(fileno(stdin), TCSANOW, &t_new);
 
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
+
+		//Handle annoying edge cases that probably mean I didn't code this program very well
 		if(cur_pos / w.ws_col && (cur_pos > (unsigned long int)w.ws_col || prev_cur_pos > cur_pos))
 			fprintf(stdout,CURSOR_UP_N,(cur_pos/w.ws_col));
 		else if(cur_pos == w.ws_col && prev_cur_pos != cur_pos-1)
 			fprintf(stdout,CURSOR_UP);
 		if((int)cur_pos == w.ws_col-1 && (int)prev_cur_pos == w.ws_col)
 			fprintf(stdout,CURSOR_UP);
+		if(prev_cur_pos < cur_pos && cur_pos == input.size() && input.size() > w.ws_col)
+			fprintf(stdout,CURSOR_DOWN);
 
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
 		for(const auto& ch : input) fprintf(stdout,"%c",ch);
@@ -196,43 +200,105 @@ int main(int argc, char** argv)
 					break;
 				case 'H':	//Home
 					if(cur_pos == 0) break;
-					fprintf(stdout,CURSOR_LEFT_N,cur_pos);
+					if(cur_pos < w.ws_col)
+					{
+						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
+						cur_pos = 0;
+					}
+					else if(cur_pos % w.ws_col)
+					{
+						fprintf(stdout,CURSOR_LEFT_N,cur_pos%w.ws_col);
+						cur_pos -= cur_pos%w.ws_col;;
+					}
 					cur_pos = 0;
 					break;
 				case '5':	//PgUp
 					if(getchar() != '~' || cur_pos == 0) break;
-					//TODO: Go to beginning of input
+					if(cur_pos == 0) break;
+					if(cur_pos < w.ws_col)
+					{
+						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
+					}
+					else
+					{
+						if(cur_pos / w.ws_col)
+							fprintf(stdout,CURSOR_UP_N,cur_pos/w.ws_col);
+						if(cur_pos % w.ws_col)
+							fprintf(stdout,CURSOR_LEFT_N,cur_pos%w.ws_col);
+					}
+					cur_pos = 0;
 					break;
 				case '6':	//PgDown
 					if(getchar() != '~' || cur_pos == input.size()) break;
-					//TODO: Go to end of input
+					if(cur_pos < w.ws_col)
+					{
+						fprintf(stdout,CURSOR_RIGHT_N,cur_pos);
+					}
+					else
+					{
+						if(cur_pos / w.ws_col)
+							fprintf(stdout,CURSOR_DOWN_N,cur_pos/w.ws_col);
+						if(cur_pos % w.ws_col)
+							fprintf(stdout,CURSOR_RIGHT_N,cur_pos%w.ws_col);
+					}
+					cur_pos = input.size();
 					break;
 				case '7':	//Home
 					if(getchar() != '~' || cur_pos == 0) break;
-					fprintf(stdout,CURSOR_LEFT_N,cur_pos);
-					cur_pos = 0;
+					if(cur_pos == 0) break;
+					if(cur_pos < w.ws_col)
+					{
+						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
+						cur_pos = 0;
+					}
+					else if(cur_pos % w.ws_col)
+					{
+						fprintf(stdout,CURSOR_LEFT_N,cur_pos%w.ws_col);
+						cur_pos -= cur_pos%w.ws_col;
+					}
 					break;
-				case 'F':	//End
+				case 'F':	//End TODO: Needs work on multi-line inputs
 					if(cur_pos == input.size()) break;
-					fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
-					cur_pos = input.size();
+					if((int)cur_pos < w.ws_col-1 && (int)input.size() >= w.ws_col-1)
+					{
+						fprintf(stdout,CURSOR_RIGHT_N,w.ws_col-cur_pos-1);
+						cur_pos = w.ws_col-1;
+					}
+					else if((int)cur_pos < w.ws_col-1)
+					{
+						fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos-1);
+						cur_pos += input.size()-cur_pos-1;
+					}
+					else if(cur_pos % w.ws_col)
+					{
+						fprintf(stdout,CURSOR_RIGHT_N,w.ws_col-(cur_pos%w.ws_col)-1);
+						cur_pos += w.ws_col-(cur_pos%w.ws_col)-1;
+					}
 					break;
-				case '8':	//End
-					if(getchar() != '~' || cur_pos >= input.size()) break;
-					fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
-					cur_pos = input.size();
+				case '8':	//End TODO: Needs work on multi-line inputs
+					if(getchar() != '~' || cur_pos == input.size()) break;
+					if((int)cur_pos < w.ws_col-1 && (int)input.size() >= w.ws_col-1)
+					{
+						fprintf(stdout,CURSOR_RIGHT_N,w.ws_col-cur_pos-1);
+						cur_pos = w.ws_col-1;
+					}
+					else if((int)cur_pos < w.ws_col-1)
+					{
+						fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos-1);
+						cur_pos += input.size()-cur_pos-1;
+					}
+					else if(cur_pos % w.ws_col)
+					{
+						fprintf(stdout,CURSOR_RIGHT_N,w.ws_col-(cur_pos%w.ws_col));
+						cur_pos += w.ws_col-(cur_pos%w.ws_col)-1;
+					}
 					break;
 				case '2':	//Insert
 					if(getchar() == '~') insert_mode = !insert_mode;
 					break;
 				case '3':	//Delete
 					if(getchar() != '~' || cur_pos >= input.size()) break;
-					fprintf(stdout,CLEAR_LINE);
 					input.erase(input.begin()+cur_pos);
-					for(long unsigned int i=cur_pos; i<input.size(); i++)
-						fprintf(stdout,"%c",input[i]);
-					if(cur_pos < input.size())
-						fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
 					break;
 			}
 		}
