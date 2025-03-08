@@ -60,6 +60,8 @@ int main(int argc, char** argv)
 	fprintf(stdout,"%s%sCTRL+ALT+ESC or ESC+ESC Exit              %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
 	fprintf(stdout,"%s%sHome                    Beginning of line %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
 	fprintf(stdout,"%s%sEnd                     End of line       %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
+	fprintf(stdout,"%s%sShift+Left              Back one word     %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
+	fprintf(stdout,"%s%sShift+Right             Forward one word  %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
 	fprintf(stdout,"%s%sPgUp                    Beginning of input%s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
 	fprintf(stdout,"%s%sPgDown                  End of line       %s\n\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
 
@@ -207,6 +209,9 @@ int main(int argc, char** argv)
 						cur_pos++;
 					for(long unsigned int i=cur_pos; input[i]==' ' && i<input.size(); i++)
 						cur_pos++;
+
+					if(cur_pos/(long unsigned int)w.ws_col > prev_cur_pos/(long unsigned int)w.ws_col)
+						fprintf(stdout,CURSOR_DOWN);
 					break;
 				case 'd':	//Shift+Left
 					if(cur_pos == 0) break;
@@ -214,6 +219,12 @@ int main(int argc, char** argv)
 						cur_pos--;
 					for(long unsigned int i=cur_pos; input[i]==' ' && i>0; i--)
 						cur_pos--;
+					for(long unsigned int i=cur_pos; input[i]!=' ' && i>0; i--)
+						cur_pos--;
+					if(cur_pos > 0) cur_pos++;
+
+					if(cur_pos/(long unsigned int)w.ws_col < prev_cur_pos/(long unsigned int)w.ws_col)
+						fprintf(stdout,CURSOR_UP);
 					break;
 				case 'H':	//Home
 					if(cur_pos == 0) break;
