@@ -6,13 +6,14 @@
 //#include "../headers/scope.h"
 #include "../headers/text.h"
 
-unsigned long int getPrintLength(std::string str)//std::string.length() returns character count, not the apparent length
+unsigned long int getPrintLength(std::string str)//std::string.length() returns character count, not the printed length
 {
 	unsigned long int length = 0;
-	for(const auto& ch : str)
+	for(unsigned long int i=0; i<str.length(); i++)
 	{
-		if     (ch == '\t')  length += 8-(length%8);
-		else if(isprint(ch)) length++;//TODO: Determine correct values for other common escape sequences
+		if(str[i] == ESC_SEQ) i=str.find('m',i);
+		else if(str[i] == '\t')  length += 8-(length%8);
+		else if(isprint(str[i])) length++;//TODO: Determine correct values for other common escape sequences
 	}
 	return length;
 }
@@ -90,20 +91,17 @@ int main(int argc, char** argv)
 		fprintf(stdout," ");
 
 		fprintf(stdout,"\n\n");
-		/*for(int i=0; i<w.ws_col; i++)
+		for(int i=0; i<w.ws_col; i++)
 			fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
-		fprintf(stdout,"%s\n\n",TEXT_NORMAL);
 
 		std::string value;
 		for(unsigned long int i=2; i<input.size()-3; i++)//Remove the start and end bits of explicit constructor, and space
 			value += input[i];
 		std::string output = makePretty(value);
+		fprintf(stdout,"%s\n\n",TEXT_NORMAL);
 		fprintf(stdout,output.c_str());
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
-		fprintf(stdout,CURSOR_UP_N,(unsigned long int)4+countu(output,'\n')+(long unsigned int)((input.size()-3)/w.ws_col)+(long unsigned int)((output.length()-1)/w.ws_col));
-		*/
-		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
-		fprintf(stdout,CURSOR_UP_N,(long unsigned int)2+(long unsigned int)(input.size()/w.ws_col));
+		fprintf(stdout,CURSOR_UP_N,(long unsigned int)4+(long unsigned int)(input.size()/w.ws_col)+((getPrintLength(output)-1)/w.ws_col));
 		if(cur_pos > 0 && cur_pos < w.ws_col)
 		{
 			fprintf(stdout,CURSOR_RIGHT_N,cur_pos);
@@ -119,13 +117,14 @@ int main(int argc, char** argv)
 
 		esc_char = 0;
 		k = getchar();
-		//fprintf(stdout,CURSOR_HIDE);
+		fprintf(stdout,CURSOR_HIDE);
 
 		if(k == ESC_SEQ)
 		{
 			if(getchar() == ESC_SEQ)//Consume '[', exiting if key combo is entered.
 			{
 				fprintf(stdout,CURSOR_DOWN_N,(long unsigned int)3);
+				fprintf(stdout,CURSOR_SHOW);
 				return 0;
 			}
 			esc_char = getchar();
