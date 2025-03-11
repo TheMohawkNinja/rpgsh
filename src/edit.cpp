@@ -101,7 +101,8 @@ int main(int argc, char** argv)
 		fprintf(stdout,"%s\n\n",TEXT_NORMAL);
 		fprintf(stdout,output.c_str());
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
-		fprintf(stdout,CURSOR_UP_N,(long unsigned int)4+(long unsigned int)(input.size()/w.ws_col)+((getPrintLength(output)-1)/w.ws_col));
+		unsigned long int output_length = getPrintLength(output)-1-(countu(output,'%')/2);
+		fprintf(stdout,CURSOR_UP_N,(long unsigned int)4+(long unsigned int)(input.size()/w.ws_col)+(output_length/w.ws_col));
 		if(cur_pos > 0 && cur_pos < w.ws_col)
 		{
 			fprintf(stdout,CURSOR_RIGHT_N,cur_pos);
