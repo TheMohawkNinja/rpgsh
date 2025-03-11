@@ -95,7 +95,7 @@ int main(int argc, char** argv)
 			fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
 
 		std::string value;
-		for(unsigned long int i=2; i<input.size()-3; i++)//Remove the start and end bits of explicit constructor, and space
+		for(unsigned long int i=2; i<input.size()-1; i++)//Remove the start and end bits of explicit constructor, and space
 			value += input[i];
 		std::string output = makePretty(value);
 		fprintf(stdout,"%s\n\n",TEXT_NORMAL);
