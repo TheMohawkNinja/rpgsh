@@ -124,7 +124,8 @@ int main(int argc, char** argv)
 		{
 			if(getchar() == ESC_SEQ)//Consume '[', exiting if key combo is entered.
 			{
-				fprintf(stdout,CURSOR_DOWN_N,(long unsigned int)3);
+				fprintf(stdout,CURSOR_DOWN_N,(long unsigned int)4+(long unsigned int)((input.size()-cur_pos)/w.ws_col)+(output_length/w.ws_col));
+				fprintf(stdout,"\n");
 				fprintf(stdout,CURSOR_SHOW);
 				return 0;
 			}
