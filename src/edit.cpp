@@ -13,7 +13,8 @@ unsigned long int getPrintLength(std::string str)//std::string.length() returns 
 	{
 		if(str[i] == ESC_SEQ) i=str.find('m',i);
 		else if(str[i] == '\t')  length += 8-(length%8);
-		else if(isprint(str[i])) length++;//TODO: Determine correct values for other common escape sequences
+		else if(str[i] == '\b')  length--;
+		else if(isprint(str[i])) length++;
 	}
 	return length;
 }
@@ -98,11 +99,11 @@ int main(int argc, char** argv)
 		for(unsigned long int i=2; i<input.size()-1; i++)//Remove the start and end bits of explicit constructor, and space
 			value += input[i];
 		std::string output = makePretty(value);
-		fprintf(stdout,"%s\n\n",TEXT_NORMAL);
+		fprintf(stdout,"%s\nw.ws_col=%d, input.size()=%lu, output_length=%lu, cur_pos=%lu\n",TEXT_NORMAL,w.ws_col,input.size(),getPrintLength(output)-1-(countu(output,'%')/2),cur_pos);
 		fprintf(stdout,output.c_str());
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
 		unsigned long int output_length = getPrintLength(output)-1-(countu(output,'%')/2);
-		fprintf(stdout,CURSOR_UP_N,(long unsigned int)4+(long unsigned int)(input.size()/w.ws_col)+(output_length/w.ws_col));
+		fprintf(stdout,CURSOR_UP_N,(long unsigned int)4+(long unsigned int)(input.size()/w.ws_col)+(output_length/w.ws_col)+countu(output,'\n')+countu(output,'\f')+countu(output,'\v'));
 		if(cur_pos > 0 && cur_pos < w.ws_col)
 		{
 			fprintf(stdout,CURSOR_RIGHT_N,cur_pos);
@@ -124,7 +125,7 @@ int main(int argc, char** argv)
 		{
 			if(getchar() == ESC_SEQ)//Consume '[', exiting if key combo is entered.
 			{
-				fprintf(stdout,CURSOR_DOWN_N,(long unsigned int)4+(long unsigned int)((input.size()-cur_pos)/w.ws_col)+(output_length/w.ws_col));
+				fprintf(stdout,CURSOR_DOWN_N,(long unsigned int)4+(long unsigned int)((input.size()-cur_pos)/w.ws_col)+(output_length/w.ws_col)+countu(output,'\n')+countu(output,'\f')+countu(output,'\v'));
 				fprintf(stdout,"\n");
 				fprintf(stdout,CURSOR_SHOW);
 				return 0;
