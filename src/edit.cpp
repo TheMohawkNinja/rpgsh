@@ -8,11 +8,15 @@
 
 unsigned long int getPrintLength(std::string str)//std::string.length() returns character count, not the printed length
 {
+	struct winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
 	unsigned long int length = 0;
 	for(unsigned long int i=0; i<str.length(); i++)
 	{
 		if(str[i] == ESC_SEQ) i=str.find('m',i);
-		else if(str[i] == '\t')  length += 8-(length%8);
+		else if(str[i] == '\t' && (length+(8-(length%8)))%w.ws_col == length%w.ws_col)	length += 8-(length%8);
+		else if(str[i] == '\t' && (length+(8-(length%8)))%w.ws_col > length%w.ws_col)	length += w.ws_col-length-1;
 		else if(str[i] == '\b')  length--;
 		else if(isprint(str[i])) length++;
 	}
@@ -77,15 +81,8 @@ int main(int argc, char** argv)
 
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
 
-		//Handle annoying edge cases that probably mean I didn't code this program very well
-		if(cur_pos / w.ws_col && (cur_pos > (unsigned long int)w.ws_col || prev_cur_pos > cur_pos))
-			fprintf(stdout,CURSOR_UP_N,(cur_pos/w.ws_col));
-		else if(cur_pos == w.ws_col && prev_cur_pos != cur_pos-1)
-			fprintf(stdout,CURSOR_UP);
-		if(cur_pos == (unsigned long int)w.ws_col-1 && prev_cur_pos == (unsigned long int)w.ws_col)
-			fprintf(stdout,CURSOR_UP);
-		if((unsigned long int)(prev_cur_pos/w.ws_col) < (unsigned long int)(cur_pos/w.ws_col) && cur_pos == input.size() && input.size() > w.ws_col)
-			fprintf(stdout,CURSOR_DOWN);
+		//Move cursor to beginning of input
+		if(cur_pos && (cur_pos-1)/w.ws_col) fprintf(stdout,CURSOR_UP_N,((cur_pos-1)/w.ws_col));
 
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
 		for(const auto& ch : input) fprintf(stdout,"%c",ch);
@@ -103,7 +100,8 @@ int main(int argc, char** argv)
 		fprintf(stdout,output.c_str());
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
 		unsigned long int output_length = getPrintLength(output)-1-(countu(output,'%')/2);
-		fprintf(stdout,CURSOR_UP_N,(long unsigned int)4+(long unsigned int)(input.size()/w.ws_col)+(output_length/w.ws_col)+countu(output,'\n')+countu(output,'\f')+countu(output,'\v'));
+		unsigned long int cursor_vert_offset = 4+(output_length/w.ws_col)+countu(output,'\n')+countu(output,'\f')+countu(output,'\v');
+		fprintf(stdout,CURSOR_UP_N,(long unsigned int)(input.size()/w.ws_col)+cursor_vert_offset);
 		if(cur_pos > 0 && cur_pos < w.ws_col)
 		{
 			fprintf(stdout,CURSOR_RIGHT_N,cur_pos);
@@ -125,7 +123,7 @@ int main(int argc, char** argv)
 		{
 			if(getchar() == ESC_SEQ)//Consume '[', exiting if key combo is entered.
 			{
-				fprintf(stdout,CURSOR_DOWN_N,(long unsigned int)4+(long unsigned int)((input.size()-cur_pos)/w.ws_col)+(output_length/w.ws_col)+countu(output,'\n')+countu(output,'\f')+countu(output,'\v'));
+				fprintf(stdout,CURSOR_DOWN_N,(long unsigned int)((input.size()-cur_pos)/w.ws_col)+cursor_vert_offset);
 				fprintf(stdout,"\n");
 				fprintf(stdout,CURSOR_SHOW);
 				return 0;
@@ -170,13 +168,6 @@ int main(int argc, char** argv)
 				input.insert(input.begin()+cur_pos+1,char_to_insert);
 			}
 
-			fprintf(stdout,CLEAR_LINE);
-
-			for(long unsigned int i=cur_pos; i<input.size(); i++)
-				fprintf(stdout,"%c",input[i]);
-			if(cur_pos < input.size()-2)
-				fprintf(stdout,CURSOR_LEFT_N,input.size()-2-cur_pos);
-
 			cur_pos+=2;
 		}
 		else if(k == ESC_SEQ)//Escape sequences
@@ -184,18 +175,15 @@ int main(int argc, char** argv)
 			switch(esc_char)
 			{
 				case 'A':	//Up
-					if(cur_pos >= w.ws_col)
-					{
-						cur_pos -= w.ws_col;
-						fprintf(stdout,CURSOR_UP);
-					}
+					if(cur_pos < w.ws_col) break;
+					cur_pos -= w.ws_col;
+					fprintf(stdout,CURSOR_UP);
 					break;
 				case 'B':	//Down
-					if(cur_pos+w.ws_col <= input.size())
-					{
-						cur_pos += w.ws_col;
-						fprintf(stdout,CURSOR_DOWN);
-					}
+					if(cur_pos == w.ws_col) fprintf(stdout,CURSOR_UP);
+					if(cur_pos+w.ws_col > input.size()) break;
+					cur_pos += w.ws_col;
+					if(cur_pos > w.ws_col) fprintf(stdout,CURSOR_DOWN);
 					break;
 				case 'C':	//Right
 					if(cur_pos == input.size()) break;
@@ -204,6 +192,8 @@ int main(int argc, char** argv)
 				case 'D':	//Left
 					if(cur_pos == 0) break;
 					cur_pos--;
+					if(cur_pos && (cur_pos/w.ws_col < prev_cur_pos/w.ws_col || !(cur_pos%w.ws_col)))
+						fprintf(stdout,CURSOR_UP);
 					break;
 				case 'c':	//Shift+Right
 					if(cur_pos == input.size()) break;
@@ -238,7 +228,7 @@ int main(int argc, char** argv)
 					else if(cur_pos % w.ws_col)
 					{
 						fprintf(stdout,CURSOR_LEFT_N,cur_pos%w.ws_col);
-						cur_pos -= cur_pos%w.ws_col;;
+						cur_pos -= cur_pos%w.ws_col;
 					}
 					cur_pos = 0;
 					break;
@@ -262,12 +252,12 @@ int main(int argc, char** argv)
 					if(getchar() != '~' || cur_pos == input.size()) break;
 					if(cur_pos < w.ws_col)
 					{
-						fprintf(stdout,CURSOR_RIGHT_N,cur_pos);
+						fprintf(stdout,CURSOR_RIGHT_N,w.ws_col-cur_pos);
 					}
 					else
 					{
-						if(cur_pos / w.ws_col)
-							fprintf(stdout,CURSOR_DOWN_N,cur_pos/w.ws_col);
+						if((input.size()-cur_pos) / w.ws_col)//TODO: Fix
+							fprintf(stdout,CURSOR_DOWN_N,(input.size()-cur_pos)/w.ws_col);
 						if(cur_pos % w.ws_col)
 							fprintf(stdout,CURSOR_RIGHT_N,cur_pos%w.ws_col);
 					}
