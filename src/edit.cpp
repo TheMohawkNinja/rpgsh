@@ -182,6 +182,7 @@ int main(int argc, char** argv)
 				case 'B':	//Down
 					if(cur_pos == w.ws_col) fprintf(stdout,CURSOR_UP);
 					if(cur_pos+w.ws_col > input.size()) break;
+					if(cur_pos/w.ws_col > 1) fprintf(stdout,CURSOR_UP);
 					cur_pos += w.ws_col;
 					if(cur_pos > w.ws_col) fprintf(stdout,CURSOR_DOWN);
 					break;
@@ -228,14 +229,14 @@ int main(int argc, char** argv)
 					else if(cur_pos % w.ws_col)
 					{
 						fprintf(stdout,CURSOR_LEFT_N,cur_pos%w.ws_col);
+						fprintf(stdout,CURSOR_UP);
 						cur_pos -= cur_pos%w.ws_col;
 					}
 					cur_pos = 0;
 					break;
 				case '5':	//PgUp
 					if(getchar() != '~' || cur_pos == 0) break;
-					if(cur_pos == 0) break;
-					if(cur_pos < w.ws_col)
+					if(input.size() < w.ws_col)
 					{
 						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
 					}
@@ -250,14 +251,14 @@ int main(int argc, char** argv)
 					break;
 				case '6':	//PgDown
 					if(getchar() != '~' || cur_pos == input.size()) break;
-					if(cur_pos < w.ws_col)
+					if(input.size() < w.ws_col)
 					{
 						fprintf(stdout,CURSOR_RIGHT_N,w.ws_col-cur_pos);
 					}
 					else
 					{
-						if((input.size()-cur_pos) / w.ws_col)//TODO: Fix
-							fprintf(stdout,CURSOR_DOWN_N,(input.size()-cur_pos)/w.ws_col);
+						if(input.size()/w.ws_col > cur_pos/w.ws_col)
+							fprintf(stdout,CURSOR_DOWN_N,((input.size()/w.ws_col)-(cur_pos/w.ws_col)));
 						if(cur_pos % w.ws_col)
 							fprintf(stdout,CURSOR_RIGHT_N,cur_pos%w.ws_col);
 					}
@@ -265,7 +266,6 @@ int main(int argc, char** argv)
 					break;
 				case '7':	//Home
 					if(getchar() != '~' || cur_pos == 0) break;
-					if(cur_pos == 0) break;
 					if(cur_pos < w.ws_col)
 					{
 						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
@@ -274,6 +274,7 @@ int main(int argc, char** argv)
 					else if(cur_pos % w.ws_col)
 					{
 						fprintf(stdout,CURSOR_LEFT_N,cur_pos%w.ws_col);
+						fprintf(stdout,CURSOR_UP);
 						cur_pos -= cur_pos%w.ws_col;
 					}
 					break;
