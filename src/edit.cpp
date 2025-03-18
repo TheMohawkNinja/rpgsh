@@ -3,7 +3,6 @@
 #include <termios.h>
 #include <unistd.h>
 #include "../headers/functions.h"
-//#include "../headers/scope.h"
 #include "../headers/text.h"
 
 unsigned long int getPrintLength(std::string str)//std::string.length() returns character count, not the printed length
@@ -15,8 +14,8 @@ unsigned long int getPrintLength(std::string str)//std::string.length() returns 
 	for(unsigned long int i=0; i<str.length(); i++)
 	{
 		if(str[i] == ESC_SEQ) i=str.find('m',i);
-		else if(str[i] == '\t' && (length+(8-(length%8)))%w.ws_col == length%w.ws_col)	length += 8-(length%8);
-		else if(str[i] == '\t' && (length+(8-(length%8)))%w.ws_col > length%w.ws_col)	length += w.ws_col-length-1;
+		else if(str[i] == '\t' && (length+(8-(length%8)))/w.ws_col == length/w.ws_col)	length += 8-(length%8);
+		else if(str[i] == '\t' && (length+(8-(length%8)))/w.ws_col > length/w.ws_col)	length += w.ws_col-length-1;
 		else if(str[i] == '\b')  length--;
 		else if(isprint(str[i])) length++;
 	}
@@ -29,7 +28,7 @@ int main(int argc, char** argv)
 		output(Warning,"edit only expects 0 or 1 arguments, ignoring all other arguments.");
 
 	chkFlagAppDesc(argv,"Barebones WYSIWYG text editor for variables. Useful for long and/or heavily formatted text.");
-	chkFlagModifyVariables(argv,false);
+	chkFlagModifyVariables(argv,true);
 
 	if(chkFlagHelp(argv))
 	{
@@ -53,17 +52,54 @@ int main(int argc, char** argv)
 	struct termios t_old, t_new;
 
 	std::vector<char> input;
-	input.push_back('v'); //
-	input.push_back('{'); //TODO: Don't include this if specifying a variable to edit
-	for(int i=0; i<(2*w.ws_col)+30; i++) input.push_back('a');
-	input.push_back('}'); //
+	VariableInfo vi;
+	if(argc == 1)
+	{
+		input.push_back('v');
+		input.push_back('{');
+		input.push_back('}');
+	}
+	else if(looksLikeVariable(std::string(argv[argc-1])))
+	{
+		vi = parseVariable(std::string(argv[argc-1]));
+
+		if(vi.property != "")
+		{
+			output(Error,"Edit cannot be used to modify properties");
+			return -1;
+		}
+
+		std::string value;
+		switch(vi.evalType)
+		{
+			case VAR_SIGIL:
+				value = vi.scope.getStr<Var>(vi.key);
+				break;
+			case DICE_SIGIL:
+				value = vi.scope.getStr<Dice>(vi.key);
+				break;
+			case WALLET_SIGIL:
+				value = vi.scope.getStr<Wallet>(vi.key);
+				break;
+			case CURRENCY_SIGIL:
+				value = vi.scope.getStr<Currency>(vi.key);
+				break;
+		}
+		for(const auto& ch : value) input.push_back(ch);
+	}
+	else
+	{
+		output(Error,"Edit expects either a variable or help flags for an argument.");
+		return -1;
+	}
 	bool insert_mode = false;
 	char k = 0;
 	char esc_char = 0;
 	long unsigned int cur_pos = 2;
 	long unsigned int prev_cur_pos = cur_pos;
 
-	fprintf(stdout,"%s%sCTRL+ALT+ESC or ESC+ESC Exit              %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
+	fprintf(stdout,"%s%sCTRL+ALT+ESC or ESC+ESC Exit w/o saving   %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
+	fprintf(stdout,"%s%sESC+s                   Save              %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
 	fprintf(stdout,"%s%sHome                    Beginning of line %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
 	fprintf(stdout,"%s%sEnd                     End of line       %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
 	fprintf(stdout,"%s%sShift+Left              Back one word     %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
@@ -121,12 +157,18 @@ int main(int argc, char** argv)
 
 		if(k == ESC_SEQ)
 		{
-			if(getchar() == ESC_SEQ)//Consume '[', exiting if key combo is entered.
+			char next_char = getchar();
+			if(next_char == ESC_SEQ)//Consume '[', exiting if key combo is entered.
 			{
 				fprintf(stdout,CURSOR_DOWN_N,(long unsigned int)((input.size()-cur_pos)/w.ws_col)+cursor_vert_offset);
 				fprintf(stdout,"\n");
 				fprintf(stdout,CURSOR_SHOW);
 				return 0;
+			}
+			else if(next_char == 's')
+			{
+				vi.scope.save();
+				fprintf(stdout,"%s%sSAVED!%s",TEXT_BOLD,TEXT_CYAN,TEXT_NORMAL);
 			}
 			esc_char = getchar();
 		}
