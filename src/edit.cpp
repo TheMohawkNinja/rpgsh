@@ -69,7 +69,7 @@ int main(int argc, char** argv)
 	fprintf(stdout,"%s%sShift+Left              Back one word     %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
 	fprintf(stdout,"%s%sShift+Right             Forward one word  %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
 	fprintf(stdout,"%s%sPgUp                    Beginning of input%s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
-	fprintf(stdout,"%s%sPgDown                  End of line       %s\n\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
+	fprintf(stdout,"%s%sPgDown                  End of input      %s\n\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
 
 	while(true)
 	{
