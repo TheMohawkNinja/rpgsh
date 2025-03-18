@@ -55,12 +55,12 @@ int main(int argc, char** argv)
 	std::vector<char> input;
 	input.push_back('v'); //
 	input.push_back('{'); //TODO: Don't include this if specifying a variable to edit
-	for(int i=0; i<w.ws_col-6; i++) input.push_back('a');
+	for(int i=0; i<(2*w.ws_col)+30; i++) input.push_back('a');
 	input.push_back('}'); //
 	bool insert_mode = false;
 	char k = 0;
 	char esc_char = 0;
-	long unsigned int cur_pos = input.size()-1;
+	long unsigned int cur_pos = 2;
 	long unsigned int prev_cur_pos = cur_pos;
 
 	fprintf(stdout,"%s%sCTRL+ALT+ESC or ESC+ESC Exit              %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
@@ -178,9 +178,11 @@ int main(int argc, char** argv)
 					if(cur_pos < w.ws_col) break;
 					cur_pos -= w.ws_col;
 					fprintf(stdout,CURSOR_UP);
+					if(cur_pos == w.ws_col  && !(prev_cur_pos%w.ws_col))
+						fprintf(stdout,CURSOR_UP);
 					break;
 				case 'B':	//Down
-					if(cur_pos == w.ws_col) fprintf(stdout,CURSOR_UP);
+					if(cur_pos && !(cur_pos%w.ws_col)) fprintf(stdout,CURSOR_UP);
 					if(cur_pos+w.ws_col > input.size()) break;
 					if(cur_pos/w.ws_col > 1) fprintf(stdout,CURSOR_UP);
 					cur_pos += w.ws_col;
@@ -204,7 +206,7 @@ int main(int argc, char** argv)
 						cur_pos++;
 
 					if(cur_pos/(long unsigned int)w.ws_col > prev_cur_pos/(long unsigned int)w.ws_col)
-						fprintf(stdout,CURSOR_DOWN);
+						fprintf(stdout,CURSOR_DOWN_N,(cur_pos/w.ws_col)-(prev_cur_pos/w.ws_col));
 					break;
 				case 'd':	//Shift+Left
 					if(cur_pos == 0) break;
@@ -217,7 +219,7 @@ int main(int argc, char** argv)
 					if(cur_pos > 0) cur_pos++;
 
 					if(cur_pos/(long unsigned int)w.ws_col < prev_cur_pos/(long unsigned int)w.ws_col)
-						fprintf(stdout,CURSOR_UP);
+						fprintf(stdout,CURSOR_UP_N,(prev_cur_pos/w.ws_col)-(cur_pos/w.ws_col));
 					break;
 				case 'H':	//Home
 					if(cur_pos == 0) break;
@@ -226,9 +228,10 @@ int main(int argc, char** argv)
 						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
 						cur_pos = 0;
 					}
-					else if(cur_pos % w.ws_col)
+					else
 					{
-						fprintf(stdout,CURSOR_LEFT_N,cur_pos%w.ws_col);
+						if(cur_pos % w.ws_col)
+							fprintf(stdout,CURSOR_LEFT_N,cur_pos%w.ws_col);
 						fprintf(stdout,CURSOR_UP);
 						cur_pos -= cur_pos%w.ws_col;
 					}
@@ -271,38 +274,31 @@ int main(int argc, char** argv)
 						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
 						cur_pos = 0;
 					}
-					else if(cur_pos % w.ws_col)
+					else
 					{
-						fprintf(stdout,CURSOR_LEFT_N,cur_pos%w.ws_col);
+						if(cur_pos % w.ws_col)
+							fprintf(stdout,CURSOR_LEFT_N,cur_pos%w.ws_col);
 						fprintf(stdout,CURSOR_UP);
 						cur_pos -= cur_pos%w.ws_col;
 					}
 					break;
 				case 'F':	//End
-					if(cur_pos == input.size()) break;
-					if((int)cur_pos < w.ws_col && (int)input.size() >= w.ws_col-1)
-					{
-						fprintf(stdout,CURSOR_RIGHT_N,w.ws_col-cur_pos-1);
+					if(cur_pos == input.size() || !((cur_pos+1)%w.ws_col)) break;
+					if((long unsigned int)(cur_pos+w.ws_col) > input.size())
+						cur_pos = input.size();
+					else if(cur_pos < w.ws_col)
 						cur_pos = w.ws_col-1;
-					}
-					else if((long unsigned int)(cur_pos+w.ws_col) > input.size())
-					{
-						fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
-						cur_pos += input.size()-cur_pos;
-					}
+					else
+						cur_pos += w.ws_col-(cur_pos%w.ws_col)-1;
 					break;
 				case '8':	//End
-					if(getchar() != '~' || cur_pos == input.size()) break;
-					if((int)cur_pos < w.ws_col && (int)input.size() >= w.ws_col-1)
-					{
-						fprintf(stdout,CURSOR_RIGHT_N,w.ws_col-cur_pos-1);
+					if(getchar() != '~' || cur_pos == input.size() || !((cur_pos+1)%w.ws_col)) break;
+					if((long unsigned int)(cur_pos+w.ws_col) > input.size())
+						cur_pos = input.size();
+					else if(cur_pos < w.ws_col)
 						cur_pos = w.ws_col-1;
-					}
-					else if((long unsigned int)(cur_pos+w.ws_col) > input.size())
-					{
-						fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
-						cur_pos += input.size()-cur_pos;
-					}
+					else
+						cur_pos += w.ws_col-(cur_pos%w.ws_col)-1;
 					break;
 				case '2':	//Insert
 					if(getchar() == '~') insert_mode = !insert_mode;
