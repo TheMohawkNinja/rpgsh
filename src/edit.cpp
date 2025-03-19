@@ -98,6 +98,15 @@ int main(int argc, char** argv)
 	long unsigned int cur_pos = 2;
 	long unsigned int prev_cur_pos = cur_pos;
 
+	enum save_text_state
+	{
+		UNSAVED,
+		SHOW_SAVE_TEXT,
+		REMOVE_SAVE_TEXT
+	};
+
+	save_text_state sts = UNSAVED;
+
 	fprintf(stdout,"%s%sCTRL+ALT+ESC or ESC+ESC Exit w/o saving   %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
 	fprintf(stdout,"%s%sESC+s                   Save              %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
 	fprintf(stdout,"%s%sHome                    Beginning of line %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
@@ -120,7 +129,21 @@ int main(int argc, char** argv)
 		//Move cursor to beginning of input
 		if(cur_pos && (cur_pos-1)/w.ws_col) fprintf(stdout,CURSOR_UP_N,((cur_pos-1)/w.ws_col));
 
+		if(sts == REMOVE_SAVE_TEXT)
+		{
+			fprintf(stdout,CURSOR_UP);
+		}
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
+		if(sts == SHOW_SAVE_TEXT)
+		{
+			sts = REMOVE_SAVE_TEXT;
+		}
+		else if(sts == REMOVE_SAVE_TEXT)
+		{
+			fprintf(stdout,CURSOR_DOWN);
+			sts = UNSAVED;
+		}
+
 		for(const auto& ch : input) fprintf(stdout,"%c",ch);
 		fprintf(stdout," ");
 
@@ -132,7 +155,8 @@ int main(int argc, char** argv)
 		for(unsigned long int i=2; i<input.size()-1; i++)//Remove the start and end bits of explicit constructor, and space
 			value += input[i];
 		std::string output = makePretty(value);
-		fprintf(stdout,"%s\nw.ws_col=%d, input.size()=%lu, output_length=%lu, cur_pos=%lu\n",TEXT_NORMAL,w.ws_col,input.size(),getPrintLength(output)-1-(countu(output,'%')/2),cur_pos);
+		fprintf(stdout,"%s\n\n",TEXT_NORMAL);
+		//fprintf(stdout,"%s\nw.ws_col=%d, input.size()=%lu, output_length=%lu, cur_pos=%lu\n",TEXT_NORMAL,w.ws_col,input.size(),getPrintLength(output)-1-(countu(output,'%')/2),cur_pos);
 		fprintf(stdout,output.c_str());
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
 		unsigned long int output_length = getPrintLength(output)-1-(countu(output,'%')/2);
@@ -167,10 +191,38 @@ int main(int argc, char** argv)
 			}
 			else if(next_char == 's')
 			{
+				switch(vi.evalType)
+				{
+					case VAR_SIGIL:
+						vi.scope.set<Var>(vi.key,Var(std::string(input.data())));
+						break;
+					case DICE_SIGIL:
+						vi.scope.set<Dice>(vi.key,Dice(std::string(input.data())));
+						break;
+					case WALLET_SIGIL:
+						vi.scope.set<Wallet>(vi.key,Wallet(std::string(input.data())));
+						break;
+					case CURRENCY_SIGIL:
+						vi.scope.set<Currency>(vi.key,Currency(std::string(input.data())));
+						break;
+				}
+				fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
+				fprintf(stdout,CURSOR_UP_N,(cur_pos/w.ws_col)+1);
+				fprintf(stdout,"%s%s%c%c/%s has been saved%s",TEXT_BOLD,TEXT_CYAN,vi.scope.sigil,vi.evalType,vi.key.c_str(),TEXT_NORMAL);
+				fprintf(stdout,CURSOR_DOWN_N,(cur_pos/w.ws_col)+1);
+				if(cur_pos < w.ws_col)
+					fprintf(stdout,CURSOR_RIGHT_N,cur_pos);
+				else if(cur_pos % w.ws_col)
+					fprintf(stdout,CURSOR_RIGHT_N,cur_pos%w.ws_col);
+
 				vi.scope.save();
-				fprintf(stdout,"%s%sSAVED!%s",TEXT_BOLD,TEXT_CYAN,TEXT_NORMAL);
+				sts = SHOW_SAVE_TEXT;
+				esc_char = 0;
 			}
-			esc_char = getchar();
+			else
+			{
+				esc_char = getchar();
+			}
 		}
 
 		prev_cur_pos = cur_pos;
