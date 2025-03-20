@@ -163,8 +163,26 @@ int main(int argc, char** argv)
 		fprintf(stdout,output.c_str());
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
-		unsigned long int output_length = getPrintLength(output)-1-(countu(output,'%')/2);
-		unsigned long int cursor_vert_offset = 4+(output_length/w.ws_col)+countu(output,'\n')+(countu(output,'\n')>0)+countu(output,'\f')+countu(output,'\v');//TODO: Take into account the lengths of last line of paragraph
+		unsigned long int output_print_length = getPrintLength(output)-1;
+		unsigned long int total_last_lines_length = 0;
+		if(findu(output,'\n') != std::string::npos)
+		{
+			for(unsigned long int i=0; i<output_print_length; i++)
+			{
+				unsigned long int next_newline = findu(output,'\n',i);
+				if(next_newline == std::string::npos)
+					break;
+				else if(next_newline < w.ws_col)
+					total_last_lines_length += (next_newline-i);
+				else
+					total_last_lines_length += (next_newline-i)%w.ws_col;
+
+				i = next_newline;
+			}
+		}
+		fprintf(stdout,"\ntotal_last_lines_length = %lu\n",total_last_lines_length);
+		unsigned long int output_length = output_print_length-(countu(output,'%')/2);
+		unsigned long int cursor_vert_offset = 4+(output_length/w.ws_col)+countu(output,'\n')+(countu(output,'\n')>0)+countu(output,'\f')+countu(output,'\v')+(total_last_lines_length/w.ws_col);//TODO: Take into account the lengths of last line of paragraph
 		fprintf(stdout,CURSOR_UP_N,(long unsigned int)(input.size()/w.ws_col)+cursor_vert_offset);
 		if(cur_pos > 0 && cur_pos < w.ws_col)
 		{
