@@ -298,7 +298,7 @@ int main(int argc, char** argv)
 					for(long unsigned int i=cur_pos; input[i]==' ' && i<input.size(); i++)
 						cur_pos++;
 
-					if(cur_pos/(long unsigned int)w.ws_col > prev_cur_pos/(long unsigned int)w.ws_col)
+					if(cur_pos/(long unsigned int)w.ws_col > prev_cur_pos/(long unsigned int)w.ws_col && cur_pos%w.ws_col)
 						fprintf(stdout,CURSOR_DOWN_N,(cur_pos/w.ws_col)-(prev_cur_pos/w.ws_col));
 					break;
 				case 'd':	//Shift+Left
@@ -313,6 +313,8 @@ int main(int argc, char** argv)
 
 					if(cur_pos/(long unsigned int)w.ws_col < prev_cur_pos/(long unsigned int)w.ws_col)
 						fprintf(stdout,CURSOR_UP_N,(prev_cur_pos/w.ws_col)-(cur_pos/w.ws_col));
+
+					if(!(cur_pos % w.ws_col)) fprintf(stdout,CURSOR_UP);
 					break;
 				case 'H':	//Home
 					if(cur_pos == 0) break;
