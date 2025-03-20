@@ -1,3 +1,4 @@
+#include <regex>
 #include <stdio.h>
 #include <sys/ioctl.h>
 #include <termios.h>
@@ -132,8 +133,9 @@ int main(int argc, char** argv)
 		if(sts == REMOVE_SAVE_TEXT)
 		{
 			fprintf(stdout,CURSOR_UP);
+			fprintf(stdout,CLEAR_LINE);
 		}
-		fprintf(stdout,CLEAR_TO_SCREEN_END);
+		//fprintf(stdout,CLEAR_TO_SCREEN_END);
 		if(sts == SHOW_SAVE_TEXT)
 		{
 			sts = REMOVE_SAVE_TEXT;
@@ -147,20 +149,22 @@ int main(int argc, char** argv)
 		for(const auto& ch : input) fprintf(stdout,"%c",ch);
 		fprintf(stdout," ");
 
-		fprintf(stdout,"\n\n");
+		fprintf(stdout,"%s\n%s\n",CLEAR_TO_LINE_END,CLEAR_LINE);
 		for(int i=0; i<w.ws_col; i++)
 			fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
 
 		std::string value;
 		for(unsigned long int i=2; i<input.size()-1; i++)//Remove the start and end bits of explicit constructor, and space
 			value += input[i];
+		value = std::regex_replace(value,std::regex("\\\\n"),std::string(CLEAR_TO_LINE_END)+"\\n");
 		std::string output = makePretty(value);
-		fprintf(stdout,"%s\n\n",TEXT_NORMAL);
+		fprintf(stdout,"%s\n%s\n",TEXT_NORMAL,CLEAR_LINE);
 		//fprintf(stdout,"%s\nw.ws_col=%d, input.size()=%lu, output_length=%lu, cur_pos=%lu\n",TEXT_NORMAL,w.ws_col,input.size(),getPrintLength(output)-1-(countu(output,'%')/2),cur_pos);
 		fprintf(stdout,output.c_str());
+		fprintf(stdout,CLEAR_TO_SCREEN_END);
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
 		unsigned long int output_length = getPrintLength(output)-1-(countu(output,'%')/2);
-		unsigned long int cursor_vert_offset = 4+(output_length/w.ws_col)+countu(output,'\n')+countu(output,'\f')+countu(output,'\v');
+		unsigned long int cursor_vert_offset = 4+(output_length/w.ws_col)+countu(output,'\n')+(countu(output,'\n')>0)+countu(output,'\f')+countu(output,'\v');//TODO: Take into account the lengths of last line of paragraph
 		fprintf(stdout,CURSOR_UP_N,(long unsigned int)(input.size()/w.ws_col)+cursor_vert_offset);
 		if(cur_pos > 0 && cur_pos < w.ws_col)
 		{
