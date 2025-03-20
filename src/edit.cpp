@@ -272,13 +272,12 @@ int main(int argc, char** argv)
 					if(cur_pos < w.ws_col) break;
 					cur_pos -= w.ws_col;
 					fprintf(stdout,CURSOR_UP);
-					if(cur_pos == w.ws_col  && !(prev_cur_pos%w.ws_col))
+					if(cur_pos >= w.ws_col  && !(prev_cur_pos%w.ws_col))
 						fprintf(stdout,CURSOR_UP);
 					break;
 				case 'B':	//Down
 					if(cur_pos && !(cur_pos%w.ws_col)) fprintf(stdout,CURSOR_UP);
 					if(cur_pos+w.ws_col > input.size()) break;
-					if(cur_pos/w.ws_col > 1) fprintf(stdout,CURSOR_UP);
 					cur_pos += w.ws_col;
 					if(cur_pos > w.ws_col) fprintf(stdout,CURSOR_DOWN);
 					break;
