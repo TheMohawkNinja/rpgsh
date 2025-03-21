@@ -6,6 +6,16 @@
 #include "../headers/functions.h"
 #include "../headers/text.h"
 
+std::string getUnformattedOutput(std::string str)
+{
+	//fprintf(stdout,"\n\nstr = %s\n",str.c_str());
+	for(unsigned long int i=0; i<str.length(); i++)
+	{
+		if(str[i] == ESC_SEQ) str.erase(str.begin()+i,str.begin()+str.find('m',i)+1);
+		else if(str[i] == '\b' && i) str.erase(i-1);
+	}
+	return str;
+}
 unsigned long int getPrintLength(std::string str)//std::string.length() returns character count, not the printed length
 {
 	struct winsize w;
@@ -14,7 +24,7 @@ unsigned long int getPrintLength(std::string str)//std::string.length() returns 
 	unsigned long int length = 0;
 	for(unsigned long int i=0; i<str.length(); i++)
 	{
-		if(str[i] == ESC_SEQ) i=str.find('m',i);
+		if(str[i] == ESC_SEQ) i = str.find('m',i);
 		else if(str[i] == '\t' && (length+(8-(length%8)))/w.ws_col == length/w.ws_col)	length += 8-(length%8);
 		else if(str[i] == '\t' && (length+(8-(length%8)))/w.ws_col > length/w.ws_col)	length += w.ws_col-length-1;
 		else if(str[i] == '\b')  length--;
@@ -156,33 +166,37 @@ int main(int argc, char** argv)
 		std::string value;
 		for(unsigned long int i=2; i<input.size()-1; i++)//Remove the start and end bits of explicit constructor, and space
 			value += input[i];
-		value = std::regex_replace(value,std::regex("\\\\n"),std::string(CLEAR_TO_LINE_END)+"\\n");
 		std::string output = makePretty(value);
 		fprintf(stdout,"%s\n%s\n",TEXT_NORMAL,CLEAR_LINE);
 		//fprintf(stdout,"%s\nw.ws_col=%d, input.size()=%lu, output_length=%lu, cur_pos=%lu\n",TEXT_NORMAL,w.ws_col,input.size(),getPrintLength(output)-1-(countu(output,'%')/2),cur_pos);
-		fprintf(stdout,output.c_str());
+		fprintf(stdout,(std::regex_replace(output,std::regex("\\n"),std::string(CLEAR_TO_LINE_END)+std::string(1,'\n')).c_str()));
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
-		unsigned long int output_print_length = getPrintLength(output)-1;
-		unsigned long int total_last_lines_length = 0;
-		if(findu(output,'\n') != std::string::npos)
+		unsigned long int total_paragraph_lines = 0;
+		std::string u_output = getUnformattedOutput(output);
+		if(findu(u_output,'\n') != std::string::npos)
 		{
-			for(unsigned long int i=0; i<output_print_length; i++)
+			for(unsigned long int i=0; i<getPrintLength(output)-1; i++)
 			{
-				unsigned long int next_newline = findu(output,'\n',i);
-				if(next_newline == std::string::npos)
-					break;
-				else if(next_newline < w.ws_col)
-					total_last_lines_length += (next_newline-i);
+				unsigned long int next_newline = findu(u_output,'\n',i);
+				if(next_newline != std::string::npos)
+				{
+					total_paragraph_lines += (next_newline-i)/w.ws_col;
+				}
 				else
-					total_last_lines_length += (next_newline-i)%w.ws_col;
-
+				{
+					total_paragraph_lines += (u_output.length()-i)/w.ws_col;
+					break;
+				}
 				i = next_newline;
 			}
 		}
-		fprintf(stdout,"\ntotal_last_lines_length = %lu\n",total_last_lines_length);
-		unsigned long int output_length = output_print_length-(countu(output,'%')/2);
-		unsigned long int cursor_vert_offset = 4+(output_length/w.ws_col)+countu(output,'\n')+(countu(output,'\n')>0)+countu(output,'\f')+countu(output,'\v')+(total_last_lines_length/w.ws_col);//TODO: Take into account the lengths of last line of paragraph
+		unsigned long int output_length = getPrintLength(output)-1-(countu(output,'%')/2);
+		unsigned long int cursor_vert_offset = 4+countu(output,'\n')+countu(output,'\f')+countu(output,'\v');//TODO: Take into account the lengths of last line of paragraph, appears to be related to cursor position though
+		if(total_paragraph_lines)
+			cursor_vert_offset += total_paragraph_lines;
+		else
+			cursor_vert_offset += output_length/w.ws_col;
 		fprintf(stdout,CURSOR_UP_N,(long unsigned int)(input.size()/w.ws_col)+cursor_vert_offset);
 		if(cur_pos > 0 && cur_pos < w.ws_col)
 		{
