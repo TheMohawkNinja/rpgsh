@@ -163,15 +163,20 @@ int main(int argc, char** argv)
 		for(int i=0; i<w.ws_col; i++)
 			fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
 
+		//Remove beginning and end bits of explicit constructor
 		std::string value;
-		for(unsigned long int i=2; i<input.size()-1; i++)//Remove the start and end bits of explicit constructor, and space
+		for(unsigned long int i=2; i<input.size()-1; i++)
 			value += input[i];
 		std::string output = makePretty(value);
 		fprintf(stdout,"%s\n%s\n",TEXT_NORMAL,CLEAR_LINE);
-		//fprintf(stdout,"%s\nw.ws_col=%d, input.size()=%lu, output_length=%lu, cur_pos=%lu\n",TEXT_NORMAL,w.ws_col,input.size(),getPrintLength(output)-1-(countu(output,'%')/2),cur_pos);
+
+		//Clear all characters after newlines to remove left over characters from previous buffer if characters in that line were deleted
 		fprintf(stdout,(std::regex_replace(output,std::regex("\\n"),std::string(CLEAR_TO_LINE_END)+std::string(1,'\n')).c_str()));
+
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
+
+		//Determine number of paragraphs
 		unsigned long int total_paragraph_lines = 0;
 		std::string u_output = getUnformattedOutput(output);
 		if(findu(u_output,'\n') != std::string::npos)
@@ -179,9 +184,9 @@ int main(int argc, char** argv)
 			for(unsigned long int i=0; i<getPrintLength(output)-1; i++)
 			{
 				unsigned long int next_newline = findu(u_output,'\n',i);
-				if(next_newline != std::string::npos)
+				if(next_newline != std::string::npos && next_newline != i)
 				{
-					total_paragraph_lines += (next_newline-i)/w.ws_col;
+					total_paragraph_lines += (next_newline-1-i)/w.ws_col;
 				}
 				else
 				{
@@ -191,6 +196,7 @@ int main(int argc, char** argv)
 				i = next_newline;
 			}
 		}
+
 		unsigned long int output_length = getPrintLength(output)-1-(countu(output,'%')/2);
 		unsigned long int cursor_vert_offset = 4+countu(output,'\n')+countu(output,'\f')+countu(output,'\v');//TODO: Take into account the lengths of last line of paragraph, appears to be related to cursor position though
 		if(total_paragraph_lines)
@@ -273,6 +279,8 @@ int main(int argc, char** argv)
 		}
 		else if(k == KB_BACKSPACE && cur_pos > 0)//Backspace
 		{
+			if(!(cur_pos%w.ws_col) || cur_pos%w.ws_col == 1)
+				fprintf(stdout,CURSOR_UP);
 			cur_pos--;
 			input.erase(input.begin()+cur_pos);
 		}
