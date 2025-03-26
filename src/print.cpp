@@ -22,12 +22,11 @@ void getLongestKey(datamap<T> m, unsigned int* p_current_longest_len)
 			(*p_current_longest_len) = k.length();
 	}
 }
-void printData(Scope scope)
+void printData(Scope scope, Var depth)
 {
 	for(auto& [k,v] : scope.getDatamap<Var>())
 	{
-		//Skip hidden variables
-		if(k[0] == '.') continue;
+		if(k[0] == '.' || (depth>=0 && depth<countu(k,'/')+1)) continue;
 		fprintf(stdout,"%s%sVar%s%s",TEXT_BOLD,VAR_COLOR,TEXT_NORMAL,addSpaces(COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		fprintf(stdout,"%sValue:  %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.Value));
@@ -35,8 +34,7 @@ void printData(Scope scope)
 	}
 	for(auto& [k,v] : scope.getDatamap<Dice>())
 	{
-		//Skip hidden variables
-		if(k[0] == '.') continue;
+		if((k[0] == '.') || (depth>=0 && depth<countu(k,'/')+1)) continue;
 		fprintf(stdout,"%s%sDice%s%s",TEXT_BOLD,DICE_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		if(v.List != "")
@@ -53,8 +51,7 @@ void printData(Scope scope)
 	}
 	for(auto& [k,v] : scope.getDatamap<Wallet>())
 	{
-		//Skip hidden variables
-		if(k[0] == '.') continue;
+		if((k[0] == '.') || (depth>=0 && depth<countu(k,'/')+1)) continue;
 
 		//Get longest currency name
 		long unsigned int longest_cur = 0;
@@ -80,8 +77,7 @@ void printData(Scope scope)
 	}
 	for(auto& [k,v] : scope.getDatamap<Currency>())
 	{
-		//Skip hidden variables
-		if(k[0] == '.') continue;
+		if((k[0] == '.') || (depth>=0 && depth<countu(k,'/')+1)) continue;
 		fprintf(stdout,"%s%sCurrency%s%s",TEXT_BOLD,CURRENCY_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
 		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		fprintf(stdout,"%sSystem:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.System));
@@ -98,7 +94,7 @@ void printCharacterVariables()
 	Character c = Character();
 	std::string sigil(1,CHARACTER_SIGIL);
 	printHeader("("+sigil+") "+c.getName());
-	printData(c);
+	printData(c, -1);
 }
 void printCampaignVariables()
 {
@@ -107,22 +103,22 @@ void printCampaignVariables()
 	std::string sigil(1,CAMPAIGN_SIGIL);
 	std::string m_name = getEnvVariable(ENV_CURRENT_CAMPAIGN);
 	printHeader("("+sigil+") "+left(m_name,m_name.length()-1));// Omit trailing '/'
-	printData(m);
+	printData(m, -1);
 }
 void printShellVariables()
 {
 	Shell s = Shell();
 	std::string sigil(1,SHELL_SIGIL);
 	printHeader("("+sigil+") "+"Shell");
-	printData(s);
+	printData(s, -1);
 }
 int main(int argc, char** argv)
 {
 	chkFlagAppDesc(argv,"Pretty prints variables, variable sets, and scopes.");
 	chkFlagModifyVariables(argv,false);
 
-	if(argc > 2)
-		output(Warning,"Expected only one argument. All args past \"%s\" will be ignored.",argv[1]);
+	if(argc > 4)
+		output(Warning,"Print expects no more than four arguments. All args past \"%s\" will be ignored.",argv[1]);
 
 	if(argc == 1)
 	{
@@ -131,61 +127,7 @@ int main(int argc, char** argv)
 		printCampaignVariables();
 		fprintf(stdout,"\n");
 		printCharacterVariables();
-	}
-	else if(isTypeSigil(argv[1][0]) && argv[1][1] == '{')
-	{
-		Scope variable;
-		std::string v_str = std::string(argv[1]);
-
-		try
-		{
-			switch(argv[1][0])
-			{
-				case(VAR_SIGIL):
-					variable.set<Var>("",Var(v_str));
-					break;
-				case(DICE_SIGIL):
-					variable.set<Dice>("",Dice(v_str));
-					break;
-				case(WALLET_SIGIL):
-					variable.set<Wallet>("",Wallet(v_str));
-					break;
-				case(CURRENCY_SIGIL):
-					variable.set<Currency>("",Currency(v_str));
-					break;
-			}
-		}
-		catch(const std::runtime_error& e)
-		{
-			output(Error,"Unable to pretty-print explicit constructor \"%s\": %s",v_str.c_str(),e.what());
-			exit(-1);
-		}
-		printData(variable);
-	}
-	else if(looksLikeSet(std::string(argv[1])))
-	{
-		Scope set;
-
-		for(const auto& [k,v] : getSet(std::string(argv[1])))
-		{
-			switch(v[0])
-			{
-				case VAR_SIGIL:
-					set.set<Var>(k,v);
-					break;
-				case DICE_SIGIL:
-					set.set<Dice>(k,v);
-					break;
-				case WALLET_SIGIL:
-					set.set<Wallet>(k,v);
-					break;
-				case CURRENCY_SIGIL:
-					set.set<Currency>(k,v);
-					break;
-			}
-		}
-
-		printData(set);
+		return 0;
 	}
 	else if(chkFlagHelp(argv))
 	{
@@ -194,11 +136,86 @@ int main(int argc, char** argv)
 		fprintf(stdout,"\tprint [%svariable%s | %svariable set%s] [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\nOPTIONS:\n");
 		fprintf(stdout,"\t%snone%s\t\tPrints all variables in all scopes.\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t-d %sn%s\t\tPrints data in the set with keys up to a depth (number of blocks of text separated by \'/\' in the key) of %sn%s.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\t%s | %s\tPrints this help text.\n",FLAG_HELPSHORT,FLAG_HELPLONG);
+		return 0;
 	}
-	else
+
+
+	Scope data;
+	Var depth = -1;
+	for(int i=1; i<argc; i++)
 	{
-		output(Error,"Unknown option \"%s\".",argv[1]);
-		exit(-1);
+		std::string arg_str = std::string(argv[i]);
+
+		if(isTypeSigil(argv[i][0]) && argv[i][1] == '{')
+		{
+			try
+			{
+				switch(argv[i][0])
+				{
+					case(VAR_SIGIL):
+						data.set<Var>("",Var(arg_str));
+						break;
+					case(DICE_SIGIL):
+						data.set<Dice>("",Dice(arg_str));
+						break;
+					case(WALLET_SIGIL):
+						data.set<Wallet>("",Wallet(arg_str));
+						break;
+					case(CURRENCY_SIGIL):
+						data.set<Currency>("",Currency(arg_str));
+						break;
+				}
+			}
+			catch(const std::runtime_error& e)
+			{
+				output(Error,"Unable to pretty-print explicit constructor \"%s\": %s",arg_str.c_str(),e.what());
+				return -1;
+			}
+		}
+		else if(looksLikeSet(arg_str))
+		{
+			for(const auto& [k,v] : getSet(arg_str))
+			{
+				switch(v[0])
+				{
+					case VAR_SIGIL:
+						data.set<Var>(k,v);
+						break;
+					case DICE_SIGIL:
+						data.set<Dice>(k,v);
+						break;
+					case WALLET_SIGIL:
+						data.set<Wallet>(k,v);
+						break;
+					case CURRENCY_SIGIL:
+						data.set<Currency>(k,v);
+						break;
+				}
+			}
+		}
+		else if(arg_str == "-d")
+		{
+			if(i == argc)
+			{
+				output(Error,"Missing value for print depth.");
+				return -1;
+			}
+
+			depth = Var(std::string(argv[i+1]));
+			i++;
+			if(!depth.isInt())
+			{
+				output(Error,"Invalid value \'%s\" for depth.",depth.c_str());
+				return -1;
+			}
+		}
+		else
+		{
+			output(Error,"Unknown option \"%s\".",argv[i]);
+			return -1;
+		}
 	}
+	printData(data, depth);
 }
