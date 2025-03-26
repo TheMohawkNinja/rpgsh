@@ -279,7 +279,7 @@ int main(int argc, char** argv)
 		}
 		else if(k == KB_BACKSPACE && cur_pos > 0)//Backspace
 		{
-			if(!(cur_pos%w.ws_col) || cur_pos%w.ws_col == 1)
+			if(cur_pos > 1 && (!(cur_pos%w.ws_col) || cur_pos%w.ws_col == 1))
 				fprintf(stdout,CURSOR_UP);
 			cur_pos--;
 			input.erase(input.begin()+cur_pos);
