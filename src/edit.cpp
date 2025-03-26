@@ -118,14 +118,14 @@ int main(int argc, char** argv)
 
 	save_text_state sts = UNSAVED;
 
-	fprintf(stdout,"%s%sCTRL+ALT+ESC or ESC+ESC Exit w/o saving   %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
-	fprintf(stdout,"%s%sESC+s                   Save              %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
-	fprintf(stdout,"%s%sHome                    Beginning of line %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
-	fprintf(stdout,"%s%sEnd                     End of line       %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
-	fprintf(stdout,"%s%sShift+Left              Back one word     %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
-	fprintf(stdout,"%s%sShift+Right             Forward one word  %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
-	fprintf(stdout,"%s%sPgUp                    Beginning of input%s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
-	fprintf(stdout,"%s%sPgDown                  End of input      %s\n\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_NORMAL);
+	fprintf(stdout,"%s%s%sCTRL%s+%sALT%s+%sESC%s or %sESC%s+%sESC%s Exit w/o saving   %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_ITALIC,TEXT_NOITALIC,TEXT_ITALIC,TEXT_NOITALIC,TEXT_ITALIC,TEXT_NOITALIC,TEXT_ITALIC,TEXT_NOITALIC,TEXT_ITALIC,TEXT_NOITALIC,TEXT_NORMAL);
+	fprintf(stdout,"%s%s%sESC%s+s                   Save              %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_ITALIC,TEXT_NOITALIC,TEXT_NORMAL);
+	fprintf(stdout,"%s%s%sHome%s                    Beginning of line %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_ITALIC,TEXT_NOITALIC,TEXT_NORMAL);
+	fprintf(stdout,"%s%s%sEnd%s                     End of line       %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_ITALIC,TEXT_NOITALIC,TEXT_NORMAL);
+	fprintf(stdout,"%s%s%sShift%s+%sLeft%s              Back one word     %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_ITALIC,TEXT_NOITALIC,TEXT_ITALIC,TEXT_NOITALIC,TEXT_NORMAL);
+	fprintf(stdout,"%s%s%sShift%s+%sRight%s             Forward one word  %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_ITALIC,TEXT_NOITALIC,TEXT_ITALIC,TEXT_NOITALIC,TEXT_NORMAL);
+	fprintf(stdout,"%s%s%sPgUp%s                    Beginning of input%s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_ITALIC,TEXT_NOITALIC,TEXT_NORMAL);
+	fprintf(stdout,"%s%s%sPgDown%s                  End of input      %s\n\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_ITALIC,TEXT_NOITALIC,TEXT_NORMAL);
 
 	while(true)
 	{
