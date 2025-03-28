@@ -56,28 +56,30 @@ if [[ $EUID -eq 0 ]]; then
 	echo "Compiling applications:"
 	echo -e "\tsrc/main.cpp\t\t->\t$bold_white""/bin/rpgsh"$normal
 	g++ $flags src/main.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh
-	echo -e "\tsrc/setname.cpp\t\t->\t$bold_white""/bin/rpgsh-setname"$normal
-	g++ $flags src/setname.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-setname
-	echo -e "\tsrc/eval.cpp\t\t->\t$bold_white""/bin/rpgsh-eval"$normal
-	g++ $flags src/eval.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-eval
-	echo -e "\tsrc/version.cpp\t\t->\t$bold_white""/bin/rpgsh-version"$normal
-	g++ $flags src/version.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-version
 	echo -e "\tsrc/banner.cpp\t\t->\t$bold_white""/bin/rpgsh-banner"$normal
 	g++ $flags src/banner.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-banner
-	echo -e "\tsrc/roll.cpp\t\t->\t$bold_white""/bin/rpgsh-roll"$normal
-	g++ $flags src/roll.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-roll
-	echo -e "\tsrc/print.cpp\t\t->\t$bold_white""/bin/rpgsh-print"$normal
-	g++ $flags src/print.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-print
-	echo -e "\tsrc/help.cpp\t\t->\t$bold_white""/bin/rpgsh-help"$normal
-	g++ $flags src/help.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-help
 	echo -e "\tsrc/clear.cpp\t\t->\t$bold_white""/bin/rpgsh-clear"$normal
 	g++ $flags src/clear.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-clear
-	echo -e "\tsrc/history.cpp\t\t->\t$bold_white""/bin/rpgsh-history"$normal
-	g++ $flags src/history.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-history
 	echo -e "\tsrc/del.cpp\t\t->\t$bold_white""/bin/rpgsh-del"$normal
 	g++ $flags src/del.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-del
 	echo -e "\tsrc/edit.cpp\t\t->\t$bold_white""/bin/rpgsh-edit"$normal
 	g++ $flags src/edit.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-edit
+	echo -e "\tsrc/eval.cpp\t\t->\t$bold_white""/bin/rpgsh-eval"$normal
+	g++ $flags src/eval.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-eval
+	echo -e "\tsrc/help.cpp\t\t->\t$bold_white""/bin/rpgsh-help"$normal
+	g++ $flags src/help.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-help
+	echo -e "\tsrc/history.cpp\t\t->\t$bold_white""/bin/rpgsh-history"$normal
+	g++ $flags src/history.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-history
+	echo -e "\tsrc/new.cpp\t\t->\t$bold_white""/bin/rpgsh-new"$normal
+	g++ $flags src/new.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-new
+	echo -e "\tsrc/print.cpp\t\t->\t$bold_white""/bin/rpgsh-print"$normal
+	g++ $flags src/print.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-print
+	echo -e "\tsrc/roll.cpp\t\t->\t$bold_white""/bin/rpgsh-roll"$normal
+	g++ $flags src/roll.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-roll
+	echo -e "\tsrc/setname.cpp\t\t->\t$bold_white""/bin/rpgsh-setname"$normal
+	g++ $flags src/setname.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-setname
+	echo -e "\tsrc/version.cpp\t\t->\t$bold_white""/bin/rpgsh-version"$normal
+	g++ $flags src/version.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-version
 
 	echo "Done!"
 else
