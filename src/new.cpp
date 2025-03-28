@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 		fprintf(stdout,"USAGE:\n");
 		fprintf(stdout,"\tnew [%sOPTIONS%s]\n\n",TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"OPTIONS:\n");
-		fprintf(stdout,"\tnew -c %sname%s %stemplate%s\tCreates a new character file called %sname%s using the character template %stemplate%s. Uses %sdefault_game%s setting if %stemplate%s is omitted.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\tnew -c %stemplate%s\tCreates a new character file using the character template %stemplate%s. Uses %sdefault_game%s setting if %stemplate%s is omitted.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\tnew -m %sname%s\t\tCreates a new campaign file called %sname%s\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		return 0;
 	}
