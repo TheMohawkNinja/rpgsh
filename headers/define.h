@@ -96,7 +96,7 @@ extern const char* prng_path;
 extern const char* backup_prng_path;
 extern const char* rpgsh_programs_cache_path;
 extern const char* rpgsh_output_redirect_path;
-extern std::string variable_file_name;
+extern std::string variables_file_name;
 extern std::string user;
 extern std::string root_dir;
 extern std::string shell_variables_path;

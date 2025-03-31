@@ -588,7 +588,7 @@ Campaign::Campaign()
 	sigil = CAMPAIGN_SIGIL;
 	datasource = campaigns_dir +
 		     getEnvVariable(ENV_CURRENT_CAMPAIGN) +
-		     variable_file_name;
+		     variables_file_name;
 
 	if(!confirmDatasource()) save();
 

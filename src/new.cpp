@@ -150,7 +150,7 @@ int main(int argc, char** argv)
 		else
 		{
 			std::filesystem::create_directory(campaign_root);
-			std::string campaign_variables_file = campaign_root+"/"+variable_file_name;
+			std::string campaign_variables_file = campaign_root+"/"+variables_file_name;
 			std::string characters_dir = campaign_root+"/characters";
 
 			if(!std::filesystem::exists(characters_dir) || (std::filesystem::exists(characters_dir) && !std::filesystem::is_directory(characters_dir)))

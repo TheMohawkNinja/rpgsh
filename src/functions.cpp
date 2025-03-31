@@ -420,7 +420,7 @@ void confirmCampaignVariablesFile()
 {
 	std::string campaign_variables_file = campaigns_dir +
 					      getEnvVariable(ENV_CURRENT_CAMPAIGN) +
-					      variable_file_name;
+					      variables_file_name;
 
 	if(std::filesystem::exists(campaign_variables_file.c_str())) return;
 
@@ -511,7 +511,7 @@ void loadXRef(std::string* arg, VariableInfo* p_vi)
 			p_vi->scope.setDatasource(campaigns_dir+
 						  getLikeFileName(p_vi->xref,campaigns_dir,true,p_vi->xref)+
 						  "/"+
-						  variable_file_name);
+						  variables_file_name);
 			p_vi->scope.load();
 			break;
 		case SHELL_SIGIL:
@@ -1021,7 +1021,7 @@ datamap<Currency> getDatamapFromAllScopes()
 	std::string character = getEnvVariable(ENV_CURRENT_CHAR);
 	std::string campaign = getEnvVariable(ENV_CURRENT_CAMPAIGN);
 	std::string current_campaign_dir = campaigns_dir+campaign;
-	std::string current_campaign_path = current_campaign_dir+variable_file_name;
+	std::string current_campaign_path = current_campaign_dir+variables_file_name;
 	std::string current_character_path = current_campaign_dir+"characters/"+character+".char";
 
 	datamap<Currency> ret;

@@ -340,7 +340,7 @@ std::string inputHandler()
 				{
 					std::string xref_path = campaigns_dir+
 								right(left(chk_str,findu(chk_str,']')),findu(chk_str,'[')+1)+
-								variable_file_name;
+								variables_file_name;
 
 					if(std::filesystem::exists(xref_path) && !std::filesystem::is_directory(xref_path))
 						tab_comp_scope.load(xref_path);
