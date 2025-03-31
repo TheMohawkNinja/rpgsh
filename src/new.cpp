@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 		fprintf(stdout,"USAGE:\n");
 		fprintf(stdout,"\tnew [%sOPTIONS%s]\n\n",TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"OPTIONS:\n");
-		fprintf(stdout,"\tnew -c %stemplate%s\tCreates a new character file using the character template %stemplate%s. Uses %sdefault_game%s setting if %stemplate%s is omitted.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\tnew -c %stemplate%s\tCreates a new character file using the character template %stemplate%s. Uses %sdefault_game%s setting if %stemplate%s is omitted.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\tnew -m %sname%s\t\tCreates a new campaign file called %sname%s\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		return 0;
 	}
@@ -128,7 +128,7 @@ int main(int argc, char** argv)
 		fillCharacterSheet<Dice>(&c);
 		fillCharacterSheet<Wallet>(&c);
 		fillCharacterSheet<Currency>(&c);
-		c.setDatasource(campaigns_dir+getEnvVariable(ENV_CURRENT_CAMPAIGN)+"characters/"+c.getProperty<Var>(c.getName()+".char");
+		c.setDatasource(campaigns_dir+getEnvVariable(ENV_CURRENT_CAMPAIGN)+"characters/"+c.getProperty<Var>(c.getName()+".char","Value"));
 		if(std::filesystem::exists(c.getDatasource()))
 		{
 			fprintf(stdout,"Character file \"%s\" exists, do you want to overwrite? (y/N): ",c.getDatasource().c_str());
@@ -151,10 +151,13 @@ int main(int argc, char** argv)
 		{
 			std::filesystem::create_directory(campaign_root);
 			std::string campaign_variables_file = campaign_root+"/"+variable_file_name;
-			if(!std::filesystem::exists(campaign_root+"/characters") || (std::filesystem::exists(campaign_root+"/characters") && !std::filesystem::is_directory(campaign_root+"/characters")))
-				std::filesystem::create_directory(campaign_root+"/characters");
+			std::string characters_dir = campaign_root+"/characters";
+
+			if(!std::filesystem::exists(characters_dir) || (std::filesystem::exists(characters_dir) && !std::filesystem::is_directory(characters_dir)))
+				std::filesystem::create_directory(characters_dir);
 			if(std::filesystem::exists(campaign_variables_file))
 				std::filesystem::remove(campaign_variables_file);
+
 			std::ofstream ofs(campaign_variables_file);
 			ofs.close();
 			Campaign m = Campaign(campaign_variables_file);
