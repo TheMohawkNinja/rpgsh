@@ -68,40 +68,34 @@ int main(int argc, char** argv)
 	std::string campaign_name;
 	std::string template_name;
 	newFileScope nfs;
-	for(int i=1; i<argc; i++)
+
+	if(!strcmp(argv[1],"-c"))
 	{
-		if(!strcmp(argv[i],"-c"))
+		if(argc == 2)
+			template_name = cfg.setting[DEFAULT_GAME];
+		else
+			template_name = std::string(argv[2]);
+
+		nfs = CHARACTER;
+	}
+	else if(!strcmp(argv[1],"-m"))
+	{
+		if(argc == 2)
 		{
-			if(i == argc-1)
-			{
-				template_name = cfg.setting[DEFAULT_GAME];
-			}
-			else
-			{
-				template_name = std::string(argv[i+1]);
-				i++;
-			}
-			nfs = CHARACTER;
+			fprintf(stdout,"Please enter a campaign name: ");
+			getline(std::cin,campaign_name);
 		}
-		else if(!strcmp(argv[i],"-m"))
+		else
 		{
-			if(i == argc-1)
-			{
-				fprintf(stdout,"Please enter a campaign name: ");
-				getline(std::cin,campaign_name);
-			}
-			else
-			{
-				campaign_name = std::string(argv[i+1]);
-				i++;
-			}
-			nfs = CAMPAIGN;
+			campaign_name = std::string(argv[2]);
 		}
-		else if(argv[i][0] == '-')
-		{
-			output(Error,"Unknown option \"%s\"\n",argv[i]);
-			return -1;
-		}
+
+		nfs = CAMPAIGN;
+	}
+	else if(argv[1][0] == '-')
+	{
+		output(Error,"Unknown option \"%s\"\n",argv[1]);
+		return -1;
 	}
 
 	if(nfs == CHARACTER)
