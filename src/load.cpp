@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 		fprintf(stdout,"\tload [%sOPTIONS%s]\n\n",TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"OPTIONS:\n");
 		fprintf(stdout,"\t-c %scharacter%s\tSets %scharacter%s as the currently loaded character if it exists\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"\t-m %scampaign%s\t\tSets %scampaign%s as the currently loaded campaign if it exists\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t-m %scampaign%s\tSets %scampaign%s as the currently loaded campaign if it exists\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		return 0;
 	}
 
