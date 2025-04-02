@@ -86,7 +86,7 @@ int main(int argc, char** argv)
 	}
 	if(character_name != "")
 	{
-		setEnvVariable(ENV_CURRENT_CHAR,character_name);
+		setEnvVariable(ENV_CURRENT_CHARACTER,character_name);
 		output(Info,"Loaded character \"%s\".",character_name.c_str());
 	}
 

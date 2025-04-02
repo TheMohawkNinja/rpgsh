@@ -403,7 +403,7 @@ void confirmEnvVariablesFile()
 	//Set default values for built-in env variables
 	Config config = Config();
 	Character c = Character(templates_dir + config.setting[DEFAULT_GAME].c_str());
-	setEnvVariable(ENV_CURRENT_CHAR,c.getName());
+	setEnvVariable(ENV_CURRENT_CHARACTER,c.getName());
 	setEnvVariable(ENV_CURRENT_CAMPAIGN,"default/");
 }
 
@@ -1018,7 +1018,7 @@ void sort(std::vector<std::string>* v);
 template <>
 datamap<Currency> getDatamapFromAllScopes()
 {
-	std::string character = getEnvVariable(ENV_CURRENT_CHAR);
+	std::string character = getEnvVariable(ENV_CURRENT_CHARACTER);
 	std::string campaign = getEnvVariable(ENV_CURRENT_CAMPAIGN);
 	std::string current_campaign_dir = campaigns_dir+campaign;
 	std::string current_campaign_path = current_campaign_dir+variables_file_name;

@@ -501,7 +501,7 @@ void Scope::save()
 			std::filesystem::remove(datasource);
 			std::filesystem::remove(datasource+".bak");
 			datasource = left(datasource,rfindu(datasource,'/')+1) + new_name + ".char";
-			setEnvVariable(ENV_CURRENT_CHAR,new_name);
+			setEnvVariable(ENV_CURRENT_CHARACTER,new_name);
 		}
 	}
 
@@ -551,7 +551,7 @@ Character::Character(bool backup)
 		datasource = campaigns_dir + "default/characters/" + getName() + ".char";
 		std::filesystem::copy_options co = std::filesystem::copy_options::update_existing;
 		std::filesystem::copy(templates_dir + config.setting[DEFAULT_GAME],datasource,co);
-		setEnvVariable(ENV_CURRENT_CHAR,getName());
+		setEnvVariable(ENV_CURRENT_CHARACTER,getName());
 		save();
 	}
 }
@@ -564,7 +564,7 @@ Character::Character(std::string path)
 
 std::string Character::getCurrentCharacterFilePath()
 {
-	std::string character = getEnvVariable(ENV_CURRENT_CHAR);
+	std::string character = getEnvVariable(ENV_CURRENT_CHARACTER);
 	std::string campaign = getEnvVariable(ENV_CURRENT_CAMPAIGN);
 	std::string current_campaign_dir = campaigns_dir+campaign;
 	std::string current_character_dir = current_campaign_dir+"characters/";
