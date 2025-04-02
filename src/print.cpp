@@ -22,7 +22,7 @@ void getLongestKey(datamap<T> m, unsigned int* p_current_longest_len)
 			(*p_current_longest_len) = k.length();
 	}
 }
-void printData(Scope scope, Var depth)
+void printData(Scope scope, Var depth=-1)
 {
 	for(auto& [k,v] : scope.getDatamap<Var>())
 	{
@@ -89,28 +89,28 @@ void printData(Scope scope, Var depth)
 	}
 	fprintf(stdout,"\b");//Remove extraneous newline
 }
-void printCharacterVariables()
+void printCharacterVariables(Var depth=-1)
 {
 	Character c = Character();
 	std::string sigil(1,CHARACTER_SIGIL);
 	printHeader("("+sigil+") "+c.getName());
-	printData(c, -1);
+	printData(c, depth);
 }
-void printCampaignVariables()
+void printCampaignVariables(Var depth=-1)
 {
 	confirmCampaignVariablesFile();
 	Campaign m = Campaign();
 	std::string sigil(1,CAMPAIGN_SIGIL);
 	std::string m_name = getEnvVariable(ENV_CURRENT_CAMPAIGN);
 	printHeader("("+sigil+") "+left(m_name,m_name.length()-1));// Omit trailing '/'
-	printData(m, -1);
+	printData(m, depth);
 }
-void printShellVariables()
+void printShellVariables(Var depth=-1)
 {
 	Shell s = Shell();
 	std::string sigil(1,SHELL_SIGIL);
 	printHeader("("+sigil+") "+"Shell");
-	printData(s, -1);
+	printData(s, depth);
 }
 int main(int argc, char** argv)
 {
@@ -120,16 +120,7 @@ int main(int argc, char** argv)
 	if(argc > 4)
 		output(Warning,"Print expects no more than four arguments. All args past \"%s\" will be ignored.",argv[1]);
 
-	if(argc == 1)
-	{
-		printShellVariables();
-		fprintf(stdout,"\n");
-		printCampaignVariables();
-		fprintf(stdout,"\n");
-		printCharacterVariables();
-		return 0;
-	}
-	else if(chkFlagHelp(argv))
+	if(chkFlagHelp(argv))
 	{
 		fprintf(stdout,"USAGE:\n");
 		fprintf(stdout,"\tprint\n");
@@ -203,12 +194,15 @@ int main(int argc, char** argv)
 				return -1;
 			}
 
-			depth = Var(std::string(argv[i+1]));
-			i++;
-			if(!depth.isInt())
+			if(i < argc-1)
 			{
-				output(Error,"Invalid value \'%s\" for depth.",depth.c_str());
-				return -1;
+				depth = Var(std::string(argv[i+1]));
+				i++;
+				if(!depth.isInt())
+				{
+					output(Error,"Invalid value \'%s\" for depth.",depth.c_str());
+					return -1;
+				}
 			}
 		}
 		else
@@ -216,6 +210,16 @@ int main(int argc, char** argv)
 			output(Error,"Unknown option \"%s\".",argv[i]);
 			return -1;
 		}
+	}
+
+	if(data.isEmpty())
+	{
+		printShellVariables(depth);
+		fprintf(stdout,"\n");
+		printCampaignVariables(depth);
+		fprintf(stdout,"\n");
+		printCharacterVariables(depth);
+		return 0;
 	}
 	printData(data, depth);
 }
