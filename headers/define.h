@@ -48,7 +48,7 @@
 #define OP_MODA				"%="
 
 //Environment variables
-#define ENV_CURRENT_CHARACTER		"CURRENT_CHAR"
+#define ENV_CURRENT_CHARACTER		"CURRENT_CHARACTER"
 #define ENV_CURRENT_CAMPAIGN		"CURRENT_CAMPAIGN"
 
 //Hidden Character variables
