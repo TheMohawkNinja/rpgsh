@@ -10,7 +10,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	chkFlagAppDesc(argv,"Loads a character or campaign.");
+	chkFlagAppDesc(argv,"Loads a campaign and/or character.");
 	chkFlagModifyVariables(argv,false);
 
 	if(chkFlagHelp(argv))
@@ -19,6 +19,7 @@ int main(int argc, char** argv)
 		fprintf(stdout,"\tload [%sOPTIONS%s]\n\n",TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"OPTIONS:\n");
 		fprintf(stdout,"\t-c %scharacter%s\tSets %scharacter%s as the currently loaded character if it exists\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t-c %s/campaign%s/%scharacter%s\tSets %scamapign%s as the curerntly loaded campaign if it exists, and sets %scharacter%s as the currently loaded character if it exists\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\t-m %scampaign%s\tSets %scampaign%s as the currently loaded campaign if it exists\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		return 0;
 	}
@@ -38,7 +39,7 @@ int main(int argc, char** argv)
 		else
 		{
 			std::string arg2 = std::string(argv[2]);
-			campaign_name = left(arg2,findu(arg2,'/')-1);
+			campaign_name = left(arg2,findu(arg2,'/'));
 			character_name = right(arg2,findu(arg2,'/')+1);
 		}
 	}
@@ -54,9 +55,9 @@ int main(int argc, char** argv)
 			campaign_name = std::string(argv[2]);
 		}
 	}
-	else if(argv[1][0] == '-')
+	else
 	{
-		output(Error,"Unknown option \"%s\"\n",argv[1]);
+		output(Error,"Unknown option \"%s\"",argv[1]);
 		return -1;
 	}
 
@@ -79,8 +80,9 @@ int main(int argc, char** argv)
 
 	if(campaign_name != "")
 	{
+		if(campaign_name.back() != '/') campaign_name += '/';
 		setEnvVariable(ENV_CURRENT_CAMPAIGN,campaign_name);
-		output(Info,"Loaded campaign \"%s\".",campaign_name.c_str());
+		output(Info,"Loaded campaign \"%s\".",left(campaign_name,campaign_name.length()-1).c_str());
 	}
 	if(character_name != "")
 	{
