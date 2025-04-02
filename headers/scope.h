@@ -38,6 +38,9 @@ class Scope
 		std::string getDatasource();
 		void setDatasource(std::string path);
 
+		//Does the scope have any data?
+		bool isEmpty();
+
 		//Check if key exists
 		template <typename T>
 		bool keyExists(std::string key);

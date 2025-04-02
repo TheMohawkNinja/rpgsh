@@ -58,6 +58,11 @@ void Scope::setDatasource(std::string path)
 	datasource = path;
 }
 
+//Does the scope have any data?
+bool Scope::isEmpty()
+{
+	return !(currencies.size()+dice.size()+vars.size()+wallets.size());
+}
 
 //Check if key exists
 template<>
