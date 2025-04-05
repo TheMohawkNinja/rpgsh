@@ -22,30 +22,48 @@ void getLongestKey(datamap<T> m, unsigned int* p_current_longest_len)
 			(*p_current_longest_len) = k.length();
 	}
 }
-void printData(Scope scope, Var depth=-1)
+void printData(Scope scope, Var depth=-1, bool raw=false)
 {
 	for(auto& [k,v] : scope.getDatamap<Var>())
 	{
 		if(k[0] == '.' || (depth>=0 && depth<countu(k,'/')+1)) continue;
-		fprintf(stdout,"%s%sVar%s%s",TEXT_BOLD,VAR_COLOR,TEXT_NORMAL,addSpaces(COLUMN_PADDING).c_str());
-		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
-		fprintf(stdout,"%sValue:  %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.Value));
+		if(!raw)
+		{
+			fprintf(stdout,"%s%sVar%s%s",TEXT_BOLD,VAR_COLOR,TEXT_NORMAL,addSpaces(COLUMN_PADDING).c_str());
+			fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
+			fprintf(stdout,"%sValue:  %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.Value));
+		}
+		else
+		{
+			fprintf(stdout,"%s\n",makePretty(v.Value));
+		}
 		fprintf(stdout,"\n");
 	}
 	for(auto& [k,v] : scope.getDatamap<Dice>())
 	{
 		if((k[0] == '.') || (depth>=0 && depth<countu(k,'/')+1)) continue;
-		fprintf(stdout,"%s%sDice%s%s",TEXT_BOLD,DICE_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
-		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
-		if(v.List != "")
+		if(!raw)
 		{
-			fprintf(stdout,"%sList:         %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.List));
+			fprintf(stdout,"%s%sDice%s%s",TEXT_BOLD,DICE_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
+			fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
+
+			if(v.List != "")
+			{
+				fprintf(stdout,"%sList:         %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.List));
+			}
+			else
+			{
+				fprintf(stdout,"%sQuantity:     %s%u\n",TEXT_ITALIC,TEXT_NORMAL,v.Quantity);
+				fprintf(stdout,"%sFaces:        %s%u\n",TEXT_ITALIC,TEXT_NORMAL,v.Faces);
+				fprintf(stdout,"%sModifier:     %s%d\n",TEXT_ITALIC,TEXT_NORMAL,v.Modifier);
+			}
 		}
 		else
 		{
-			fprintf(stdout,"%sQuantity:     %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(std::to_string(v.Quantity)));
-			fprintf(stdout,"%sFaces:        %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(std::to_string(v.Faces)));
-			fprintf(stdout,"%sModifier:     %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(std::to_string(v.Modifier)));
+			if(v.List != "")
+				fprintf(stdout,"%s\n",makePretty(v.List));
+			else
+				fprintf(stdout,"%ud%u%s%d\n",v.Quantity,v.Faces,v.Modifier>=0 ? "+" : "",v.Modifier);
 		}
 		fprintf(stdout,"\n");
 	}
@@ -61,25 +79,29 @@ void printData(Scope scope, Var depth=-1)
 			if(c.Name.length() > longest_cur)
 				longest_cur = c.Name.length();
 		}
-
-		fprintf(stdout,"%s%sWallet%s%s",TEXT_BOLD,WALLET_COLOR,TEXT_NORMAL,addSpaces(longest_cur+COLUMN_PADDING-5).c_str());
-		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
+		if(!raw)
+		{
+			fprintf(stdout,"%s%sWallet%s%s",TEXT_BOLD,WALLET_COLOR,TEXT_NORMAL,addSpaces(longest_cur+COLUMN_PADDING-5).c_str());
+			fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
+		}
 
 		//Print values
 		for(auto& [c,q] : v)
 		{
 			if(!q) continue;
-
 			fprintf(stdout,"%s%s:%s%s",TEXT_ITALIC,c.Name.c_str(),TEXT_NORMAL,addSpaces(longest_cur-c.Name.length()+COLUMN_PADDING).c_str());
-			fprintf(stdout,"%s\n",makePretty(std::to_string(q)));
+			fprintf(stdout,"%d\n",q);
 		}
 		fprintf(stdout,"\n");
 	}
 	for(auto& [k,v] : scope.getDatamap<Currency>())
 	{
 		if((k[0] == '.') || (depth>=0 && depth<countu(k,'/')+1)) continue;
-		fprintf(stdout,"%s%sCurrency%s%s",TEXT_BOLD,CURRENCY_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
-		fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
+		if(!raw)
+		{
+			fprintf(stdout,"%s%sCurrency%s%s",TEXT_BOLD,CURRENCY_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
+			fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
+		}
 		fprintf(stdout,"%sSystem:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.System));
 		fprintf(stdout,"%sName:             %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.Name));
 		fprintf(stdout,"%sSmallerAmount:    %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(std::to_string(v.SmallerAmount)));
@@ -89,30 +111,30 @@ void printData(Scope scope, Var depth=-1)
 	}
 	fprintf(stdout,"\b");//Remove extraneous newline
 }
-void printCharacterVariables(Var depth=-1)
+void printCharacterVariables(Var depth=-1, bool raw=false)
 {
 	Character c = Character();
 	std::string sigil(1,CHARACTER_SIGIL);
-	printHeader("("+sigil+") "+c.getName());
-	printData(c, depth);
+	if(!raw) printHeader("("+sigil+") "+c.getName());
+	printData(c, depth, raw);
 }
-void printCampaignVariables(Var depth=-1)
+void printCampaignVariables(Var depth=-1, bool raw=false)
 {
 	confirmCampaignVariablesFile();
 	Campaign m = Campaign();
 	std::string sigil(1,CAMPAIGN_SIGIL);
 	std::string m_name = getEnvVariable(ENV_CURRENT_CAMPAIGN);
-	printHeader("("+sigil+") "+left(m_name,m_name.length()-1));// Omit trailing '/'
-	printData(m, depth);
+	if(!raw) printHeader("("+sigil+") "+left(m_name,m_name.length()-1));// Omit trailing '/'
+	printData(m, depth, raw);
 }
-void printShellVariables(Var depth=-1)
+void printShellVariables(Var depth=-1, bool raw=false)
 {
 	Shell s = Shell();
 	std::string sigil(1,SHELL_SIGIL);
-	printHeader("("+sigil+") "+"Shell");
-	printData(s, depth);
+	if(!raw) printHeader("("+sigil+") "+"Shell");
+	printData(s, depth, raw);
 }
-int main(int argc, char** argv)
+int main(int argc, char** argv)//TODO: Crashing when trying to print single variable
 {
 	chkFlagAppDesc(argv,"Pretty prints variables, variable sets, and scopes.");
 	chkFlagModifyVariables(argv,false);
@@ -126,8 +148,10 @@ int main(int argc, char** argv)
 		fprintf(stdout,"\tprint\n");
 		fprintf(stdout,"\tprint [%svariable%s | %svariable set%s] [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\nOPTIONS:\n");
-		fprintf(stdout,"\t%snone%s\t\tPrints all variables in all scopes.\n",TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"\t-d %sn%s\t\tPrints data in the set with keys up to a depth (number of blocks of text separated by \'/\' in the key) of %sn%s.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t%snone%s\t\tPretty prints all variables in all scopes.\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t-d\t\t\tPretty prints all variables in all scopes up to a depth (number of blocks of text separated by \'/\' in the key) of %sn%s.\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t-d %sn%s\t\tPretty prints data in the set with keys up to a depth of %sn%s.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t-r\t\t\tOnly pretty print the data, no headers.\n");
 		fprintf(stdout,"\t%s | %s\tPrints this help text.\n",FLAG_HELPSHORT,FLAG_HELPLONG);
 		return 0;
 	}
@@ -135,12 +159,15 @@ int main(int argc, char** argv)
 
 	Scope data;
 	Var depth = -1;
+	bool raw = false;
 	for(int i=1; i<argc; i++)
 	{
 		std::string arg_str = std::string(argv[i]);
+		fprintf(stdout,"argv[%d] = %s\n",i,argv[i]);
 
 		if(isTypeSigil(argv[i][0]) && argv[i][1] == '{')
 		{
+			fprintf(stdout,"Looks like explicit constructor.\n");
 			try
 			{
 				switch(argv[i][0])
@@ -205,6 +232,10 @@ int main(int argc, char** argv)
 				}
 			}
 		}
+		else if(arg_str == "-r")
+		{
+			raw = true;
+		}
 		else
 		{
 			output(Error,"Unknown option \"%s\".",argv[i]);
@@ -214,12 +245,12 @@ int main(int argc, char** argv)
 
 	if(data.isEmpty())
 	{
-		printShellVariables(depth);
+		printShellVariables(depth,raw);
 		fprintf(stdout,"\n");
-		printCampaignVariables(depth);
+		printCampaignVariables(depth,raw);
 		fprintf(stdout,"\n");
-		printCharacterVariables(depth);
+		printCharacterVariables(depth,raw);
 		return 0;
 	}
-	printData(data, depth);
+	printData(data, depth, raw);
 }
