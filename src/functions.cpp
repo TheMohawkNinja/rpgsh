@@ -676,7 +676,7 @@ int runApp(std::string arg_str, bool redirect_output)
 		v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\)"),"\\)");
 		v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\{"),"\\{");
 		v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\}"),"\\}");
-		arg_str = std::regex_replace(arg_str,std::regex(v_str_it_pattern),"\""+getAppOutput(v_str).output[0]+"\"");
+		arg_str = std::regex_replace(arg_str,std::regex(v_str_it_pattern),getAppOutput(v_str).output[0]);
 		v_str_it++;
 	}
 	//Get args for program
