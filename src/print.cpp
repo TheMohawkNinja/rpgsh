@@ -134,7 +134,7 @@ void printShellVariables(Var depth=-1, bool raw=false)
 	if(!raw) printHeader("("+sigil+") "+"Shell");
 	printData(s, depth, raw);
 }
-int main(int argc, char** argv)//TODO: Crashing when trying to print single variable
+int main(int argc, char** argv)
 {
 	chkFlagAppDesc(argv,"Pretty prints variables, variable sets, and scopes.");
 	chkFlagModifyVariables(argv,false);
@@ -163,11 +163,9 @@ int main(int argc, char** argv)//TODO: Crashing when trying to print single vari
 	for(int i=1; i<argc; i++)
 	{
 		std::string arg_str = std::string(argv[i]);
-		fprintf(stdout,"argv[%d] = %s\n",i,argv[i]);
 
 		if(isTypeSigil(argv[i][0]) && argv[i][1] == '{')
 		{
-			fprintf(stdout,"Looks like explicit constructor.\n");
 			try
 			{
 				switch(argv[i][0])
