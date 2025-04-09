@@ -70,6 +70,8 @@ if [[ $EUID -eq 0 ]]; then
 	g++ $flags src/help.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-help
 	echo -e "\tsrc/history.cpp\t\t->\t$bold_white""/bin/rpgsh-history"$normal
 	g++ $flags src/history.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-history
+	echo -e "\tsrc/list.cpp\t\t->\t$bold_white""/bin/rpgsh-list"$normal
+	g++ $flags src/list.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-list
 	echo -e "\tsrc/load.cpp\t\t->\t$bold_white""/bin/rpgsh-load"$normal
 	g++ $flags src/load.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-load
 	echo -e "\tsrc/new.cpp\t\t->\t$bold_white""/bin/rpgsh-new"$normal
