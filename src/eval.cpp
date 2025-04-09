@@ -195,7 +195,7 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 			if(action == SetAddA)
 				output(Info,"Set \"%c%s%c/%s\" to \"%s\"",p_vi->scope.sigil,xref.c_str(),p_vi->evalType,(p_vi->key+k).c_str(),v.c_str());
 			else if(action == SetRemoveA && rk.isRemoved)
-				output(Warning,"Removed \"%c%s%c/%s\"",p_vi->scope.sigil,xref.c_str(),rk.type,k.c_str());
+				output(Info,"Variable \"%c%s%c/%s\" (value: \"%s\") has been deleted.",p_vi->scope.sigil,xref.c_str(),rk.type,k.c_str(),v.c_str());
 		}
 
 		if (action == SetAdd || action == SetRemove) return getSetStr(*p_vi);
