@@ -50,9 +50,6 @@ int main(int argc, char** argv)
 		std::string value = getAppOutput(vi.variable).output[0];
 		bool deleted = false;
 
-		fprintf(stdout,"%s%sDelete variable \"%c%s%c/%s\" (value: \"%s\") [y/N]?%s ",TEXT_YELLOW,TEXT_BOLD,vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str(),value.c_str(),TEXT_NORMAL);
-		if(getchar() != 'y') return 0;
-
 		if(vi.property != "")
 		{
 			output(Error,"Properties cannot be deleted.");
@@ -76,14 +73,12 @@ int main(int argc, char** argv)
 		}
 
 		vi.scope.save();
-		if(deleted)	output(Warning,"Variable \"%c%s%c/%s\" (value: \"%s\") has been deleted.",vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str(),value.c_str());
+		if(deleted)	output(Info,"Variable \"%c%s%c/%s\" (value: \"%s\") has been deleted.",vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str(),value.c_str());
 		else		output(Error,"Variable \"%c%s%c/%s\" does not exist to be deleted.",vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str());
 	}
 	else if(!onlyChkC && !onlyChkM && vi.variable.back() == '/')
 	{
 		std::string xref = (vi.xref != "" ? "["+vi.xref+"]" : "");
-		fprintf(stdout,"%s%sDelete variable set \"%c%s%c/%s\" (value: \"%s\") [y/N]?%s ",TEXT_YELLOW,TEXT_BOLD,vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str(),getSetStr(vi).c_str(),TEXT_NORMAL);
-		if(getchar() != 'y') return 0;
 
 		bool atLeastOneKeyRemoved = false;
 		struct RemovedKey
@@ -117,7 +112,7 @@ int main(int argc, char** argv)
 
 			if(rk.isRemoved)
 			{
-				output(Warning,"Variable \"%c%s%c/%s\" (value: \"%s\") has been deleted.",vi.scope.sigil,xref.c_str(),rk.type,k.c_str(),v.c_str());
+				output(Info,"Variable \"%c%s%c/%s\" (value: \"%s\") has been deleted.",vi.scope.sigil,xref.c_str(),rk.type,k.c_str(),v.c_str());
 				atLeastOneKeyRemoved = true;
 			}
 		}
@@ -144,7 +139,7 @@ int main(int argc, char** argv)
 
 			std::filesystem::remove(campaign_path+entry);
 			if(std::filesystem::exists(campaign_path+entry+".bak")) std::filesystem::remove(campaign_path+entry+".bak");
-			output(Warning,"Character file \"%s\" has been deleted.",(campaign_path+entry).c_str());
+			output(Info,"Character file \"%s\" has been deleted.",(campaign_path+entry).c_str());
 			return 0;
 		}
 
@@ -162,7 +157,7 @@ int main(int argc, char** argv)
 			if(getchar() != 'y') return 0;
 
 			std::filesystem::remove_all(campaigns_dir+entry);
-			output(Warning,"Campaign directory \"%s\" has been deleted.",(campaigns_dir+entry).c_str());
+			output(Info,"Campaign directory \"%s\" has been deleted.",(campaigns_dir+entry).c_str());
 			return 0;
 		}
 
