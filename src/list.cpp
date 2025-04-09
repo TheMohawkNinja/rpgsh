@@ -10,7 +10,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	chkFlagAppDesc(argv,"Lists characters, and/or campaigns.");
+	chkFlagAppDesc(argv,"Lists characters and/or campaigns.");
 	chkFlagModifyVariables(argv,true);
 	if(chkFlagHelp(argv))
 	{
