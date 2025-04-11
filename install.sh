@@ -60,6 +60,8 @@ if [[ $EUID -eq 0 ]]; then
 	g++ $flags src/banner.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-banner
 	echo -e "\tsrc/clear.cpp\t\t->\t$bold_white""/bin/rpgsh-clear"$normal
 	g++ $flags src/clear.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-clear
+	echo -e "\tsrc/copy.cpp\t\t->\t$bold_white""/bin/rpgsh-copy"$normal
+	g++ $flags src/copy.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-copy
 	echo -e "\tsrc/del.cpp\t\t->\t$bold_white""/bin/rpgsh-del"$normal
 	g++ $flags src/del.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-del
 	echo -e "\tsrc/edit.cpp\t\t->\t$bold_white""/bin/rpgsh-edit"$normal
