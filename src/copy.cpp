@@ -27,9 +27,9 @@ int main(int argc, char** argv)
 	}
 
 	std::string src, dst, src_campaign_path, dst_campaign_path, src_character_path, dst_character_path, src_character, dst_character;
-	//bool copy_c = false;
-	//bool copy_m = false;
-	//int copies = 1;
+	bool copy_c = false;
+	bool copy_m = false;
+	int copies = 1;
 	for(int i=1; i<argc; i++)
 	{
 		if((!strcmp(argv[i],"-c") || !strcmp(argv[i],"-m") || !strcmp(argv[i],"-n")) && (i == argc-1 || argv[i+1][0] == '-'))
@@ -44,8 +44,8 @@ int main(int argc, char** argv)
 		}
 		else if(!strcmp(argv[i],"-c"))
 		{
-			//copy_c = true;
-			//copy_m = false;
+			copy_c = true;
+			copy_m = false;
 			Character c = Character();
 			src = std::string(argv[i+1]);
 			i++;
@@ -136,8 +136,8 @@ int main(int argc, char** argv)
 		}
 		else if(!strcmp(argv[i],"-m"))
 		{
-			//copy_c = false;
-			//copy_m = true;
+			copy_c = false;
+			copy_m = true;
 			Character c = Character();
 			src = std::string(argv[i+1]);
 			i++;
@@ -171,12 +171,29 @@ int main(int argc, char** argv)
 
 				fprintf(stdout,"%s%sThe campaign \"%s\" exists, overwrite? [y/N]: %s",TEXT_YELLOW,TEXT_BOLD,dst.c_str(),TEXT_NORMAL);
 				if(getchar() != 'y') return 0;
-				//std::filesystem::remove(campaigns_dir+entry);
+				//std::filesystem::remove_all(campaigns_dir+entry);
 				output(Info,"Campaign directory \"%s\" has been deleted.",(campaigns_dir+entry).c_str());
 				dst_character_path = dst_character_path+entry;
 			}
 
 			fprintf(stdout,"Will copy \"%s\" to \"%s\"\n",src_campaign_path.c_str(),dst_campaign_path.c_str());
+		}
+		else if(!strcmp(argv[i],"-n"))
+		{
+			if(!Var(argv[i+1]).isInt())
+			{
+				output(,"Number of copies specified is not a number.");
+				return -1;
+			}
+			copies = atoi(argv[i+1]);
+		}
+
+		for(int i=0; i<copies; i++)
+		{
+			if(copy_c)
+			{
+				for(int ch=dst_character.length(); ch>0; ch--)
+			}
 		}
 	}
 
