@@ -145,20 +145,22 @@ int main(int argc, char** argv)
 			c_to_be_deleted = right(c_to_be_deleted,findu(c_to_be_deleted,'/')+1);
 		}
 
+		std::string campaign_name = left(campaign_path,rfindu(campaign_path,"/characters/"));
+		campaign_name = right(campaign_name,rfindu(campaign_name,'/')+1);
 		for(const auto& entry : getDirectoryListing(campaign_path))
 		{
 			if(stringcasecmp(entry,c_to_be_deleted+".char") || std::filesystem::is_directory(campaign_path+entry)) continue;
 
-			fprintf(stdout,"%s%sDelete character \"%s\" [y/N]?%s ",TEXT_YELLOW,TEXT_BOLD,left(entry,entry.length()-5).c_str(),TEXT_NORMAL);
+			fprintf(stdout,"%s%sDelete character \"%s\" [y/N]?%s ",TEXT_YELLOW,TEXT_BOLD,(campaign_name+"/"+left(entry,entry.length()-5)).c_str(),TEXT_NORMAL);
 			if(getchar() != 'y') return 0;
 
 			std::filesystem::remove(campaign_path+entry);
 			if(std::filesystem::exists(campaign_path+entry+".bak")) std::filesystem::remove(campaign_path+entry+".bak");
-			output(Info,"Character file \"%s\" has been deleted.",(campaign_path+entry).c_str());
+			output(Info,"Character \"%s\" has been deleted.",(campaign_name+"/"+left(entry,entry.length()-5)).c_str());
 			return 0;
 		}
 
-		output(Error,"Character file \"%s.char\" does not exist to be deleted.",(campaign_path+c_to_be_deleted).c_str());
+		output(Error,"Character \"%s\" does not exist to be deleted.",(campaign_name+"/"+c_to_be_deleted).c_str());
 		return -1;
 	}
 	else
@@ -172,11 +174,11 @@ int main(int argc, char** argv)
 			if(getchar() != 'y') return 0;
 
 			std::filesystem::remove_all(campaigns_dir+entry);
-			output(Info,"Campaign directory \"%s\" has been deleted.",(campaigns_dir+entry).c_str());
+			output(Info,"Campaign \"%s\" has been deleted.",entry.c_str());
 			return 0;
 		}
 
-		output(Error,"Campaign directory \"%s\" does not exist to be deleted.",(campaigns_dir+m_to_be_deleted).c_str());
+		output(Error,"Campaign \"%s\" does not exist to be deleted.",m_to_be_deleted.c_str());
 		return -1;
 	}
 
