@@ -9,8 +9,8 @@ int main(int argc, char** argv)
 		output(Error,"copy expects at least 1 argument.");
 		exit(-1);
 	}
-	if(argc > 4)
-		output(Warning,"copy only expects 1, 2, or 3 arguments, ignoring all other arguments");
+	if(argc > 5)
+		output(Warning,"copy expects no more than 5 arguments, ignoring all other arguments");
 
 	chkFlagAppDesc(argv,"Copies a character or campaign, appending an incrementing number to each copy.");
 	chkFlagModifyVariables(argv,true);
@@ -48,7 +48,8 @@ int main(int argc, char** argv)
 			copy_m = false;
 			Character c = Character();
 			src = std::string(argv[i+1]);
-			i++;
+
+			//Check if destination is specified. If not, use source name
 			if(argc > i+1)
 			{
 				dst = std::string(argv[i+1]);
@@ -59,6 +60,7 @@ int main(int argc, char** argv)
 				dst = src;
 			}
 
+			//Check if using campaign/character syntax
 			if(findu(src,'/') == std::string::npos)
 			{
 				src_character_path = left(c.getDatasource(),rfindu(c.getDatasource(),'/')+1);
@@ -80,6 +82,7 @@ int main(int argc, char** argv)
 				dst_character = right(dst,findu(dst,'/')+1);
 			}
 
+			//Parse campaign if using campaign/character syntax
 			bool character_exists = false;
 			bool campaign_exists = false;
 			if(findu(src,'/') != std::string::npos)
@@ -110,6 +113,7 @@ int main(int argc, char** argv)
 				}
 			}
 
+			//Check if source character exists and if potentially overwriting destination character
 			for(const auto& entry : getDirectoryListing(left(src_character_path,rfindu(src_character_path,'/'))))
 			{
 				if(stringcasecmp(entry,src_character+".char") || std::filesystem::is_directory(src_character_path+entry)) continue;
@@ -121,18 +125,8 @@ int main(int argc, char** argv)
 				output(Error,"Character \"%s\" does not exist to be copied.",src.c_str());
 				return -1;
 			}
-			character_exists = false;
-			for(const auto& entry : getDirectoryListing(left(dst_character_path,rfindu(dst_character_path,'/'))))
-			{
-				if(stringcasecmp(entry,dst_character+".char") || std::filesystem::is_directory(dst_character_path+entry)) continue;
-				fprintf(stdout,"%s%sThe character \"%s\" exists, overwrite? [y/N]: %s",TEXT_YELLOW,TEXT_BOLD,dst.c_str(),TEXT_NORMAL);
-				if(getchar() != 'y') return 0;
-				//std::filesystem::remove(dst_character_path+entry);
-				output(Info,"Character file \"%s\" has been deleted.",dst_character_path.c_str());
-			}
 
 			dst_character_path += dst_character+".char";
-			fprintf(stdout,"Will copy \"%s\" (%s) to \"%s\" (%s)\n",src_character.c_str(),src_character_path.c_str(),dst_character.c_str(),dst_character_path.c_str());
 		}
 		else if(!strcmp(argv[i],"-m"))
 		{
@@ -140,7 +134,8 @@ int main(int argc, char** argv)
 			copy_m = true;
 			Character c = Character();
 			src = std::string(argv[i+1]);
-			i++;
+
+			//Check if destination is specified. If not, use source name
 			if(argc > i+1)
 			{
 				dst = std::string(argv[i+1]);
@@ -151,6 +146,7 @@ int main(int argc, char** argv)
 				dst = src;
 			}
 
+			//Check if source campaign exists
 			bool campaign_exists = false;
 			for(const auto& entry : getDirectoryListing(campaigns_dir))
 			{
@@ -164,36 +160,58 @@ int main(int argc, char** argv)
 				output(Error,"Campaign \"%s\" does not exist to be copied.",src.c_str());
 				return -1;
 			}
-			campaign_exists = false;
-			for(const auto& entry : getDirectoryListing(campaigns_dir))
-			{
-				if(stringcasecmp(entry,dst) || !std::filesystem::is_directory(campaigns_dir+entry)) continue;
-
-				fprintf(stdout,"%s%sThe campaign \"%s\" exists, overwrite? [y/N]: %s",TEXT_YELLOW,TEXT_BOLD,dst.c_str(),TEXT_NORMAL);
-				if(getchar() != 'y') return 0;
-				//std::filesystem::remove_all(campaigns_dir+entry);
-				output(Info,"Campaign directory \"%s\" has been deleted.",(campaigns_dir+entry).c_str());
-				dst_character_path = dst_character_path+entry;
-			}
-
-			fprintf(stdout,"Will copy \"%s\" to \"%s\"\n",src_campaign_path.c_str(),dst_campaign_path.c_str());
 		}
 		else if(!strcmp(argv[i],"-n"))
 		{
 			if(!Var(argv[i+1]).isInt())
 			{
-				output(,"Number of copies specified is not a number.");
+				output(Error,"Number of copies specified is not a number.");
 				return -1;
 			}
 			copies = atoi(argv[i+1]);
 		}
+	}
 
-		for(int i=0; i<copies; i++)
+	if(!copy_c && !copy_m)
+	{
+		output(Error,"Expected \"-c\" or \"-m\".");
+		return -1;
+	}
+
+	int copy_start = 1;
+	if(isdigit(src[src.length()-1]))
+	{
+		std::string copy_start_str;
+		for(int i=src.length(); i>0; i--)
 		{
-			if(copy_c)
-			{
-				for(int ch=dst_character.length(); ch>0; ch--)
-			}
+			if(!isdigit(src[i])) break;
+			copy_start_str.insert(copy_start_str.begin(),src[i]);
+		}
+		try
+		{
+			copy_start = std::stoi(copy_start_str);
+		}
+		catch(...)//Should only trigger if the number is >INT_MAX, but doesn't hurt to catch other issues
+		{
+			output(Error,"Unable to get starting copy index.");
+			return -1;
+		}
+	}
+	for(int i=0; i<copies; i++)
+	{
+		std::string copy_num = std::to_string(i+copy_start);
+		if(copy_c)
+		{
+			std::filesystem::copy(src_character_path,left(dst_character_path,dst_character_path.length()-5)+copy_num+".char");
+			if(findu(dst,'/') == std::string::npos)
+				output(Info,"Character \"%s\" has been created.",(dst_character+copy_num).c_str());
+			else
+				output(Info,"Character \"%s\" has been created.",(left(dst,findu(dst,'/')+1)+dst_character+copy_num).c_str());
+		}
+		else if(copy_m)
+		{
+			std::filesystem::copy(src_campaign_path,dst_campaign_path+copy_num,std::filesystem::copy_options::recursive);
+			output(Info,"Campaign \"%s\" has been created.",(dst+copy_num).c_str());
 		}
 	}
 
