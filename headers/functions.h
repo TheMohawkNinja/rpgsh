@@ -31,6 +31,10 @@ struct GetAppOutputInfo
 	int status = 0;
 	std::vector<std::string> output;
 };
+struct CMStr
+{
+	std::string c, m;
+};
 
 void output(OutputLevel level, const char* format, ...);
 
@@ -86,6 +90,8 @@ std::vector<std::string> getDirectoryListing(std::string path);
 std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir,std::string xref);
 void loadXRef(std::string* arg, Scope* p_scope);
 VariableInfo parseVariable(std::string v);// Derive information about variable from string
+
+CMStr parseCMStr(std::string s);
 
 void printBadOpAndThrow(std::string bad_op);
 

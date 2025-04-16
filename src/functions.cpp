@@ -585,6 +585,23 @@ VariableInfo parseVariable(std::string v)// Derive information about variable fr
 	return vi;
 }
 
+CMStr parseMCStr(std::string s)
+{
+	CMStr cm;
+	unsigned long int slash = findu(s,'/');
+	if(slash == std::string::npos)
+	{
+		cm.c = s;
+		return cm;
+	}
+	else
+	{
+		cm.m = left(s,slash);
+		cm.c = right(s,slash+1);
+	}
+	return cm;
+}
+
 void padding()
 {
 	Config config = Config();
