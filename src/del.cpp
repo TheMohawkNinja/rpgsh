@@ -134,17 +134,17 @@ int main(int argc, char** argv)
 	{
 		Character c = Character();
 		std::string campaign_path;
-		CMStr cm = parseCMStr(std::string(argv[2]));
-		if(cm.m == "")
+		MCStr mc = parseMCStr(std::string(argv[2]));
+		if(mc.m == "")
 			campaign_path = left(c.getDatasource(),rfindu(c.getDatasource(),'/')+1);
 		else
-			campaign_path = campaigns_dir+cm.m+"/characters/";
+			campaign_path = campaigns_dir+mc.m+"/characters/";
 
 		std::string campaign_name = left(campaign_path,rfindu(campaign_path,"/characters/"));
 		campaign_name = right(campaign_name,rfindu(campaign_name,'/')+1);
 		for(const auto& entry : getDirectoryListing(campaign_path))
 		{
-			if(stringcasecmp(entry,cm.c+".char") || std::filesystem::is_directory(campaign_path+entry)) continue;
+			if(stringcasecmp(entry,mc.c+".char") || std::filesystem::is_directory(campaign_path+entry)) continue;
 
 			fprintf(stdout,"%s%sDelete character \"%s\" [y/N]?%s ",TEXT_YELLOW,TEXT_BOLD,(campaign_name+"/"+left(entry,entry.length()-5)).c_str(),TEXT_NORMAL);
 			if(getchar() != 'y') return 0;
@@ -155,7 +155,7 @@ int main(int argc, char** argv)
 			return 0;
 		}
 
-		output(Error,"Character \"%s\" does not exist to be deleted.",(campaign_name+"/"+cm.c).c_str());
+		output(Error,"Character \"%s\" does not exist to be deleted.",(campaign_name+"/"+mc.c).c_str());
 		return -1;
 	}
 	else
