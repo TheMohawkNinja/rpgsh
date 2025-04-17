@@ -31,9 +31,9 @@ struct GetAppOutputInfo
 	int status = 0;
 	std::vector<std::string> output;
 };
-struct CMStr
+struct MCStr
 {
-	std::string c, m;
+	std::string m, c;
 };
 
 void output(OutputLevel level, const char* format, ...);
@@ -91,7 +91,7 @@ std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir
 void loadXRef(std::string* arg, Scope* p_scope);
 VariableInfo parseVariable(std::string v);// Derive information about variable from string
 
-CMStr parseCMStr(std::string s);
+MCStr parseMCStr(std::string s);
 
 void printBadOpAndThrow(std::string bad_op);
 
