@@ -26,7 +26,8 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	std::string src, dst, src_campaign_path, dst_campaign_path, src_character_path, dst_character_path, src_character, dst_character;
+	std::string src, dst, src_campaign_path, dst_campaign_path, src_character_path, dst_character_path;
+	MCStr src_mc, dst_mc;
 	bool copy_c = false;
 	bool copy_m = false;
 	int copies = 1;
@@ -50,9 +51,9 @@ int main(int argc, char** argv)
 			src = std::string(argv[i+1]);
 
 			//Check if destination is specified. If not, use source name
-			if(argc > i+1)
+			if(argv[i+2] && argv[i+2][0] != '-')
 			{
-				dst = std::string(argv[i+1]);
+				dst = std::string(argv[i+2]);
 				i++;
 			}
 			else
@@ -60,55 +61,47 @@ int main(int argc, char** argv)
 				dst = src;
 			}
 
+			src_mc = parseMCStr(src);
+			dst_mc = parseMCStr(dst);
+
 			//Check if using campaign/character syntax
-			if(findu(src,'/') == std::string::npos)
-			{
+			if(src_mc.m == "")
 				src_character_path = left(c.getDatasource(),rfindu(c.getDatasource(),'/')+1);
-				src_character = src;
-			}
 			else
-			{
-				src_character_path = campaigns_dir+left(src,findu(src,'/')+1)+"characters/";
-				src_character = right(src,findu(src,'/')+1);
-			}
-			if(findu(dst,'/') == std::string::npos)
-			{
+				src_character_path = campaigns_dir+src_mc.m+"/characters/";
+
+			if(dst_mc.m == "")
 				dst_character_path = left(c.getDatasource(),rfindu(c.getDatasource(),'/')+1);
-				dst_character = dst;
-			}
 			else
-			{
-				dst_character_path = campaigns_dir+left(dst,findu(dst,'/')+1)+"characters/";
-				dst_character = right(dst,findu(dst,'/')+1);
-			}
+				dst_character_path = campaigns_dir+dst_mc.m+"/characters/";
 
 			//Parse campaign if using campaign/character syntax
 			bool character_exists = false;
 			bool campaign_exists = false;
-			if(findu(src,'/') != std::string::npos)
+			if(src_mc.m != "")
 			{
 				for(const auto& entry : getDirectoryListing(campaigns_dir))
 				{
-					if(stringcasecmp(entry,left(src,findu(src,'/'))) || !std::filesystem::is_directory(campaigns_dir+entry)) continue;
+					if(stringcasecmp(entry,src_mc.m) || !std::filesystem::is_directory(campaigns_dir+entry)) continue;
 					campaign_exists = true;
 				}
 				if(!campaign_exists)
 				{
-					output(Error,"Source campaign \"%s\" does not exist.",left(src,findu(src,'/')).c_str());
+					output(Error,"Source campaign \"%s\" does not exist.",src_mc.m.c_str());
 					return -1;
 				}
 			}
 			campaign_exists = false;
-			if(findu(dst,'/') != std::string::npos)
+			if(dst_mc.m != "")
 			{
 				for(const auto& entry : getDirectoryListing(campaigns_dir))
 				{
-					if(stringcasecmp(entry,left(dst,findu(dst,'/'))) || !std::filesystem::is_directory(campaigns_dir+entry)) continue;
+					if(stringcasecmp(entry,dst_mc.m) || !std::filesystem::is_directory(campaigns_dir+entry)) continue;
 					campaign_exists = true;
 				}
 				if(!campaign_exists)
 				{
-					output(Error,"Destination campaign \"%s\" does not exist.",left(dst,findu(dst,'/')).c_str());
+					output(Error,"Source campaign \"%s\" does not exist.",dst_mc.m.c_str());
 					return -1;
 				}
 			}
@@ -116,7 +109,7 @@ int main(int argc, char** argv)
 			//Check if source character exists and if potentially overwriting destination character
 			for(const auto& entry : getDirectoryListing(left(src_character_path,rfindu(src_character_path,'/'))))
 			{
-				if(stringcasecmp(entry,src_character+".char") || std::filesystem::is_directory(src_character_path+entry)) continue;
+				if(stringcasecmp(entry,src_mc.c+".char") || std::filesystem::is_directory(src_character_path+entry)) continue;
 				src_character_path += entry;
 				character_exists = true;
 			}
@@ -126,7 +119,7 @@ int main(int argc, char** argv)
 				return -1;
 			}
 
-			dst_character_path += dst_character+".char";
+			dst_character_path += dst_mc.c+".char";
 		}
 		else if(!strcmp(argv[i],"-m"))
 		{
@@ -136,9 +129,9 @@ int main(int argc, char** argv)
 			src = std::string(argv[i+1]);
 
 			//Check if destination is specified. If not, use source name
-			if(argc > i+1)
+			if(argv[i+2] && argv[i+2][0] != '-')
 			{
-				dst = std::string(argv[i+1]);
+				dst = std::string(argv[i+2]);
 				i++;
 			}
 			else
@@ -197,16 +190,28 @@ int main(int argc, char** argv)
 			return -1;
 		}
 	}
+
+	//If just making one copy and changing the name, don't append a number
+	if(copy_c && src_mc.c != dst_mc.c && copies == 1)
+	{
+		std::filesystem::copy(src_character_path,left(dst_character_path,dst_character_path.length()-5)+".char");
+		output(Info,"Character \"%s\" has been created.",dst.c_str());
+		return 0;
+	}
+	if(copy_m && src_mc.m != dst_mc.m && copies == 1)
+	{
+		std::filesystem::copy(src_campaign_path,dst_campaign_path,std::filesystem::copy_options::recursive);
+		output(Info,"Campaign \"%s\" has been created.",dst.c_str());
+		return 0;
+	}
+
 	for(int i=0; i<copies; i++)
 	{
 		std::string copy_num = std::to_string(i+copy_start);
 		if(copy_c)
 		{
 			std::filesystem::copy(src_character_path,left(dst_character_path,dst_character_path.length()-5)+copy_num+".char");
-			if(findu(dst,'/') == std::string::npos)
-				output(Info,"Character \"%s\" has been created.",(dst_character+copy_num).c_str());
-			else
-				output(Info,"Character \"%s\" has been created.",(left(dst,findu(dst,'/')+1)+dst_character+copy_num).c_str());
+			output(Info,"Character \"%s\" has been created.",(dst+copy_num).c_str());
 		}
 		else if(copy_m)
 		{
