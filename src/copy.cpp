@@ -192,13 +192,13 @@ int main(int argc, char** argv)
 	}
 
 	//If just making one copy and changing the name, don't append a number
-	if(copy_c && src_mc.c != dst_mc.c && copies == 1)
+	if(copy_c && (src_mc.m != dst_mc.m || src_mc.c != dst_mc.c) && copies == 1)
 	{
 		std::filesystem::copy(src_character_path,left(dst_character_path,dst_character_path.length()-5)+".char");
 		output(Info,"Character \"%s\" has been created.",dst.c_str());
 		return 0;
 	}
-	if(copy_m && src_mc.m != dst_mc.m && copies == 1)
+	if(copy_m && src != dst && copies == 1)
 	{
 		std::filesystem::copy(src_campaign_path,dst_campaign_path,std::filesystem::copy_options::recursive);
 		output(Info,"Campaign \"%s\" has been created.",dst.c_str());
