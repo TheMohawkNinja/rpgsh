@@ -6,7 +6,7 @@
 //Version info
 #define MAJOR_VERSION			0
 #define MINOR_VERSION			17
-#define PATCH_VERSION			1
+#define PATCH_VERSION			2
 
 //Comment character definition
 #define COMMENT				'!'
