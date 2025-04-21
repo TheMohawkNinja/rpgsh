@@ -24,70 +24,50 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	std::string character_name, campaign_name;
-	if(!strcmp(argv[1],"-c"))
+	if(!strcmp(argv[1],"-c") && argc == 2)
 	{
-		if(argc == 2)
-		{
-			output(Error,"Missing character name.");
-			return -1;
-		}
-		else if(findu(std::string(argv[2]),'/') == std::string::npos)
-		{
-			character_name = std::string(argv[2]);
-		}
-		else
-		{
-			std::string arg2 = std::string(argv[2]);
-			campaign_name = left(arg2,findu(arg2,'/'));
-			character_name = right(arg2,findu(arg2,'/')+1);
-		}
+		output(Error,"Missing character name.");
+		return -1;
 	}
-	else if(!strcmp(argv[1],"-m"))
+	else if(!strcmp(argv[1],"-m") && argc == 2)
 	{
-		if(argc == 2)
-		{
-			output(Error,"Missing campaign name.");
-			return -1;
-		}
-		else
-		{
-			campaign_name = std::string(argv[2]);
-		}
+		output(Error,"Missing campaign name.");
+		return -1;
 	}
-	else
+	else if(argc == 2)
 	{
 		output(Error,"Unknown option \"%s\"",argv[1]);
 		return -1;
 	}
 
-	if(campaign_name != "" &&
-	  (!std::filesystem::exists(campaigns_dir+campaign_name) || (std::filesystem::exists(campaigns_dir+campaign_name) && !std::filesystem::is_directory(campaigns_dir+campaign_name))))
+	MCStr mc = parseMCStr(argv[2]);
+
+	if(mc.m != "" &&
+	  (!std::filesystem::exists(campaigns_dir+mc.m) || (std::filesystem::exists(campaigns_dir+mc.m) && !std::filesystem::is_directory(campaigns_dir+mc.m))))
 	{
-		output(Error,"Campaign \"%s\" does not exist.",campaign_name.c_str());
+		output(Error,"Campaign \"%s\" does not exist.",mc.m.c_str());
 		return -1;
 	}
-	else if(character_name != "" && campaign_name == "" && !std::filesystem::exists(campaigns_dir+getEnvVariable(ENV_CURRENT_CAMPAIGN)+"/characters/"+character_name+".char"))
+	else if(mc.c != "" && mc.m == "" && !std::filesystem::exists(campaigns_dir+getEnvVariable(ENV_CURRENT_CAMPAIGN)+"/characters/"+mc.c+".char"))
 	{
-		output(Error,"Character \"%s\" does not exist in this campaign.",character_name.c_str());
+		output(Error,"Character \"%s\" does not exist in this campaign.",mc.c.c_str());
 		return -1;
 	}
-	else if(character_name != "" && campaign_name != "" && !std::filesystem::exists(campaigns_dir+campaign_name+"/characters/"+character_name+".char"))
+	else if(mc.c != "" && mc.m != "" && !std::filesystem::exists(campaigns_dir+mc.m+"/characters/"+mc.c+".char"))
 	{
-		output(Error,"Character \"%s\" does not exist in the \"%s\" camapign.",character_name.c_str(),campaign_name.c_str());
+		output(Error,"Character \"%s\" does not exist in the \"%s\" camapign.",mc.c.c_str(),mc.m.c_str());
 		return -1;
 	}
 
-	if(campaign_name != "")
+	if(mc.m != "")
 	{
-		if(campaign_name.back() != '/') campaign_name += '/';
-		setEnvVariable(ENV_CURRENT_CAMPAIGN,campaign_name);
-		output(Info,"Loaded campaign \"%s\".",left(campaign_name,campaign_name.length()-1).c_str());
+		setEnvVariable(ENV_CURRENT_CAMPAIGN,mc.m+"/");
+		output(Info,"Loaded campaign \"%s\".",mc.m.c_str());
 	}
-	if(character_name != "")
+	if(mc.c != "")
 	{
-		setEnvVariable(ENV_CURRENT_CHARACTER,character_name);
-		output(Info,"Loaded character \"%s\".",character_name.c_str());
+		setEnvVariable(ENV_CURRENT_CHARACTER,mc.c);
+		output(Info,"Loaded character \"%s\".",mc.c.c_str());
 	}
 
 	return 0;
