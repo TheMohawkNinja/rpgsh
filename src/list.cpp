@@ -55,15 +55,23 @@ int main(int argc, char** argv)
 			else
 				continue;
 
-			fprintf(stdout,"%s%s %s %s\n",TEXT_GREEN,TEXT_BOLD,campaign.c_str(),TEXT_NORMAL);
+			if(campaign+"/" == getEnvVariable(ENV_CURRENT_CAMPAIGN))
+				fprintf(stdout,"%s%s %s%s* %s\n",TEXT_GREEN,TEXT_BOLD,campaign.c_str(),TEXT_RED,TEXT_NORMAL);
+			else
+				fprintf(stdout,"%s%s %s %s\n",TEXT_GREEN,TEXT_BOLD,campaign.c_str(),TEXT_NORMAL);
 			fprintf(stdout,"%s",TEXT_WHITE);
 			for(long unsigned int i=0; i<campaign.length()+2; i++)
 				fprintf(stdout,"─");
 			fprintf(stdout,"%s\n",TEXT_NORMAL);
 			for(const auto& character_entry : getDirectoryListing(campaigns_dir+campaign+"/characters/"))
 			{
-				if(character_entry.length() > 5 && right(character_entry,character_entry.length()-5) == ".char")
-					fprintf(stdout,"%s\n",left(character_entry,character_entry.length()-5).c_str());
+				if(character_entry.length() <= 5 || right(character_entry,character_entry.length()-5) != ".char")
+					continue;
+
+				fprintf(stdout,"%s",left(character_entry,character_entry.length()-5).c_str());
+				if(character_entry == getEnvVariable(ENV_CURRENT_CHARACTER)+".char")
+					fprintf(stdout,"%s%s*%s",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				fprintf(stdout,"\n");
 			}
 			fprintf(stdout,"\n");
 		}
@@ -85,20 +93,26 @@ int main(int argc, char** argv)
 			campaign_path += campaign+"/characters/";
 			for(const auto& character_entry : getDirectoryListing(campaign_path))
 			{
-				if(character_entry.length() > 5 && right(character_entry,character_entry.length()-5) == ".char")
-					fprintf(stdout,"%s\n",left(character_entry,character_entry.length()-5).c_str());
-				else
+				if(character_entry.length() <= 5 || right(character_entry,character_entry.length()-5) != ".char")
 					continue;
+
+				fprintf(stdout,"%s",left(character_entry,character_entry.length()-5).c_str());
+				if(character_entry == getEnvVariable(ENV_CURRENT_CHARACTER)+".char")
+					fprintf(stdout,"%s%s*%s",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				fprintf(stdout,"\n");
 			}
 		}
 		else
 		{
 			for(const auto& campaign_entry : getDirectoryListing(campaigns_dir))
 			{
-				if(std::filesystem::is_directory(campaigns_dir+campaign_entry))
-					fprintf(stdout,"%s\n",campaign_entry.c_str());
-				else
+				if(!std::filesystem::is_directory(campaigns_dir+campaign_entry))
 					continue;
+
+				fprintf(stdout,"%s",campaign_entry.c_str());
+				if(campaign_entry+"/" == getEnvVariable(ENV_CURRENT_CAMPAIGN))
+					fprintf(stdout,"%s%s*%s",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+				fprintf(stdout,"\n");
 			}
 		}
 	}
