@@ -497,15 +497,15 @@ void Scope::save()
 		 std::filesystem::rename(datasource.c_str(),(datasource+".bak").c_str());
 
 	//Check for name change with character scopes
-	if(datasource.substr(datasource.length()-5,5) == ".char" || datasource.substr(datasource.length()-9,9) == ".char.bak")
+	if(datasource.substr(datasource.length()-5,5) == c_ext || datasource.substr(datasource.length()-9,9) == ".char.bak")
 	{
-		std::string old_name = right(left(datasource,rfindu(datasource,".char")),rfindu(datasource,'/')+1);
+		std::string old_name = right(left(datasource,rfindu(datasource,c_ext)),rfindu(datasource,'/')+1);
 		std::string new_name = getProperty<Var>(getProperty<Var>(std::string(CHAR_NAME_ATTR),"Value"),"Value");
 		if(old_name != new_name)
 		{
 			std::filesystem::remove(datasource);
 			std::filesystem::remove(datasource+".bak");
-			datasource = left(datasource,rfindu(datasource,'/')+1) + new_name + ".char";
+			datasource = left(datasource,rfindu(datasource,'/')+1) + new_name + c_ext;
 			setEnvVariable(ENV_CURRENT_CHARACTER,new_name);
 		}
 	}
@@ -553,7 +553,7 @@ Character::Character(bool backup)
 		confirmDefaultCampaign();
 		Config config = Config();
 		load(templates_dir + config.setting[DEFAULT_GAME]);
-		datasource = campaigns_dir + "default/characters/" + getName() + ".char";
+		datasource = campaigns_dir + "default/characters/" + getName() + c_ext;
 		std::filesystem::copy_options co = std::filesystem::copy_options::update_existing;
 		std::filesystem::copy(templates_dir + config.setting[DEFAULT_GAME],datasource,co);
 		setEnvVariable(ENV_CURRENT_CHARACTER,getName());
@@ -574,7 +574,7 @@ std::string Character::getCurrentCharacterFilePath()
 	std::string current_campaign_dir = campaigns_dir+campaign;
 	std::string current_character_dir = current_campaign_dir+"characters/";
 
-	return (current_character_dir + character + ".char");
+	return (current_character_dir + character + c_ext);
 }
 
 //Get character name

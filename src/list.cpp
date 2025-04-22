@@ -65,11 +65,11 @@ int main(int argc, char** argv)
 			fprintf(stdout,"%s\n",TEXT_NORMAL);
 			for(const auto& character_entry : getDirectoryListing(campaigns_dir+campaign+"/characters/"))
 			{
-				if(character_entry.length() <= 5 || right(character_entry,character_entry.length()-5) != ".char")
+				if(character_entry.length() <= 5 || right(character_entry,character_entry.length()-5) != c_ext)
 					continue;
 
 				fprintf(stdout,"%s",left(character_entry,character_entry.length()-5).c_str());
-				if(character_entry == getEnvVariable(ENV_CURRENT_CHARACTER)+".char")
+				if(character_entry == getEnvVariable(ENV_CURRENT_CHARACTER)+c_ext)
 					fprintf(stdout,"%s%s*%s",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
 				fprintf(stdout,"\n");
 			}
@@ -93,11 +93,11 @@ int main(int argc, char** argv)
 			campaign_path += campaign+"/characters/";
 			for(const auto& character_entry : getDirectoryListing(campaign_path))
 			{
-				if(character_entry.length() <= 5 || right(character_entry,character_entry.length()-5) != ".char")
+				if(character_entry.length() <= 5 || right(character_entry,character_entry.length()-5) != c_ext)
 					continue;
 
 				fprintf(stdout,"%s",left(character_entry,character_entry.length()-5).c_str());
-				if(character_entry == getEnvVariable(ENV_CURRENT_CHARACTER)+".char")
+				if(character_entry == getEnvVariable(ENV_CURRENT_CHARACTER)+c_ext)
 					fprintf(stdout,"%s%s*%s",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
 				fprintf(stdout,"\n");
 			}

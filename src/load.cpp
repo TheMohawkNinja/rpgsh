@@ -48,12 +48,12 @@ int main(int argc, char** argv)
 		output(Error,"Campaign \"%s\" does not exist.",mc.m.c_str());
 		return -1;
 	}
-	else if(mc.c != "" && mc.m == "" && !std::filesystem::exists(campaigns_dir+getEnvVariable(ENV_CURRENT_CAMPAIGN)+"/characters/"+mc.c+".char"))
+	else if(mc.c != "" && mc.m == "" && !std::filesystem::exists(campaigns_dir+getEnvVariable(ENV_CURRENT_CAMPAIGN)+"/characters/"+mc.c+c_ext))
 	{
 		output(Error,"Character \"%s\" does not exist in this campaign.",mc.c.c_str());
 		return -1;
 	}
-	else if(mc.c != "" && mc.m != "" && !std::filesystem::exists(campaigns_dir+mc.m+"/characters/"+mc.c+".char"))
+	else if(mc.c != "" && mc.m != "" && !std::filesystem::exists(campaigns_dir+mc.m+"/characters/"+mc.c+c_ext))
 	{
 		output(Error,"Character \"%s\" does not exist in the \"%s\" camapign.",mc.c.c_str(),mc.m.c_str());
 		return -1;

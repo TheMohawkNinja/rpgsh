@@ -109,7 +109,7 @@ int main(int argc, char** argv)
 			//Check if source character exists and if potentially overwriting destination character
 			for(const auto& entry : getDirectoryListing(left(src_character_path,rfindu(src_character_path,'/'))))
 			{
-				if(stringcasecmp(entry,src_mc.c+".char") || std::filesystem::is_directory(src_character_path+entry)) continue;
+				if(stringcasecmp(entry,src_mc.c+c_ext) || std::filesystem::is_directory(src_character_path+entry)) continue;
 				src_character_path += entry;
 				character_exists = true;
 			}
@@ -119,7 +119,7 @@ int main(int argc, char** argv)
 				return -1;
 			}
 
-			dst_character_path += dst_mc.c+".char";
+			dst_character_path += dst_mc.c+c_ext;
 		}
 		else if(!strcmp(argv[i],"-m"))
 		{
@@ -194,7 +194,7 @@ int main(int argc, char** argv)
 	//If just making one copy and changing the name, don't append a number
 	if(copy_c && (src_mc.m != dst_mc.m || src_mc.c != dst_mc.c) && copies == 1)
 	{
-		std::filesystem::copy(src_character_path,left(dst_character_path,dst_character_path.length()-5)+".char");
+		std::filesystem::copy(src_character_path,left(dst_character_path,dst_character_path.length()-5)+c_ext);
 		output(Info,"Character \"%s\" has been created.",dst.c_str());
 		return 0;
 	}
@@ -210,7 +210,7 @@ int main(int argc, char** argv)
 		std::string copy_num = std::to_string(i+copy_start);
 		if(copy_c)
 		{
-			std::filesystem::copy(src_character_path,left(dst_character_path,dst_character_path.length()-5)+copy_num+".char");
+			std::filesystem::copy(src_character_path,left(dst_character_path,dst_character_path.length()-5)+copy_num+c_ext);
 			output(Info,"Character \"%s\" has been created.",(dst+copy_num).c_str());
 		}
 		else if(copy_m)

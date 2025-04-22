@@ -506,7 +506,7 @@ void loadXRef(std::string* arg, VariableInfo* p_vi)
 					   "/characters/";
 			}
 
-			p_vi->scope.setDatasource(xref_dir+getLikeFileName(xref_char+".char",xref_dir,false,p_vi->xref));
+			p_vi->scope.setDatasource(xref_dir+getLikeFileName(xref_char+c_ext,xref_dir,false,p_vi->xref));
 			p_vi->scope.load();
 			break;
 		case CAMPAIGN_SIGIL:
@@ -1041,7 +1041,7 @@ datamap<Currency> getDatamapFromAllScopes()
 	std::string campaign = getEnvVariable(ENV_CURRENT_CAMPAIGN);
 	std::string current_campaign_dir = campaigns_dir+campaign;
 	std::string current_campaign_path = current_campaign_dir+variables_file_name;
-	std::string current_character_path = current_campaign_dir+"characters/"+character+".char";
+	std::string current_character_path = current_campaign_dir+"characters/"+character+c_ext;
 
 	datamap<Currency> ret;
 	Scope scope;

@@ -230,10 +230,10 @@ std::string inputHandler()
 				{
 					for(auto& c : getDirectoryListing(xref_path))
 					{
-						if(right(c,c.length()-5) != ".char")//Don't include backup files or non-character files
+						if(right(c,c.length()-5) != c_ext)//Don't include backup files or non-character files
 							continue;
 
-						std::string xref = left(c,findu(c,".char"));
+						std::string xref = left(c,findu(c,c_ext));
 						std::string chk_str_xref = right(chk_str,2);
 						if(chk_str.length() == 2 ||
 						   (!stringcasecmp(chk_str_xref,left(xref,chk_str.length()-2)) &&
@@ -275,10 +275,10 @@ std::string inputHandler()
 
 					for(auto& c : getDirectoryListing(xref_path))
 					{
-						if(right(c,c.length()-5) != ".char")//Don't include backup files or non-character files
+						if(right(c,c.length()-5) != c_ext)//Don't include backup files or non-character files
 							continue;
 
-						std::string xref = left(c,findu(c,".char"));
+						std::string xref = left(c,findu(c,c_ext));
 						std::string chk_str_xref = right(chk_str,findu(chk_str,'/')+1);
 						if(!stringcasecmp(chk_str_xref,left(xref,chk_str.length()-findu(chk_str,'/')-1)) &&
 						   xref.length() > chk_str_xref.length())
@@ -298,7 +298,7 @@ std::string inputHandler()
 									getEnvVariable(ENV_CURRENT_CAMPAIGN)+
 									"characters/"+
 									right(left(chk_str,findu(chk_str,']')),findu(chk_str,'[')+1)+
-									".char";
+									c_ext;
 
 						if(std::filesystem::exists(xref_path) && !std::filesystem::is_directory(xref_path))
 							tab_comp_scope.load(xref_path);
@@ -311,7 +311,7 @@ std::string inputHandler()
 									right(left(chk_str,findu(chk_str,'/')+1),findu(chk_str,'[')+1)+
 									"characters/"+
 									right(left(chk_str,findu(chk_str,']')),findu(chk_str,'/')+1)+
-									".char";
+									c_ext;
 
 						if(std::filesystem::exists(xref_path) && !std::filesystem::is_directory(xref_path))
 							tab_comp_scope.load(xref_path);

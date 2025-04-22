@@ -121,7 +121,7 @@ int main(int argc, char** argv)
 		fillCharacterSheet<Dice>(&c);
 		fillCharacterSheet<Wallet>(&c);
 		fillCharacterSheet<Currency>(&c);
-		c.setDatasource(campaigns_dir+getEnvVariable(ENV_CURRENT_CAMPAIGN)+"characters/"+c.getProperty<Var>(c.getName(),"Value")+".char");
+		c.setDatasource(campaigns_dir+getEnvVariable(ENV_CURRENT_CAMPAIGN)+"characters/"+c.getProperty<Var>(c.getName(),"Value")+c_ext);
 		if(std::filesystem::exists(c.getDatasource()))
 		{
 			fprintf(stdout,"Character file \"%s\" exists, do you want to overwrite? (y/N): ",c.getDatasource().c_str());

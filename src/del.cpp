@@ -144,7 +144,7 @@ int main(int argc, char** argv)
 		campaign_name = right(campaign_name,rfindu(campaign_name,'/')+1);
 		for(const auto& entry : getDirectoryListing(campaign_path))
 		{
-			if(stringcasecmp(entry,mc.c+".char") || std::filesystem::is_directory(campaign_path+entry)) continue;
+			if(stringcasecmp(entry,mc.c+c_ext) || std::filesystem::is_directory(campaign_path+entry)) continue;
 
 			fprintf(stdout,"%s%sDelete character \"%s\" [y/N]?%s ",TEXT_YELLOW,TEXT_BOLD,(campaign_name+"/"+left(entry,entry.length()-5)).c_str(),TEXT_NORMAL);
 			if(getchar() != 'y') return 0;
