@@ -558,12 +558,8 @@ VariableInfo parseVariable(std::string v)// Derive information about variable fr
 	vi.type = v[1];
 	vi.variable = v;
 	vi.key = right(v,findu(v,'/')+1);
-	if(v[rfindu(v,'/')+1] == '.' && rfindu(v,'.') > rfindu(v,'/')+1)//Hidden variable w/ property
-	{
-		vi.key = left(vi.key,rfindu(vi.key,'.'));
-		vi.property = right(v,rfindu(v,'.')+1);
-	}
-	else if(findu(v,'.') > rfindu(v,'/')+1 && rfindu(v,'.') < UINT_MAX)
+	if((v[rfindu(v,'/')+1] == '.' && rfindu(v,'.') > rfindu(v,'/')+1) ||
+	   (findu(v,'.') > rfindu(v,'/')+1 && rfindu(v,'.') < UINT_MAX))
 	{
 		vi.key = left(vi.key,rfindu(vi.key,'.'));
 		vi.property = right(v,rfindu(v,'.')+1);
