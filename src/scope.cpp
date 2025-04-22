@@ -497,7 +497,7 @@ void Scope::save()
 		 std::filesystem::rename(datasource.c_str(),(datasource+".bak").c_str());
 
 	//Check for name change with character scopes
-	if(datasource.substr(datasource.length()-5,5) == c_ext || datasource.substr(datasource.length()-9,9) == ".char.bak")
+	if(datasource.substr(datasource.length()-5,5) == c_ext || datasource.substr(datasource.length()-9,9) == (c_ext+".bak"))
 	{
 		std::string old_name = right(left(datasource,rfindu(datasource,c_ext)),rfindu(datasource,'/')+1);
 		std::string new_name = getProperty<Var>(getProperty<Var>(std::string(DOT_NAME),"Value"),"Value");
