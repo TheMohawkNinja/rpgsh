@@ -51,8 +51,9 @@
 #define ENV_CURRENT_CHARACTER		"CURRENT_CHARACTER"
 #define ENV_CURRENT_CAMPAIGN		"CURRENT_CAMPAIGN"
 
-//Hidden Character variables
-#define CHAR_NAME_ATTR			".NAME"
+//Special hidden variables
+#define DOT_NAME			".NAME"
+#define DOT_PROMPT			".PROMPT"
 
 //Setting names
 #define PADDING				"padding"
