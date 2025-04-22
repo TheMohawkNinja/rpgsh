@@ -21,6 +21,7 @@ std::string templates_dir = 			root_dir + "templates/";
 std::string dice_lists_dir = 			root_dir + "dice-lists/";
 std::string history_path =			root_dir + ".history";
 std::string prefix =				"rpgsh-";
+std::string c_ext =				".char";
 
 //RegEx patterns
 std::string arg_pattern_str =			"[^\\s]{1,}";
