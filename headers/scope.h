@@ -100,9 +100,10 @@ class Character: public Scope
 		//Get current character file path
 		std::string getCurrentCharacterFilePath();
 
-		//Get character name
+		//Get/set character name
 		std::string getName();
-		};
+		void setName(std::string name);
+};
 
 class Campaign: public Scope
 {

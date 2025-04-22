@@ -577,10 +577,14 @@ std::string Character::getCurrentCharacterFilePath()
 	return (current_character_dir + character + c_ext);
 }
 
-//Get character name
+//Get/set character name
 std::string Character::getName()
 {
 	return getProperty<Var>(getProperty<Var>(std::string(DOT_NAME),"Value"),"Value");
+}
+void Character::setName(std::string name)
+{
+	set<Var>(getProperty<Var>(DOT_NAME,"Value"),name);
 }
 
 //			//
