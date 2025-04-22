@@ -23,8 +23,8 @@ int main(int argc, char** argv)
 	{
 		Character c = Character();
 
-		fprintf(stdout,"Display name character attribute:\t%s%s%s\n",TEXT_WHITE,c.getStr<Var>(CHAR_NAME_ATTR).c_str(),TEXT_NORMAL);
-		fprintf(stdout,"Current value of %s%%%s%s:\t\t\t%s%s%s\n",TEXT_WHITE,c.getStr<Var>(CHAR_NAME_ATTR).c_str(),TEXT_NORMAL,TEXT_WHITE,c.getName().c_str(),TEXT_NORMAL);
+		fprintf(stdout,"Display name character attribute:\t%s%s%s\n",TEXT_WHITE,c.getStr<Var>(DOT_NAME).c_str(),TEXT_NORMAL);
+		fprintf(stdout,"Current value of %s%%%s%s:\t\t\t%s%s%s\n",TEXT_WHITE,c.getStr<Var>(DOT_NAME).c_str(),TEXT_NORMAL,TEXT_WHITE,c.getName().c_str(),TEXT_NORMAL);
 		return 0;
 	}
 	else if(chkFlagHelp(argv))
@@ -42,7 +42,7 @@ int main(int argc, char** argv)
 
 	if(std::string(argv[1]) == "") output(Warning,"%s is empty.",argv[1]);
 
-	c.set<Var>(CHAR_NAME_ATTR,std::string(argv[1]));
+	c.set<Var>(DOT_NAME,std::string(argv[1]));
 	c.save();
 	output(Info,"Current character's name is now set to the key \"%s\" (Current value: \"%s\")",argv[1],c.getStr<Var>(argv[1]).c_str());
 

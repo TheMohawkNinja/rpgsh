@@ -500,7 +500,7 @@ void Scope::save()
 	if(datasource.substr(datasource.length()-5,5) == c_ext || datasource.substr(datasource.length()-9,9) == ".char.bak")
 	{
 		std::string old_name = right(left(datasource,rfindu(datasource,c_ext)),rfindu(datasource,'/')+1);
-		std::string new_name = getProperty<Var>(getProperty<Var>(std::string(CHAR_NAME_ATTR),"Value"),"Value");
+		std::string new_name = getProperty<Var>(getProperty<Var>(std::string(DOT_NAME),"Value"),"Value");
 		if(old_name != new_name)
 		{
 			std::filesystem::remove(datasource);
@@ -580,7 +580,7 @@ std::string Character::getCurrentCharacterFilePath()
 //Get character name
 std::string Character::getName()
 {
-	return getProperty<Var>(getProperty<Var>(std::string(CHAR_NAME_ATTR),"Value"),"Value");
+	return getProperty<Var>(getProperty<Var>(std::string(DOT_NAME),"Value"),"Value");
 }
 
 //			//
