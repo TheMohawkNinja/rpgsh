@@ -31,11 +31,11 @@ void printData(Scope scope, Var depth=-1, bool raw=false)
 		{
 			fprintf(stdout,"%s%sVar%s%s",TEXT_BOLD,VAR_COLOR,TEXT_NORMAL,addSpaces(COLUMN_PADDING).c_str());
 			fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
-			fprintf(stdout,"%sValue:  %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.Value));
+			fprintf(stdout,"%sValue:  %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.Value).c_str());
 		}
 		else
 		{
-			fprintf(stdout,"%s\n",makePretty(v.Value));
+			fprintf(stdout,"%s\n",makePretty(v.Value).c_str());
 		}
 		fprintf(stdout,"\n");
 	}
@@ -49,7 +49,7 @@ void printData(Scope scope, Var depth=-1, bool raw=false)
 
 			if(v.List != "")
 			{
-				fprintf(stdout,"%sList:         %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.List));
+				fprintf(stdout,"%sList:         %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.List).c_str());
 			}
 			else
 			{
@@ -61,7 +61,7 @@ void printData(Scope scope, Var depth=-1, bool raw=false)
 		else
 		{
 			if(v.List != "")
-				fprintf(stdout,"%s\n",makePretty(v.List));
+				fprintf(stdout,"%s\n",makePretty(v.List).c_str());
 			else
 				fprintf(stdout,"%ud%u%s%d\n",v.Quantity,v.Faces,v.Modifier>=0 ? "+" : "",v.Modifier);
 		}
@@ -102,11 +102,11 @@ void printData(Scope scope, Var depth=-1, bool raw=false)
 			fprintf(stdout,"%s%sCurrency%s%s",TEXT_BOLD,CURRENCY_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
 			fprintf(stdout,"%s%s%s%s%s\n",TEXT_BOLD,TEXT_ITALIC,TEXT_WHITE,k.c_str(),TEXT_NORMAL);
 		}
-		fprintf(stdout,"%sSystem:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.System));
-		fprintf(stdout,"%sName:             %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.Name));
-		fprintf(stdout,"%sSmallerAmount:    %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(std::to_string(v.SmallerAmount)));
-		fprintf(stdout,"%sSmaller:          %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.Smaller));
-		fprintf(stdout,"%sLarger:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.Larger));
+		fprintf(stdout,"%sSystem:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.System).c_str());
+		fprintf(stdout,"%sName:             %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.Name).c_str());
+		fprintf(stdout,"%sSmallerAmount:    %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(std::to_string(v.SmallerAmount)).c_str());
+		fprintf(stdout,"%sSmaller:          %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.Smaller).c_str());
+		fprintf(stdout,"%sLarger:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.Larger).c_str());
 		fprintf(stdout,"\n");
 	}
 	fprintf(stdout,"\b");//Remove extraneous newline
