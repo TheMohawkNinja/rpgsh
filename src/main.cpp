@@ -13,6 +13,14 @@
 Config cfg = Config();
 Character c = Character();
 
+std::wstring stows(const std::string& s)
+{
+	std::wstring ws;
+	ws.resize(s.length());
+	mbstowcs(&ws[0],s.c_str(),s.size());
+	return ws;
+}
+
 bool containsNonSpaceChar(std::string str)
 {
 	for(const auto& ch : str)
@@ -532,8 +540,58 @@ int prompt()
 
 	try
 	{
-		fprintf(stdout,"%s┌─%s[%s%s%s%s%s%s%s]%s─%s(%s%s/%s%s %s(%s)%s%s%s)%s%s\n",TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_ITALIC,TEXT_RED,c.getName().c_str(),TEXT_NOITALIC,TEXT_WHITE,TEXT_BOLD,TEXT_NOBOLD,TEXT_BOLD,TEXT_GREEN,c.getProperty<Var>("HitPoints/Current","Value").c_str(),c.getProperty<Var>("HitPoints/Maximum","Value").c_str(),TEXT_NOBOLD,TEXT_ITALIC,c.getProperty<Var>("HitPoints/Temporary","Value").c_str(),TEXT_NOITALIC,TEXT_BOLD,TEXT_WHITE,TEXT_NOBOLD,TEXT_NORMAL);
-		fprintf(stdout,"%s└─%s$%s ",TEXT_WHITE,TEXT_CYAN,TEXT_NORMAL);
+		std::string prompt = c.getStr<Var>(DOT_PROMPT);
+		if(prompt != "")
+		{
+			//Replaces all instances of variables with their respective value
+			std::regex variable_pattern = std::regex(variable_pattern_str);
+			std::sregex_iterator v_str_it = std::sregex_iterator(prompt.begin(), prompt.end(), variable_pattern);
+			std::sregex_iterator v_str_end;
+			std::regex arg_pattern(arg_pattern_str);
+			std::sregex_iterator prompt_it(prompt.begin(), prompt.end(), arg_pattern);
+			std::sregex_iterator prompt_end;
+
+			if(prompt_it != prompt_end) prompt_it++;
+
+			if(v_str_it != v_str_end &&
+			   prompt_it != prompt_end &&
+			   v_str_it->str() == prompt_it->str()) v_str_it++;
+
+			while(v_str_it != v_str_end)
+			{
+				std::string v_str = v_str_it->str();
+				if(runApp(v_str,true))
+				{
+					output(Error,"%s is not a valid variable string.",v_str.c_str());
+					return -1;
+				}
+				std::string v_str_it_pattern = v_str;
+				v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\["),"\\[");
+				v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\]"),"\\]");
+				v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\("),"\\(");
+				v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\)"),"\\)");
+				v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\{"),"\\{");
+				v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\}"),"\\}");
+				prompt = std::regex_replace(prompt,std::regex(v_str_it_pattern),getAppOutput(v_str).output[0]);
+				v_str_it++;
+			}
+
+			std::vector<std::string> prompt_output = getAppOutput("print -r "+prompt).output;
+			long unsigned int last_line_length;
+			for(const auto& line : prompt_output)
+			{
+				if(line.length() <= 1) continue;
+				last_line_length = std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(stripFormatting(line)).length();//TODO: Remove when we convert everything to std::wstring
+				fprintf(stdout,"%s\n",line.c_str());
+			}
+			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)0);
+			fprintf(stdout,CURSOR_UP);
+			fprintf(stdout,CURSOR_RIGHT_N,last_line_length);
+		}
+		else
+		{
+			fprintf(stdout,"%s%s%s %s>%s ",TEXT_BOLD,TEXT_RED,c.getName().c_str(),TEXT_WHITE,TEXT_NORMAL);
+		}
 
 		if(backup)
 		{
