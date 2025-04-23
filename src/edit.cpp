@@ -6,16 +6,6 @@
 #include "../headers/functions.h"
 #include "../headers/text.h"
 
-std::string getUnformattedOutput(std::string str)
-{
-	//fprintf(stdout,"\n\nstr = %s\n",str.c_str());
-	for(unsigned long int i=0; i<str.length(); i++)
-	{
-		if(str[i] == ESC_SEQ) str.erase(str.begin()+i,str.begin()+str.find('m',i)+1);
-		else if(str[i] == '\b' && i) str.erase(i-1);
-	}
-	return str;
-}
 unsigned long int getPrintLength(std::string str)//std::string.length() returns character count, not the printed length
 {
 	struct winsize w;
@@ -178,7 +168,7 @@ int main(int argc, char** argv)
 
 		//Determine number of paragraphs
 		unsigned long int total_paragraph_lines = 0;
-		std::string u_output = getUnformattedOutput(output);
+		std::string u_output = stripFormatting(output);
 		if(findu(u_output,'\n') != std::string::npos)
 		{
 			for(unsigned long int i=0; i<getPrintLength(output)-1; i++)
