@@ -43,7 +43,7 @@ void output(OutputLevel level, const char* format, ...)
 	fprintf(stream,"%s\n",TEXT_NORMAL);
 }
 
-const char* makePretty(std::string value)
+std::string makePretty(std::string value)
 {
 	if(value == "") return empty_str.c_str();
 
@@ -229,7 +229,24 @@ const char* makePretty(std::string value)
 	value = std::regex_replace(value,std::regex("%"),"%%");//Prevent printf() parsing '%' as format specifiers
 
 	value += std::string(TEXT_NORMAL); //Make sure we don't carry over any unterminated formatting
-	return value.c_str();
+	return value;
+}
+std::string stripFormatting(std::string str)
+{
+	for(unsigned long int i=0; i<str.length(); i++)
+	{
+		const std::string::iterator cur_it = str.begin()+i;
+		if(str[i] == ESC_SEQ)
+		{
+			str.erase(cur_it,str.begin()+str.find('m',i)+1);
+			i--;
+		}
+		else if(str[i] == '\b' && i)
+		{
+			str.erase(cur_it-1,cur_it-1);
+		}
+	}
+	return str;
 }
 
 bool stob(std::string s)

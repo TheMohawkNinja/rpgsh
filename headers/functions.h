@@ -38,7 +38,8 @@ struct MCStr
 
 void output(OutputLevel level, const char* format, ...);
 
-const char* makePretty(std::string value);
+std::string makePretty(std::string value);
+std::string stripFormatting(std::string str);
 
 std::string btos(bool b);
 bool stob(std::string s);
