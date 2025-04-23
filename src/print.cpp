@@ -140,7 +140,7 @@ int main(int argc, char** argv)
 	chkFlagModifyVariables(argv,false);
 
 	if(argc > 4)
-		output(Warning,"Print expects no more than four arguments. All args past \"%s\" will be ignored.",argv[1]);
+		output(Warning,"Print expects no more than four arguments. All args past \"%s\" will be ignored.",argv[5]);
 
 	if(chkFlagHelp(argv))
 	{
