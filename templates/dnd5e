@@ -1,6 +1,7 @@
 d::HitDice/Current::d{0,0,0}
 d::HitDice/Total::d{0,0,0}
 v::.NAME::v{Name}
+v::.PROMPT::v{%b%%white%┌─[%/b%%i%%red%@/Name.Value%/i%%b%%white%]─(%green%@/HitPoints/Current.Value%green%\ \b/%green%@/HitPoints/Maximum.Value%/b%%i%\ (@/HitPoints/Temporary.Value)%/i%%b%%white%)\n└─%/b%%cyan%$\ }
 v::ArmorClass::v{0}
 v::Age::v{0}
 v::Alignment::v{<NO_ALIGNMENT>}
