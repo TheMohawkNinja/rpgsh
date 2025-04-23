@@ -29,18 +29,18 @@ std::string variable_pattern_str =		"["+
 						std::string(1,CHARACTER_SIGIL)+
 						std::string(1,CAMPAIGN_SIGIL)+
 						std::string(1,SHELL_SIGIL)+
-						"]["+
+						"]{1}["+
 						std::string(1,VAR_SIGIL)+
 						std::string(1,DICE_SIGIL)+
 						std::string(1,CURRENCY_SIGIL)+
 						std::string(1,WALLET_SIGIL)+
-						"]?[^\\s!@#$%\\^&\\*\\\"\\)]{1,}";
+						"]?[\\w\\/\\.]{1,}";
 std::string exp_const_pattern_str =		"["+
 						std::string(1,VAR_SIGIL)+
 						std::string(1,DICE_SIGIL)+
 						std::string(1,CURRENCY_SIGIL)+
 						std::string(1,WALLET_SIGIL)+
-						"]\\{.*\\}";
+						"]{1}\\{.*\\}";
 std::string set_pattern_str =			"(([\\.a-zA-Z0-9]{1,}\\/*)*::["+
 						std::string(1,VAR_SIGIL)+
 						std::string(1,DICE_SIGIL)+
