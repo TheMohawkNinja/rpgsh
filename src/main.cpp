@@ -532,12 +532,10 @@ int prompt()
 
 	try
 	{
-		std::string prompt = c.getStr<Var>(DOT_PROMPT);
-		if(prompt != "")
+		if(c.keyExists<Var>(DOT_PROMPT))
 		{
-			std::vector<std::string> prompt_output = getAppOutput("print -r "+prompt).output;
 			long unsigned int last_line_length;
-			for(const auto& line : prompt_output)
+			for(const auto& line : getAppOutput("print -r "+c.getStr<Var>(DOT_PROMPT)).output)
 			{
 				if(line.length() <= 1) continue;
 				last_line_length = std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(stripFormatting(line)).length();//TODO: Remove when we convert everything to std::wstring
