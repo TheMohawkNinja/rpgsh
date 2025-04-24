@@ -310,7 +310,6 @@ int stringcasecmp(std::string a, std::string b)
 long unsigned int findu(std::string str, std::string match, long unsigned int start)
 {
 	if(match.length() > str.length()) return std::string::npos;
-
 	for(long unsigned int i=start; i<str.length()-(match.length()-1); i++)
 		if(str.substr(i,match.length()) == match && !isEscaped(str.substr(i,match.length()),i)) return i;
 
@@ -707,12 +706,9 @@ int runApp(std::string arg_str, bool redirect_output)
 			return -1;
 		}
 		std::string v_str_it_pattern = v_str;
-		v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\["),"\\[");
-		v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\]"),"\\]");
-		v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\("),"\\(");
-		v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\)"),"\\)");
-		v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\{"),"\\{");
-		v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex("\\}"),"\\}");
+		std::vector<std::string> patterns = {"\\[","\\]","\\(","\\)","\\{","\\}"};
+		for(const auto& p : patterns)
+			v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex(p),p);
 		arg_str = std::regex_replace(arg_str,std::regex(v_str_it_pattern),getAppOutput(v_str).output[0]);
 		v_str_it++;
 	}
