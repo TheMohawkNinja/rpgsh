@@ -298,7 +298,7 @@ bool looksLikeVariable(std::string s)
 
 bool isEscaped(std::string str, long unsigned int pos)
 {
-	if(!pos) return false;
+	if(pos <= 0 || pos >= str.length()) return false;
 	else return str[pos-1] == '\\';
 }
 
