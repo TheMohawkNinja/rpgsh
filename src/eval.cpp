@@ -715,15 +715,16 @@ int main(int argc, char** argv)
 
 		std::string new_value = getAppOutput(std::string(argv[1])).output[0];
 		std::string xref = (vi.xref != "" ? "["+vi.xref+"]" : "");
+		std::string p = vi.property;
 		if(old_value == "")
 			output(Info,"%c%s%c/%s has been initialized to %s",
 			       vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str(),new_value.c_str());
 		else if(old_value != new_value)
-			output(Info,"%c%s%c/%s has changed from %s to %s",
-			       vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str(),old_value.c_str(),new_value.c_str());
+			output(Info,"%c%s%c/%s%s has changed from %s to %s",
+			       vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str(),(p == "" ? "" : "."+p).c_str(),old_value.c_str(),new_value.c_str());
 		else
-			output(Info,"%c%s%c/%s is unchanged, current value: %s",
-			       vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str(),old_value.c_str());
+			output(Info,"%c%s%c/%s%s is unchanged, current value: %s",
+			       vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str(),(p == "" ? "" : "."+p).c_str(),old_value.c_str());
 	}
 	else// Perform operation on set
 	{
