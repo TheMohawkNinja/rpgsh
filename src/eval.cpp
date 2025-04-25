@@ -36,7 +36,9 @@ std::vector<std::string> assignOps;
 
 std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 {
-	if(p_vi->variable.back() != '/')// If the last character isn't a '/', just handle value
+	std::string v = Var(value).Value;
+
+	if(p_vi->variable.back() != '/')// If the last character isn't a '/', just handle v
 	{
 		if(p_vi->type != '/' && !isTypeSigil(p_vi->type))
 		{
@@ -50,11 +52,11 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 			if(action == Read && keyExists && p_vi->property == "")
 				return p_vi->scope.getStr<Var>(p_vi->key);
 			else if(action == Write && p_vi->property == "")
-				p_vi->scope.set<Var>(p_vi->key,Var(value));
+				p_vi->scope.set<Var>(p_vi->key,Var(v));
 			else if(action == Read && keyExists && !stringcasecmp(p_vi->property,"Value"))
 				return p_vi->scope.getProperty<Var>(p_vi->key,p_vi->property);
 			else if(action == Write && !stringcasecmp(p_vi->property,"Value"))
-				p_vi->scope.setProperty<Var,std::string>(p_vi->key,p_vi->property,Var(value).Value);
+				p_vi->scope.setProperty<Var,std::string>(p_vi->key,p_vi->property,v);
 		}
 		else if(p_vi->evalType == DICE_SIGIL)
 		{
@@ -62,7 +64,7 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 			if(action == Read && keyExists && p_vi->property == "")
 				return p_vi->scope.getStr<Dice>(p_vi->key);
 			else if(action == Write && p_vi->property == "")
-				p_vi->scope.set<Dice>(p_vi->key,Dice(value));
+				p_vi->scope.set<Dice>(p_vi->key,Dice(v));
 			else if(action == Read && keyExists &&
 				(!stringcasecmp(p_vi->property,"Quantity") ||
 			         !stringcasecmp(p_vi->property,"Faces") ||
@@ -70,13 +72,13 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 				 !stringcasecmp(p_vi->property,"List")))
 				return p_vi->scope.getProperty<Dice>(p_vi->key,p_vi->property);
 			else if(action == Write && !stringcasecmp(p_vi->property,"Quantity"))
-				p_vi->scope.setProperty<Dice,int>(p_vi->key,p_vi->property,Dice(value).Quantity);
+				p_vi->scope.setProperty<Dice,int>(p_vi->key,p_vi->property,std::stoi(v));
 			else if(action == Write && !stringcasecmp(p_vi->property,"Faces"))
-				p_vi->scope.setProperty<Dice,int>(p_vi->key,p_vi->property,Dice(value).Faces);
+				p_vi->scope.setProperty<Dice,int>(p_vi->key,p_vi->property,std::stoi(v));
 			else if(action == Write && !stringcasecmp(p_vi->property,"Modifier"))
-				p_vi->scope.setProperty<Dice,int>(p_vi->key,p_vi->property,Dice(value).Modifier);
+				p_vi->scope.setProperty<Dice,int>(p_vi->key,p_vi->property,std::stoi(v));
 			else if(action == Write && !stringcasecmp(p_vi->property,"List"))
-				p_vi->scope.setProperty<Dice,std::string>(p_vi->key,p_vi->property,Dice(value).List);
+				p_vi->scope.setProperty<Dice,std::string>(p_vi->key,p_vi->property,v);
 		}
 		else if(p_vi->evalType == WALLET_SIGIL)
 		{
@@ -84,11 +86,11 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 			if(action == Read && keyExists && p_vi->property == "")
 				return p_vi->scope.getStr<Wallet>(p_vi->key);
 			else if(action == Write && p_vi->property == "")
-				p_vi->scope.set<Wallet>(p_vi->key,Wallet(value));
+				p_vi->scope.set<Wallet>(p_vi->key,Wallet(v));
 			else if(action == Read && keyExists && p_vi->scope.get<Wallet>(p_vi->key).containsCurrency(p_vi->property))
 				return p_vi->scope.getProperty<Wallet>(p_vi->key,p_vi->property);
 			else if(action == Write)
-				p_vi->scope.setProperty<Wallet,int>(p_vi->key,p_vi->property,Wallet(value).Money[Currency(p_vi->property)]);
+				p_vi->scope.setProperty<Wallet,int>(p_vi->key,p_vi->property,std::stoi(v));
 		}
 		else if(p_vi->evalType == CURRENCY_SIGIL)
 		{
@@ -96,7 +98,7 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 			if(action == Read && keyExists && p_vi->property == "")
 				return p_vi->scope.getStr<Currency>(p_vi->key);
 			else if(action == Write && p_vi->property == "")
-				p_vi->scope.set<Currency>(p_vi->key,Currency(value));
+				p_vi->scope.set<Currency>(p_vi->key,Currency(v));
 			else if(action == Read && keyExists &&
 				(!stringcasecmp(p_vi->property,"CurrencySystem") ||
 				 !stringcasecmp(p_vi->property,"Name") ||
@@ -105,15 +107,15 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 				 !stringcasecmp(p_vi->property,"Larger")))
 				return p_vi->scope.getProperty<Currency>(p_vi->key,p_vi->property);
 			else if(action == Write && !stringcasecmp(p_vi->property,"CurrencySystem"))
-				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,Currency(value).System);
+				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,v);
 			else if(action == Write && !stringcasecmp(p_vi->property,"Name"))
-				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,Currency(value).Name);
+				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,v);
 			else if(action == Write && !stringcasecmp(p_vi->property,"Smaller"))
-				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,Currency(value).Smaller);
+				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,v);
 			else if(action == Write && !stringcasecmp(p_vi->property,"Larger"))
-				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,Currency(value).Larger);
+				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,v);
 			else if(action == Write && !stringcasecmp(p_vi->property,"SmallerAmount"))
-				p_vi->scope.setProperty<Currency,int>(p_vi->key,p_vi->property,Currency(value).SmallerAmount);
+				p_vi->scope.setProperty<Currency,int>(p_vi->key,p_vi->property,std::stoi(v));
 		}
 
 		// Should only execute if action == Write
