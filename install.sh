@@ -84,6 +84,8 @@ if [[ $EUID -eq 0 ]]; then
 	g++ $flags src/roll.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-roll
 	echo -e "\tsrc/setname.cpp\t\t->\t$bold_white""/bin/rpgsh-setname"$normal
 	g++ $flags src/setname.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-setname
+	echo -e "\tsrc/valueof.cpp\t\t->\t$bold_white""/bin/rpgsh-valueof"$normal
+	g++ $flags src/valueof.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-valueof
 	echo -e "\tsrc/version.cpp\t\t->\t$bold_white""/bin/rpgsh-version"$normal
 	g++ $flags src/version.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-version
 
