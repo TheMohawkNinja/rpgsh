@@ -931,9 +931,13 @@ Wallet::Wallet(std::string str)
 
 		//Create currency object to be added to wallet
 		std::string c(1,CURRENCY_SIGIL);
-		int c_pos = findu(str,c+"{");
+		const long unsigned int c_pos = findu(str,c+"{");
+		if(c_pos == std::string::npos)
+			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 		std::string currency_str = str.substr(c_pos,findu(str,'}')+1-c_pos);
-		int c_str_ln = currency_str.length();
+		const long unsigned int c_str_ln = currency_str.length();
+		if(c_str_ln == std::string::npos)
+			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 		currency = Currency(currency_str);
 		str = right(str,c_str_ln+1);
 
