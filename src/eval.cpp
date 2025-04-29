@@ -36,7 +36,9 @@ std::vector<std::string> assignOps;
 
 std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 {
-	std::string v = Var(value).Value;
+	std::string v;
+	if(isTypeSigil(value[0]) && value[1] == '{') v = value;
+	else v = Var(value).Value;
 
 	if(p_vi->variable.back() != '/')// If the last character isn't a '/', just handle v
 	{
