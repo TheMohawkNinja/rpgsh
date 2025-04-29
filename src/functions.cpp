@@ -701,21 +701,30 @@ int runApp(std::string arg_str, bool redirect_output)
 	   arg_str_it != arg_str_end &&
 	   v_str_it->str() == arg_str_it->str()) v_str_it++;
 
+	// For some reason, attempting to just use v_str_it in the std::regex_replace line to replace variables with their values
+	// results in the iterator getting in some way lost causing it to not replace all the variables.
+	// Seems to be limited to cases when the value length > variable length
+	// Either way, using a std::vector<std::string> is an effective work around.
+	std::vector<std::string> matches;
 	while(v_str_it != v_str_end)
 	{
-		std::string v_str = v_str_it->str();
-		if(runApp(v_str,true))
+		matches.push_back(v_str_it->str());
+		v_str_it++;
+	}
+	for(const auto& match : matches)
+	{
+		if(runApp(match,true))
 		{
-			output(Error,"%s is not a valid variable string.",v_str.c_str());
+			output(Error,"%s is not a valid variable string.",match.c_str());
 			return -1;
 		}
-		std::string v_str_it_pattern = v_str;
+		std::string v_str_it_pattern = match;
 		std::vector<std::string> patterns = {"\\[","\\]","\\(","\\)","\\{","\\}"};
 		for(const auto& p : patterns)
 			v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex(p),p);
-		arg_str = std::regex_replace(arg_str,std::regex(v_str_it_pattern),getAppOutput(v_str).output[0]);
-		v_str_it++;
+		arg_str = std::regex_replace(arg_str,std::regex(v_str_it_pattern),getAppOutput(match).output[0]);
 	}
+
 	//Get args for program
 	arg_str_it = std::sregex_iterator(arg_str.begin(), arg_str.end(), arg_pattern);
 	arg_str_it++;
