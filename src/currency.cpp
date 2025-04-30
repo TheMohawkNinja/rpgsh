@@ -10,6 +10,8 @@ datamap<Currency> getCurrencySystem(std::string system)
 	datamap<Currency> denominations;
 	for(const auto& [k,v] : getDatamapFromAllScopes<Currency>())
 		if(!stringcasecmp(v.System,system)) denominations[v.Name] = v;
+
+	for(const auto& [k,v] : denominations) fprintf(stdout,"[%s,%s]\n",k.c_str(),v.Name.c_str());
 	return denominations;
 }
 
@@ -778,13 +780,12 @@ unsigned int Wallet::getEquivalentValueInLowestDenomination(std::string system)
 	for(const auto& [k,v] : getCurrencySystem(system))
 	{
 		if(v.Smaller != "") continue;
-
 		current_denomination = v;
 		break;
 	}
 
 	//Get total
-	while(current_denomination.Larger != "")
+	while(true)
 	{
 		datamap<Currency> s = getCurrencySystem(current_denomination.System);
 		if(current_denomination.SmallerAmount > 0)
@@ -793,6 +794,7 @@ unsigned int Wallet::getEquivalentValueInLowestDenomination(std::string system)
 		if(Money[current_denomination])
 			total += Money[current_denomination] * totalFactor;
 
+		if(current_denomination.Larger == "") break;
 		current_denomination = s[current_denomination.Larger];
 	}
 
