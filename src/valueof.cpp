@@ -67,16 +67,50 @@ int main(int argc, char** argv)
 	}
 	else
 	{
+		//Get smallest currency in system
 		Currency smallest;
 		for(const auto& [c,q] : w_in)
 		{
-			if(stringcasecmp(c.Name,currency)) continue;
+			if(c.Smaller != "") continue;
 			smallest = c;
 			break;
 		}
 
 		//sdea = Smallest Denomination Equivalent Amount
-		unsigned int sdea = getEquivalentValueInLowestDenomination(smallest.System);
+		unsigned int sdea = w_in.getEquivalentValueInLowestDenomination(smallest.System);
+		w_out = Wallet(money_t(smallest,sdea));
+
+		//Give output wallet the keys of all currencies in the system
+		datamap<Currency> s = getCurrencySystem(smallest.System);
+		for(const auto& [k,v] : s)
+		{
+			bool exists = false;
+			for(const auto& [c,q] : w_out)
+			{
+				if(c != v) continue;
+				exists = true;
+				break;
+			}
+			if(!exists){ w_out[v] = 1;
+			fprintf(stdout,"Set %s to %d\n",v.Name.c_str(),w_out[v]);}
+		}
+
+		for(const auto& [c,q] : w_out)
+		{
+			fprintf(stdout,"\tChecking %s\n",c.Name.c_str());
+			if(c.System == smallest.System && c.Larger != "" && q >= s[c.Larger].SmallerAmount)
+			{
+				//Make use of the trucation of the divison return value to int to simplify the math
+				int ConversionFactor = s[c.Larger].SmallerAmount;
+				int AmountTradable = (w_out[c] / ConversionFactor);
+				w_out[s[c.Larger]] += AmountTradable;
+				w_out[c] -= (AmountTradable * ConversionFactor);
+			}
+		}
+
+		for(const auto& line : getAppOutput("print "+std::string(w_out)).output)
+			fprintf(stdout,"%s\n",line.c_str());
+		fprintf(stdout,"\b");
 	}
 
 	return 0;
