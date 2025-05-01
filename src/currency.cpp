@@ -11,7 +11,6 @@ datamap<Currency> getCurrencySystem(std::string system)
 	for(const auto& [k,v] : getDatamapFromAllScopes<Currency>())
 		if(!stringcasecmp(v.System,system)) denominations[v.Name] = v;
 
-	for(const auto& [k,v] : denominations) fprintf(stdout,"[%s,%s]\n",k.c_str(),v.Name.c_str());
 	return denominations;
 }
 
