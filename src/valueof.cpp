@@ -84,15 +84,8 @@ int main(int argc, char** argv)
 		datamap<Currency> s = getCurrencySystem(smallest.System);
 		for(const auto& [k,v] : s)
 		{
-			bool exists = false;
-			for(const auto& [c,q] : w_out)
-			{
-				if(c != v) continue;
-				exists = true;
-				break;
-			}
-			if(!exists){ w_out[v] = 1;
-			fprintf(stdout,"Set %s to %d\n",v.Name.c_str(),w_out[v]);}
+			if(!w_out[v]) w_out[v] = 1;
+			fprintf(stdout,"Set %s to %d\n",v.Name.c_str(),w_out[v]);
 		}
 
 		for(const auto& [c,q] : w_out)
