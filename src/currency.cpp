@@ -756,7 +756,7 @@ Currency& Currency::operator -- (int)
 
 bool Wallet::HasEffectivelyAtLeast(int q, Currency c)
 {
-	int total = Money[c];
+	int total = get(c);
 	int totalFactor = 1;
 
 	while(c.Larger != "")
@@ -764,7 +764,7 @@ bool Wallet::HasEffectivelyAtLeast(int q, Currency c)
 		c = getCurrencySystem(c.System)[c.Larger];
 
 		totalFactor *= c.SmallerAmount;
-		total += Money[c] * totalFactor;
+		total += get(c) * totalFactor;
 	}
 
 	return total >= q;
@@ -790,8 +790,8 @@ unsigned int Wallet::getEquivalentValueInLowestDenomination(std::string system)
 		if(current_denomination.SmallerAmount > 0)
 			totalFactor *= current_denomination.SmallerAmount;
 
-		if(Money[current_denomination])
-			total += Money[current_denomination] * totalFactor;
+		if(get(current_denomination))
+			total += get(current_denomination) * totalFactor;
 
 		if(current_denomination.Larger == "") break;
 		current_denomination = s[current_denomination.Larger];
@@ -805,7 +805,7 @@ void Wallet::print()
 	unsigned int LongestName = 0;
 
 	//Get longest currency name as reference for spacing
-	for(const auto& [key,value] : Money)
+	for(const auto& [key,value] : Monies)
 	{
 		NameLength = key.Name.length();
 		if(NameLength > LongestName)
@@ -815,7 +815,7 @@ void Wallet::print()
 	}
 
 	//Print formatted list of currencies and the currency values
-	for(const auto& [key,value] : Money)
+	for(const auto& [key,value] : Monies)
 	{
 		if(value > 0)
 		{
@@ -837,13 +837,13 @@ void Wallet::FloatQuantityToIntCurrency(Currency c, float q)
 		c = getCurrencySystem(c.System)[c.Smaller];
 	}
 
-	*this += money_t(c,(int)(q*totalFactor));
+	*this += Money{c,(int)(q*totalFactor)};
 }
 bool Wallet::containsCurrency(std::string currency_str)
 {
-	for(const auto& [c,q] : *this)
+	for(const auto& m : Monies)
 	{
-		if(!stringcasecmp(currency_str,c.Name))
+		if(!stringcasecmp(currency_str,m.c.Name))
 		{
 			return true;
 			break;
@@ -853,44 +853,26 @@ bool Wallet::containsCurrency(std::string currency_str)
 }
 Currency Wallet::getExistingCurrency(std::string currency_str)
 {
-	for(const auto& [c,q] : *this)
+	for(const auto& m : Monies)
 	{
-		if(!stringcasecmp(currency_str,c.Name))
+		if(!stringcasecmp(currency_str,m.c.Name))
 		{
-			return c;
+			return m.c;
 			break;
 		}
 	}
 	return Currency();
 }
 
-int& Wallet::operator [] (const Currency b)
-{
-	return Money[b];
-}
-
-//Beginning and end iterators. This is so I can use "for(const auto& [key,val] : Wallet){}"
-std::map<Currency, int>::const_iterator Wallet::begin() const
-{
-	return Money.begin();
-}
-std::map<Currency, int>::const_iterator Wallet::end() const
-{
-	return Money.end();
-}
-
 Wallet::Wallet(){}
 Wallet::Wallet(const Wallet& b)
 {
-	Money = b.Money;
+	Monies = b.Monies;
 	transaction = b.transaction;
 }
-Wallet::Wallet(const money_t m)
+Wallet::Wallet(const Money m)
 {
-	Currency c = m.first;
-	int q = m.second;
-
-	Money[c] = q;
+	set(m.c,m.q);
 }
 Wallet::Wallet(std::string str)
 {
@@ -950,7 +932,7 @@ Wallet::Wallet(std::string str)
 		std::string quantity_str = left(str,next_delimiter);
 		try
 		{
-			Money[currency] += std::stoi(quantity_str);
+			set(currency,std::stoi(quantity_str));
 		}
 		catch(std::runtime_error& e)
 		{
@@ -969,8 +951,8 @@ Wallet::operator std::string() const
 	//@w/MyWallet = {<currency_1>,<quantity_1>,<currency_2>,<quantity_2>,...,<currency_n>,<quantity_n>}
 
 	std::string ret = std::string(1,WALLET_SIGIL)+"{";
-	for(const auto& [c,q] : Money)
-		ret += std::string(c) + "," + std::to_string(q) + ",";
+	for(const auto& m : Monies)
+		ret += std::string(m.c) + "," + std::to_string(m.q) + ",";
 
 	//Cut final ',' and add terminating '}'
 	if(findu(ret,',') != std::string::npos)
@@ -981,8 +963,8 @@ Wallet::operator std::string() const
 }
 Wallet::operator bool() const
 {
-	for(const auto& [c,q] : Money)
-		if(q > 0) return true;
+	for(const auto& m : Monies)
+		if(m.q > 0) return true;
 
 	return false;
 }
@@ -990,6 +972,25 @@ const char* Wallet::c_str() const
 {
 	return std::string(*this).c_str();
 }
+
+int Wallet::get(const Currency c)
+{
+	for(const auto& m : Monies)
+		if(c == m.c) return m.q;
+
+	return 0;
+}
+void Wallet::set(const Currency c, const int q)
+{
+	for(auto& m : Monies)
+	{
+		if(c != m.c) continue;
+		m.q = q;
+		return;
+	}
+	Monies.push_back(Money{c,q});
+}
+
 Wallet& Wallet::operator = ([[maybe_unused]] const int b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
@@ -998,13 +999,11 @@ Wallet& Wallet::operator = ([[maybe_unused]] const std::string b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Wallet& Wallet::operator = (const money_t b)
+Wallet& Wallet::operator = (const Money b)
 {
-	for(const auto& [c,q] : Money)
-	{
-		Money[c] = 0;
-	}
-	Money[b.first] = b.second;
+	for(auto& m : Monies)
+		m.q = 0;
+	set(b.c,b.q);
 	return *this;
 }
 Wallet& Wallet::operator = (const Var b)
@@ -1020,15 +1019,15 @@ Wallet& Wallet::operator = ([[maybe_unused]] const Dice b)
 }
 Wallet& Wallet::operator = (const Wallet b)
 {
-	Money = b.Money;
+	Monies = b.Monies;
 	transaction = b.transaction;
 
 	return *this;
 }
 Wallet& Wallet::operator = (const Currency b)
 {
-	Money.clear();
-	Money[b] = 1;
+	Monies.clear();
+	set(b,1);
 
 	return *this;
 }
@@ -1040,16 +1039,13 @@ Wallet& Wallet::operator += ([[maybe_unused]] const std::string b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Wallet& Wallet::operator += (const money_t b)
+Wallet& Wallet::operator += (const Money b)
 {
-	Currency c = b.first;
-	int q = b.second;
+	set(b.c,get(b.c)+b.q);
+	datamap<Currency> s = getCurrencySystem(b.c.System);
 
-	Money[c] += q;
-	datamap<Currency> s = getCurrencySystem(c.System);
-
-	if(c.System != "" && s[c.Larger].SmallerAmount <= Money[c])
-		TradeUp(c.System,this);
+	if(b.c.System != "" && s[b.c.Larger].SmallerAmount <= get(b.c))
+		TradeUp(b.c.System,this);
 
 	return *this;
 }
@@ -1065,13 +1061,13 @@ Wallet& Wallet::operator += ([[maybe_unused]] const Dice b)
 }
 Wallet& Wallet::operator += ([[maybe_unused]] const Wallet b)
 {
-	for(const auto& [c,q] : b)
-		*this += money_t(c,q);
+	for(const auto& m : b.Monies)
+		*this += Money{m.c,m.q};
 	return *this;
 }
 Wallet& Wallet::operator += (const Currency b)
 {
-	*this += money_t(b,1);
+	*this += Money{b,1};
 	return *this;
 }
 Wallet& Wallet::operator -= ([[maybe_unused]] const int b)
@@ -1082,25 +1078,22 @@ Wallet& Wallet::operator -= ([[maybe_unused]] const std::string b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Wallet& Wallet::operator -= (const money_t b)
+Wallet& Wallet::operator -= (const Money b)
 {
-	Currency c = b.first;
-	int q = b.second;
-
 	transaction = b;
 
-	if(Money[c]-q < 0 && c.System != "" && HasEffectivelyAtLeast(q,c))
+	if(get(b.c)-b.q < 0 && b.c.System != "" && HasEffectivelyAtLeast(b.q,b.c))
 	{
-		Money[c] -= q;
-		MakeChange(c,this);
+		set(b.c,get(b.c)-b.q);
+		MakeChange(b.c,this);
 	}
-	else if(Money[c]-q < 0 && c.System != "")//TODO: Maybe create option to allow users to go into debt?
+	else if(get(b.c)-b.q < 0 && b.c.System != "")//TODO: Maybe create option to allow users to go into debt?
 	{
 		output(Error,"Insufficient funds!");
 	}
-	else if(Money[c]-q >= 0)
+	else if(get(b.c)-b.q >= 0)
 	{
-		Money[c] -= q;
+		set(b.c,get(b.c)-b.q);
 	}
 	return *this;
 }
@@ -1116,28 +1109,28 @@ Wallet& Wallet::operator -= ([[maybe_unused]] const Dice b)
 }
 Wallet& Wallet::operator -= (const Wallet b)
 {
-	for(const auto& [c,q] : b)
+	for(const auto& m : b.Monies)
 	{
-		if(!HasEffectivelyAtLeast(q,c))
+		if(!HasEffectivelyAtLeast(m.q,m.c))
 		{
 			output(Error,"Insufficient funds!");
 			return *this;
 		}
 	}
 
-	for([[maybe_unused]] const auto& [c,q] : b)
-		*this -= money_t(c,q);
+	for(const auto& m : b.Monies)
+		*this -= Money{m.c,m.q};
 	return *this;
 }
 Wallet& Wallet::operator -= (const Currency b)
 {
-	*this -= money_t(b,1);
+	*this -= Money{b,1};
 	return *this;
 }
 Wallet& Wallet::operator *= (const int b)
 {
-	for(const auto& [c,q] : *this)
-		if(b > 1) *this += money_t(c,(q*(b-1)));//Avoid zeroing out wallet if user factors by 1
+	for(const auto& m : Monies)
+		if(b > 1) *this += Money{m.c,(m.q*(b-1))};//Avoid zeroing out wallet if user factors by 1
 
 	return *this;
 }
@@ -1145,7 +1138,7 @@ Wallet& Wallet::operator *= ([[maybe_unused]] const std::string b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Wallet& Wallet::operator *= ([[maybe_unused]] const money_t b)
+Wallet& Wallet::operator *= ([[maybe_unused]] const Money b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -1172,13 +1165,13 @@ Wallet& Wallet::operator /= (const int b)
 
 	std::map<Currency,float> change;
 
-	for(const auto& [c,q] : *this)
+	for(auto& m : Monies)
 	{
-		float quotient = ((float)q/b);
+		float quotient = ((float)m.q/b);
 		unsigned int _floor = floor(quotient);
 
-		if(_floor) change[c] = (quotient-_floor);
-		Money[c] = _floor;
+		if(_floor) change[m.c] = (quotient-_floor);
+		set(m.c,_floor);
 	}
 
 	//Convert everything to the right of the decimal point to the closest whole currencies
@@ -1192,7 +1185,7 @@ Wallet& Wallet::operator /= ([[maybe_unused]] const std::string b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Wallet& Wallet::operator /= ([[maybe_unused]] const money_t b)
+Wallet& Wallet::operator /= ([[maybe_unused]] const Money b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -1240,7 +1233,7 @@ Wallet& Wallet::operator ^= ([[maybe_unused]] const Currency b)
 }
 Wallet& Wallet::operator %= (const int b)
 {
-	for(auto& [c,q] : Money) q %= b;
+	for(auto& m : Monies) m.q %= b;
 
 	return *this;
 }
@@ -1429,16 +1422,16 @@ bool Wallet::operator == ([[maybe_unused]] const Dice& b) const
 bool Wallet::operator == (const Wallet& b) const
 {
 	bool containsCurrency = false;
-	for([[maybe_unused]] const auto& [c,q] : Money)
+	for(const auto& m : Monies)
 	{
-		for([[maybe_unused]] const auto& [b_c,b_q] : b.Money)
+		for(const auto& bm : b.Monies)
 		{
-			if(c == b_c && q == b_q)
+			if(m.c == bm.c && m.q == bm.q)
 			{
 				containsCurrency = true;
 				break;
 			}
-			else if(c == b_c && q != b_q)//Differing like-currency amounts
+			else if(m.c == bm.c && m.q != bm.q)//Differing like-currency amounts
 			{
 				return false;
 			}
@@ -1447,16 +1440,16 @@ bool Wallet::operator == (const Wallet& b) const
 	}
 
 	containsCurrency = false;
-	for([[maybe_unused]] const auto& [b_c,b_q] : b.Money)
+	for(const auto& bm : b.Monies)
 	{
-		for([[maybe_unused]] const auto& [c,q] : Money)
+		for(const auto& m : Monies)
 		{
-			if(b_c == c && b_q == q)
+			if(bm.c == m.c && bm.q == m.q)
 			{
 				containsCurrency = true;
 				break;
 			}
-			else if(b_c == c && b_q != q)//Differing like-currency amounts
+			else if(bm.c == m.c && bm.q != m.q)//Differing like-currency amounts
 			{
 				return false;
 			}
@@ -1648,11 +1641,11 @@ bool Wallet::operator || (const Currency b)
 Wallet& Wallet::operator ++ ()
 {
 	//Add 1 of the smallest currency
-	for(const auto& [c,q] : Money)
+	for(const auto& m : Monies)
 	{
-		if(c.System == "" || c.Smaller == "")
+		if(m.c.System == "" || m.c.Smaller == "")
 		{
-			*this += money_t(c,1);
+			*this += Money{m.c,1};
 			break;
 		}
 	}
@@ -1664,12 +1657,12 @@ Wallet& Wallet::operator ++ (int)
 }
 Wallet& Wallet::operator -- ()
 {
-	//Subtracy 1 of the smallest currency
-	for(const auto& [c,q] : Money)
+	//Subtract 1 of the smallest currency
+	for(const auto& m : Monies)
 	{
-		if(c.System == "" || c.Smaller == "")
+		if(m.c.System == "" || m.c.Smaller == "")
 		{
-			*this -= money_t(c,1);
+			*this -= Money{m.c,1};
 			break;
 		}
 	}
@@ -1685,41 +1678,41 @@ void MakeChange(Currency c, Wallet* w)
 	datamap<Currency> s = getCurrencySystem(c.System);
 	std::string NextHighest = c.Larger;
 	int ConversionFactor = s[NextHighest].SmallerAmount;
-	int transactionAmount = (*w).transaction.second;
+	int transactionAmount = (*w).transaction.q;
 
 	//Number of Currency[NextHighest] that will need to be converted to current currency
-	int ChangeCount = (abs(((*w)[c]))/ConversionFactor);
+	int ChangeCount = (abs(((*w).get(c)))/ConversionFactor);
 
 	//Only break an extra higher denomination currency if we really need to
 	//e.g. If I owe 13 dimes, but I have 1 dollar and 5 dimes, don't try to break 2 dollars and claim I don't have enough money
 	int MinimumAmountToBreak = ChangeCount*ConversionFactor;
-	int PreTransactionQuantity = transactionAmount+(*w)[c];
-	if((MinimumAmountToBreak + PreTransactionQuantity) < transactionAmount)
+	int PreTransactionQuantity = transactionAmount+(*w).get(c);
+	if((MinimumAmountToBreak+PreTransactionQuantity) < transactionAmount)
 		ChangeCount++;
 
 	//Prevent unneccesary subtraction
 	//Check if the player has to make change with the currency after that to complete transaction
 	if(ChangeCount == 0)
 		return;
-	else if((*w)[s[NextHighest]] < ChangeCount)
+	else if((*w).get(s[NextHighest]) < ChangeCount)
 		MakeChange(s[NextHighest],w);
 
 	//Make change by breaking the larger denomination into the smaller denomination
-	(*w)[c] += ConversionFactor*ChangeCount;
-	(*w) -= money_t(s[NextHighest],ChangeCount);
+	(*w).set(c,((*w).get(c)+(ConversionFactor*ChangeCount)));
+	(*w) -= Money{s[NextHighest],ChangeCount};
 }
 void TradeUp(std::string system, Wallet* w)
 {
 	datamap<Currency> s = getCurrencySystem(system);
-	for(const auto& [c,q] : (*w).Money)
+	for(const auto& m : (*w).Monies)
 	{
-		if(c.System == system && c.Larger != "" && q >= s[c.Larger].SmallerAmount)
+		if(m.c.System == system && m.c.Larger != "" && m.q >= s[m.c.Larger].SmallerAmount)
 		{
 			//Make use of the trucation of the divison return value to int to simplify the math
-			int ConversionFactor = s[c.Larger].SmallerAmount;
-			int AmountTradable = ((*w)[c] / ConversionFactor);
-			(*w)[s[c.Larger]] += AmountTradable;
-			(*w)[c] -= (AmountTradable * ConversionFactor);
+			int ConversionFactor = s[m.c.Larger].SmallerAmount;
+			int AmountTradable = ((*w).get(m.c)/ConversionFactor);
+			(*w).set(s[m.c.Larger],(*w).get(s[m.c.Larger])+AmountTradable);
+			(*w).set(m.c,(*w).get(m.c)-(AmountTradable*ConversionFactor));
 		}
 	}
 }

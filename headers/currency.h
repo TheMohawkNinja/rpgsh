@@ -4,6 +4,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <vector>
 #include "define.h"
 
 //External forward declarations
@@ -176,12 +177,16 @@ class Currency
 	Currency& operator ++ (int);
 	Currency& operator -- (int);
 };
-typedef std::pair<Currency, int> money_t;
+struct Money
+{
+	Currency c;
+	int q;
+};
 class Wallet
 {
 	public:
-		std::map<Currency, int> Money;
-		std::pair<Currency,int> transaction;
+		std::vector<Money> Monies;
+		Money transaction;
 
 	bool HasEffectivelyAtLeast(int q, Currency c);
 	unsigned int getEquivalentValueInLowestDenomination(std::string system);
@@ -194,50 +199,44 @@ class Wallet
 	explicit operator bool() const;
 	const char* c_str() const;
 
-	int& operator [] (const Currency b);
-
-	//Iterator for the class
-	using iterator = typename std::map<Currency, int>::const_iterator;
-
-	//Beginning and end iterators. This is so I can use "for(const auto& [key,val] : Wallet){}"
-	std::map<Currency, int>::const_iterator begin() const;
-	std::map<Currency, int>::const_iterator end() const;
+	int get(const Currency c);
+	void set(const Currency c, const int q);
 
 	Wallet();
 	Wallet(const Wallet& b);
-	Wallet(const money_t m);
+	Wallet(const Money m);
 	Wallet(std::string s);
 	Wallet& operator = ([[maybe_unused]] const int b);
 	Wallet& operator = ([[maybe_unused]] const std::string b);
-	Wallet& operator = (const money_t b);
+	Wallet& operator = (const Money b);
 	Wallet& operator = (const Var b);
 	Wallet& operator = ([[maybe_unused]] const Dice b);
 	Wallet& operator = (const Wallet b);
 	Wallet& operator = (const Currency b);
 	Wallet& operator += ([[maybe_unused]] const int b);
 	Wallet& operator += ([[maybe_unused]] const std::string b);
-	Wallet& operator += (const money_t b);
+	Wallet& operator += (const Money b);
 	Wallet& operator += (const Var b);
 	Wallet& operator += ([[maybe_unused]] const Dice b);
 	Wallet& operator += (const Wallet b);
 	Wallet& operator += (const Currency b);
 	Wallet& operator -= ([[maybe_unused]] const int b);
 	Wallet& operator -= ([[maybe_unused]] const std::string b);
-	Wallet& operator -= (const money_t b);
+	Wallet& operator -= (const Money b);
 	Wallet& operator -= (const Var b);
 	Wallet& operator -= ([[maybe_unused]] const Dice b);
 	Wallet& operator -= (const Wallet b);
 	Wallet& operator -= (const Currency b);
 	Wallet& operator *= (const int b);
 	Wallet& operator *= ([[maybe_unused]] const std::string b);
-	Wallet& operator *= ([[maybe_unused]] const money_t b);
+	Wallet& operator *= ([[maybe_unused]] const Money b);
 	Wallet& operator *= (const Var b);
 	Wallet& operator *= ([[maybe_unused]] const Dice b);
 	Wallet& operator *= ([[maybe_unused]] const Wallet b);
 	Wallet& operator *= ([[maybe_unused]] const Currency b);
 	Wallet& operator /= (const int b);
 	Wallet& operator /= ([[maybe_unused]] const std::string b);
-	Wallet& operator /= ([[maybe_unused]] const money_t b);
+	Wallet& operator /= ([[maybe_unused]] const Money b);
 	Wallet& operator /= (const Var b);
 	Wallet& operator /= ([[maybe_unused]] const Dice b);
 	Wallet& operator /= ([[maybe_unused]] const Wallet b);
