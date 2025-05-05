@@ -87,8 +87,8 @@ void addPropertiesToMatches(std::vector<std::string>* pMatches, Scope scope, std
 	}
 	else if(type == WALLET_SIGIL && scope.keyExists<Wallet>(key))
 	{
-		for(auto& [c,q] : scope.get<Wallet>(key))
-			addPropertyToMatches(&pMatches,chk_str,property,std::string(c));
+		for(auto& m : scope.get<Wallet>(key).Monies)
+			addPropertyToMatches(&pMatches,chk_str,property,std::string(m.c));
 	}
 	else if(type == CURRENCY_SIGIL && scope.keyExists<Currency>(key))
 	{

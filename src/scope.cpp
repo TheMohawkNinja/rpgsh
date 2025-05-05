@@ -218,10 +218,10 @@ std::string Scope::getProperty<Var>(std::string key, std::string property)
 template<>
 std::string Scope::getProperty<Wallet>(std::string key, std::string property)
 {
-	for(const auto& [c,q] : get<Wallet>(key))
+	for(const auto& m : get<Wallet>(key).Monies)
 	{
-		if(!stringcasecmp(property,c.Name))
-			return std::to_string(q);
+		if(!stringcasecmp(property,m.c.Name))
+			return std::to_string(m.q);
 	}
 
 	throw std::runtime_error(E_INVALID_PROPERTY);
@@ -326,7 +326,7 @@ template<>
 void Scope::setProperty<Wallet,int>(std::string key, std::string property, int value)
 {
 	if(get<Wallet>(key).containsCurrency(property))
-		wallets[getExistingKey<Wallet>(key)].Money[wallets[getExistingKey<Wallet>(key)].getExistingCurrency(property)] = value;
+		wallets[getExistingKey<Wallet>(key)].set(wallets[getExistingKey<Wallet>(key)].getExistingCurrency(property),value);
 	else
 		throw std::runtime_error(E_INVALID_PROPERTY);
 }

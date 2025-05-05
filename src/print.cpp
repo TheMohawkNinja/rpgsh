@@ -73,11 +73,11 @@ void printData(Scope scope, Var depth=-1, bool raw=false)
 
 		//Get longest currency name
 		long unsigned int longest_cur = 0;
-		for(auto& [c,q] : v)
+		for(auto& m : v.Monies)
 		{
-			if(!q) continue;
-			if(c.Name.length() > longest_cur)
-				longest_cur = c.Name.length();
+			if(!m.q) continue;
+			if(m.c.Name.length() > longest_cur)
+				longest_cur = m.c.Name.length();
 		}
 		if(!raw)
 		{
@@ -86,11 +86,11 @@ void printData(Scope scope, Var depth=-1, bool raw=false)
 		}
 
 		//Print values
-		for(auto& [c,q] : v)
+		for(auto& m : v.Monies)
 		{
-			if(!q) continue;
-			fprintf(stdout,"%s%s:%s%s",TEXT_ITALIC,c.Name.c_str(),TEXT_NORMAL,addSpaces(longest_cur-c.Name.length()+COLUMN_PADDING).c_str());
-			fprintf(stdout,"%d\n",q);
+			if(!m.q) continue;
+			fprintf(stdout,"%s%s:%s%s",TEXT_ITALIC,m.c.Name.c_str(),TEXT_NORMAL,addSpaces(longest_cur-m.c.Name.length()+COLUMN_PADDING).c_str());
+			fprintf(stdout,"%d\n",m.q);
 		}
 		fprintf(stdout,"\n");
 	}

@@ -19,14 +19,14 @@ int main(int argc, char** argv)
 		fprintf(stdout,"\tvalueof [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\nOPTIONS:\n");
 		fprintf(stdout,"\t%swallet%s\t\tPretty prints the content of %swallet%s.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"\t%swallet%s -%scurrency%s\tPretty prints the equivalent value of %swallet%s in %scurrency%s.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t%swallet%s %scurrency%s\tPretty prints the equivalent value of %swallet%s in %scurrency%s.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\t%s | %s\t\tPrints this help text\n",FLAG_HELPSHORT,FLAG_HELPLONG);
 		return 0;
 	}
 
 	Wallet w_in, w_out;
 	bool hasWallet = false;
-	std::string currency;
+	Currency currency;
 	for(int i=1; i<argc; i++)
 	{
 		if(argv[i][0] == WALLET_SIGIL && argv[i][1] == '{')
@@ -42,9 +42,21 @@ int main(int argc, char** argv)
 				return -1;
 			}
 		}
+		else if(argv[i][0] == CURRENCY_SIGIL && argv[i][1] == '{')
+		{
+			try
+			{
+				currency = Currency(std::string(argv[i]));
+			}
+			catch(const std::runtime_error& e)
+			{
+				output(Error,"Unable to construct a Currency from \"%s\": %s",argv[i],e.what());
+				return -1;
+			}
+		}
 		else if(argv[i][0] == '-')
 		{
-			currency = right(std::string(argv[i]),1);
+			output(Warning,"Unknown option \"%s\"",argv[i]);
 		}
 	}
 
@@ -53,14 +65,14 @@ int main(int argc, char** argv)
 		output(Error,"valueof expects a wallet for an argument.");
 		return -1;
 	}
-	if(currency == "")
+	if(currency == Currency())
 	{
 		for(const auto& line : getAppOutput("print "+std::string(w_in)).output)
 			fprintf(stdout,"%s\n",line.c_str());
 		fprintf(stdout,"\b");
 		return 0;
 	}
-	else if(!w_in.containsCurrency(currency))
+	else if(!w_in.containsCurrency(currency.Name))
 	{
 		output(Error,"Currency \"%s\" is not contained within the inputted Wallet.",currency.c_str());
 		return -1;
@@ -69,35 +81,31 @@ int main(int argc, char** argv)
 	{
 		//Get smallest currency in system
 		Currency smallest;
-		for(const auto& [c,q] : w_in)
+		for(const auto& [k,v] : getCurrencySystem(currency.System))
 		{
-			if(c.Smaller != "") continue;
-			smallest = c;
+			if(v.Smaller != "") continue;
+			smallest = v;
 			break;
 		}
 
 		//sdea = Smallest Denomination Equivalent Amount
-		unsigned int sdea = w_in.getEquivalentValueInLowestDenomination(smallest.System);
-		w_out = Wallet(money_t(smallest,sdea));
+		int sdea = w_in.getEquivalentValueInLowestDenomination(smallest.System);
+		w_out = Wallet(Money{smallest,sdea});
 
 		//Give output wallet the keys of all currencies in the system
 		datamap<Currency> s = getCurrencySystem(smallest.System);
 		for(const auto& [k,v] : s)
-		{
-			if(!w_out[v]) w_out[v] = 1;
-			fprintf(stdout,"Set %s to %d\n",v.Name.c_str(),w_out[v]);
-		}
+			if(!w_out.get(v)) w_out.set(v,0);
 
-		for(const auto& [c,q] : w_out)
+		for(const auto& m : w_out.Monies)
 		{
-			fprintf(stdout,"\tChecking %s\n",c.Name.c_str());
-			if(c.System == smallest.System && c.Larger != "" && q >= s[c.Larger].SmallerAmount)
+			if(m.c.System == smallest.System && m.c.Larger != currency.Larger && m.q >= s[m.c.Larger].SmallerAmount)
 			{
 				//Make use of the trucation of the divison return value to int to simplify the math
-				int ConversionFactor = s[c.Larger].SmallerAmount;
-				int AmountTradable = (w_out[c] / ConversionFactor);
-				w_out[s[c.Larger]] += AmountTradable;
-				w_out[c] -= (AmountTradable * ConversionFactor);
+				int ConversionFactor = s[m.c.Larger].SmallerAmount;
+				int AmountTradable = (w_out.get(m.c)/ConversionFactor);
+				w_out.set(s[m.c.Larger],w_out.get(s[m.c.Larger])+AmountTradable);
+				w_out.set(m.c,w_out.get(m.c)-(AmountTradable*ConversionFactor));
 			}
 		}
 
