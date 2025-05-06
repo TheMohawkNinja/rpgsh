@@ -542,34 +542,17 @@ bool Currency::operator < ([[maybe_unused]] const Wallet& b) const
 }
 bool Currency::operator < (const Currency& b) const//Orders std::map with Currency key
 {
-	if((System == ""  && b.System != "") || (b.System == "" && System != ""))
+	if(stringcasecmp(System,b.System))
 		return false;
-	if(System == "" && b.System == "")
-	{
-		if(b.Larger == Name)
-			return true;
-		else if(b.Smaller == Name)
-			return false;
-		else if(b.Name == Name)
-			return false;
-		else
-			return true;
-	}
+	else if(!stringcasecmp(b.Larger,Name))
+		return true;
+	else if(!stringcasecmp(b.Smaller,Name))
+		return false;
+	else if(!stringcasecmp(b.Name,Name))
+		return false;
+	else
+		return true;
 
-	//No idea why this needs to be in a loop, but it doesn't work right otherwise
-	while(true)
-	{
-		if(System != b.System)
-			continue;
-		else if(b.Larger == Name)
-			return true;
-		else if(b.Smaller == Name)
-			return false;
-		else if(b.Name == Name)
-			return false;
-		else
-			return true;
-	}
 	return (Name < b.Name);
 }
 bool Currency::operator > ([[maybe_unused]] const int& b) const
