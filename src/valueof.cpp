@@ -97,21 +97,34 @@ int main(int argc, char** argv)
 		for(const auto& [k,v] : s)
 			if(!w_out.get(v)) w_out.set(v,0);
 
-		for(const auto& m : w_out.Monies)
+		for(long unsigned int i=0; i<w_out.Monies.size(); i++)
 		{
-			if(m.c.System == smallest.System && m.c.Larger != currency.Larger && m.q >= s[m.c.Larger].SmallerAmount)
+			Money m = w_out.Monies[i];
+			if(m.c.Larger != "" && m.c.Larger != currency.Larger && m.q >= s[m.c.Larger].SmallerAmount)
 			{
 				//Make use of the trucation of the divison return value to int to simplify the math
 				int ConversionFactor = s[m.c.Larger].SmallerAmount;
 				int AmountTradable = (w_out.get(m.c)/ConversionFactor);
 				w_out.set(s[m.c.Larger],w_out.get(s[m.c.Larger])+AmountTradable);
 				w_out.set(m.c,w_out.get(m.c)-(AmountTradable*ConversionFactor));
+				i=0;
 			}
 		}
 
-		for(const auto& line : getAppOutput("print "+std::string(w_out)).output)
-			fprintf(stdout,"%s\n",line.c_str());
-		fprintf(stdout,"\b");
+		for(long unsigned int i=0; i<w_out.Monies.size()-1; i++)
+		{
+			if(w_out.Monies[i].q) break;
+			w_out.Monies.erase(w_out.Monies.begin()+i);
+			i--;
+		}
+		fprintf(stdout,"%d\n",w_out.Monies[0].q);
+		if(w_out.Monies.size() > 1)
+		{
+			fprintf(stdout,"\nRemainder: ");
+			for(long unsigned int i=1; i<w_out.Monies.size(); i++)
+				fprintf(stdout,"%d %s, ",w_out.Monies[i].q,w_out.Monies[i].c.Name.c_str());
+			fprintf(stdout,"\b\b%s\n",CLEAR_TO_LINE_END);
+		}
 	}
 
 	return 0;
