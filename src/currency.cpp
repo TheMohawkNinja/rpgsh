@@ -973,6 +973,79 @@ const char* Wallet::c_str() const
 	return std::string(*this).c_str();
 }
 
+void Wallet::sort()
+{
+	//Sort first by system alphabetically
+	for(long unsigned int i=0; i<Monies.size(); i++)
+	{
+		if(i && Monies[i].c.System < Monies[i-1].c.System)
+		{
+			Money tmp = Monies[i-1];
+			Monies[i-1] = Monies[i];
+			Monies[i] = tmp;
+			i=0;
+		}
+	}
+
+	//Find where each system starts
+	typedef std::pair<std::string,long unsigned int> sys_index;
+	std::vector<sys_index> systems;
+	for(long unsigned int i=0; i<Monies.size(); i++)
+		if(!systems.size() || Monies[i].c.System != systems[systems.size()-1].first)
+			systems.push_back(sys_index(Monies[i].c.System,i));
+
+	//Main sorting algorithm
+	for(long unsigned int system=0; system<systems.size(); system++)
+	{
+		sys_index s = systems[system];
+		for(long unsigned int i=s.second; i<Monies.size()-1 && Monies[i].c.System == s.first; i++)
+		{
+			if(i > s.second && Monies[i].c.Larger == "")
+			{
+				Money tmp = Monies[s.second];
+				Monies[s.second] = Monies[i];
+				Monies[i] = tmp;
+				i=s.second;
+			}
+			else if(i > s.second && Monies[i-1].c.Larger == Monies[i].c.Name)
+			{
+				Money tmp = Monies[i-1];
+				Monies[i-1] = Monies[i];
+				Monies[i] = tmp;
+				i=s.second;
+			}
+			else if(system < systems.size()-1 && Monies[i+1].c.System == s.first && Monies[i+1].c.Smaller == Monies[i].c.Name)
+			{
+				Money tmp = Monies[i+1];
+				Monies[i+1] = Monies[i];
+				Monies[i] = tmp;
+				i=s.second;
+			}
+			else if(system == systems.size()-1 && i < Monies.size()-1 && Monies[i+1].c.Smaller == Monies[i].c.Name)
+			{
+				Money tmp = Monies[i+1];
+				Monies[i+1] = Monies[i];
+				Monies[i] = tmp;
+				i=s.second;
+			}
+			else if(system < systems.size()-1 && Monies[i+1].c.System == s.first && Monies[i].c.Smaller == "")
+			{
+				Money tmp = Monies[systems[system+1].second-1];
+				Monies[systems[system+1].second-1] = Monies[i];
+				Monies[i] = tmp;
+				i=s.second;
+			}
+			else if(system == systems.size()-1 && i < Monies.size()-1 && Monies[i].c.Smaller == "")
+			{
+				Money tmp = Monies.back();
+				Monies.back() = Monies[i];
+				Monies[i] = tmp;
+				i=s.second;
+			}
+		}
+	}
+}
+
 int Wallet::get(const Currency c)
 {
 	for(const auto& m : Monies)
@@ -986,9 +1059,11 @@ void Wallet::set(const Currency c, const int q)
 	{
 		if(c != m.c) continue;
 		m.q = q;
+		sort();
 		return;
 	}
 	Monies.push_back(Money{c,q});
+	sort();
 }
 
 Wallet& Wallet::operator = ([[maybe_unused]] const int b)
@@ -1004,6 +1079,7 @@ Wallet& Wallet::operator = (const Money b)
 	for(auto& m : Monies)
 		m.q = 0;
 	set(b.c,b.q);
+	sort();
 	return *this;
 }
 Wallet& Wallet::operator = (const Var b)
@@ -1059,7 +1135,7 @@ Wallet& Wallet::operator += ([[maybe_unused]] const Dice b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Wallet& Wallet::operator += ([[maybe_unused]] const Wallet b)
+Wallet& Wallet::operator += (const Wallet b)
 {
 	for(const auto& m : b.Monies)
 		*this += Money{m.c,m.q};

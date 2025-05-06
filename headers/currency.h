@@ -1,7 +1,6 @@
 #pragma once
 
 #include <cassert>
-#include <map>
 #include <memory>
 #include <string>
 #include <vector>
@@ -198,6 +197,8 @@ class Wallet
 	explicit operator std::string() const;
 	explicit operator bool() const;
 	const char* c_str() const;
+
+	void sort();
 
 	int get(const Currency c);
 	void set(const Currency c, const int q);
