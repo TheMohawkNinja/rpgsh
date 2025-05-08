@@ -674,20 +674,8 @@ int main()
 
 	fprintf(stdout,CLEAR_ENTIRE_LINE);//Delete "Generating..." line from start of main()
 
-	std::string startup_apps = cfg.setting[STARTUP_APPS];
-	while(true)
-	{
-		if(findu(startup_apps,',') == std::string::npos)
-		{
-			(void)runApp(startup_apps.c_str(),false);
-			break;
-		}
-		else
-		{
-			(void)runApp(left(startup_apps,findu(startup_apps,',')).c_str(),false);
-			startup_apps = right(startup_apps,findu(startup_apps,',')+1);
-		}
-	}
+	for(const auto& app : parseCommaDelimitedList(cfg.setting[STARTUP_APPS]))
+		(void)runApp(app.c_str(),false);
 
 	if(!stob(cfg.setting[HIDE_TIPS]))
 	{
