@@ -311,6 +311,27 @@ int stringcasecmp(std::string a, std::string b)
 	return strcasecmp(a.c_str(),b.c_str());
 }
 
+std::vector<std::string> parseCommaDelimitedList(std::string str)
+{
+	std::vector<std::string> list;
+	if(findu(str,',') == std::string::npos)
+	{
+		list.push_back(str);
+		return list;
+	};
+
+	while(true)
+	{
+		if(findu(str,',') == std::string::npos)
+			return list;
+
+		list.push_back(left(str,findu(str,',')));
+		str = right(str,findu(str,',')+1);
+	}
+
+	return list;
+}
+
 long unsigned int findu(std::string str, std::string match, long unsigned int start)
 {
 	if(match.length() > str.length()) return std::string::npos;

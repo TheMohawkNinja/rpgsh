@@ -54,6 +54,8 @@ bool isEscaped(std::string str, long unsigned int pos);
 
 int stringcasecmp(std::string a, std::string b);
 
+std::vector<std::string> parseCommaDelimitedList(std::string list);
+
 template <typename T>
 long long int findInVect(std::vector<T> v, T match, long unsigned int start=0)
 {
