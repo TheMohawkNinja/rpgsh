@@ -52,6 +52,7 @@ Config::Config()
 	setting[HISTORY_LENGTH]	=	"100";
 	setting[ALIASES]	=	"?::help::-::del";
 	setting[STARTUP_APPS]	=	"banner,version";
+	setting[POST_RUN_APPS]	=	"";
 
 	// Create default config file if one does not exist
 	if(!std::filesystem::exists(config_path.c_str()))
@@ -83,6 +84,10 @@ Config::Config()
 		fs<<COMMENT<<" Comma-delimited list of programs to run when rpgsh launches.\n";
 		fs<<COMMENT<<" Default: "<<setting[STARTUP_APPS]<<"\n";
 		fs<<STARTUP_APPS<<"="<<setting[STARTUP_APPS]<<"\n";
+		fs<<"\n";
+		fs<<COMMENT<<" Comma-delimited list of programs to run after a command is entered into the prompt.\n";
+		fs<<COMMENT<<" Default: "<<setting[POST_RUN_APPS]<<"\n";
+		fs<<STARTUP_APPS<<"="<<setting[POST_RUN_APPS]<<"\n";
 		fs.close();
 	}
 	std::ifstream fs(config_path.c_str());
