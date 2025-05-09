@@ -56,6 +56,8 @@ if [[ $EUID -eq 0 ]]; then
 	echo "Compiling applications:"
 	echo -e "\tsrc/main.cpp\t\t->\t$bold_white""/bin/rpgsh"$normal
 	g++ $flags src/main.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh
+	echo -e "\tsrc/autorun.cpp\t\t->\t$bold_white""/bin/rpgsh-autorun"$normal
+	g++ $flags src/autorun.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-autorun
 	echo -e "\tsrc/banner.cpp\t\t->\t$bold_white""/bin/rpgsh-banner"$normal
 	g++ $flags src/banner.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-banner
 	echo -e "\tsrc/clear.cpp\t\t->\t$bold_white""/bin/rpgsh-clear"$normal
