@@ -149,8 +149,9 @@ int main(int argc, char** argv)
 			fprintf(stdout,"%s%sDelete character \"%s\" [y/N]?%s ",TEXT_YELLOW,TEXT_BOLD,(campaign_name+"/"+left(entry,entry.length()-5)).c_str(),TEXT_NORMAL);
 			if(getchar() != 'y') return 0;
 
-			std::filesystem::remove(campaign_path+entry);
-			if(std::filesystem::exists(campaign_path+entry+".bak")) std::filesystem::remove(campaign_path+entry+".bak");
+			for(const auto& file : getDirectoryListing(campaign_path))
+			if(!stringcasecmp(left(file,findu(file,'.')),mc.c))
+				std::filesystem::remove(campaign_path+file);
 			output(Info,"Character \"%s\" has been deleted.",(campaign_name+"/"+left(entry,entry.length()-5)).c_str());
 			return 0;
 		}
