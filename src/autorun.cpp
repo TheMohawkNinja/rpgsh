@@ -2,16 +2,18 @@
 #include <iostream>
 #include "../headers/functions.h"
 
-void execAutorun(std::string path, std::string scope, bool verbose)
+void confirmPath(std::string path, std::string scope)
 {
 	if(!std::filesystem::exists(path))
 	{
 		std::ofstream ofs(path);
 		ofs.close();
-		if(verbose)
-			output(Info,"Created %s autorun file at \"%s\"",scope.c_str(),path.c_str());
+		output(Info,"Created %s autorun file at \"%s\"",scope.c_str(),path.c_str());
 		return;
 	}
+}
+void execAutorun(std::string path, std::string scope, bool verbose)
+{
 	std::ifstream ifs(path);
 	while(!ifs.eof())
 	{
@@ -129,6 +131,10 @@ int main(int argc, char** argv)
 	std::string m_path = left(m.getDatasource(),rfindu(m.getDatasource(),".variables"))+".autorun";
 	std::string c_path = left(c.getDatasource(),rfindu(c.getDatasource(),'/')+1)+c.getName()+".autorun";
 
+	confirmPath(s_path,"shell");
+	confirmPath(m_path,"campaign");
+	confirmPath(c_path,"character");
+
 	if(argc == 1 || !strcasecmp(argv[1],"-v"))
 	{
 		bool verbose = false;
@@ -189,11 +195,18 @@ int main(int argc, char** argv)
 			catch(...){}
 		}
 
-		if(!removeCommand(s_path,&index,"shell") && !removeCommand(m_path,&index,"campaign") && !removeCommand(c_path,&index,"character"))
+		if(!removeCommand(s_path,&index,"shell") &&
+		   !removeCommand(m_path,&index,"campaign") &&
+		   !removeCommand(c_path,&index,"character"))
 		{
 			output(Error,"No command exists at position %s",index_str.c_str());
 			return -1;
 		}
+	}
+	else
+	{
+		output(Error,"Unknown option \"%s\"",argv[1]);
+		return -1;
 	}
 
 	return 0;
