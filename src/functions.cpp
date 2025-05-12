@@ -12,6 +12,11 @@
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 
+std::string defaultPrompt(Character c)
+{
+	return std::string(TEXT_BOLD)+std::string(TEXT_RED)+c.getName()+std::string(TEXT_WHITE)+"> "+std::string(TEXT_NORMAL);
+}
+
 void output(OutputLevel level, const char* format, ...)
 {
 	FILE* stream;

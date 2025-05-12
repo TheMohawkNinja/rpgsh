@@ -36,6 +36,8 @@ struct MCStr
 	std::string m, c;
 };
 
+std::string defaultPrompt(Character c);
+
 void output(OutputLevel level, const char* format, ...);
 
 std::string makePretty(std::string value);
