@@ -674,7 +674,7 @@ int main()
 
 	fprintf(stdout,CLEAR_ENTIRE_LINE);//Delete "Generating..." line from start of main()
 
-	for(const auto& app : parseCommaDelimitedList(cfg.setting[STARTUP_APPS]))
+	for(const auto& app : split(cfg.setting[STARTUP_APPS],','))
 		(void)runApp(app.c_str(),false);
 
 	if(!stob(cfg.setting[HIDE_TIPS]))
