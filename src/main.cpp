@@ -4,7 +4,9 @@
 #include <fstream>
 #include <map>
 #include <regex>
+#include <sys/ioctl.h>
 #include <termios.h>
+#include <unistd.h>
 #include "../headers/config.h"
 #include "../headers/functions.h"
 #include "../headers/scope.h"
@@ -112,16 +114,37 @@ std::string inputHandler()
 	t_new.c_lflag &= ~(ICANON | ECHO);
 	tcsetattr(fileno(stdin), TCSANOW, &t_new);
 
+	//Get terminal dimensions
+	struct winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
 	bool insert_mode = false;
 	char k = 0;
 	char esc_char = 0;
 	long unsigned int cur_pos = 0;
 	int tab_ctr = 0;
-	std::string last_match = "";
+	std::string last_match, last_history;
 	std::vector<char> input;
 	std::vector<std::string> history = getAppOutput("history").output;
+	std::vector<std::string> prompt = getAppOutput("print -r "+c.getStr<Var>(DOT_PROMPT)).output;
+	long unsigned int last_prompt_line_length;
+
+	if(c.keyExists<Var>(DOT_PROMPT))
+	{
+		for(const auto& line : getAppOutput("print -r "+c.getStr<Var>(DOT_PROMPT)).output)
+		{
+			if(line.length() <= 1) continue;
+			last_prompt_line_length = std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(stripFormatting(line)).length();//TODO: Remove when we convert everything to std::wstring
+		}
+	}
+	else
+	{
+		last_prompt_line_length = defaultPrompt(c).length();
+	}
+
 	unsigned long history_len = history.size();
 	unsigned long history_ctr = history_len-1;
+	long unsigned int total_prompt_line_length = last_prompt_line_length+last_history.length();
 
 	while(k != KB_ENTER)
 	{
@@ -435,7 +458,12 @@ std::string inputHandler()
 				case 'A':	//Up
 				case 'B':	//Down
 					if(cur_pos > 0) fprintf(stdout,CURSOR_LEFT_N,cur_pos);
-					fprintf(stdout,CLEAR_TO_LINE_END);
+					if(total_prompt_line_length>=w.ws_col)
+					{
+						fprintf(stdout,CURSOR_UP_N,total_prompt_line_length/w.ws_col);
+						fprintf(stdout,CURSOR_RIGHT_N,last_prompt_line_length);
+					}
+					fprintf(stdout,CLEAR_TO_SCREEN_END);
 					input.clear();
 					if(esc_char == 'B' && history_ctr == history_len-1)
 					{
@@ -445,11 +473,11 @@ std::string inputHandler()
 					if     (esc_char == 'A' && history_ctr > 0)		history_ctr--;
 					else if(esc_char == 'B' && history_ctr < history_len-1)	history_ctr++;
 					for(const auto& c : history[history_ctr])
-					{
 						input.push_back(c);
-						fprintf(stdout,"%c",c);
-					}
+					fprintf(stdout,"%s",history[history_ctr].c_str());
+					last_history = history[history_ctr];
 					cur_pos = input.size();
+					total_prompt_line_length = last_history.length()+last_prompt_line_length;
 					break;
 				case 'C':	//Right
 					if(cur_pos >= input.size()) continue;
@@ -534,20 +562,20 @@ int prompt()
 	{
 		if(c.keyExists<Var>(DOT_PROMPT))
 		{
-			long unsigned int last_line_length;
+			long unsigned int last_prompt_line_length;
 			for(const auto& line : getAppOutput("print -r "+c.getStr<Var>(DOT_PROMPT)).output)
 			{
 				if(line.length() <= 1) continue;
-				last_line_length = std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(stripFormatting(line)).length();//TODO: Remove when we convert everything to std::wstring
+				last_prompt_line_length = std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(stripFormatting(line)).length();//TODO: Remove when we convert everything to std::wstring
 				fprintf(stdout,"%s\n",line.c_str());
 			}
 			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)0);
 			fprintf(stdout,CURSOR_UP);
-			fprintf(stdout,CURSOR_RIGHT_N,last_line_length);
+			fprintf(stdout,CURSOR_RIGHT_N,last_prompt_line_length);
 		}
 		else
 		{
-			fprintf(stdout,"%s%s%s %s>%s ",TEXT_BOLD,TEXT_RED,c.getName().c_str(),TEXT_WHITE,TEXT_NORMAL);
+			fprintf(stdout,"%s",defaultPrompt(c).c_str());
 		}
 
 		if(backup)
