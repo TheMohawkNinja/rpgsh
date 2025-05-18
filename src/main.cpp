@@ -101,6 +101,40 @@ void addPropertiesToMatches(std::vector<std::string>* pMatches, Scope scope, std
 		addPropertyToMatches(&pMatches,chk_str,property,"Larger");
 	}
 }
+void moveCursorBack(winsize w, long unsigned int start, long unsigned int end=0)
+{
+	fprintf(stdout,CURSOR_HIDE);
+	for(long unsigned int i=start; i>end; i--)
+	{
+		if(i && !(i%w.ws_col))
+		{
+			fprintf(stdout,CURSOR_UP);
+			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)w.ws_col);
+		}
+		else
+		{
+			fprintf(stdout,CURSOR_LEFT);
+		}
+	}
+	fprintf(stdout,CURSOR_SHOW);
+}
+void moveCursorForward(winsize w, long unsigned int start, long unsigned int end)
+{
+	fprintf(stdout,CURSOR_HIDE);
+	for(long unsigned int i=start; i<end; i++)
+	{
+		if(i && !(i%w.ws_col))
+		{
+			fprintf(stdout,CURSOR_DOWN);
+			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)0);
+		}
+		else
+		{
+			fprintf(stdout,CURSOR_RIGHT);
+		}
+	}
+	fprintf(stdout,CURSOR_SHOW);
+}
 std::string inputHandler()
 {
 	#define KB_TAB		9
@@ -126,7 +160,6 @@ std::string inputHandler()
 	std::string last_match, last_history;
 	std::vector<char> input;
 	std::vector<std::string> history = getAppOutput("history").output;
-	std::vector<std::string> prompt = getAppOutput("print -r "+c.getStr<Var>(DOT_PROMPT)).output;
 	long unsigned int last_prompt_line_length;
 
 	if(c.keyExists<Var>(DOT_PROMPT))
@@ -184,12 +217,12 @@ std::string inputHandler()
 				input.insert(input.begin()+cur_pos,k);
 			}
 
-			fprintf(stdout,CLEAR_LINE);
-
+			fprintf(stdout,CLEAR_TO_SCREEN_END);
 			for(long unsigned int i=cur_pos; i<input.size(); i++)
 				fprintf(stdout,"%c",input[i]);
+
 			if(cur_pos < input.size()-1)
-				fprintf(stdout,CURSOR_LEFT_N,input.size()-1-cur_pos);
+				moveCursorBack(w,input.size()+last_prompt_line_length,cur_pos+last_prompt_line_length+1);
 
 			cur_pos++;
 		}
@@ -202,8 +235,9 @@ std::string inputHandler()
 
 			for(long unsigned int i=cur_pos; i<input.size(); i++)
 				fprintf(stdout,"%c",input[i]);
+
 			if(cur_pos < input.size())
-				fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
+				moveCursorBack(w,input.size()+last_prompt_line_length,cur_pos+last_prompt_line_length);
 		}
 		else if((k == KB_TAB || esc_char == 'Z') && input.size() &&
 			(cur_pos == input.size() || input[cur_pos] == ')' || input[cur_pos] == ' ' || last_match != ""))//Tab (completion)
@@ -434,8 +468,8 @@ std::string inputHandler()
 			//Reprint input
 			if(last_match != "" && match != "" && containsNonSpaceChar(match))
 			{
-				fprintf(stdout,CURSOR_LEFT_N,last_match.length()-chk_str.length());
-				fprintf(stdout,CLEAR_TO_LINE_END);
+				moveCursorBack(w,last_match.length()-chk_str.length());
+				fprintf(stdout,CLEAR_TO_SCREEN_END);
 			}
 
 			for(long unsigned int i=cur_pos; i<input.size(); i++)
@@ -481,17 +515,26 @@ std::string inputHandler()
 					break;
 				case 'C':	//Right
 					if(cur_pos >= input.size()) continue;
-					fprintf(stdout,CURSOR_RIGHT);
 					cur_pos++;
+					moveCursorForward(w,last_prompt_line_length+cur_pos,last_prompt_line_length+cur_pos+1);
 					break;
 				case 'D':	//Left
 					if(cur_pos == 0) continue;
-					fprintf(stdout,CURSOR_LEFT);
 					cur_pos--;
+					moveCursorBack(w,last_prompt_line_length+cur_pos+1,last_prompt_line_length+cur_pos);
 					break;
 				case 'H':	//Home
 					if(cur_pos == 0) continue;
-					fprintf(stdout,CURSOR_LEFT_N,cur_pos);
+					if(cur_pos+last_prompt_line_length>=w.ws_col)
+					{
+						fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)0);
+						fprintf(stdout,CURSOR_UP_N,(cur_pos+last_prompt_line_length)/w.ws_col);
+						fprintf(stdout,CURSOR_RIGHT_N,last_prompt_line_length);
+					}
+					else
+					{
+						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
+					}
 					cur_pos = 0;
 					break;
 				case '5':	//PgUp
@@ -511,17 +554,42 @@ std::string inputHandler()
 					break;
 				case '7':	//Home
 					if(getchar() != '~' || cur_pos == 0) continue;
-					fprintf(stdout,CURSOR_LEFT_N,cur_pos);
+					if(cur_pos+last_prompt_line_length>=w.ws_col)
+					{
+						fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)0);
+						fprintf(stdout,CURSOR_UP_N,(cur_pos+last_prompt_line_length)/w.ws_col);
+						fprintf(stdout,CURSOR_RIGHT_N,last_prompt_line_length);
+					}
+					else
+					{
+						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
+					}
 					cur_pos = 0;
 					break;
 				case 'F':	//End
 					if(cur_pos >= input.size()) continue;
-					fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
+					if(input.size()-cur_pos>=w.ws_col)
+					{
+						fprintf(stdout,CURSOR_DOWN_N,(input.size()-cur_pos)/w.ws_col);
+						fprintf(stdout,CURSOR_RIGHT_N,(input.size()-cur_pos)%w.ws_col);
+					}
+					else
+					{
+						fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
+					}
 					cur_pos = input.size();
 					break;
 				case '8':	//End
 					if(getchar() != '~' || cur_pos >= input.size()) continue;
-					fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
+					if(input.size()-cur_pos>=w.ws_col)
+					{
+						fprintf(stdout,CURSOR_DOWN_N,(input.size()-cur_pos)/w.ws_col);
+						fprintf(stdout,CURSOR_RIGHT_N,(input.size()-cur_pos)%w.ws_col);
+					}
+					else
+					{
+						fprintf(stdout,CURSOR_RIGHT_N,input.size()-cur_pos);
+					}
 					cur_pos = input.size();
 					break;
 				case '2':	//Insert
@@ -529,12 +597,17 @@ std::string inputHandler()
 					break;
 				case '3':	//Delete
 					if(getchar() != '~' || cur_pos >= input.size()) continue;
-					fprintf(stdout,CLEAR_LINE);
+					fprintf(stdout,CLEAR_TO_SCREEN_END);
 					input.erase(input.begin()+cur_pos);
 					for(long unsigned int i=cur_pos; i<input.size(); i++)
 						fprintf(stdout,"%c",input[i]);
 					if(cur_pos < input.size())
-						fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos);
+						moveCursorBack(w,input.size()-cur_pos);
+					if(!((cur_pos+last_prompt_line_length+1)%w.ws_col))
+					{
+						fprintf(stdout,CURSOR_UP);
+						fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)w.ws_col);
+					}
 					break;
 			}
 		}
