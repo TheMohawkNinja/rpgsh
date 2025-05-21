@@ -11,7 +11,7 @@ templates_dir="$root_dir""templates/"
 dice_lists_dir="$root_dir""dice-lists/"
 
 flags="-Wall -Wextra -Wpedantic"
-libs="-lfunctions -ldefine -lscope -lvar -lconfig -ldice -lcurrency -lcolors"
+libs="-loutput -lpretty -lvariable -lstring -lfunctions -ldefine -lscope -lvar -lconfig -ldice -lcurrency -lcolors"
 
 #debug="-g -fsanitize=address"
 debug="-g"
@@ -39,12 +39,24 @@ if [[ $EUID -eq 0 ]]; then
 	echo -e "\tsrc/functions.cpp\t->\t$bold_white$lib_dir""libfunctions.so"$normal
 	g++ $flags $debug -std=c++20 -c -fPIC src/functions.cpp -o "$lib_dir""functions.o"
 	g++ $flags -shared "$lib_dir""functions.o" -o "$lib_dir""libfunctions.so"
+	echo -e "\tsrc/output.cpp\t\t->\t$bold_white$lib_dir""liboutput.so"$normal
+	g++ $flags $debug -c -fPIC src/output.cpp -o "$lib_dir""output.o"
+	g++ $flags -shared "$lib_dir""output.o" -o "$lib_dir""liboutput.so"
+	echo -e "\tsrc/string.cpp\t\t->\t$bold_white$lib_dir""libstring.so"$normal
+	g++ $flags $debug -c -fPIC src/string.cpp -o "$lib_dir""string.o"
+	g++ $flags -shared "$lib_dir""string.o" -o "$lib_dir""libstring.so"
+	echo -e "\tsrc/pretty.cpp\t\t->\t$bold_white$lib_dir""libpretty.so"$normal
+	g++ $flags $debug -c -fPIC src/pretty.cpp -o "$lib_dir""pretty.o"
+	g++ $flags -shared "$lib_dir""pretty.o" -o "$lib_dir""libpretty.so"
 	echo -e "\tsrc/scope.cpp\t\t->\t$bold_white$lib_dir""libscope.so"$normal
 	g++ $flags $debug $fs -c -fPIC src/scope.cpp -o "$lib_dir""scope.o"
 	g++ $flags -shared "$lib_dir""scope.o" -o "$lib_dir""libscope.so"
 	echo -e "\tsrc/var.cpp\t\t->\t$bold_white$lib_dir""libvar.so"$normal
 	g++ $flags $debug -c -fPIC src/var.cpp -o "$lib_dir""var.o"
 	g++ $flags -shared "$lib_dir""var.o" -o "$lib_dir""libvar.so"
+	echo -e "\tsrc/variable.cpp\t->\t$bold_white$lib_dir""libvariable.so"$normal
+	g++ $flags $debug -c -fPIC src/variable.cpp -o "$lib_dir""variable.o"
+	g++ $flags -shared "$lib_dir""variable.o" -o "$lib_dir""libvariable.so"
 
 	echo
 
