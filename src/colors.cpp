@@ -1,5 +1,6 @@
 #include "../headers/colors.h"
 #include "../headers/functions.h"
+#include "../headers/string.h"
 
 RGB Colors::as24Bit(std::string color)
 {

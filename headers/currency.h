@@ -18,6 +18,7 @@ class Wallet;
 datamap<Currency> getCurrencySystem(std::string system);
 void MakeChange(Currency c, Wallet* w);
 void TradeUp(std::string system, Wallet* w);
+unsigned int getWalletValue(Wallet w);
 
 class Currency
 {

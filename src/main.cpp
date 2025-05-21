@@ -15,6 +15,10 @@
 Config cfg = Config();
 Character c = Character();
 
+std::string defaultPrompt(Character c)
+{
+	return std::string(TEXT_BOLD)+std::string(TEXT_RED)+c.getName()+std::string(TEXT_WHITE)+"> "+std::string(TEXT_NORMAL);
+}
 bool containsNonSpaceChar(std::string str)
 {
 	for(const auto& ch : str)

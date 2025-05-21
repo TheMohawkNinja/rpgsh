@@ -2,6 +2,8 @@
 #include "../headers/currency.h"
 #include "../headers/dice.h"
 #include "../headers/functions.h"
+#include "../headers/output.h"
+#include "../headers/string.h"
 #include "../headers/text.h"
 #include "../headers/var.h"
 
@@ -12,6 +14,22 @@ datamap<Currency> getCurrencySystem(std::string system)
 		if(!stringcasecmp(v.System,system)) denominations[v.Name] = v;
 
 	return denominations;
+}
+unsigned int getWalletValue(Wallet w)
+{
+	unsigned int total = 0;
+	std::vector<std::string> systems;
+
+	for(const auto& m : w.Monies)
+	{
+		if(findInVect<std::string>(systems,m.c.System) != -1)
+		{
+			systems.push_back(m.c.System);
+			total += w.getEquivalentValueInLowestDenomination(m.c.System);
+		}
+	}
+
+	return total;
 }
 
 void Currency::tryParseCurrencySystem(std::string* str)
