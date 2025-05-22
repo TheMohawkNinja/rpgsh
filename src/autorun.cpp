@@ -1,6 +1,10 @@
 #include <cstring>
 #include <iostream>
+#include "../headers/chkflag.h"
 #include "../headers/functions.h"
+#include "../headers/output.h"
+#include "../headers/scope.h"
+#include "../headers/string.h"
 
 void confirmPath(std::string path, std::string scope)
 {

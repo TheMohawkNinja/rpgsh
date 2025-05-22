@@ -1,15 +1,16 @@
-#include <climits>
 #include <cstring>
 #include <filesystem>
 #include <fstream>
-#include <map>
 #include <regex>
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
 #include "../headers/config.h"
 #include "../headers/functions.h"
+#include "../headers/output.h"
+#include "../headers/pretty.h"
 #include "../headers/scope.h"
+#include "../headers/string.h"
 #include "../headers/text.h"
 
 Config cfg = Config();

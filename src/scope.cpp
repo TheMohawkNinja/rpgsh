@@ -1,6 +1,4 @@
-#include <cstring>
 #include <filesystem>
-#include <fstream>
 #include "../headers/config.h"
 #include "../headers/functions.h"
 #include "../headers/output.h"

@@ -1,11 +1,15 @@
 #include <climits>
 #include <string.h>
+#include "../headers/chkflag.h"
 #include "../headers/currency.h"
 #include "../headers/dice.h"
 #include "../headers/functions.h"
+#include "../headers/output.h"
 #include "../headers/scope.h"
+#include "../headers/string.h"
 #include "../headers/text.h"
 #include "../headers/var.h"
+#include "../headers/variable.h"
 
 enum Action
 {

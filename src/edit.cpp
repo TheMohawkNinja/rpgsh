@@ -3,8 +3,13 @@
 #include <sys/ioctl.h>
 #include <termios.h>
 #include <unistd.h>
+#include "../headers/chkflag.h"
 #include "../headers/functions.h"
+#include "../headers/output.h"
+#include "../headers/pretty.h"
+#include "../headers/string.h"
 #include "../headers/text.h"
+#include "../headers/variable.h"
 
 unsigned long int getPrintLength(std::string str)//std::string.length() returns character count, not the printed length
 {

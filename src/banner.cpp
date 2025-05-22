@@ -1,6 +1,7 @@
 #include <cstring>
 #include <stdio.h>
 #include <string>
+#include "../headers/chkflag.h"
 #include "../headers/define.h"
 #include "../headers/functions.h"
 #include "../headers/text.h"
