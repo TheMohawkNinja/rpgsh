@@ -16,3 +16,10 @@ struct VariableInfo
 
 void loadXRef(std::string* arg, Scope* p_scope);
 VariableInfo parseVariable(std::string v);
+
+template<typename T>
+void appendMap(Scope scope, std::map<std::string,std::string>* p_map);
+void appendOutput(std::map<std::string,std::string> map, std::string key, std::string* pOutput);
+
+std::map<std::string,std::string> getSet(std::string set_str);
+std::string getSetStr(VariableInfo vi);

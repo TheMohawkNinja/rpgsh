@@ -9,7 +9,6 @@
 #include "define.h"
 #include "text.h"
 #include "var.h"
-#include "variable.h"
 
 struct GetAppOutputInfo
 {
@@ -47,19 +46,8 @@ void padding();
 int runApp(std::string args, bool redirect_output);
 GetAppOutputInfo getAppOutput(std::string prog);
 
-void chkFlagAppDesc(char** _argv, std::string description);
-void chkFlagModifyVariables(char** _argv, bool canModify=false);
-bool chkFlagHelp(char** _argv);
-
 std::string getEnvVariable(std::string v);
 void setEnvVariable(std::string v, std::string value);
-
-template<typename T>
-void appendMap(Scope scope, std::map<std::string,std::string>* p_map);
-void appendOutput(std::map<std::string,std::string> map, std::string key, std::string* pOutput);
-
-std::map<std::string,std::string> getSet(std::string set_str);
-std::string getSetStr(VariableInfo vi);
 
 template <typename T>
 void sort(std::vector<T>* v)
