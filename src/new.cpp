@@ -1,8 +1,12 @@
 #include <filesystem>
 #include <iostream>
 #include <string.h>
+#include "../headers/chkflag.h"
 #include "../headers/config.h"
 #include "../headers/functions.h"
+#include "../headers/output.h"
+#include "../headers/scope.h"
+#include "../headers/string.h"
 
 enum newFileScope
 {

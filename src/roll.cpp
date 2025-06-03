@@ -1,6 +1,9 @@
 #include <cstring>
+#include "../headers/chkflag.h"
 #include "../headers/dice.h"
 #include "../headers/functions.h"
+#include "../headers/output.h"
+#include "../headers/string.h"
 #include "../headers/text.h"
 
 void test()

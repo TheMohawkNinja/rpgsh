@@ -1,7 +1,12 @@
+#include <string>
 #include <cstring>
+#include "../headers/chkflag.h"
 #include "../headers/config.h"
 #include "../headers/functions.h"
+#include "../headers/output.h"
+#include "../headers/string.h"
 #include "../headers/text.h"
+#include "../headers/variable.h"
 
 int main(int argc, char** argv)
 {

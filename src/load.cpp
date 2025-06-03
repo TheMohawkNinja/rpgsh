@@ -1,6 +1,10 @@
 #include <filesystem>
 #include <string.h>
+#include "../headers/chkflag.h"
 #include "../headers/functions.h"
+#include "../headers/output.h"
+#include "../headers/string.h"
+#include "../headers/variable.h"
 
 int main(int argc, char** argv)
 {
