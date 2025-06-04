@@ -4,7 +4,6 @@
 #include "../headers/define.h"
 #include "../headers/dice.h"
 #include "../headers/functions.h"
-#include "../headers/string.h"
 #include "../headers/text.h"
 
 int Dice::getValue(std::string d, long unsigned int start, std::string terminator, bool allow_sign, bool required)

@@ -1,7 +1,6 @@
 #include <stdexcept>
 #include "../headers/define.h"
 #include "../headers/functions.h"
-#include "../headers/string.h"
 #include "../headers/var.h"
 
 Var::Var(){}

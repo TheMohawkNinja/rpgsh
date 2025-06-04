@@ -3,9 +3,7 @@
 #include <fstream>
 #include "../headers/config.h"
 #include "../headers/functions.h"
-#include "../headers/output.h"
 #include "../headers/scope.h"
-#include "../headers/string.h"
 
 //			//
 //	BASE CLASS	//

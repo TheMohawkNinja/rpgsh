@@ -5,6 +5,7 @@
 #include "currency.h"
 #include "define.h"
 #include "dice.h"
+#include "functions.h"
 #include "var.h"
 
 class Scope

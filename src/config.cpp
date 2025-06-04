@@ -5,8 +5,6 @@
 #include "../headers/config.h"
 #include "../headers/define.h"
 #include "../headers/functions.h"
-#include "../headers/output.h"
-#include "../headers/string.h"
 
 std::string Config::getConfigItem(std::string s)
 {
