@@ -19,44 +19,47 @@ enum OutputLevel
 struct VariableInfo
 {
 	Scope scope = Scope();
-	std::string variable = "";
-	std::string xref = "";
+	std::wstring variable = L"";
+	std::wstring xref = L"";
 	char type = '\0';
 	char evalType = '\0';
-	std::string key = "";
-	std::string property = "";
+	std::wstring key = L"";
+	std::wstring property = L"";
 };
 struct GetAppOutputInfo
 {
 	int status = 0;
-	std::vector<std::string> output;
+	std::vector<std::wstring> output;
 };
 struct MCStr
 {
-	std::string m, c;
+	std::wstring m, c;
 };
 
-std::string defaultPrompt(Character c);
+std::wstring defaultPrompt(Character c);
 
 void output(OutputLevel level, const char* format, ...);
 
-std::string makePretty(std::string value);
-std::string stripFormatting(std::string str);
+std::wstring makePretty(std::wstring value);
+std::wstring stripFormatting(std::wstring str);
 
 std::string btos(bool b);
+std::wstring btows(bool b);
 bool stob(std::string s);
+bool wstob(std::wstring s);
 
 bool isScopeSigil(char c);
 bool isTypeSigil(char c);
 
-bool looksLikeSet(std::string s);
-bool looksLikeVariable(std::string s);
+bool looksLikeSet(std::wstring s);
+bool looksLikeVariable(std::wstring s);
 
-bool isEscaped(std::string str, long unsigned int pos);
+bool isEscaped(std::wstring str, long unsigned int pos);
 
 int stringcasecmp(std::string a, std::string b);
+int stringcasecmp(std::wstring a, std::wstring b);
 
-std::vector<std::string> split(std::string str, char delimiter);
+std::vector<std::wstring> split(std::wstring str, char delimiter);
 
 template <typename T>
 long long int findInVect(std::vector<T> v, T match, long unsigned int start=0)
@@ -71,17 +74,23 @@ long unsigned int findu(std::string str, std::string match, long unsigned int st
 long unsigned int findu(std::string str, char ch, long unsigned int start=0);
 long unsigned int rfindu(std::string str, std::string match, long unsigned int start=UINT_MAX);
 long unsigned int rfindu(std::string str, char ch, long unsigned int start=UINT_MAX);
+long unsigned int findu(std::wstring str, std::wstring match, long unsigned int start=0);
+long unsigned int findu(std::wstring str, char ch, long unsigned int start=0);
+long unsigned int rfindu(std::wstring str, std::wstring match, long unsigned int start=UINT_MAX);
+long unsigned int rfindu(std::wstring str, char ch, long unsigned int start=UINT_MAX);
 
 std::string left(std::string str, int n);
+std::wstring left(std::wstring str, int n);
 std::string right(std::string str, int n);
+std::wstring right(std::wstring str, int n);
 
-long unsigned int countu(std::string str, char ch);
+long unsigned int countu(std::wstring str, char ch);
 
-std::string addSpaces(unsigned int n);
+std::wstring addSpaces(unsigned int n);
 
-std::string mergeQuotes(std::string str);
+std::wstring mergeQuotes(std::wstring str);
 
-std::string escapeSpaces(std::string str);
+std::wstring escapeSpaces(std::wstring str);
 
 void confirmEnvVariablesFile();
 
@@ -91,35 +100,35 @@ void confirmCampaignVariablesFile();
 
 void confirmHistoryFile();
 
-std::vector<std::string> getDirectoryListing(std::string path);
-std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir,std::string xref);
-void loadXRef(std::string* arg, Scope* p_scope);
-VariableInfo parseVariable(std::string v);// Derive information about variable from string
+std::vector<std::wstring> getDirectoryListing(std::wstring path);
+std::wstring getLikeFileName(std::wstring chk_file,std::wstring chk_dir,bool is_dir,std::wstring xref);
+void loadXRef(std::wstring* arg, Scope* p_scope);
+VariableInfo parseVariable(std::wstring v);// Derive information about variable from string
 
-MCStr parseMCStr(std::string s);
+MCStr parseMCStr(std::wstring s);
 
-void printBadOpAndThrow(std::string bad_op);
+void printBadOpAndThrow(std::wstring bad_op);
 
 void padding();
 
-int runApp(std::string args, bool redirect_output);
-GetAppOutputInfo getAppOutput(std::string prog);
+int runApp(std::wstring args, bool redirect_output);
+GetAppOutputInfo getAppOutput(std::wstring prog);
 
-void chkFlagAppDesc(char** _argv, std::string description);
+void chkFlagAppDesc(char** _argv, std::wstring description);
 void chkFlagModifyVariables(char** _argv, bool canModify=false);
 bool chkFlagHelp(char** _argv);
 
-std::string getEnvVariable(std::string v);
-void setEnvVariable(std::string v, std::string value);
+std::wstring getEnvVariable(std::wstring v);
+void setEnvVariable(std::wstring v, std::wstring value);
 
 unsigned int getWalletValue(Wallet w);
 
 template<typename T>
-void appendMap(Scope scope, std::map<std::string,std::string>* p_map);
-void appendOutput(std::map<std::string,std::string> map, std::string key, std::string* pOutput);
+void appendMap(Scope scope, std::map<std::wstring,std::wstring>* p_map);
+void appendOutput(std::map<std::wstring,std::wstring> map, std::wstring key, std::wstring* pOutput);
 
-std::map<std::string,std::string> getSet(std::string set_str);
-std::string getSetStr(VariableInfo vi);
+std::map<std::wstring,std::wstring> getSet(std::wstring set_str);
+std::wstring getSetStr(VariableInfo vi);
 
 template <typename T>
 void sort(std::vector<T>* v)
@@ -130,7 +139,7 @@ void sort(std::vector<T>* v)
 		{
 			if((*v)[j] < (*v)[i])
 			{
-				std::string tmp = (*v)[i];
+				std::wstring tmp = (*v)[i];
 				(*v)[i]=(*v)[j];
 				(*v)[j]=tmp;
 			}

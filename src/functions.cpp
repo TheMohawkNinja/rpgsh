@@ -12,16 +12,16 @@
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 
-std::string defaultPrompt(Character c)
+std::wstring defaultPrompt(Character c)
 {
-	return std::string(TEXT_BOLD)+std::string(TEXT_RED)+c.getName()+std::string(TEXT_WHITE)+"> "+std::string(TEXT_NORMAL);
+	return std::wstring(TEXT_BOLD)+std::wstring(TEXT_RED)+c.getName()+std::wstring(TEXT_WHITE)+"> "+std::wstring(TEXT_NORMAL);
 }
 
 void output(OutputLevel level, const char* format, ...)
 {
 	FILE* stream;
-	std::string prefix = "";
-	std::string color;
+	std::wstring prefix = "";
+	std::wstring color;
 	va_list args;
 	va_start(args, format);
 
@@ -48,13 +48,13 @@ void output(OutputLevel level, const char* format, ...)
 	fprintf(stream,"%s\n",TEXT_NORMAL);
 }
 
-std::string makePretty(std::string value)
+std::wstring makePretty(std::wstring value)
 {
 	Character c = Character();
 
 	if(value == "") return empty_str.c_str();
 
-	std::map<std::string,const char*> ansi_esc_seqs = {
+	std::map<std::wstring,const char*> ansi_esc_seqs = {
 	{"/",			TEXT_NORMAL},
 	{"b",			TEXT_BOLD},
 	{"/b",			TEXT_NOBOLD},
@@ -169,7 +169,7 @@ std::string makePretty(std::string value)
 	}
 
 	for(const auto& [k,v] : ansi_esc_seqs)
-		value = std::regex_replace(value,std::regex("%"+k+"%",std::regex_constants::icase),std::string(v));
+		value = std::regex_replace(value,std::regex("%"+k+"%",std::regex_constants::icase),std::wstring(v));
 
 	value = std::regex_replace(value,std::regex("%name%",std::regex_constants::icase),c.getName());
 
@@ -185,11 +185,11 @@ std::string makePretty(std::string value)
 
 	std::sregex_iterator it_end;
 
-	std::map<std::string,std::string> string_replacements;
+	std::map<std::wstring,std::wstring> string_replacements;
 
 	while(fg_rgb_it != it_end)
 	{
-		std::string rgb_str = fg_rgb_it->str();
+		std::wstring rgb_str = fg_rgb_it->str();
 		std::regex color_channels_pattern("[0-9]{1,3}");
 		std::sregex_iterator color_channels_it(rgb_str.begin(),rgb_str.end(),color_channels_pattern);
 		unsigned char r = (char)std::stoi(color_channels_it->str());
@@ -198,21 +198,21 @@ std::string makePretty(std::string value)
 		color_channels_it++;
 		unsigned char b = (char)std::stoi(color_channels_it->str());
 
-		string_replacements[rgb_str] = std::string(TEXT_FG_8BIT_PRE)+std::to_string(r)+";"+std::to_string(g)+";"+std::to_string(b)+"m";
+		string_replacements[rgb_str] = std::wstring(TEXT_FG_8BIT_PRE)+std::to_string(r)+";"+std::to_string(g)+";"+std::to_string(b)+"m";
 		fg_rgb_it++;
 	}
 	while(fg_html_it != it_end)
 	{
-		std::string html_str = fg_html_it->str().substr(4,fg_html_it->str().length()-5);//Pull out just the color name
+		std::wstring html_str = fg_html_it->str().substr(4,fg_html_it->str().length()-5);//Pull out just the color name
 		Colors colors = Colors();
 		RGB cc = colors.as24Bit(html_str);
 
-		string_replacements[fg_html_it->str()] = std::string(TEXT_FG_8BIT_PRE)+std::to_string(cc.r)+";"+std::to_string(cc.g)+";"+std::to_string(cc.b)+"m";
+		string_replacements[fg_html_it->str()] = std::wstring(TEXT_FG_8BIT_PRE)+std::to_string(cc.r)+";"+std::to_string(cc.g)+";"+std::to_string(cc.b)+"m";
 		fg_html_it++;
 	}
 	while(bg_rgb_it != it_end)
 	{
-		std::string rgb_str = bg_rgb_it->str();
+		std::wstring rgb_str = bg_rgb_it->str();
 		std::regex color_channels_pattern("[0-9]{1,3}");
 		std::sregex_iterator color_channels_it(rgb_str.begin(),rgb_str.end(),color_channels_pattern);
 		unsigned char r = (char)std::stoi(color_channels_it->str());
@@ -221,30 +221,30 @@ std::string makePretty(std::string value)
 		color_channels_it++;
 		unsigned char b = (char)std::stoi(color_channels_it->str());
 
-		string_replacements[rgb_str] = std::string(TEXT_BG_8BIT_PRE)+std::to_string(r)+";"+std::to_string(g)+";"+std::to_string(b)+"m";
+		string_replacements[rgb_str] = std::wstring(TEXT_BG_8BIT_PRE)+std::to_string(r)+";"+std::to_string(g)+";"+std::to_string(b)+"m";
 		bg_rgb_it++;
 	}
 	while(bg_html_it != it_end)
 	{
-		std::string html_str = bg_html_it->str().substr(4,bg_html_it->str().length()-5);//Pull out just the color name
+		std::wstring html_str = bg_html_it->str().substr(4,bg_html_it->str().length()-5);//Pull out just the color name
 		Colors colors = Colors();
 		RGB cc = colors.as24Bit(html_str);
 
-		string_replacements[bg_html_it->str()] = std::string(TEXT_BG_8BIT_PRE)+std::to_string(cc.r)+";"+std::to_string(cc.g)+";"+std::to_string(cc.b)+"m";
+		string_replacements[bg_html_it->str()] = std::wstring(TEXT_BG_8BIT_PRE)+std::to_string(cc.r)+";"+std::to_string(cc.g)+";"+std::to_string(cc.b)+"m";
 		bg_html_it++;
 	}
 
 	for(const auto& [k,v] : string_replacements) value = std::regex_replace(value,std::regex(k),v);
 	value = std::regex_replace(value,std::regex("%"),"%%");//Prevent printf() parsing '%' as format specifiers
 
-	value += std::string(TEXT_NORMAL); //Make sure we don't carry over any unterminated formatting
+	value += std::wstring(TEXT_NORMAL); //Make sure we don't carry over any unterminated formatting
 	return value;
 }
-std::string stripFormatting(std::string str)
+std::wstring stripFormatting(std::wstring str)
 {
 	for(unsigned long int i=0; i<str.length(); i++)
 	{
-		const std::string::iterator cur_it = str.begin()+i;
+		const std::wstring::iterator cur_it = str.begin()+i;
 		if(str[i] == ESC_SEQ)
 		{
 			str.erase(cur_it,str.begin()+str.find('m',i)+1);
@@ -262,10 +262,19 @@ bool stob(std::string s)
 {
 	return !stringcasecmp(s,"true");
 }
+bool wstob(std::wstring s)
+{
+	return !stringcasecmp(s,L"true");
+}
 std::string btos(bool b)
 {
 	if(b) return "True";
 	return "False";
+}
+std::wstring btows(bool b)
+{
+	if(b) return L"True";
+	return L"False";
 }
 
 bool isScopeSigil(char c)
@@ -282,7 +291,7 @@ bool isTypeSigil(char c)
 		c == WALLET_SIGIL);
 }
 
-bool looksLikeSet(std::string s)
+bool looksLikeSet(std::wstring s)
 {
 	std::regex set_pattern(set_pattern_str);
 	std::sregex_iterator match_it(s.begin(), s.end(), set_pattern);
@@ -293,7 +302,7 @@ bool looksLikeSet(std::string s)
 	else
 		return false;
 }
-bool looksLikeVariable(std::string s)
+bool looksLikeVariable(std::wstring s)
 {
 	std::regex variable_pattern(variable_pattern_str);
 	std::sregex_iterator match_it(s.begin(), s.end(), variable_pattern);
@@ -305,7 +314,7 @@ bool looksLikeVariable(std::string s)
 		return false;
 }
 
-bool isEscaped(std::string str, long unsigned int pos)
+bool isEscaped(std::wstring str, long unsigned int pos)
 {
 	if(pos <= 0 || pos >= str.length()) return false;
 	else return str[pos-1] == '\\';
@@ -315,11 +324,15 @@ int stringcasecmp(std::string a, std::string b)
 {
 	return strcasecmp(a.c_str(),b.c_str());
 }
-
-std::vector<std::string> split(std::string str, char delimiter)
+int stringcasecmp(std::wstring a, std::wstring b)
 {
-	std::vector<std::string> list;
-	if(findu(str,delimiter) == std::string::npos)
+	return strcasecmp(a.c_str(),b.c_str());
+}
+
+std::vector<std::wstring> split(std::wstring str, char delimiter)
+{
+	std::vector<std::wstring> list;
+	if(findu(str,delimiter) == std::wstring::npos)
 	{
 		list.push_back(str);
 		return list;
@@ -327,7 +340,7 @@ std::vector<std::string> split(std::string str, char delimiter)
 
 	while(true)
 	{
-		if(findu(str,delimiter) == std::string::npos)
+		if(findu(str,delimiter) == std::wstring::npos)
 			return list;
 
 		list.push_back(left(str,findu(str,delimiter)));
@@ -372,8 +385,47 @@ long unsigned int rfindu(std::string str, char ch, long unsigned int start)
 {
 	return rfindu(str, std::string(1,ch), start);
 }
+long unsigned int findu(std::wstring str, std::wstring match, long unsigned int start)
+{
+	if(match.length() > str.length()) return std::wstring::npos;
+	for(long unsigned int i=start; i<str.length()-(match.length()-1); i++)
+		if(str.substr(i,match.length()) == match && !isEscaped(str.substr(i,match.length()),i)) return i;
+
+	return std::wstring::npos;
+}
+long unsigned int findu(std::wstring str, char ch, long unsigned int start)
+{
+	return findu(str, std::wstring(1,ch), start);
+}
+long unsigned int rfindu(std::wstring str, std::wstring match, long unsigned int start)
+{
+	if(match.length() > str.length()) return std::wstring::npos;
+	if(start == UINT_MAX) start = str.length();
+
+	bool last_check = false;
+	for(long unsigned int i=start-match.length(); i>0; i--)
+	{
+		if(str.substr(i-last_check,match.length()) == match &&
+		   !isEscaped(str.substr(i-last_check,match.length()),i-last_check)) return i-last_check;
+		else if(i == 1 && !last_check)
+		{
+			i++;
+			last_check = true;
+		}
+	}
+
+	return std::wstring::npos;
+}
+long unsigned int rfindu(std::wstring str, char ch, long unsigned int start)
+{
+	return rfindu(str, std::wstring(1,ch), start);
+}
 
 std::string left(std::string str, int n)
+{
+	return str.substr(0,n);
+}
+std::wstring left(std::wstring str, int n)
 {
 	return str.substr(0,n);
 }
@@ -381,8 +433,12 @@ std::string right(std::string str, int n)
 {
 	return str.substr(n,str.length()-n);
 }
+std::wstring right(std::wstring str, int n)
+{
+	return str.substr(n,str.length()-n);
+}
 
-long unsigned int countu(std::string str, char ch)
+long unsigned int countu(std::wstring str, char ch)
 {
 	long unsigned int count = 0;
 	for(long unsigned int i=0; i<str.length(); i++)
@@ -391,17 +447,17 @@ long unsigned int countu(std::string str, char ch)
 	return count;
 }
 
-std::string addSpaces(unsigned int n)
+std::wstring addSpaces(unsigned int n)
 {
-	std::string ret = "";
+	std::wstring ret = "";
 	for(unsigned int i=0; i<n; i++) ret += " ";
 
 	return ret;
 }
 
-std::string mergeQuotes(std::string str)
+std::wstring mergeQuotes(std::wstring str)
 {
-	std::string ret = "";
+	std::wstring ret = "";
 
 	// When running a program, rpgsh should already cut off any charaters outside of unescaped quotation marks.
 	// Therefore, we shouldn't need to check for odd inputs
@@ -425,9 +481,9 @@ std::string mergeQuotes(std::string str)
 	return '\"'+ret+'\"';
 }
 
-std::string escapeSpaces(std::string str)
+std::wstring escapeSpaces(std::wstring str)
 {
-	std::string ret = "";
+	std::wstring ret = "";
 
 	for(long unsigned int i=0; i<str.length(); i++)
 	{
@@ -466,7 +522,7 @@ void confirmShellVariablesFile()
 
 void confirmCampaignVariablesFile()
 {
-	std::string campaign_variables_file = campaigns_dir +
+	std::wstring campaign_variables_file = campaigns_dir +
 					      getEnvVariable(ENV_CURRENT_CAMPAIGN) +
 					      variables_file_name;
 
@@ -486,7 +542,7 @@ void confirmHistoryFile()
 	ofs.close();
 }
 
-std::vector<std::string> getDirectoryListing(std::string path)
+std::vector<std::wstring> getDirectoryListing(std::wstring path)
 {
 	if(!std::filesystem::exists(path))
 	{
@@ -499,13 +555,13 @@ std::vector<std::string> getDirectoryListing(std::string path)
 		exit(-1);
 	}
 
-	std::vector<std::string> entries;
+	std::vector<std::wstring> entries;
 	for(const auto& entry : std::filesystem::directory_iterator(path))
 		entries.push_back(entry.path().filename().string());
 
 	return entries;
 }
-std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir,std::string xref)
+std::wstring getLikeFileName(std::wstring chk_file,std::wstring chk_dir,bool is_dir,std::wstring xref)
 {
 	for(const auto& entry : getDirectoryListing(chk_dir))
 	{
@@ -521,10 +577,10 @@ std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir
 	output(Error,"Invalid xref \"%s\".",xref.c_str());
 	exit(-1);
 }
-void loadXRef(std::string* arg, VariableInfo* p_vi)
+void loadXRef(std::wstring* arg, VariableInfo* p_vi)
 {
 	// Ending square bracket not found
-	if(findu(*arg,']') == std::string::npos)
+	if(findu(*arg,']') == std::wstring::npos)
 	{
 		output(Error,"No terminating \']\' found for xref.");
 		exit(-1);
@@ -534,16 +590,16 @@ void loadXRef(std::string* arg, VariableInfo* p_vi)
 	p_vi->xref = arg->substr(findu(*arg,'[')+1,findu(*arg,']')-(findu(*arg,'[')+1));
 
 	// Actually load the xref into the scope
-	std::vector<std::string> campaigns;
-	std::string xref_dir = campaigns_dir+
+	std::vector<std::wstring> campaigns;
+	std::wstring xref_dir = campaigns_dir+
 			       getEnvVariable(ENV_CURRENT_CAMPAIGN)+
 			       "characters/";
-	std::string xref_char = p_vi->xref;
-	std::string campaign = "";
+	std::wstring xref_char = p_vi->xref;
+	std::wstring campaign = "";
 	switch((*arg)[0])
 	{
 		case CHARACTER_SIGIL:
-			if(findu(p_vi->xref,'/') != std::string::npos)// Attempt to load character from another campaign
+			if(findu(p_vi->xref,'/') != std::wstring::npos)// Attempt to load character from another campaign
 			{
 				campaign = left(p_vi->xref,findu(p_vi->xref,'/'));
 				xref_char = right(p_vi->xref,findu(p_vi->xref,'/')+1);
@@ -570,7 +626,7 @@ void loadXRef(std::string* arg, VariableInfo* p_vi)
 	// Remove external reference string so we can continue to use the current arg under the new context
 	*arg = (*arg)[0]+left(*arg,findu(*arg,'[')-1)+right(*arg,findu(*arg,']')+1);
 }
-VariableInfo parseVariable(std::string v)// Derive information about variable from string
+VariableInfo parseVariable(std::wstring v)// Derive information about variable from string
 {
 	VariableInfo vi;
 
@@ -632,11 +688,11 @@ VariableInfo parseVariable(std::string v)// Derive information about variable fr
 	return vi;
 }
 
-MCStr parseMCStr(std::string s)
+MCStr parseMCStr(std::wstring s)
 {
 	MCStr mc;
 	unsigned long int slash = findu(s,'/');
-	if(slash == std::string::npos)
+	if(slash == std::wstring::npos)
 	{
 		mc.c = s;
 		return mc;
@@ -666,19 +722,19 @@ void padding()
 	}
 }
 
-int runApp(std::string arg_str, bool redirect_output)
+int runApp(std::wstring arg_str, bool redirect_output)
 {
 	Config cfg = Config();
 	Character c = Character();
 	Campaign m = Campaign();
 	Shell s = Shell();
 
-	std::vector<std::string> args;
+	std::vector<std::wstring> args;
 	extern char** environ;
 	pid_t pid;
 
-	std::string first_arg;
-	if(findu(arg_str," ") != std::string::npos) first_arg = left(arg_str,findu(arg_str," "));
+	std::wstring first_arg;
+	if(findu(arg_str," ") != std::wstring::npos) first_arg = left(arg_str,findu(arg_str," "));
 	else					    first_arg = arg_str;
 
 	//Check aliases
@@ -696,21 +752,21 @@ int runApp(std::string arg_str, bool redirect_output)
 	std::sregex_iterator v_str_end;
 	if(v_str_it != v_str_end && v_str_it->str() == first_arg) arg_str = "eval " + arg_str;
 
-	if(findu(arg_str," ") != std::string::npos) first_arg = left(arg_str,findu(arg_str," "));
+	if(findu(arg_str," ") != std::wstring::npos) first_arg = left(arg_str,findu(arg_str," "));
 	else					    first_arg = arg_str;
 
 	//See if we need to preserve the argv[1] if it is a variable
 	bool preserveSecondArg = false;
-	if(findu(arg_str,std::string(FLAG_MODIFYVARIABLES)) == std::string::npos)
+	if(findu(arg_str,std::wstring(FLAG_MODIFYVARIABLES)) == std::wstring::npos)
 	{
-		GetAppOutputInfo info = getAppOutput(first_arg + " " + std::string(FLAG_MODIFYVARIABLES));
+		GetAppOutputInfo info = getAppOutput(first_arg + " " + std::wstring(FLAG_MODIFYVARIABLES));
 
 		if(!info.status) preserveSecondArg = stob(info.output[0]);
 		else return info.status;
 	}
 
 	//Push back program we are going to run
-	std::string path = std::string(RPGSH_INSTALL_DIR);
+	std::wstring path = std::wstring(RPGSH_INSTALL_DIR);
 	args.push_back(path+prefix+left(arg_str,findu(arg_str," ")));
 
 	//Replaces all instances of variables with their respective value
@@ -730,8 +786,8 @@ int runApp(std::string arg_str, bool redirect_output)
 	// For some reason, attempting to just use v_str_it in the std::regex_replace line to replace variables with their values
 	// results in the iterator getting in some way lost causing it to not replace all the variables.
 	// Seems to be limited to cases when the value length > variable length
-	// Either way, using a std::vector<std::string> is an effective work around.
-	std::vector<std::string> matches;
+	// Either way, using a std::vector<std::wstring> is an effective work around.
+	std::vector<std::wstring> matches;
 	while(v_str_it != v_str_end)
 	{
 		matches.push_back(v_str_it->str());
@@ -744,8 +800,8 @@ int runApp(std::string arg_str, bool redirect_output)
 			output(Error,"%s is not a valid variable string.",match.c_str());
 			return -1;
 		}
-		std::string v_str_it_pattern = match;
-		std::vector<std::string> patterns = {"\\[","\\]","\\(","\\)","\\{","\\}"};
+		std::wstring v_str_it_pattern = match;
+		std::vector<std::wstring> patterns = {"\\[","\\]","\\(","\\)","\\{","\\}"};
 		for(const auto& p : patterns)
 			v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex(p),p);
 		arg_str = std::regex_replace(arg_str,std::regex(v_str_it_pattern),getAppOutput(match).output[0]);
@@ -757,7 +813,7 @@ int runApp(std::string arg_str, bool redirect_output)
 
 	while(arg_str_it != arg_str_end)
 	{
-		std::string arg = arg_str_it->str();
+		std::wstring arg = arg_str_it->str();
 		while(arg.back() == '\\')//Merge args with escaped spaces
 		{
 			arg_str_it++;
@@ -765,12 +821,12 @@ int runApp(std::string arg_str, bool redirect_output)
 		}
 
 		//Handle comments
-		if(findu(arg,COMMENT) != std::string::npos && findu(arg,COMMENT) > 0)
+		if(findu(arg,COMMENT) != std::wstring::npos && findu(arg,COMMENT) > 0)
 		{
 			args.push_back(left(arg,findu(arg,COMMENT)));
 			break;
 		}
-		else if(findu(arg,COMMENT) == std::string::npos)
+		else if(findu(arg,COMMENT) == std::wstring::npos)
 		{
 			args.push_back(arg);
 			arg_str_it++;
@@ -782,33 +838,33 @@ int runApp(std::string arg_str, bool redirect_output)
 	}
 
 	//Merge args wrapped in quotes
-	unsigned long int quote_begin = std::string::npos;
-	unsigned long int quote_end = std::string::npos;
+	unsigned long int quote_begin = std::wstring::npos;
+	unsigned long int quote_end = std::wstring::npos;
 	unsigned long int quote_start_arg = 0;
 	for(unsigned long int i=0; i<args.size(); i++)
 	{
 		//Find unescaped quote marks
 		for(unsigned long int c=0; c<args[i].length(); c++)
 		{
-			if(quote_begin == std::string::npos && args[i][c] == '\"' && !isEscaped(args[i],c))
+			if(quote_begin == std::wstring::npos && args[i][c] == '\"' && !isEscaped(args[i],c))
 			{
 				quote_begin = c;
 				quote_end = findu(args[i],'\"',c+1);
 				quote_start_arg = i;
-				if(quote_end == std::string::npos)
+				if(quote_end == std::wstring::npos)
 				{
 					args[i] = right(args[i],c+1);
 				}
 				else//No spaces in quote-wrapped string
 				{
 					args[i] = mergeQuotes(left(args[i],quote_end));
-					quote_begin = std::string::npos;
-					quote_end = std::string::npos;
+					quote_begin = std::wstring::npos;
+					quote_end = std::wstring::npos;
 					quote_start_arg = 0;
 					break;
 				}
 			}
-			else if(quote_end == std::string::npos && args[i][c] == '\"' && !isEscaped(args[i],c))
+			else if(quote_end == std::wstring::npos && args[i][c] == '\"' && !isEscaped(args[i],c))
 			{
 				quote_end = c;
 
@@ -821,8 +877,8 @@ int runApp(std::string arg_str, bool redirect_output)
 					i--;
 				}
 				args[i] = mergeQuotes(args[i]);
-				quote_begin = std::string::npos;
-				quote_end = std::string::npos;
+				quote_begin = std::wstring::npos;
+				quote_end = std::wstring::npos;
 				quote_start_arg = 0;
 				break;
 			}
@@ -871,8 +927,8 @@ int runApp(std::string arg_str, bool redirect_output)
 	}
 	else
 	{
-		std::string displayed_command = std::string(argv[0]).substr(prefix.length()+path.length(),
-							    std::string(argv[0]).length()-prefix.length()-path.length());
+		std::wstring displayed_command = std::wstring(argv[0]).substr(prefix.length()+path.length(),
+							    std::wstring(argv[0]).length()-prefix.length()-path.length());
 		if(status == 2)//File not found
 			output(Error,"Error code %d while attempting to run \"%s\": Not a valid rpgsh command.",status,displayed_command.c_str());
 		else
@@ -890,7 +946,7 @@ int runApp(std::string arg_str, bool redirect_output)
 
 	return exit_code;
 }
-GetAppOutputInfo getAppOutput(std::string prog)
+GetAppOutputInfo getAppOutput(std::wstring prog)
 {
 	GetAppOutputInfo info;
 
@@ -899,7 +955,7 @@ GetAppOutputInfo getAppOutput(std::string prog)
 	std::ifstream ifs(rpgsh_output_redirect_path);
 	while(!ifs.eof())
 	{
-		std::string data = "";
+		std::wstring data = "";
 		std::getline(ifs,data);
 		info.output.push_back(data);
 	}
@@ -908,7 +964,7 @@ GetAppOutputInfo getAppOutput(std::string prog)
 	return info;
 }
 
-void chkFlagAppDesc(char** _argv, std::string description)
+void chkFlagAppDesc(char** _argv, std::wstring description)
 {
 	if(_argv[1] && !strcmp(_argv[1],FLAG_APPDESCRIPTION))
 	{
@@ -929,14 +985,14 @@ bool chkFlagHelp(char** _argv)
 	return _argv[1] && (!strcasecmp(_argv[1],FLAG_HELPSHORT) || !strcasecmp(_argv[1],FLAG_HELPLONG));
 }
 
-std::string getEnvVariable(std::string v)
+std::wstring getEnvVariable(std::wstring v)
 {
 	confirmEnvVariablesFile();
 
 	std::ifstream ifs(rpgsh_env_variables_path.c_str());
 	while(!ifs.eof())
 	{
-		std::string data = "";
+		std::wstring data = "";
 		std::getline(ifs,data);
 
 		if(left(data,findu(data,DS)) == v)
@@ -945,7 +1001,7 @@ std::string getEnvVariable(std::string v)
 	ifs.close();
 	return "";
 }
-void setEnvVariable(std::string v,std::string value)
+void setEnvVariable(std::wstring v,std::wstring value)
 {
 	confirmEnvVariablesFile();
 
@@ -956,7 +1012,7 @@ void setEnvVariable(std::string v,std::string value)
 
 	while(!ifs.eof())
 	{
-		std::string data = "";
+		std::wstring data = "";
 		std::getline(ifs,data);
 		if(data == "" || data == "\n")// Prevents writing blank lines back to file
 			continue;
@@ -982,11 +1038,11 @@ void setEnvVariable(std::string v,std::string value)
 unsigned int getWalletValue(Wallet w)
 {
 	unsigned int total = 0;
-	std::vector<std::string> systems;
+	std::vector<std::wstring> systems;
 
 	for(const auto& m : w.Monies)
 	{
-		if(findInVect<std::string>(systems,m.c.System) != -1)
+		if(findInVect<std::wstring>(systems,m.c.System) != -1)
 		{
 			systems.push_back(m.c.System);
 			total += w.getEquivalentValueInLowestDenomination(m.c.System);
@@ -997,12 +1053,12 @@ unsigned int getWalletValue(Wallet w)
 }
 
 template<typename T>
-void appendMap(Scope scope, std::map<std::string,std::string>* p_map)
+void appendMap(Scope scope, std::map<std::wstring,std::wstring>* p_map)
 {
 	for(const auto& [k,v] : scope.getDatamap<T>())
 		(*p_map)[k] = scope.getStr<T>(k);
 }
-void appendOutput(std::map<std::string,std::string> map, std::string key, std::string* pOutput)
+void appendOutput(std::map<std::wstring,std::wstring> map, std::wstring key, std::wstring* pOutput)
 {
 	for(const auto& [k,v] : map)
 	{
@@ -1016,17 +1072,17 @@ void appendOutput(std::map<std::string,std::string> map, std::string key, std::s
 	}
 }
 
-std::map<std::string,std::string> getSet(std::string set_str)
+std::map<std::wstring,std::wstring> getSet(std::wstring set_str)
 {
-	std::map<std::string,std::string> set;
-	std::string key, value;
+	std::map<std::wstring,std::wstring> set;
+	std::wstring key, value;
 
-	while(findu(set_str,DS) != std::string::npos)
+	while(findu(set_str,DS) != std::wstring::npos)
 	{
 		key = left(set_str,findu(set_str,DS));
 		set_str = right(set_str,findu(set_str,key)+key.length()+DS.length());
 
-		if(findu(set_str,DS) != std::string::npos)
+		if(findu(set_str,DS) != std::wstring::npos)
 		{
 			value = left(set_str,findu(set_str,DS));
 			set_str = right(set_str,findu(set_str,value)+value.length()+DS.length());
@@ -1040,12 +1096,12 @@ std::map<std::string,std::string> getSet(std::string set_str)
 
 	return set;
 }
-std::string getSetStr(VariableInfo vi)
+std::wstring getSetStr(VariableInfo vi)
 {
-	std::map<std::string,std::string> c_map;
-	std::map<std::string,std::string> d_map;
-	std::map<std::string,std::string> v_map;
-	std::map<std::string,std::string> w_map;
+	std::map<std::wstring,std::wstring> c_map;
+	std::map<std::wstring,std::wstring> d_map;
+	std::map<std::wstring,std::wstring> v_map;
+	std::map<std::wstring,std::wstring> w_map;
 
 	// When printing entire containers, treat type sigil as a filter
 	switch(vi.variable[1])
@@ -1074,7 +1130,7 @@ std::string getSetStr(VariableInfo vi)
 	}
 
 	// Create output string from map
-	std::string output = "";
+	std::wstring output = "";
 	appendOutput(c_map,vi.key,&output);
 	appendOutput(d_map,vi.key,&output);
 	appendOutput(v_map,vi.key,&output);
@@ -1085,16 +1141,16 @@ std::string getSetStr(VariableInfo vi)
 }
 
 template <typename T>
-void sort(std::vector<std::string>* v);
+void sort(std::vector<std::wstring>* v);
 
 template <>
 datamap<Currency> getDatamapFromAllScopes()
 {
-	std::string character = getEnvVariable(ENV_CURRENT_CHARACTER);
-	std::string campaign = getEnvVariable(ENV_CURRENT_CAMPAIGN);
-	std::string current_campaign_dir = campaigns_dir+campaign;
-	std::string current_campaign_path = current_campaign_dir+variables_file_name;
-	std::string current_character_path = current_campaign_dir+"characters/"+character+c_ext;
+	std::wstring character = getEnvVariable(ENV_CURRENT_CHARACTER);
+	std::wstring campaign = getEnvVariable(ENV_CURRENT_CAMPAIGN);
+	std::wstring current_campaign_dir = campaigns_dir+campaign;
+	std::wstring current_campaign_path = current_campaign_dir+variables_file_name;
+	std::wstring current_character_path = current_campaign_dir+"characters/"+character+c_ext;
 
 	datamap<Currency> ret;
 	Scope scope;
