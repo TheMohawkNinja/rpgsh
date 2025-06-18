@@ -10,11 +10,11 @@ class Config
 	// Name=Value
 	// Ignore COMMENT for use as comments
 	public:
-		std::map<std::string,std::string> setting;
+		std::map<std::wstring,std::wstring> setting;
 
 	private:
-	std::string getConfigItem(std::string s);
-	std::string getConfigValue(std::string s);
+	std::wstring getConfigItem(std::wstring s);
+	std::wstring getConfigValue(std::wstring s);
 
 	public:
 	Config();

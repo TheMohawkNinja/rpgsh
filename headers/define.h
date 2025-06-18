@@ -56,13 +56,13 @@
 #define DOT_PROMPT			".PROMPT"
 
 //Setting names
-#define PADDING				"padding"
-#define DEFAULT_GAME			"default_game"
-#define HIDE_TIPS			"hide_tips"
-#define HISTORY_LENGTH			"history_length"
-#define ALIASES				"aliases"
-#define STARTUP_APPS			"startup_apps"
-#define POST_RUN_APPS			"post_run_apps"
+#define PADDING				L"padding"
+#define DEFAULT_GAME			L"default_game"
+#define HIDE_TIPS			L"hide_tips"
+#define HISTORY_LENGTH			L"history_length"
+#define ALIASES				L"aliases"
+#define STARTUP_APPS			L"startup_apps"
+#define POST_RUN_APPS			L"post_run_apps"
 
 //Universal flags
 #define FLAG_APPDESCRIPTION		"--appdescription"

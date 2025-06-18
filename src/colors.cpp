@@ -1,7 +1,7 @@
 #include "../headers/colors.h"
 #include "../headers/functions.h"
 
-RGB Colors::as24Bit(std::string color)
+RGB Colors::as24Bit(std::wstring color)
 {
 	for(const auto& [k,v] : color_map)
 		if(!stringcasecmp(k,color)) return v;
@@ -9,7 +9,7 @@ RGB Colors::as24Bit(std::string color)
 	return BAD_COLOR;
 }
 
-RGB Colors::asCurses(std::string color)
+RGB Colors::asCurses(std::wstring color)
 {
 	for(const auto& [k,v] : color_map)
 		if(!stringcasecmp(k,color))
