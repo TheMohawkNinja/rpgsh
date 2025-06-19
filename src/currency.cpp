@@ -5,7 +5,7 @@
 #include "../headers/text.h"
 #include "../headers/var.h"
 
-datamap<Currency> getCurrencySystem(std::string system)
+datamap<Currency> getCurrencySystem(std::wstring system)
 {
 	datamap<Currency> denominations;
 	for(const auto& [k,v] : getDatamapFromAllScopes<Currency>())
@@ -14,7 +14,7 @@ datamap<Currency> getCurrencySystem(std::string system)
 	return denominations;
 }
 
-void Currency::tryParseCurrencySystem(std::string* str)
+void Currency::tryParseCurrencySystem(std::wstring* str)
 {
 	try
 	{
@@ -27,7 +27,7 @@ void Currency::tryParseCurrencySystem(std::string* str)
 		throw e.what();
 	}
 }
-void Currency::tryParseName(std::string* str)
+void Currency::tryParseName(std::wstring* str)
 {
 	try
 	{
@@ -40,16 +40,16 @@ void Currency::tryParseName(std::string* str)
 		throw e.what();
 	}
 }
-void Currency::tryParseSmallerAmount(std::string* str)
+void Currency::tryParseSmallerAmount(std::wstring* str)
 {
 	try
 	{
 		long unsigned int comma_pos = findu(*str,',');
-		std::string SmallerAmountStr = left(*str,comma_pos);
+		std::wstring SmallerAmountStr = left(*str,comma_pos);
 		*str = str->substr(comma_pos+1,str->length()-(comma_pos+1));
 
 		//Allow an empty SmallerAmount to imply 0
-		if(SmallerAmountStr == "") SmallerAmountStr = "0";
+		if(SmallerAmountStr == L"") SmallerAmountStr = L"0";
 
 		SmallerAmount = std::stoi(SmallerAmountStr);
 	}
@@ -58,7 +58,7 @@ void Currency::tryParseSmallerAmount(std::string* str)
 		throw e.what();
 	}
 }
-void Currency::tryParseSmaller(std::string* str)
+void Currency::tryParseSmaller(std::wstring* str)
 {
 	try
 	{
@@ -71,7 +71,7 @@ void Currency::tryParseSmaller(std::string* str)
 		throw e.what();
 	}
 }
-void Currency::tryParseLarger(std::string* str)
+void Currency::tryParseLarger(std::wstring* str)
 {
 	try
 	{
@@ -92,7 +92,7 @@ Currency::Currency(const Currency& b)
 	Smaller = b.Smaller;
 	Larger = b.Larger;
 }
-Currency::Currency(std::string str)
+Currency::Currency(std::wstring str)
 {
 	//FORMAT
 	//@c/MyCurrency = c{CurrencySystem,Name,SmallerAmount,Smaller,Larger}
@@ -101,7 +101,7 @@ Currency::Currency(std::string str)
 	if(str.length() < 7 ||
 	   str[1] != '{' ||
 	   str[0] != CURRENCY_SIGIL ||
-	   findu(str,'}') == std::string::npos ||
+	   findu(str,'}') == std::wstring::npos ||
 	   countu(str,',') > 4 ||
 	   countu(str,',') < 3) throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 
@@ -115,14 +115,14 @@ Currency::Currency(std::string str)
 	tryParseSmaller(&str);
 	tryParseLarger(&str);
 }
-Currency::Currency(std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
+Currency::Currency(std::wstring _Name, int _SmallerAmount, std::wstring _Smaller, std::wstring _Larger)
 {
 	Name = _Name;
 	Smaller = _Smaller;
 	SmallerAmount = _SmallerAmount;
 	Larger = _Larger;
 }
-Currency::Currency(std::string _System, std::string _Name, int _SmallerAmount, std::string _Smaller, std::string _Larger)
+Currency::Currency(std::wstring _System, std::wstring _Name, int _SmallerAmount, std::wstring _Smaller, std::wstring _Larger)
 {
 	System = _System;
 	Name = _Name;
@@ -131,35 +131,35 @@ Currency::Currency(std::string _System, std::string _Name, int _SmallerAmount, s
 	Larger = _Larger;
 }
 
-Currency::operator std::string() const
+Currency::operator std::wstring() const
 {
-	if(System != "")
-		return std::string(1,CURRENCY_SIGIL)+"{"+
-		       System+","+
-		       Name+","+
-		       std::to_string(SmallerAmount)+","+
-		       Smaller+","+
-		       Larger+"}";
+	if(System != L"")
+		return std::wstring(1,CURRENCY_SIGIL)+L"{"+
+		       System+L","+
+		       Name+L","+
+		       std::to_wstring(SmallerAmount)+L","+
+		       Smaller+L","+
+		       Larger+L"}";
 	else
-		return std::string(1,CURRENCY_SIGIL)+"{"+
-		       Name+","+
-		       std::to_string(SmallerAmount)+","+
-		       Smaller+","+
-		       Larger+"}";
+		return std::wstring(1,CURRENCY_SIGIL)+L"{"+
+		       Name+L","+
+		       std::to_wstring(SmallerAmount)+L","+
+		       Smaller+L","+
+		       Larger+L"}";
 }
 Currency::operator bool() const
 {
-	return Smaller != "";
+	return Smaller != L"";
 }
-const char* Currency::c_str() const
+const wchar_t* Currency::c_str() const
 {
-	return std::string(*this).c_str();
+	return std::wstring(*this).c_str();
 }
 Currency& Currency::operator = ([[maybe_unused]] const int b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Currency& Currency::operator = ([[maybe_unused]] const std::string b)
+Currency& Currency::operator = ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -191,7 +191,7 @@ Currency& Currency::operator += (const int b)
 	SmallerAmount += b;
 	return *this;
 }
-Currency& Currency::operator += (const std::string b)
+Currency& Currency::operator += (const std::wstring b)
 {
 	Name = mergeQuotes(Name + b);
 	return *this;
@@ -207,7 +207,7 @@ Currency& Currency::operator += ([[maybe_unused]] const Dice b)
 }
 Wallet Currency::operator += (const Wallet b)
 {
-	Wallet lhs = Wallet(std::string(1,WALLET_SIGIL)+"{"+std::string(*this)+",1}");
+	Wallet lhs = Wallet(std::wstring(1,WALLET_SIGIL)+L"{"+std::wstring(*this)+L",1}");
 	Wallet rhs = b;
 
 	return (lhs + rhs);
@@ -215,14 +215,14 @@ Wallet Currency::operator += (const Wallet b)
 Wallet Currency::operator += (const Currency b)
 {
 	Currency lhs = *this;
-	return Wallet("w{"+std::string(lhs)+","+"1"+","+std::string(b)+",1}");
+	return Wallet(L"w{"+std::wstring(lhs)+L","+L"1"+L","+std::wstring(b)+L",1}");
 }
 Currency& Currency::operator -= (const int b)
 {
 	SmallerAmount -= b;
 	return *this;
 }
-Currency& Currency::operator -= ([[maybe_unused]] const std::string b)
+Currency& Currency::operator -= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -246,9 +246,9 @@ Currency& Currency::operator -= ([[maybe_unused]] const Currency b)
 Wallet Currency::operator *= (const int b)
 {
 	Currency lhs = *this;
-	return Wallet("w{"+std::string(lhs)+","+std::to_string(b)+"}");
+	return Wallet(L"w{"+std::wstring(lhs)+L","+std::to_wstring(b)+L"}");
 }
-Wallet Currency::operator *= ([[maybe_unused]] const std::string b)
+Wallet Currency::operator *= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -273,7 +273,7 @@ Currency& Currency::operator /= ([[maybe_unused]] const int b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Currency& Currency::operator /= ([[maybe_unused]] const std::string b)
+Currency& Currency::operator /= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -298,7 +298,7 @@ Currency& Currency::operator ^= ([[maybe_unused]] const int b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Currency& Currency::operator ^= ([[maybe_unused]] const std::string b)
+Currency& Currency::operator ^= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -323,7 +323,7 @@ Currency& Currency::operator %= ([[maybe_unused]] const int b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Currency& Currency::operator %= ([[maybe_unused]] const std::string b)
+Currency& Currency::operator %= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -348,7 +348,7 @@ Currency Currency::operator + (const int b)
 {
 	return *this += b;
 }
-Currency Currency::operator + (const std::string b)
+Currency Currency::operator + (const std::wstring b)
 {
 	return *this += b;
 }
@@ -372,7 +372,7 @@ Currency Currency::operator - (const int b)
 {
 	return *this -= b;
 }
-Currency Currency::operator - (const std::string b)
+Currency Currency::operator - (const std::wstring b)
 {
 	return *this -= b;
 }
@@ -396,7 +396,7 @@ Wallet Currency::operator * (const int b)
 {
 	return *this *= b;
 }
-Wallet Currency::operator * (const std::string b)
+Wallet Currency::operator * (const std::wstring b)
 {
 	return *this *= b;
 }
@@ -420,7 +420,7 @@ Currency Currency::operator / (const int b)
 {
 	return *this /= b;
 }
-Currency Currency::operator / (const std::string b)
+Currency Currency::operator / (const std::wstring b)
 {
 	return *this /= b;
 }
@@ -444,7 +444,7 @@ Currency Currency::operator ^ (const int b)
 {
 	return *this ^= b;
 }
-Currency Currency::operator ^ (const std::string b)
+Currency Currency::operator ^ (const std::wstring b)
 {
 	return *this ^= b;
 }
@@ -468,7 +468,7 @@ Currency Currency::operator % (const int b)
 {
 	return *this %= b;
 }
-Currency Currency::operator % (const std::string b)
+Currency Currency::operator % (const std::wstring b)
 {
 	return *this %= b;
 }
@@ -492,7 +492,7 @@ bool Currency::operator == ([[maybe_unused]] const int& b) const
 {
 	return false;
 }
-bool Currency::operator == ([[maybe_unused]] const std::string& b) const
+bool Currency::operator == ([[maybe_unused]] const std::wstring& b) const
 {
 	return false;
 }
@@ -522,7 +522,7 @@ bool Currency::operator < ([[maybe_unused]] const int& b) const
 {
 	return false;
 }
-bool Currency::operator < ([[maybe_unused]] const std::string& b) const
+bool Currency::operator < ([[maybe_unused]] const std::wstring& b) const
 {
 	return false;
 }
@@ -559,7 +559,7 @@ bool Currency::operator > ([[maybe_unused]] const int& b) const
 {
 	return false;
 }
-bool Currency::operator > ([[maybe_unused]] const std::string& b) const
+bool Currency::operator > ([[maybe_unused]] const std::wstring& b) const
 {
 	return false;
 }
@@ -579,9 +579,9 @@ bool Currency::operator > ([[maybe_unused]] const Wallet& b) const
 }
 bool Currency::operator > (const Currency& b) const
 {
-	if((System == ""  && b.System != "") || (b.System == "" && System != ""))
+	if((System == L""  && b.System != L"") || (b.System == L"" && System != L""))
 		return false;
-	if(System == "" && b.System == "")
+	if(System == L"" && b.System == L"")
 	{
 		if(b.Larger == Name)
 			return false;
@@ -612,7 +612,7 @@ bool Currency::operator <= (const int& b) const
 {
 	return (*this < b || *this == b);
 }
-bool Currency::operator <= (const std::string& b) const
+bool Currency::operator <= (const std::wstring& b) const
 {
 	return (*this < b || *this == b);
 }
@@ -636,7 +636,7 @@ bool Currency::operator >= (const int& b) const
 {
 	return (*this > b || *this == b);
 }
-bool Currency::operator >= (const std::string& b) const
+bool Currency::operator >= (const std::wstring& b) const
 {
 	return (*this > b || *this == b);
 }
@@ -660,7 +660,7 @@ bool Currency::operator != (const int& b) const
 {
 	return !(*this == b);
 }
-bool Currency::operator != (const std::string& b) const
+bool Currency::operator != (const std::wstring& b) const
 {
 	return !(*this == b);
 }
@@ -684,9 +684,9 @@ bool Currency::operator && (const int b)
 {
 	return bool(*this) && (b != 0);
 }
-bool Currency::operator && (const std::string b)
+bool Currency::operator && (const std::wstring b)
 {
-	return bool(*this) && (b != "" && stringcasecmp(b,"false"));
+	return bool(*this) && (b != L"" && stringcasecmp(b,L"false"));
 }
 bool Currency::operator && (const Var b)
 {
@@ -708,9 +708,9 @@ bool Currency::operator || (const int b)
 {
 	return bool(*this) || (b != 0);
 }
-bool Currency::operator || (const std::string b)
+bool Currency::operator || (const std::wstring b)
 {
-	return bool(*this) || (b != "" && stringcasecmp(b,"false"));
+	return bool(*this) || (b != L"" && stringcasecmp(b,L"false"));
 }
 bool Currency::operator || (const Var b)
 {
@@ -742,7 +742,7 @@ bool Wallet::HasEffectivelyAtLeast(int q, Currency c)
 	int total = get(c);
 	int totalFactor = 1;
 
-	while(c.Larger != "")
+	while(c.Larger != L"")
 	{
 		c = getCurrencySystem(c.System)[c.Larger];
 
@@ -752,7 +752,7 @@ bool Wallet::HasEffectivelyAtLeast(int q, Currency c)
 
 	return total >= q;
 }
-unsigned int Wallet::getEquivalentValueInLowestDenomination(std::string system)
+unsigned int Wallet::getEquivalentValueInLowestDenomination(std::wstring system)
 {
 	Currency current_denomination = Currency();
 	unsigned int total = 0;
@@ -761,7 +761,7 @@ unsigned int Wallet::getEquivalentValueInLowestDenomination(std::string system)
 	//Get smallest Currency
 	for(const auto& [k,v] : getCurrencySystem(system))
 	{
-		if(v.Smaller != "") continue;
+		if(v.Smaller != L"") continue;
 		current_denomination = v;
 		break;
 	}
@@ -776,7 +776,7 @@ unsigned int Wallet::getEquivalentValueInLowestDenomination(std::string system)
 		if(get(current_denomination))
 			total += get(current_denomination) * totalFactor;
 
-		if(current_denomination.Larger == "") break;
+		if(current_denomination.Larger == L"") break;
 		current_denomination = s[current_denomination.Larger];
 	}
 
@@ -806,7 +806,7 @@ void Wallet::print()
 			unsigned int PadLength = (LongestName - key.Name.length()) +
 						 QuantityLength +
 						 COLUMN_PADDING;
-			fprintf(stdout,"%s%s%*d%s\n",key.Name.c_str(),TEXT_WHITE,PadLength,value,TEXT_NORMAL);
+			fprintf(stdout,"%ls%s%*d%s\n",key.Name.c_str(),TEXT_WHITE,PadLength,value,TEXT_NORMAL);
 		}
 	}
 }
@@ -814,7 +814,7 @@ void Wallet::FloatQuantityToIntCurrency(Currency c, float q)
 {
 	int totalFactor = 1;
 
-	while(c.Smaller != "")
+	while(c.Smaller != L"")
 	{
 		totalFactor *= c.SmallerAmount;
 		c = getCurrencySystem(c.System)[c.Smaller];
@@ -822,7 +822,7 @@ void Wallet::FloatQuantityToIntCurrency(Currency c, float q)
 
 	*this += Money{c,(int)(q*totalFactor)};
 }
-bool Wallet::containsCurrency(std::string currency_str)
+bool Wallet::containsCurrency(std::wstring currency_str)
 {
 	for(const auto& m : Monies)
 	{
@@ -834,7 +834,7 @@ bool Wallet::containsCurrency(std::string currency_str)
 	}
 	return false;
 }
-Currency Wallet::getExistingCurrency(std::string currency_str)
+Currency Wallet::getExistingCurrency(std::wstring currency_str)
 {
 	for(const auto& m : Monies)
 	{
@@ -857,7 +857,7 @@ Wallet::Wallet(const Money m)
 {
 	set(m.c,m.q);
 }
-Wallet::Wallet(std::string str)
+Wallet::Wallet(std::wstring str)
 {
 	//FORMAT
 	//@w/MyWallet = w{currency_1,quantity_1,currency_2,quantity_2,...,currency_n,quantity_n}
@@ -866,7 +866,7 @@ Wallet::Wallet(std::string str)
 	Currency currency = Currency();
 
 	//Get map of currency names
-	datamap<std::string> currencynames;
+	datamap<std::wstring> currencynames;
 	for(auto& [k,v] : currencies)
 		currencynames[k] = v.Name;
 
@@ -875,7 +875,7 @@ Wallet::Wallet(std::string str)
 
 	if(str[0] == CURRENCY_SIGIL)// Create wallet from currency explicit constructor
 	{
-		*this = Wallet(std::string(1,WALLET_SIGIL)+"{"+str+",1}");
+		*this = Wallet(std::wstring(1,WALLET_SIGIL)+L"{"+str+L",1}");
 		return;
 	}
 
@@ -885,34 +885,34 @@ Wallet::Wallet(std::string str)
 	//Cut off the initial "w{" to make parsing consistent
 	str = str.substr(2,str.length()-2);
 
-	if(str == "}") return; // Empty constructor, so don't continue parsing
+	if(str == L"}") return; // Empty constructor, so don't continue parsing
 
 	//Main parsing loop
 	while(true)
 	{
 		char delimiter = ',';
 
-		if(findu(str,delimiter) == std::string::npos)
+		if(findu(str,delimiter) == std::wstring::npos)
 			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 
 		//Create currency object to be added to wallet
-		std::string c(1,CURRENCY_SIGIL);
-		const long unsigned int c_pos = findu(str,c+"{");
-		if(c_pos == std::string::npos)
+		std::wstring c(1,CURRENCY_SIGIL);
+		const long unsigned int c_pos = findu(str,c+L"{");
+		if(c_pos == std::wstring::npos)
 			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
-		std::string currency_str = str.substr(c_pos,findu(str,'}')+1-c_pos);
+		std::wstring currency_str = str.substr(c_pos,findu(str,'}')+1-c_pos);
 		const long unsigned int c_str_ln = currency_str.length();
-		if(c_str_ln == std::string::npos)
+		if(c_str_ln == std::wstring::npos)
 			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 		currency = Currency(currency_str);
 		str = right(str,c_str_ln+1);
 
 		//If we're at the end of the constructor
-		if(findu(str,delimiter) == std::string::npos) delimiter = '}';
+		if(findu(str,delimiter) == std::wstring::npos) delimiter = '}';
 		const long unsigned int next_delimiter = findu(str,delimiter);
 
 		//Parse quantity string and try to add it to the wallet
-		std::string quantity_str = left(str,next_delimiter);
+		std::wstring quantity_str = left(str,next_delimiter);
 		try
 		{
 			set(currency,std::stoi(quantity_str));
@@ -929,18 +929,18 @@ Wallet::Wallet(std::string str)
 	}
 }
 
-Wallet::operator std::string() const
+Wallet::operator std::wstring() const
 {
 	//@w/MyWallet = {<currency_1>,<quantity_1>,<currency_2>,<quantity_2>,...,<currency_n>,<quantity_n>}
 
-	std::string ret = std::string(1,WALLET_SIGIL)+"{";
+	std::wstring ret = std::wstring(1,WALLET_SIGIL)+L"{";
 	for(const auto& m : Monies)
-		ret += std::string(m.c) + "," + std::to_string(m.q) + ",";
+		ret += std::wstring(m.c)+L","+std::to_wstring(m.q)+L",";
 
 	//Cut final ',' and add terminating '}'
-	if(findu(ret,',') != std::string::npos)
+	if(findu(ret,',') != std::wstring::npos)
 		ret = left(ret,ret.length()-1);
-	ret += "}";
+	ret += L"}";
 
 	return ret;
 }
@@ -951,9 +951,9 @@ Wallet::operator bool() const
 
 	return false;
 }
-const char* Wallet::c_str() const
+const wchar_t* Wallet::c_str() const
 {
-	return std::string(*this).c_str();
+	return std::wstring(*this).c_str();
 }
 
 void Wallet::sort()
@@ -971,7 +971,7 @@ void Wallet::sort()
 	}
 
 	//Find where each system starts
-	typedef std::pair<std::string,long unsigned int> sys_index;
+	typedef std::pair<std::wstring,long unsigned int> sys_index;
 	std::vector<sys_index> systems;
 	for(long unsigned int i=0; i<Monies.size(); i++)
 		if(!systems.size() || Monies[i].c.System != systems[systems.size()-1].first)
@@ -983,7 +983,7 @@ void Wallet::sort()
 		sys_index s = systems[system];
 		for(long unsigned int i=s.second; i<Monies.size()-1 && Monies[i].c.System == s.first; i++)
 		{
-			if(i > s.second && Monies[i].c.Larger == "")
+			if(i > s.second && Monies[i].c.Larger == L"")
 			{
 				Money tmp = Monies[s.second];
 				Monies[s.second] = Monies[i];
@@ -1011,14 +1011,14 @@ void Wallet::sort()
 				Monies[i] = tmp;
 				i=s.second;
 			}
-			else if(system < systems.size()-1 && Monies[i+1].c.System == s.first && Monies[i].c.Smaller == "")
+			else if(system < systems.size()-1 && Monies[i+1].c.System == s.first && Monies[i].c.Smaller == L"")
 			{
 				Money tmp = Monies[systems[system+1].second-1];
 				Monies[systems[system+1].second-1] = Monies[i];
 				Monies[i] = tmp;
 				i=s.second;
 			}
-			else if(system == systems.size()-1 && i < Monies.size()-1 && Monies[i].c.Smaller == "")
+			else if(system == systems.size()-1 && i < Monies.size()-1 && Monies[i].c.Smaller == L"")
 			{
 				Money tmp = Monies.back();
 				Monies.back() = Monies[i];
@@ -1053,7 +1053,7 @@ Wallet& Wallet::operator = ([[maybe_unused]] const int b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Wallet& Wallet::operator = ([[maybe_unused]] const std::string b)
+Wallet& Wallet::operator = ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -1094,7 +1094,7 @@ Wallet& Wallet::operator += ([[maybe_unused]] const int b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Wallet& Wallet::operator += ([[maybe_unused]] const std::string b)
+Wallet& Wallet::operator += ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -1103,7 +1103,7 @@ Wallet& Wallet::operator += (const Money b)
 	set(b.c,get(b.c)+b.q);
 	datamap<Currency> s = getCurrencySystem(b.c.System);
 
-	if(b.c.System != "" && s[b.c.Larger].SmallerAmount <= get(b.c))
+	if(b.c.System != L"" && s[b.c.Larger].SmallerAmount <= get(b.c))
 		TradeUp(b.c.System,this);
 
 	return *this;
@@ -1133,7 +1133,7 @@ Wallet& Wallet::operator -= ([[maybe_unused]] const int b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Wallet& Wallet::operator -= ([[maybe_unused]] const std::string b)
+Wallet& Wallet::operator -= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -1141,12 +1141,12 @@ Wallet& Wallet::operator -= (const Money b)
 {
 	transaction = b;
 
-	if(get(b.c)-b.q < 0 && b.c.System != "" && HasEffectivelyAtLeast(b.q,b.c))
+	if(get(b.c)-b.q < 0 && b.c.System != L"" && HasEffectivelyAtLeast(b.q,b.c))
 	{
 		set(b.c,get(b.c)-b.q);
 		MakeChange(b.c,this);
 	}
-	else if(get(b.c)-b.q < 0 && b.c.System != "")//TODO: Maybe create option to allow users to go into debt?
+	else if(get(b.c)-b.q < 0 && b.c.System != L"")//TODO: Maybe create option to allow users to go into debt?
 	{
 		output(Error,"Insufficient funds!");
 	}
@@ -1193,7 +1193,7 @@ Wallet& Wallet::operator *= (const int b)
 
 	return *this;
 }
-Wallet& Wallet::operator *= ([[maybe_unused]] const std::string b)
+Wallet& Wallet::operator *= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -1240,7 +1240,7 @@ Wallet& Wallet::operator /= (const int b)
 
 	return *this;
 }
-Wallet& Wallet::operator /= ([[maybe_unused]] const std::string b)
+Wallet& Wallet::operator /= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -1269,7 +1269,7 @@ Wallet& Wallet::operator ^= ([[maybe_unused]] const int b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Wallet& Wallet::operator ^= ([[maybe_unused]] const std::string b)
+Wallet& Wallet::operator ^= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -1296,7 +1296,7 @@ Wallet& Wallet::operator %= (const int b)
 
 	return *this;
 }
-Wallet& Wallet::operator %= ([[maybe_unused]] const std::string b)
+Wallet& Wallet::operator %= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -1321,7 +1321,7 @@ Wallet Wallet::operator + (const int b)
 {
 	return *this += b;
 }
-Wallet Wallet::operator + (const std::string b)
+Wallet Wallet::operator + (const std::wstring b)
 {
 	return *this += b;
 }
@@ -1345,7 +1345,7 @@ Wallet Wallet::operator - (const int b)
 {
 	return *this -= b;
 }
-Wallet Wallet::operator - (const std::string b)
+Wallet Wallet::operator - (const std::wstring b)
 {
 	return *this -= b;
 }
@@ -1369,7 +1369,7 @@ Wallet Wallet::operator * (const int b)
 {
 	return *this *= b;
 }
-Wallet Wallet::operator * (const std::string b)
+Wallet Wallet::operator * (const std::wstring b)
 {
 	return *this *= b;
 }
@@ -1393,7 +1393,7 @@ Wallet Wallet::operator / (const int b)
 {
 	return *this /= b;
 }
-Wallet Wallet::operator / (const std::string b)
+Wallet Wallet::operator / (const std::wstring b)
 {
 	return *this /= b;
 }
@@ -1417,7 +1417,7 @@ Wallet Wallet::operator ^ (const int b)
 {
 	return *this ^= b;
 }
-Wallet Wallet::operator ^ (const std::string b)
+Wallet Wallet::operator ^ (const std::wstring b)
 {
 	return *this ^= b;
 }
@@ -1441,7 +1441,7 @@ Wallet Wallet::operator % (const int b)
 {
 	return *this %= b;
 }
-Wallet Wallet::operator % (const std::string b)
+Wallet Wallet::operator % (const std::wstring b)
 {
 	return *this %= b;
 }
@@ -1465,7 +1465,7 @@ bool Wallet::operator == ([[maybe_unused]] const int& b) const
 {
 	return false;
 }
-bool Wallet::operator == ([[maybe_unused]] const std::string& b) const
+bool Wallet::operator == ([[maybe_unused]] const std::wstring& b) const
 {
 	return false;
 }
@@ -1520,14 +1520,14 @@ bool Wallet::operator == (const Wallet& b) const
 }
 bool Wallet::operator == (const Currency& b) const
 {
-	Wallet w = Wallet(std::string(1,WALLET_SIGIL)+"{"+std::string(b)+",1}");
+	Wallet w = Wallet(std::wstring(1,WALLET_SIGIL)+L"{"+std::wstring(b)+L",1}");
 	return getWalletValue(*this) == getWalletValue(w);
 }
 bool Wallet::operator < ([[maybe_unused]] const int& b) const
 {
 	return false;
 }
-bool Wallet::operator < ([[maybe_unused]] const std::string& b) const
+bool Wallet::operator < ([[maybe_unused]] const std::wstring& b) const
 {
 	return false;
 }
@@ -1546,14 +1546,14 @@ bool Wallet::operator < (const Wallet& b) const
 }
 bool Wallet::operator < (const Currency& b) const
 {
-	Wallet w = Wallet(std::string(1,WALLET_SIGIL)+"{"+std::string(b)+",1}");
+	Wallet w = Wallet(std::wstring(1,WALLET_SIGIL)+L"{"+std::wstring(b)+L",1}");
 	return getWalletValue(*this) < getWalletValue(w);
 }
 bool Wallet::operator > ([[maybe_unused]] const int& b) const
 {
 	return false;
 }
-bool Wallet::operator > ([[maybe_unused]] const std::string& b) const
+bool Wallet::operator > ([[maybe_unused]] const std::wstring& b) const
 {
 	return false;
 }
@@ -1572,14 +1572,14 @@ bool Wallet::operator > (const Wallet& b) const
 }
 bool Wallet::operator > ([[maybe_unused]] const Currency& b) const
 {
-	Wallet w = Wallet(std::string(1,WALLET_SIGIL)+"{"+std::string(b)+",1}");
+	Wallet w = Wallet(std::wstring(1,WALLET_SIGIL)+L"{"+std::wstring(b)+L",1}");
 	return getWalletValue(*this) > getWalletValue(w);
 }
 bool Wallet::operator <= (const int& b) const
 {
 	return *this < b || *this == b;
 }
-bool Wallet::operator <= (const std::string& b) const
+bool Wallet::operator <= (const std::wstring& b) const
 {
 	return *this < b || *this == b;
 }
@@ -1604,7 +1604,7 @@ bool Wallet::operator >= (const int& b) const
 {
 	return *this < b || *this == b;
 }
-bool Wallet::operator >= (const std::string& b) const
+bool Wallet::operator >= (const std::wstring& b) const
 {
 	return *this < b || *this == b;
 }
@@ -1629,7 +1629,7 @@ bool Wallet::operator != (const int& b) const
 {
 	return !(*this == b);
 }
-bool Wallet::operator != (const std::string& b) const
+bool Wallet::operator != (const std::wstring& b) const
 {
 	return !(*this == b);
 }
@@ -1653,9 +1653,9 @@ bool Wallet::operator && (const int b)
 {
 	return bool(*this) && (b != 0);
 }
-bool Wallet::operator && (const std::string b)
+bool Wallet::operator && (const std::wstring b)
 {
-	return bool(*this) && (b != "" && stringcasecmp(b,"false"));
+	return bool(*this) && (b != L"" && stringcasecmp(b,L"false"));
 }
 bool Wallet::operator && (const Var b)
 {
@@ -1677,9 +1677,9 @@ bool Wallet::operator || (const int b)
 {
 	return bool(*this) || (b != 0);
 }
-bool Wallet::operator || (const std::string b)
+bool Wallet::operator || (const std::wstring b)
 {
-	return bool(*this) || (b != "" && stringcasecmp(b,"false"));
+	return bool(*this) || (b != L"" && stringcasecmp(b,L"false"));
 }
 bool Wallet::operator || (const Var b)
 {
@@ -1702,7 +1702,7 @@ Wallet& Wallet::operator ++ ()
 	//Add 1 of the smallest currency
 	for(const auto& m : Monies)
 	{
-		if(m.c.System == "" || m.c.Smaller == "")
+		if(m.c.System == L"" || m.c.Smaller == L"")
 		{
 			*this += Money{m.c,1};
 			break;
@@ -1719,7 +1719,7 @@ Wallet& Wallet::operator -- ()
 	//Subtract 1 of the smallest currency
 	for(const auto& m : Monies)
 	{
-		if(m.c.System == "" || m.c.Smaller == "")
+		if(m.c.System == L"" || m.c.Smaller == L"")
 		{
 			*this -= Money{m.c,1};
 			break;
@@ -1735,7 +1735,7 @@ Wallet& Wallet::operator -- (int)
 void MakeChange(Currency c, Wallet* w)
 {
 	datamap<Currency> s = getCurrencySystem(c.System);
-	std::string NextHighest = c.Larger;
+	std::wstring NextHighest = c.Larger;
 	int ConversionFactor = s[NextHighest].SmallerAmount;
 	int transactionAmount = (*w).transaction.q;
 
@@ -1760,12 +1760,12 @@ void MakeChange(Currency c, Wallet* w)
 	(*w).set(c,((*w).get(c)+(ConversionFactor*ChangeCount)));
 	(*w) -= Money{s[NextHighest],ChangeCount};
 }
-void TradeUp(std::string system, Wallet* w)
+void TradeUp(std::wstring system, Wallet* w)
 {
 	datamap<Currency> s = getCurrencySystem(system);
 	for(const auto& m : (*w).Monies)
 	{
-		if(m.c.System == system && m.c.Larger != "" && m.q >= s[m.c.Larger].SmallerAmount)
+		if(m.c.System == system && m.c.Larger != L"" && m.q >= s[m.c.Larger].SmallerAmount)
 		{
 			//Make use of the trucation of the divison return value to int to simplify the math
 			int ConversionFactor = s[m.c.Larger].SmallerAmount;
