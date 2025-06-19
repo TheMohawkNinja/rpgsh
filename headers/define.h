@@ -125,4 +125,4 @@ extern std::string empty_str;
 
 //typedef for handing the various std::string key'd maps that are used
 template <typename T>
-using datamap = std::map<std::string, T>;
+using datamap = std::map<std::wstring, T>;
