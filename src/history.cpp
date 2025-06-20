@@ -78,8 +78,8 @@ int main(int argc, char** argv)
 	confirmHistoryFile();
 	unsigned long line_count = 0;
 	std::ifstream ifs(history_path.c_str());
-	std::string data;
-	std::vector<std::string> history;
+	std::wstring data;
+	std::vector<std::wstring> history;
 	while(!ifs.eof())
 	{
 		std::getline(ifs,data);

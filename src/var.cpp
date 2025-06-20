@@ -4,9 +4,9 @@
 #include "../headers/var.h"
 
 Var::Var(){}
-Var::Var(std::string str)
+Var::Var(std::wstring str)
 {
-	std::string v(1,VAR_SIGIL);
+	std::wstring v(1,VAR_SIGIL);
 
 	//If second character isn't a '{', this isn't an explicit constructor, so just treat it as a normal value
 	if(str[1] != '{')
@@ -16,7 +16,7 @@ Var::Var(std::string str)
 	}
 
 	//Make sure first character is VAR_SIGIL
-	if(str[0] != VAR_SIGIL || findu(str,'}') == std::string::npos)
+	if(str[0] != VAR_SIGIL || findu(str,'}') == std::wstring::npos)
 		throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 
 	Value = str.substr(2,findu(str,'}')-2);
@@ -25,9 +25,9 @@ Var::Var(int _value)
 {
 	Value = std::to_string(_value);
 }
-Var::operator std::string() const
+Var::operator std::wstring() const
 {
-	return std::string(1,VAR_SIGIL)+"{"+Value+"}";
+	return std::wstring(1,VAR_SIGIL)+"{"+Value+"}";
 }
 Var::operator int() const
 {
@@ -46,7 +46,7 @@ Var::operator bool() const
 }
 const char* Var::c_str() const
 {
-	return std::string(*this).c_str();
+	return std::wstring(*this).c_str();
 }
 bool Var::isInt() const
 {
@@ -69,7 +69,7 @@ Var& Var::operator = (const int b)
 	Value = std::to_string(b);
 	return *this;
 }
-Var& Var::operator = (const std::string b)
+Var& Var::operator = (const std::wstring b)
 {
 	Value = mergeQuotes(b);
 	return *this;
@@ -100,7 +100,7 @@ Var& Var::operator += (const int b)
 
 	return *this;
 }
-Var& Var::operator += (const std::string b)
+Var& Var::operator += (const std::wstring b)
 {
 	if(isInt())
 		throw std::runtime_error(E_INVALID_OPERATION);
@@ -139,7 +139,7 @@ Var& Var::operator -= (const int b)
 
 	return *this;
 }
-Var& Var::operator -= ([[maybe_unused]] const std::string b)
+Var& Var::operator -= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -177,7 +177,7 @@ Var& Var::operator *= (const int b)
 
 	return *this;
 }
-Var& Var::operator *= ([[maybe_unused]] const std::string b)
+Var& Var::operator *= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -211,7 +211,7 @@ Var& Var::operator /= (const int b)
 
 	return *this;
 }
-Var& Var::operator /= ([[maybe_unused]] const std::string b)
+Var& Var::operator /= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -252,7 +252,7 @@ Var& Var::operator ^= (const int b)
 
 	return *this;
 }
-Var& Var::operator ^= ([[maybe_unused]] const std::string b)
+Var& Var::operator ^= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -286,7 +286,7 @@ Var& Var::operator %= (const int b)
 
 	return *this;
 }
-Var& Var::operator %= ([[maybe_unused]] const std::string b)
+Var& Var::operator %= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -315,7 +315,7 @@ Var Var::operator + (const int b)
 {
 	return *this += b;
 }
-Var Var::operator + (const std::string b)
+Var Var::operator + (const std::wstring b)
 {
 	return *this += b;
 }
@@ -339,7 +339,7 @@ Var Var::operator - (const int b)
 {
 	return *this -= b;
 }
-Var Var::operator - (const std::string b)
+Var Var::operator - (const std::wstring b)
 {
 	return *this -= b;
 }
@@ -363,7 +363,7 @@ Var Var::operator * (const int b)
 {
 	return *this *= b;
 }
-Var Var::operator * (const std::string b)
+Var Var::operator * (const std::wstring b)
 {
 	return *this *= b;
 }
@@ -387,7 +387,7 @@ Var Var::operator / (const int b)
 {
 	return *this /= b;
 }
-Var Var::operator / (const std::string b)
+Var Var::operator / (const std::wstring b)
 {
 	return *this /= b;
 }
@@ -411,7 +411,7 @@ Var Var::operator ^ (const int b)
 {
 	return *this ^= b;
 }
-Var Var::operator ^ (const std::string b)
+Var Var::operator ^ (const std::wstring b)
 {
 	return *this ^= b;
 }
@@ -435,7 +435,7 @@ Var Var::operator % (const int b)
 {
 	return *this %= b;
 }
-Var Var::operator % (const std::string b)
+Var Var::operator % (const std::wstring b)
 {
 	return *this %= b;
 }
@@ -462,7 +462,7 @@ bool Var::operator == (const int b)
 	else
 		return false;
 }
-bool Var::operator == (const std::string b)
+bool Var::operator == (const std::wstring b)
 {
 	return (Value == b);
 }
@@ -495,7 +495,7 @@ if(isInt())
 	else
 		return false;
 }
-bool Var::operator < (const std::string b)
+bool Var::operator < (const std::wstring b)
 {
 	return (Value < b);
 }
@@ -528,7 +528,7 @@ bool Var::operator > (const int b)
 	else
 		return false;
 }
-bool Var::operator > (const std::string b)
+bool Var::operator > (const std::wstring b)
 {
 	return (Value > b);
 }
@@ -559,7 +559,7 @@ bool Var::operator <= (const int b)
 	Var lhs = *this;
 	return (lhs < b || lhs == b);
 }
-bool Var::operator <= (const std::string b)
+bool Var::operator <= (const std::wstring b)
 {
 	Var lhs = *this;
 	return (lhs < b || lhs == b);
@@ -589,7 +589,7 @@ bool Var::operator >= (const int b)
 	Var lhs = *this;
 	return (lhs > b || lhs == b);
 }
-bool Var::operator >= (const std::string b)
+bool Var::operator >= (const std::wstring b)
 {
 	Var lhs = *this;
 	return (lhs > b || lhs == b);
@@ -619,7 +619,7 @@ bool Var::operator != (const int b)
 	Var lhs = *this;
 	return !(lhs == b);
 }
-bool Var::operator != (const std::string b)
+bool Var::operator != (const std::wstring b)
 {
 	Var lhs = *this;
 	return !(lhs == b);
@@ -648,7 +648,7 @@ bool Var::operator && (const int b)
 {
 	return bool(*this) && (b != 0);
 }
-bool Var::operator && (const std::string b)
+bool Var::operator && (const std::wstring b)
 {
 	return bool(*this) && (b != "" && stringcasecmp(b,"false"));
 }
@@ -672,7 +672,7 @@ bool Var::operator || (const int b)
 {
 	return bool(*this) || (b != 0);
 }
-bool Var::operator || (const std::string b)
+bool Var::operator || (const std::wstring b)
 {
 	return bool(*this) || (b != "" && stringcasecmp(b,"false"));
 }

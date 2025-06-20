@@ -33,7 +33,7 @@ int main(int argc, char** argv)
 		{
 			try
 			{
-				w_in = Wallet(std::string(argv[i]));
+				w_in = Wallet(std::wstring(argv[i]));
 				hasWallet = true;
 			}
 			catch(const std::runtime_error& e)
@@ -46,7 +46,7 @@ int main(int argc, char** argv)
 		{
 			try
 			{
-				currency = Currency(std::string(argv[i]));
+				currency = Currency(std::wstring(argv[i]));
 			}
 			catch(const std::runtime_error& e)
 			{
@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 	}
 	if(currency == Currency())
 	{
-		for(const auto& line : getAppOutput("print "+std::string(w_in)).output)
+		for(const auto& line : getAppOutput("print "+std::wstring(w_in)).output)
 			fprintf(stdout,"%s\n",line.c_str());
 		fprintf(stdout,"\b");
 		return 0;

@@ -26,7 +26,7 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	std::string src, dst, src_campaign_path, dst_campaign_path, src_character_path, dst_character_path;
+	std::wstring src, dst, src_campaign_path, dst_campaign_path, src_character_path, dst_character_path;
 	MCStr src_mc, dst_mc;
 	bool copy_c = false;
 	bool copy_m = false;
@@ -48,12 +48,12 @@ int main(int argc, char** argv)
 			copy_c = true;
 			copy_m = false;
 			Character c = Character();
-			src = std::string(argv[i+1]);
+			src = std::wstring(argv[i+1]);
 
 			//Check if destination is specified. If not, use source name
 			if(argv[i+2] && argv[i+2][0] != '-')
 			{
-				dst = std::string(argv[i+2]);
+				dst = std::wstring(argv[i+2]);
 				i++;
 			}
 			else
@@ -126,12 +126,12 @@ int main(int argc, char** argv)
 			copy_c = false;
 			copy_m = true;
 			Character c = Character();
-			src = std::string(argv[i+1]);
+			src = std::wstring(argv[i+1]);
 
 			//Check if destination is specified. If not, use source name
 			if(argv[i+2] && argv[i+2][0] != '-')
 			{
-				dst = std::string(argv[i+2]);
+				dst = std::wstring(argv[i+2]);
 				i++;
 			}
 			else
@@ -174,7 +174,7 @@ int main(int argc, char** argv)
 	int copy_start = 1;
 	if(isdigit(src[src.length()-1]))
 	{
-		std::string copy_start_str;
+		std::wstring copy_start_str;
 		for(int i=src.length(); i>0; i--)
 		{
 			if(!isdigit(src[i])) break;
@@ -207,7 +207,7 @@ int main(int argc, char** argv)
 
 	for(int i=0; i<copies; i++)
 	{
-		std::string copy_num = std::to_string(i+copy_start);
+		std::wstring copy_num = std::to_string(i+copy_start);
 		if(copy_c)
 		{
 			std::filesystem::copy(src_character_path,left(dst_character_path,dst_character_path.length()-5)+copy_num+c_ext);

@@ -23,7 +23,7 @@ void Scope::confirmDefaultCampaign()
 
 //Try to create a filestream
 template<>
-std::ifstream Scope::tryCreateFileStream<std::ifstream>(std::string path)
+std::ifstream Scope::tryCreateFileStream<std::ifstream>(std::wstring path)
 {
 	if(!std::filesystem::exists(path)) throw std::runtime_error(E_FILE_NOT_FOUND);
 
@@ -33,7 +33,7 @@ std::ifstream Scope::tryCreateFileStream<std::ifstream>(std::string path)
 	return fs;
 }
 template<>
-std::ofstream Scope::tryCreateFileStream<std::ofstream>(std::string path)
+std::ofstream Scope::tryCreateFileStream<std::ofstream>(std::wstring path)
 {
 	//Open as an appending stream
 	std::ofstream fs(path, std::ios::app);
@@ -49,11 +49,11 @@ bool Scope::confirmDatasource()
 }
 
 //Get/set datasource
-std::string Scope::getDatasource()
+std::wstring Scope::getDatasource()
 {
 	return datasource;
 }
-void Scope::setDatasource(std::string path)
+void Scope::setDatasource(std::wstring path)
 {
 	datasource = path;
 }
@@ -66,7 +66,7 @@ bool Scope::isEmpty()
 
 //Check if key exists
 template<>
-bool Scope::keyExists<Currency>(std::string key)
+bool Scope::keyExists<Currency>(std::wstring key)
 {
 	for(const auto& [k,v] : currencies)
 		if(!stringcasecmp(k,key)) return true;
@@ -74,7 +74,7 @@ bool Scope::keyExists<Currency>(std::string key)
 	return false;
 }
 template<>
-bool Scope::keyExists<Dice>(std::string key)
+bool Scope::keyExists<Dice>(std::wstring key)
 {
 	for(const auto& [k,v] : dice)
 		if(!stringcasecmp(k,key)) return true;
@@ -82,7 +82,7 @@ bool Scope::keyExists<Dice>(std::string key)
 	return false;
 }
 template<>
-bool Scope::keyExists<Var>(std::string key)
+bool Scope::keyExists<Var>(std::wstring key)
 {
 	for(const auto& [k,v] : vars)
 		if(!stringcasecmp(k,key)) return true;
@@ -90,7 +90,7 @@ bool Scope::keyExists<Var>(std::string key)
 	return false;
 }
 template<>
-bool Scope::keyExists<Wallet>(std::string key)
+bool Scope::keyExists<Wallet>(std::wstring key)
 {
 	for(const auto& [k,v] : wallets)
 		if(!stringcasecmp(k,key)) return true;
@@ -100,7 +100,7 @@ bool Scope::keyExists<Wallet>(std::string key)
 
 //Get existing case-insensitive key match (if applicable)
 template<>
-std::string Scope::getExistingKey<Currency>(std::string key)
+std::wstring Scope::getExistingKey<Currency>(std::wstring key)
 {
 	for(const auto& [k,v] : currencies)
 		if(!stringcasecmp(k,key)) return k;
@@ -108,7 +108,7 @@ std::string Scope::getExistingKey<Currency>(std::string key)
 	return key;
 }
 template<>
-std::string Scope::getExistingKey<Dice>(std::string key)
+std::wstring Scope::getExistingKey<Dice>(std::wstring key)
 {
 	for(const auto& [k,v] : dice)
 		if(!stringcasecmp(k,key)) return k;
@@ -116,7 +116,7 @@ std::string Scope::getExistingKey<Dice>(std::string key)
 	return key;
 }
 template<>
-std::string Scope::getExistingKey<Var>(std::string key)
+std::wstring Scope::getExistingKey<Var>(std::wstring key)
 {
 	for(const auto& [k,v] : vars)
 		if(!stringcasecmp(k,key)) return k;
@@ -124,7 +124,7 @@ std::string Scope::getExistingKey<Var>(std::string key)
 	return key;
 }
 template<>
-std::string Scope::getExistingKey<Wallet>(std::string key)
+std::wstring Scope::getExistingKey<Wallet>(std::wstring key)
 {
 	for(const auto& [k,v] : wallets)
 		if(!stringcasecmp(k,key)) return k;
@@ -134,51 +134,51 @@ std::string Scope::getExistingKey<Wallet>(std::string key)
 
 //Get single variable
 template<>
-Currency Scope::get<Currency>(std::string key)
+Currency Scope::get<Currency>(std::wstring key)
 {
 	return currencies[getExistingKey<Currency>(key)];
 }
 template<>
-Dice Scope::get<Dice>(std::string key)
+Dice Scope::get<Dice>(std::wstring key)
 {
 	return dice[getExistingKey<Dice>(key)];
 }
 template<>
-Var Scope::get<Var>(std::string key)
+Var Scope::get<Var>(std::wstring key)
 {
 	return vars[getExistingKey<Var>(key)];
 }
 template<>
-Wallet Scope::get<Wallet>(std::string key)
+Wallet Scope::get<Wallet>(std::wstring key)
 {
 	return wallets[getExistingKey<Wallet>(key)];
 }
 
-//Get single variable, but return a std::string
+//Get single variable, but return a std::wstring
 template<>
-std::string Scope::getStr<Currency>(std::string key)
+std::wstring Scope::getStr<Currency>(std::wstring key)
 {
-	return std::string(Scope::get<Currency>(key));
+	return std::wstring(Scope::get<Currency>(key));
 }
 template<>
-std::string Scope::getStr<Dice>(std::string key)
+std::wstring Scope::getStr<Dice>(std::wstring key)
 {
-	return std::string(Scope::get<Dice>(key));
+	return std::wstring(Scope::get<Dice>(key));
 }
 template<>
-std::string Scope::getStr<Var>(std::string key)
+std::wstring Scope::getStr<Var>(std::wstring key)
 {
-	return std::string(Scope::get<Var>(key));
+	return std::wstring(Scope::get<Var>(key));
 }
 template<>
-std::string Scope::getStr<Wallet>(std::string key)
+std::wstring Scope::getStr<Wallet>(std::wstring key)
 {
-	return std::string(Scope::get<Wallet>(key));
+	return std::wstring(Scope::get<Wallet>(key));
 }
 
 //Get property from a variable
 template<>
-std::string Scope::getProperty<Currency>(std::string key, std::string property)
+std::wstring Scope::getProperty<Currency>(std::wstring key, std::wstring property)
 {
 	if(!stringcasecmp(property,"CurrencySystem"))
 		return get<Currency>(key).System;
@@ -194,7 +194,7 @@ std::string Scope::getProperty<Currency>(std::string key, std::string property)
 	throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
-std::string Scope::getProperty<Dice>(std::string key, std::string property)
+std::wstring Scope::getProperty<Dice>(std::wstring key, std::wstring property)
 {
 	if(!stringcasecmp(property,"Quantity"))
 		return std::to_string(get<Dice>(key).Quantity);
@@ -208,7 +208,7 @@ std::string Scope::getProperty<Dice>(std::string key, std::string property)
 	throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
-std::string Scope::getProperty<Var>(std::string key, std::string property)
+std::wstring Scope::getProperty<Var>(std::wstring key, std::wstring property)
 {
 	if(!stringcasecmp(property,"Value"))
 		return get<Var>(key).Value;
@@ -216,7 +216,7 @@ std::string Scope::getProperty<Var>(std::string key, std::string property)
 	throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
-std::string Scope::getProperty<Wallet>(std::string key, std::string property)
+std::wstring Scope::getProperty<Wallet>(std::wstring key, std::wstring property)
 {
 	for(const auto& m : get<Wallet>(key).Monies)
 	{
@@ -251,29 +251,29 @@ datamap<Wallet> Scope::getDatamap<Wallet>()
 
 //Set single variable
 template<>
-void Scope::set<Currency>(std::string key, Currency value)
+void Scope::set<Currency>(std::wstring key, Currency value)
 {
 	currencies[getExistingKey<Currency>(key)] = value;
 }
 template<>
-void Scope::set<Dice>(std::string key, Dice value)
+void Scope::set<Dice>(std::wstring key, Dice value)
 {
 	dice[getExistingKey<Dice>(key)] = value;
 }
 template<>
-void Scope::set<Var>(std::string key, Var value)
+void Scope::set<Var>(std::wstring key, Var value)
 {
 	vars[getExistingKey<Var>(key)] = value;
 }
 template<>
-void Scope::set<Wallet>(std::string key, Wallet value)
+void Scope::set<Wallet>(std::wstring key, Wallet value)
 {
 	wallets[getExistingKey<Wallet>(key)] = value;
 }
 
 //Set a property
 template<>
-void Scope::setProperty<Currency,int>(std::string key, std::string property, int value)
+void Scope::setProperty<Currency,int>(std::wstring key, std::wstring property, int value)
 {
 	if(!stringcasecmp(property,"SmallerAmount"))
 		currencies[getExistingKey<Currency>(key)].SmallerAmount = value;
@@ -281,7 +281,7 @@ void Scope::setProperty<Currency,int>(std::string key, std::string property, int
 		throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
-void Scope::setProperty<Currency,std::string>(std::string key, std::string property, std::string value)
+void Scope::setProperty<Currency,std::wstring>(std::wstring key, std::wstring property, std::wstring value)
 {
 	if(!stringcasecmp(property,"CurrencySystem"))
 		currencies[getExistingKey<Currency>(key)].System = value;
@@ -295,7 +295,7 @@ void Scope::setProperty<Currency,std::string>(std::string key, std::string prope
 		throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
-void Scope::setProperty<Dice,int>(std::string key, std::string property, int value)
+void Scope::setProperty<Dice,int>(std::wstring key, std::wstring property, int value)
 {
 	if(!stringcasecmp(property,"Quantity"))
 		dice[getExistingKey<Dice>(key)].Quantity = value;
@@ -307,7 +307,7 @@ void Scope::setProperty<Dice,int>(std::string key, std::string property, int val
 		throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
-void Scope::setProperty<Dice,std::string>(std::string key, std::string property, std::string value)
+void Scope::setProperty<Dice,std::wstring>(std::wstring key, std::wstring property, std::wstring value)
 {
 	if(!stringcasecmp(property,"List"))
 		dice[getExistingKey<Dice>(key)].List = value;
@@ -315,7 +315,7 @@ void Scope::setProperty<Dice,std::string>(std::string key, std::string property,
 		throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
-void Scope::setProperty<Var,std::string>(std::string key, std::string property, std::string value)
+void Scope::setProperty<Var,std::wstring>(std::wstring key, std::wstring property, std::wstring value)
 {
 	if(!stringcasecmp(property,"Value"))
 		vars[getExistingKey<Var>(key)].Value = value;
@@ -323,7 +323,7 @@ void Scope::setProperty<Var,std::string>(std::string key, std::string property, 
 		throw std::runtime_error(E_INVALID_PROPERTY);
 }
 template<>
-void Scope::setProperty<Wallet,int>(std::string key, std::string property, int value)
+void Scope::setProperty<Wallet,int>(std::wstring key, std::wstring property, int value)
 {
 	if(get<Wallet>(key).containsCurrency(property))
 		wallets[getExistingKey<Wallet>(key)].set(wallets[getExistingKey<Wallet>(key)].getExistingCurrency(property),value);
@@ -355,35 +355,35 @@ void Scope::setDatamap<Wallet>(datamap<Wallet> map)
 
 //Delete single variable
 template<>
-bool Scope::remove<Currency>(std::string key)
+bool Scope::remove<Currency>(std::wstring key)
 {
 	return currencies.erase(getExistingKey<Currency>(key));
 }
 template<>
-bool Scope::remove<Dice>(std::string key)
+bool Scope::remove<Dice>(std::wstring key)
 {
 	return dice.erase(getExistingKey<Dice>(key));
 }
 template<>
-bool Scope::remove<Var>(std::string key)
+bool Scope::remove<Var>(std::wstring key)
 {
 	return vars.erase(getExistingKey<Var>(key));
 }
 template<>
-bool Scope::remove<Wallet>(std::string key)
+bool Scope::remove<Wallet>(std::wstring key)
 {
 	return wallets.erase(getExistingKey<Wallet>(key));
 }
 
 //Save file formatting
-std::string Scope::formatLine(char type, std::string k, std::string v)
+std::wstring Scope::formatLine(char type, std::wstring k, std::wstring v)
 {
-	std::string type_str(1,type);
+	std::wstring type_str(1,type);
 	return (type_str + DS + k + DS + v + "\n");
 }
 
 //Load all data in from file
-void Scope::load(std::string path, bool loadVar, bool loadDice, bool loadCurrency, bool loadWallet)
+void Scope::load(std::wstring path, bool loadVar, bool loadDice, bool loadCurrency, bool loadWallet)
 {
 	//Start from a clean slate
 	currencies.clear();
@@ -407,10 +407,10 @@ void Scope::load(std::string path, bool loadVar, bool loadDice, bool loadCurrenc
 	while(!ifs.eof())
 	{
 		linenum++;
-		std::string data = "";
+		std::wstring data = "";
 		char type = '\0';
-		std::string key = "";
-		std::string value = "";
+		std::wstring key = "";
+		std::wstring value = "";
 
 		std::getline(ifs,data);
 
@@ -482,7 +482,7 @@ void Scope::load()
 		throw;
 	}
 }
-void Scope::load(std::string path)
+void Scope::load(std::wstring path)
 {
 	datasource = path;
 	try{load();}
@@ -499,8 +499,8 @@ void Scope::save()
 	//Check for name change with character scopes
 	if(datasource.substr(datasource.length()-5,5) == c_ext || datasource.substr(datasource.length()-9,9) == (c_ext+".bak"))
 	{
-		std::string old_name = right(left(datasource,rfindu(datasource,c_ext)),rfindu(datasource,'/')+1);
-		std::string new_name = getProperty<Var>(getProperty<Var>(std::string(DOT_NAME),"Value"),"Value");
+		std::wstring old_name = right(left(datasource,rfindu(datasource,c_ext)),rfindu(datasource,'/')+1);
+		std::wstring new_name = getProperty<Var>(getProperty<Var>(std::wstring(DOT_NAME),"Value"),"Value");
 		if(old_name != new_name)
 		{
 			std::filesystem::remove(datasource);
@@ -523,13 +523,13 @@ void Scope::save()
 	}
 
 	for(const auto& [k,v] : currencies)
-		ofs<<formatLine(CURRENCY_SIGIL,k,std::string(v));
+		ofs<<formatLine(CURRENCY_SIGIL,k,std::wstring(v));
 	for(const auto& [k,v] : dice)
-		ofs<<formatLine(DICE_SIGIL,k,std::string(v));
+		ofs<<formatLine(DICE_SIGIL,k,std::wstring(v));
 	for(const auto& [k,v] : vars)
-		ofs<<formatLine(VAR_SIGIL,k,std::string(v));
+		ofs<<formatLine(VAR_SIGIL,k,std::wstring(v));
 	for(const auto& [k,v] : wallets)
-		ofs<<formatLine(WALLET_SIGIL,k,std::string(v));
+		ofs<<formatLine(WALLET_SIGIL,k,std::wstring(v));
 
 	ofs.close();
 }
@@ -560,29 +560,29 @@ Character::Character(bool backup)
 		save();
 	}
 }
-Character::Character(std::string path)
+Character::Character(std::wstring path)
 {
 	sigil = CHARACTER_SIGIL;
 
 	load(path);
 }
 
-std::string Character::getCurrentCharacterFilePath()
+std::wstring Character::getCurrentCharacterFilePath()
 {
-	std::string character = getEnvVariable(ENV_CURRENT_CHARACTER);
-	std::string campaign = getEnvVariable(ENV_CURRENT_CAMPAIGN);
-	std::string current_campaign_dir = campaigns_dir+campaign;
-	std::string current_character_dir = current_campaign_dir+"characters/";
+	std::wstring character = getEnvVariable(ENV_CURRENT_CHARACTER);
+	std::wstring campaign = getEnvVariable(ENV_CURRENT_CAMPAIGN);
+	std::wstring current_campaign_dir = campaigns_dir+campaign;
+	std::wstring current_character_dir = current_campaign_dir+"characters/";
 
 	return (current_character_dir + character + c_ext);
 }
 
 //Get/set character name
-std::string Character::getName()
+std::wstring Character::getName()
 {
-	return getProperty<Var>(getProperty<Var>(std::string(DOT_NAME),"Value"),"Value");
+	return getProperty<Var>(getProperty<Var>(std::wstring(DOT_NAME),"Value"),"Value");
 }
-void Character::setName(std::string name)
+void Character::setName(std::wstring name)
 {
 	set<Var>(getProperty<Var>(DOT_NAME,"Value"),name);
 }
@@ -603,7 +603,7 @@ Campaign::Campaign()
 
 	load();
 }
-Campaign::Campaign(std::string path)
+Campaign::Campaign(std::wstring path)
 {
 	sigil = CAMPAIGN_SIGIL;
 

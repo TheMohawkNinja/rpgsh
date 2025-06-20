@@ -40,9 +40,9 @@ int main(int argc, char** argv)
 
 	Character c = Character();
 
-	if(std::string(argv[1]) == "") output(Warning,"%s is empty.",argv[1]);
+	if(std::wstring(argv[1]) == "") output(Warning,"%s is empty.",argv[1]);
 
-	c.set<Var>(DOT_NAME,std::string(argv[1]));
+	c.set<Var>(DOT_NAME,std::wstring(argv[1]));
 	c.save();
 	output(Info,"Current character's name is now set to the key \"%s\" (Current value: \"%s\")",argv[1],c.getStr<Var>(argv[1]).c_str());
 

@@ -2,7 +2,7 @@
 #include <iostream>
 #include "../headers/functions.h"
 
-void confirmPath(std::string path, std::string scope)
+void confirmPath(std::wstring path, std::wstring scope)
 {
 	if(!std::filesystem::exists(path))
 	{
@@ -12,12 +12,12 @@ void confirmPath(std::string path, std::string scope)
 		return;
 	}
 }
-void execAutorun(std::string path, std::string scope, bool verbose)
+void execAutorun(std::wstring path, std::wstring scope, bool verbose)
 {
 	std::ifstream ifs(path);
 	while(!ifs.eof())
 	{
-		std::string command;
+		std::wstring command;
 		getline(ifs,command);
 		if(command == "") continue;
 		if(verbose)
@@ -26,11 +26,11 @@ void execAutorun(std::string path, std::string scope, bool verbose)
 	}
 	ifs.close();
 }
-void saveAutorun(std::string path, std::string scope)
+void saveAutorun(std::wstring path, std::wstring scope)
 {
 	while(true)
 	{
-		std::string command;
+		std::wstring command;
 		fprintf(stdout,"Please enter a command: ");
 		getline(std::cin,command);
 		if(command == "") continue;
@@ -41,7 +41,7 @@ void saveAutorun(std::string path, std::string scope)
 		return;
 	}
 }
-void printHeader(std::string s)
+void printHeader(std::wstring s)
 {
 	fprintf(stdout,"%s%s %s %s\n",TEXT_GREEN,TEXT_BOLD,s.c_str(),TEXT_NORMAL);
 	fprintf(stdout,"%s",TEXT_WHITE);
@@ -49,12 +49,12 @@ void printHeader(std::string s)
 		fprintf(stdout,"─");
 	fprintf(stdout,"%s\n",TEXT_NORMAL);
 }
-void printCommands(std::string path, bool print_index, int* cmd_ctr)
+void printCommands(std::wstring path, bool print_index, int* cmd_ctr)
 {
 	std::ifstream ifs(path);
 	while(true)
 	{
-		std::string command;
+		std::wstring command;
 		getline(ifs,command);
 		if(ifs.eof())
 		{
@@ -65,15 +65,15 @@ void printCommands(std::string path, bool print_index, int* cmd_ctr)
 		fprintf(stdout,"%s%s\n",(print_index ? "["+std::to_string(*cmd_ctr)+"] " : "").c_str(),command.c_str());
 	}
 }
-bool removeCommand(std::string path, int* index, std::string scope)
+bool removeCommand(std::wstring path, int* index, std::wstring scope)
 {
 	bool thisFile = false;
 	std::ifstream ifs(path);
-	std::string deletedCommand;
-	std::vector<std::string> commands;
+	std::wstring deletedCommand;
+	std::vector<std::wstring> commands;
 	while(true)
 	{
-		std::string command;
+		std::wstring command;
 		getline(ifs,command);
 		if(ifs.eof()) break;
 		if((*index) != 1)
@@ -127,9 +127,9 @@ int main(int argc, char** argv)
 
 	Character c = Character();
 	Campaign m = Campaign();
-	std::string s_path = root_dir+".autorun";
-	std::string m_path = left(m.getDatasource(),rfindu(m.getDatasource(),".variables"))+".autorun";
-	std::string c_path = left(c.getDatasource(),rfindu(c.getDatasource(),'/')+1)+c.getName()+".autorun";
+	std::wstring s_path = root_dir+".autorun";
+	std::wstring m_path = left(m.getDatasource(),rfindu(m.getDatasource(),".variables"))+".autorun";
+	std::wstring c_path = left(c.getDatasource(),rfindu(c.getDatasource(),'/')+1)+c.getName()+".autorun";
 
 	confirmPath(s_path,"shell");
 	confirmPath(m_path,"campaign");
@@ -159,29 +159,29 @@ int main(int argc, char** argv)
 	else if(!strcasecmp(argv[1],"-l"))
 	{
 		int cmd_ctr = 0;
-		std::string m_name = getEnvVariable(ENV_CURRENT_CAMPAIGN);
-		printHeader("("+std::string(1,SHELL_SIGIL)+") "+"Shell");
+		std::wstring m_name = getEnvVariable(ENV_CURRENT_CAMPAIGN);
+		printHeader("("+std::wstring(1,SHELL_SIGIL)+") "+"Shell");
 		printCommands(s_path,false,&cmd_ctr);
-		printHeader("("+std::string(1,CAMPAIGN_SIGIL)+") "+left(m_name,m_name.length()-1));
+		printHeader("("+std::wstring(1,CAMPAIGN_SIGIL)+") "+left(m_name,m_name.length()-1));
 		printCommands(m_path,false,&cmd_ctr);
-		printHeader("("+std::string(1,CHARACTER_SIGIL)+") "+c.getName());
+		printHeader("("+std::wstring(1,CHARACTER_SIGIL)+") "+c.getName());
 		printCommands(c_path,false,&cmd_ctr);
 		fprintf(stdout,"\b");
 	}
 	else if(!strcasecmp(argv[1],"-r"))
 	{
 		int cmd_ctr = 0;
-		std::string m_name = getEnvVariable(ENV_CURRENT_CAMPAIGN);
-		printHeader("("+std::string(1,SHELL_SIGIL)+") "+"Shell");
+		std::wstring m_name = getEnvVariable(ENV_CURRENT_CAMPAIGN);
+		printHeader("("+std::wstring(1,SHELL_SIGIL)+") "+"Shell");
 		printCommands(s_path,true,&cmd_ctr);
-		printHeader("("+std::string(1,CAMPAIGN_SIGIL)+") "+left(m_name,m_name.length()-1));
+		printHeader("("+std::wstring(1,CAMPAIGN_SIGIL)+") "+left(m_name,m_name.length()-1));
 		printCommands(m_path,true,&cmd_ctr);
-		printHeader("("+std::string(1,CHARACTER_SIGIL)+") "+c.getName());
+		printHeader("("+std::wstring(1,CHARACTER_SIGIL)+") "+c.getName());
 		printCommands(c_path,true,&cmd_ctr);
 		fprintf(stdout,"\b");
 
 		int index = 0;
-		std::string index_str;
+		std::wstring index_str;
 
 		while(true)
 		{

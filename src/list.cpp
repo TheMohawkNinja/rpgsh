@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	std::string campaign;
+	std::wstring campaign;
 	bool campaign_flag = false;
 	for(int i=1; i<argc; i++)
 	{
@@ -79,7 +79,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		std::string campaign_path = campaigns_dir;
+		std::wstring campaign_path = campaigns_dir;
 		if(campaign != "")
 		{
 			for(const auto& campaign_entry : getDirectoryListing(campaigns_dir))

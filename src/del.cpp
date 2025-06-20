@@ -41,7 +41,7 @@ int main(int argc, char** argv)
 	}
 
 	VariableInfo vi;
-	std::string obj_to_be_deleted = std::string(argv[1]);
+	std::wstring obj_to_be_deleted = std::wstring(argv[1]);
 	if(looksLikeVariable(obj_to_be_deleted)) vi = parseVariable(obj_to_be_deleted);
 
 	if(!onlyChkC && !onlyChkM)
@@ -54,8 +54,8 @@ int main(int argc, char** argv)
 
 		if(vi.variable.back() != '/')
 		{
-			std::string xref = (vi.xref != "" ? "["+vi.xref+"]" : "");
-			std::string value = getAppOutput(vi.variable).output[0];
+			std::wstring xref = (vi.xref != "" ? "["+vi.xref+"]" : "");
+			std::wstring value = getAppOutput(vi.variable).output[0];
 			bool deleted = false;
 
 			if(vi.property != "")
@@ -86,7 +86,7 @@ int main(int argc, char** argv)
 		}
 		else
 		{
-			std::string xref = (vi.xref != "" ? "["+vi.xref+"]" : "");
+			std::wstring xref = (vi.xref != "" ? "["+vi.xref+"]" : "");
 
 			bool atLeastOneKeyRemoved = false;
 			struct RemovedKey
@@ -133,14 +133,14 @@ int main(int argc, char** argv)
 	else if(onlyChkC)
 	{
 		Character c = Character();
-		std::string campaign_path;
-		MCStr mc = parseMCStr(std::string(argv[2]));
+		std::wstring campaign_path;
+		MCStr mc = parseMCStr(std::wstring(argv[2]));
 		if(mc.m == "")
 			campaign_path = left(c.getDatasource(),rfindu(c.getDatasource(),'/')+1);
 		else
 			campaign_path = campaigns_dir+mc.m+"/characters/";
 
-		std::string campaign_name = left(campaign_path,rfindu(campaign_path,"/characters/"));
+		std::wstring campaign_name = left(campaign_path,rfindu(campaign_path,"/characters/"));
 		campaign_name = right(campaign_name,rfindu(campaign_name,'/')+1);
 		for(const auto& entry : getDirectoryListing(campaign_path))
 		{
@@ -161,7 +161,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		std::string m_to_be_deleted = std::string(argv[2]);
+		std::wstring m_to_be_deleted = std::wstring(argv[2]);
 		for(const auto& entry : getDirectoryListing(campaigns_dir))
 		{
 			if(stringcasecmp(entry,m_to_be_deleted) || !std::filesystem::is_directory(campaigns_dir+entry)) continue;

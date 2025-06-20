@@ -19,7 +19,7 @@ enum Action
 
 // Operator precedence, later string vectors = lower precedence
 // https://en.cppreference.com/w/cpp/language/operator_precedence
-std::vector<std::vector<std::string>> operations = {	{OP_INC,OP_DEC},
+std::vector<std::vector<std::wstring>> operations = {	{OP_INC,OP_DEC},
 							{OP_MUL,OP_DIV,OP_EXP,OP_MOD},
 							{OP_ADD,OP_SUB},
 							{OP_LT,OP_LE,OP_GT,OP_GE},
@@ -29,14 +29,14 @@ std::vector<std::vector<std::string>> operations = {	{OP_INC,OP_DEC},
 							{OP_ASSIGN,OP_ADDA,OP_SUBA,OP_MULA,OP_DIVA,OP_EXPA,OP_MODA}};
 
 // Vectors for readability
-std::vector<std::string> modOps;
-std::vector<std::string> unaryOps;
-std::vector<std::string> boolOps;
-std::vector<std::string> assignOps;
+std::vector<std::wstring> modOps;
+std::vector<std::wstring> unaryOps;
+std::vector<std::wstring> boolOps;
+std::vector<std::wstring> assignOps;
 
-std::string doAction(VariableInfo* p_vi, Action action, std::string value)
+std::wstring doAction(VariableInfo* p_vi, Action action, std::wstring value)
 {
-	std::string v;
+	std::wstring v;
 	if(isTypeSigil(value[0]) && value[1] == '{') v = value;
 	else v = Var(value).Value;
 
@@ -58,7 +58,7 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 			else if(action == Read && keyExists && !stringcasecmp(p_vi->property,"Value"))
 				return p_vi->scope.getProperty<Var>(p_vi->key,p_vi->property);
 			else if(action == Write && !stringcasecmp(p_vi->property,"Value"))
-				p_vi->scope.setProperty<Var,std::string>(p_vi->key,p_vi->property,v);
+				p_vi->scope.setProperty<Var,std::wstring>(p_vi->key,p_vi->property,v);
 		}
 		else if(p_vi->evalType == DICE_SIGIL)
 		{
@@ -80,7 +80,7 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 			else if(action == Write && !stringcasecmp(p_vi->property,"Modifier"))
 				p_vi->scope.setProperty<Dice,int>(p_vi->key,p_vi->property,std::stoi(v));
 			else if(action == Write && !stringcasecmp(p_vi->property,"List"))
-				p_vi->scope.setProperty<Dice,std::string>(p_vi->key,p_vi->property,v);
+				p_vi->scope.setProperty<Dice,std::wstring>(p_vi->key,p_vi->property,v);
 		}
 		else if(p_vi->evalType == WALLET_SIGIL)
 		{
@@ -109,13 +109,13 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 				 !stringcasecmp(p_vi->property,"Larger")))
 				return p_vi->scope.getProperty<Currency>(p_vi->key,p_vi->property);
 			else if(action == Write && !stringcasecmp(p_vi->property,"CurrencySystem"))
-				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,v);
+				p_vi->scope.setProperty<Currency,std::wstring>(p_vi->key,p_vi->property,v);
 			else if(action == Write && !stringcasecmp(p_vi->property,"Name"))
-				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,v);
+				p_vi->scope.setProperty<Currency,std::wstring>(p_vi->key,p_vi->property,v);
 			else if(action == Write && !stringcasecmp(p_vi->property,"Smaller"))
-				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,v);
+				p_vi->scope.setProperty<Currency,std::wstring>(p_vi->key,p_vi->property,v);
 			else if(action == Write && !stringcasecmp(p_vi->property,"Larger"))
-				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,v);
+				p_vi->scope.setProperty<Currency,std::wstring>(p_vi->key,p_vi->property,v);
 			else if(action == Write && !stringcasecmp(p_vi->property,"SmallerAmount"))
 				p_vi->scope.setProperty<Currency,int>(p_vi->key,p_vi->property,std::stoi(v));
 		}
@@ -195,7 +195,7 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 					break;
 			}
 
-			std::string xref = (p_vi->xref != "" ? "["+p_vi->xref+"]" : "");
+			std::wstring xref = (p_vi->xref != "" ? "["+p_vi->xref+"]" : "");
 			if(action == SetAddA)
 				output(Info,"Set \"%c%s%c/%s\" to \"%s\"",p_vi->scope.sigil,xref.c_str(),p_vi->evalType,(p_vi->key+k).c_str(),v.c_str());
 			else if(action == SetRemoveA && rk.isRemoved)
@@ -209,7 +209,7 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 	return ""; // Supress -Wreturn-type
 }
 template<typename TL, typename TR>
-TL doModOp(TL lhs, std::string op, TR rhs)
+TL doModOp(TL lhs, std::wstring op, TR rhs)
 {
 	if(op == OP_INC)
 	{
@@ -294,7 +294,7 @@ TL doModOp(TL lhs, std::string op, TR rhs)
 	return lhs;
 }
 template<typename TL, typename TR>
-bool doBoolOp(TL lhs, std::string op, TR rhs)
+bool doBoolOp(TL lhs, std::wstring op, TR rhs)
 {
 	if(op == OP_LT)
 	{
@@ -342,16 +342,16 @@ bool doBoolOp(TL lhs, std::string op, TR rhs)
 	}
 }
 template<typename TL, typename TR>
-std::string getResult(std::string lhs, std::string op, std::string rhs)
+std::wstring getResult(std::wstring lhs, std::wstring op, std::wstring rhs)
 {
 	for(long unsigned int precedence=0; precedence<operations.size(); precedence++)
 	{
-		int op_match = findInVect<std::string>(operations[precedence],op);
+		int op_match = findInVect<std::wstring>(operations[precedence],op);
 
 		try{(void)TL(lhs);}
 		catch(const std::runtime_error& e)
 		{
-			if(e.what() == std::string(E_INVALID_EXPLICIT_CONSTRUCTOR))
+			if(e.what() == std::wstring(E_INVALID_EXPLICIT_CONSTRUCTOR))
 				output(Error,"Invalid LHS explicit constructor: \"%s\"",lhs.c_str());
 			else
 				output(Error,"Error constructing LHS: %s",e.what());
@@ -361,7 +361,7 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 			try{(void)TR(rhs);}
 			catch(const std::runtime_error& e)
 			{
-				if(e.what() == std::string(E_INVALID_EXPLICIT_CONSTRUCTOR))
+				if(e.what() == std::wstring(E_INVALID_EXPLICIT_CONSTRUCTOR))
 					output(Error,"Invalid RHS explicit constructor: \"%s\"",rhs.c_str());
 				else
 					output(Error,"Error constructing RHS: %s",e.what());
@@ -370,17 +370,17 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 		try
 		{
 			if(op_match > -1 && (precedence < 3 || precedence == 7))// Mod operators
-				return escapeSpaces(std::string(doModOp<TL,TR>(TL(lhs),op,TR(rhs))));
+				return escapeSpaces(std::wstring(doModOp<TL,TR>(TL(lhs),op,TR(rhs))));
 			else if(op_match > -1 && (precedence >= 3 && precedence < 7))// Boolean operators
 				return btos(doBoolOp<TL,TR>(TL(lhs),op,TR(rhs)));
 		}
 		catch(const std::runtime_error& e)
 		{
-			if(e.what() == std::string(E_INVALID_OPERATION))
+			if(e.what() == std::wstring(E_INVALID_OPERATION))
 				output(Error,"Invalid operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
-			else if(e.what() == std::string(E_UNKNOWN_OPERATION))
+			else if(e.what() == std::wstring(E_UNKNOWN_OPERATION))
 				output(Error,"Unknown operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
-			else if(e.what() == std::string(E_INSUFFICIENT_FUNDS))
+			else if(e.what() == std::wstring(E_INSUFFICIENT_FUNDS))
 				output(Error,"Insufficient funds: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
 			else
 				output(Error,"Error during operation: \"%s %s %s\" (%s)",lhs.c_str(),op.c_str(),rhs.c_str(),e.what());
@@ -391,7 +391,7 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 	return "";// Supress -Wreturn-type
 }
 template<typename TL>
-std::string parseRHSAndDoOp(std::vector<std::string> v, unsigned int lhs_pos, unsigned int op_pos, unsigned int rhs_pos)
+std::wstring parseRHSAndDoOp(std::vector<std::wstring> v, unsigned int lhs_pos, unsigned int op_pos, unsigned int rhs_pos)
 {
 	if(rhs_pos == UINT_MAX)// Unary operators
 		return getResult<TL,Var>(v[lhs_pos],v[op_pos],"");
@@ -400,18 +400,18 @@ std::string parseRHSAndDoOp(std::vector<std::string> v, unsigned int lhs_pos, un
 	try
 	{
 		//TODO: Handle exceptions on constructors
-		if(std::is_same_v<TL,Currency> && (left(v[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{" || v[rhs_pos][1] != '{') && Var(v[rhs_pos]).isInt() && v[op_pos] == OP_MUL)
-			return escapeSpaces(std::string(Currency(v[lhs_pos]) * Var(v[rhs_pos])));
-		else if(std::is_same_v<TL,Var> && left(v[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{" && Var(v[lhs_pos]).isInt() && v[op_pos] == OP_MUL)
-			return escapeSpaces(std::string(Currency(v[rhs_pos]) * Var(v[lhs_pos])));
-		else if(std::is_same_v<TL,Currency> && left(v[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{" && v[op_pos] == OP_ADD)
-			return escapeSpaces(std::string(Currency(v[lhs_pos]) + Currency(v[rhs_pos])));
-		else if(std::is_same_v<TL,Currency> && left(v[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{" && v[op_pos] == OP_ADD)
-			return escapeSpaces(std::string(Currency(v[lhs_pos]) + Wallet(v[rhs_pos])));
+		if(std::is_same_v<TL,Currency> && (left(v[rhs_pos],2) == std::wstring(1,VAR_SIGIL)+"{" || v[rhs_pos][1] != '{') && Var(v[rhs_pos]).isInt() && v[op_pos] == OP_MUL)
+			return escapeSpaces(std::wstring(Currency(v[lhs_pos]) * Var(v[rhs_pos])));
+		else if(std::is_same_v<TL,Var> && left(v[rhs_pos],2) == std::wstring(1,CURRENCY_SIGIL)+"{" && Var(v[lhs_pos]).isInt() && v[op_pos] == OP_MUL)
+			return escapeSpaces(std::wstring(Currency(v[rhs_pos]) * Var(v[lhs_pos])));
+		else if(std::is_same_v<TL,Currency> && left(v[rhs_pos],2) == std::wstring(1,CURRENCY_SIGIL)+"{" && v[op_pos] == OP_ADD)
+			return escapeSpaces(std::wstring(Currency(v[lhs_pos]) + Currency(v[rhs_pos])));
+		else if(std::is_same_v<TL,Currency> && left(v[rhs_pos],2) == std::wstring(1,WALLET_SIGIL)+"{" && v[op_pos] == OP_ADD)
+			return escapeSpaces(std::wstring(Currency(v[lhs_pos]) + Wallet(v[rhs_pos])));
 	}
 	catch(const std::runtime_error& e)
 	{
-		if(e.what() == std::string(E_INVALID_EXPLICIT_CONSTRUCTOR))
+		if(e.what() == std::wstring(E_INVALID_EXPLICIT_CONSTRUCTOR))
 			output(Error,"Invalid RHS explicit constructor: %s\n",v[rhs_pos].c_str());
 		else
 			output(Error,"Error during operation: \"%s %s %s\" (%s)",v[lhs_pos].c_str(),v[op_pos].c_str(),v[rhs_pos].c_str(),e.what());
@@ -419,13 +419,13 @@ std::string parseRHSAndDoOp(std::vector<std::string> v, unsigned int lhs_pos, un
 		exit(-1);
 	}
 
-	if(left(v[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
+	if(left(v[rhs_pos],2) == std::wstring(1,VAR_SIGIL)+"{")
 		return getResult<TL,Var>(v[lhs_pos],v[op_pos],v[rhs_pos]);
-	else if(left(v[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
+	else if(left(v[rhs_pos],2) == std::wstring(1,DICE_SIGIL)+"{")
 		return getResult<TL,Dice>(v[lhs_pos],v[op_pos],v[rhs_pos]);
-	else if(left(v[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
+	else if(left(v[rhs_pos],2) == std::wstring(1,WALLET_SIGIL)+"{")
 		return getResult<TL,Wallet>(v[lhs_pos],v[op_pos],v[rhs_pos]);
-	else if(left(v[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
+	else if(left(v[rhs_pos],2) == std::wstring(1,CURRENCY_SIGIL)+"{")
 		return getResult<TL,Currency>(v[lhs_pos],v[op_pos],v[rhs_pos]);
 	else if(std::is_same_v<TL,Dice> && !Var(v[rhs_pos]).isInt())
 		return getResult<TL,Dice>(v[lhs_pos],v[op_pos],v[rhs_pos]);
@@ -434,27 +434,27 @@ std::string parseRHSAndDoOp(std::vector<std::string> v, unsigned int lhs_pos, un
 
 	return "";// Supress -Wreturn-type
 }
-void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int lhs_pos, unsigned int op_pos, unsigned int rhs_pos)
+void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::wstring>* v, unsigned int lhs_pos, unsigned int op_pos, unsigned int rhs_pos)
 {
-	std::string result = "";
+	std::wstring result = "";
 
 	if(rhs_pos >= v->size())
 		rhs_pos = UINT_MAX;// Unary operators. MAX_BUFFER is way less than UINT_MAX, so this is okay.
 
-	if(left((*v)[lhs_pos],2) == std::string(1,VAR_SIGIL)+"{")
+	if(left((*v)[lhs_pos],2) == std::wstring(1,VAR_SIGIL)+"{")
 		result = parseRHSAndDoOp<Var>(*v, lhs_pos, op_pos, rhs_pos);
-	else if(left((*v)[lhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
+	else if(left((*v)[lhs_pos],2) == std::wstring(1,DICE_SIGIL)+"{")
 		result = parseRHSAndDoOp<Dice>(*v, lhs_pos, op_pos, rhs_pos);
-	else if(left((*v)[lhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
+	else if(left((*v)[lhs_pos],2) == std::wstring(1,WALLET_SIGIL)+"{")
 		result = parseRHSAndDoOp<Wallet>(*v, lhs_pos, op_pos, rhs_pos);
-	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
+	else if(left((*v)[lhs_pos],2) == std::wstring(1,CURRENCY_SIGIL)+"{")
 		result = parseRHSAndDoOp<Currency>(*v, lhs_pos, op_pos, rhs_pos);
 	else
 		result = parseRHSAndDoOp<Var>(*v, lhs_pos, op_pos, rhs_pos);
 
 	// If the first arg is a variable and we are assigning it, we'll need to save the result
 	if(lhs_pos == 0 && vi->key != "" &&
-	  (findInVect<std::string>(assignOps,(*v)[op_pos]) > -1 || findInVect<std::string>(unaryOps,(*v)[op_pos]) > -1))
+	  (findInVect<std::wstring>(assignOps,(*v)[op_pos]) > -1 || findInVect<std::wstring>(unaryOps,(*v)[op_pos]) > -1))
 		(void)doAction(vi, Write, result);
 
 	// Replace operators and operands with result
@@ -507,8 +507,8 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	if(!looksLikeVariable(std::string(argv[1])) && argv[2] &&
-	   findInVect<std::string>(assignOps,std::string(argv[2])) != -1)
+	if(!looksLikeVariable(std::wstring(argv[1])) && argv[2] &&
+	   findInVect<std::wstring>(assignOps,std::wstring(argv[2])) != -1)
 	{
 		output(Error,"Values cannot be assigned to constants.");
 		return -1;
@@ -516,8 +516,8 @@ int main(int argc, char** argv)
 
 	VariableInfo vi;
 
-	if(looksLikeVariable(std::string(argv[1])))
-		vi = parseVariable(std::string(argv[1]));
+	if(looksLikeVariable(std::wstring(argv[1])))
+		vi = parseVariable(std::wstring(argv[1]));
 
 	if(argc == 2)// Print data if all the user enters is a variable
 	{
@@ -544,20 +544,20 @@ int main(int argc, char** argv)
 			}
 		}
 
-		std::string str = doAction(&vi, Read, "");
+		std::wstring str = doAction(&vi, Read, "");
 		if(str != "") fprintf(stdout,"%s\n",str.c_str());
 	}
 	else if(vi.variable == "" || vi.variable.back() != '/')// Perform operation on variable
 	{
-		std::string old_value;
+		std::wstring old_value;
 		if(vi.variable != "") old_value = getAppOutput(vi.variable).output[0];
 
-		std::vector<std::string> args;
+		std::vector<std::wstring> args;
 		long unsigned int open_paren_ctr = 0;
 		long unsigned int close_paren_ctr = 0;
 
 		// Need to know final operation to determine whether we print to screen or not
-		std::string final_op = std::string(argv[2]);
+		std::wstring final_op = std::wstring(argv[2]);
 		if(final_op[0] == '(')
 			final_op = right(final_op,1);
 		if(final_op.back() == ')' && !isEscaped(final_op,final_op.length()-1))
@@ -566,17 +566,17 @@ int main(int argc, char** argv)
 		// Generate vector of operators and operands, while also determining number of parentheses
 		for(int i=1; i<argc; i++)
 		{
-			std::string arg = std::string(argv[i]);
+			std::wstring arg = std::wstring(argv[i]);
 			long unsigned int open_paren = findu(arg,'(');
 			long unsigned int close_paren = rfindu(arg,')');
 			open_paren_ctr += countu(arg,'(');
 			close_paren_ctr += countu(arg,')');
 
-			if(open_paren != std::string::npos && close_paren != std::string::npos)
+			if(open_paren != std::wstring::npos && close_paren != std::wstring::npos)
 				args.push_back(arg.substr(open_paren,close_paren+1-open_paren));
-			else if(open_paren != std::string::npos)
+			else if(open_paren != std::wstring::npos)
 				args.push_back(arg.substr(open_paren,arg.length()-open_paren));
-			else if(close_paren != std::string::npos)
+			else if(close_paren != std::wstring::npos)
 				args.push_back(arg.substr(0,close_paren+1));
 			else
 				args.push_back(arg);
@@ -623,7 +623,7 @@ int main(int argc, char** argv)
 		}
 		else
 		{
-			args[0] = std::string(Var(args[0]));
+			args[0] = std::wstring(Var(args[0]));
 		}
 
 		if(open_paren_ctr > close_paren_ctr)
@@ -644,14 +644,14 @@ int main(int argc, char** argv)
 		// PEMDAS
 		for(int start=0; start<args_size-1; start++)
 		{
-			if(findu(args[start],'(') != std::string::npos)
+			if(findu(args[start],'(') != std::wstring::npos)
 			{
 				for(int end=start; end<args_size; end++)
 				{
 					if(args[end].back() == ')' && !isEscaped(args[end],args[end].length()-1))
 					{
 						// Strip parenthesis off args to ensure good parsing
-						std::string rparens = right(args[end],findu(args[end],')')+1);
+						std::wstring rparens = right(args[end],findu(args[end],')')+1);
 						args[start] = right(args[start],rfindu(args[start],'(')+1);
 						args[end] = left(args[end],findu(args[end],')'));
 
@@ -662,7 +662,7 @@ int main(int argc, char** argv)
 						{
 							for(const auto& op : precedence)
 							{
-								int found_op = findInVect<std::string>(args,op,start);
+								int found_op = findInVect<std::wstring>(args,op,start);
 								if(found_op > -1 && found_op < op_pos)
 									op_pos = found_op;
 							}
@@ -682,7 +682,7 @@ int main(int argc, char** argv)
 						start = -1;
 						break;
 					}
-					else if(findu(args[end],'(') != std::string::npos && end>start)// Nested '('
+					else if(findu(args[end],'(') != std::wstring::npos && end>start)// Nested '('
 					{
 						start = end - 1;
 						break;
@@ -709,15 +709,15 @@ int main(int argc, char** argv)
 		}
 
 		// Print result
-		if(findInVect<std::string>(assignOps,final_op) == -1 && findInVect<std::string>(unaryOps,final_op) == -1)
+		if(findInVect<std::wstring>(assignOps,final_op) == -1 && findInVect<std::wstring>(unaryOps,final_op) == -1)
 		{
 			fprintf(stdout,"%s\n",args[0].c_str());
 			return 0;
 		}
 
-		std::string new_value = getAppOutput(std::string(argv[1])).output[0];
-		std::string xref = (vi.xref != "" ? "["+vi.xref+"]" : "");
-		std::string p = vi.property;
+		std::wstring new_value = getAppOutput(std::wstring(argv[1])).output[0];
+		std::wstring xref = (vi.xref != "" ? "["+vi.xref+"]" : "");
+		std::wstring p = vi.property;
 		if(old_value == "")
 			output(Info,"%c%s%c/%s has been initialized to %s",
 			       vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str(),new_value.c_str());
@@ -739,7 +739,7 @@ int main(int argc, char** argv)
 			return -1;
 		}
 
-		std::string rhs = std::string(argv[3]);
+		std::wstring rhs = std::wstring(argv[3]);
 
 		if(!looksLikeSet(rhs))
 		{

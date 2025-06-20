@@ -11,7 +11,7 @@
 class Scope
 {
 	protected:
-		std::string datasource;
+		std::wstring datasource;
 
 		datamap<Currency>		currencies;
 		datamap<Dice>			dice;
@@ -20,10 +20,10 @@ class Scope
 
 		//Try to create a filestream
 		template<typename T>
-		T tryCreateFileStream(std::string path);
+		T tryCreateFileStream(std::wstring path);
 
 		//Save formatting
-		std::string formatLine(char type, std::string k, std::string v);
+		std::wstring formatLine(char type, std::wstring k, std::wstring v);
 
 		//Default campaign/character loader
 		void confirmDefaultCampaign();
@@ -35,31 +35,31 @@ class Scope
 		bool confirmDatasource();
 
 		//Get/set datasource
-		std::string getDatasource();
-		void setDatasource(std::string path);
+		std::wstring getDatasource();
+		void setDatasource(std::wstring path);
 
 		//Does the scope have any data?
 		bool isEmpty();
 
 		//Check if key exists
 		template <typename T>
-		bool keyExists(std::string key);
+		bool keyExists(std::wstring key);
 
 		//Get existing case-insensitive key match (if applicable)
 		template <typename T>
-		std::string getExistingKey(std::string key);
+		std::wstring getExistingKey(std::wstring key);
 
 		//Get single variable
 		template <typename T>
-		T get(std::string key);
+		T get(std::wstring key);
 
-		//Get single variable, but return a std::string
+		//Get single variable, but return a std::wstring
 		template <typename T>
-		std::string getStr(std::string key);
+		std::wstring getStr(std::wstring key);
 
 		//Get property from a variable
 		template <typename T>
-		std::string getProperty(std::string key, std::string property);
+		std::wstring getProperty(std::wstring key, std::wstring property);
 
 		//Get all variables of a specific datatype
 		template <typename T>
@@ -67,11 +67,11 @@ class Scope
 
 		//Set single variable
 		template <typename T>
-		void set(std::string key, T value);
+		void set(std::wstring key, T value);
 
 		//Set a property
 		template<typename TK, typename TP>
-		void setProperty(std::string key, std::string property, TP value);
+		void setProperty(std::wstring key, std::wstring property, TP value);
 
 		//Set entire datamap to another datamap
 		template <typename T>
@@ -79,12 +79,12 @@ class Scope
 
 		//Delete single variable
 		template <typename T>
-		bool remove(std::string key);
+		bool remove(std::wstring key);
 
 		//Load/save data
-		void load(std::string path, bool loadVar, bool loadDice, bool loadCurrency, bool loadWallet);
+		void load(std::wstring path, bool loadVar, bool loadDice, bool loadCurrency, bool loadWallet);
 		void load();
-		void load(std::string path);
+		void load(std::wstring path);
 		void save();
 };
 
@@ -95,14 +95,14 @@ class Character: public Scope
 		Character(bool backup=false);
 
 		//Load other character/template
-		Character(std::string path);
+		Character(std::wstring path);
 
 		//Get current character file path
-		std::string getCurrentCharacterFilePath();
+		std::wstring getCurrentCharacterFilePath();
 
 		//Get/set character name
-		std::string getName();
-		void setName(std::string name);
+		std::wstring getName();
+		void setName(std::wstring name);
 };
 
 class Campaign: public Scope
@@ -112,7 +112,7 @@ class Campaign: public Scope
 		Campaign();
 
 		//Load other campaign
-		Campaign(std::string path);
+		Campaign(std::wstring path);
 };
 
 class Shell: public Scope

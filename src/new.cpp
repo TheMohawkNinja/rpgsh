@@ -16,9 +16,9 @@ void fillCharacterSheet(Character* p_c)
 	for(const auto& [k,v] : p_c->getDatamap<T>())
 	{
 		if(k[0] == '.') continue;
-		std::string new_value;
+		std::wstring new_value;
 		const char* color;
-		switch(std::string(v)[0])
+		switch(std::wstring(v)[0])
 		{
 			case VAR_SIGIL:
 				color = VAR_COLOR;
@@ -36,7 +36,7 @@ void fillCharacterSheet(Character* p_c)
 				color = VAR_COLOR;
 				break;
 		}
-		fprintf(stdout,"%s%s%s%s (%s%s%s%s): ",TEXT_WHITE,TEXT_BOLD,k.c_str(),TEXT_NORMAL,color,TEXT_ITALIC,(std::string(v)+'\0').c_str(),TEXT_NORMAL);
+		fprintf(stdout,"%s%s%s%s (%s%s%s%s): ",TEXT_WHITE,TEXT_BOLD,k.c_str(),TEXT_NORMAL,color,TEXT_ITALIC,(std::wstring(v)+'\0').c_str(),TEXT_NORMAL);
 		getline(std::cin,new_value);
 		if(new_value != "") p_c->set<T>(k,new_value);
 	}
@@ -64,8 +64,8 @@ int main(int argc, char** argv)
 	}
 
 	Config cfg = Config();
-	std::string campaign_name;
-	std::string template_name;
+	std::wstring campaign_name;
+	std::wstring template_name;
 	newFileScope nfs;
 
 	if(!strcmp(argv[1],"-c"))
@@ -73,7 +73,7 @@ int main(int argc, char** argv)
 		if(argc == 2)
 			template_name = cfg.setting[DEFAULT_GAME];
 		else
-			template_name = std::string(argv[2]);
+			template_name = std::wstring(argv[2]);
 
 		nfs = CHARACTER;
 	}
@@ -86,7 +86,7 @@ int main(int argc, char** argv)
 		}
 		else
 		{
-			campaign_name = std::string(argv[2]);
+			campaign_name = std::wstring(argv[2]);
 		}
 
 		nfs = CAMPAIGN;
@@ -133,7 +133,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		std::string campaign_root = campaigns_dir+campaign_name;
+		std::wstring campaign_root = campaigns_dir+campaign_name;
 		if(std::filesystem::is_directory(campaign_root))
 		{
 			fprintf(stdout,"Campaign directory \"%s\" exists, do you want to overwrite? (y/N): ",campaign_root.c_str());
@@ -143,8 +143,8 @@ int main(int argc, char** argv)
 		else
 		{
 			std::filesystem::create_directory(campaign_root);
-			std::string campaign_variables_file = campaign_root+"/"+variables_file_name;
-			std::string characters_dir = campaign_root+"/characters";
+			std::wstring campaign_variables_file = campaign_root+"/"+variables_file_name;
+			std::wstring characters_dir = campaign_root+"/characters";
 
 			if(!std::filesystem::exists(characters_dir) || (std::filesystem::exists(characters_dir) && !std::filesystem::is_directory(characters_dir)))
 				std::filesystem::create_directory(characters_dir);

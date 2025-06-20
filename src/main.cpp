@@ -15,14 +15,14 @@
 Config cfg = Config();
 Character c = Character();
 
-bool containsNonSpaceChar(std::string str)
+bool containsNonSpaceChar(std::wstring str)
 {
 	for(const auto& ch : str)
 		if(ch != ' ') return true;
 
 	return false;
 }
-void addKeyToMatches(std::vector<std::string>** ppMatches, std::string k, std::string chk_str, std::string key)
+void addKeyToMatches(std::vector<std::wstring>** ppMatches, std::wstring k, std::wstring chk_str, std::wstring key)
 {
 	//Limit keys to one level past current
 	if(!stringcasecmp(left(k,key.length()),key) && k[0] != '.')
@@ -35,7 +35,7 @@ void addKeyToMatches(std::vector<std::string>** ppMatches, std::string k, std::s
 		}
 		else if(k_next_slash > key.length())
 		{
-			std::string potential_match = left(right(k,key.length()),(k_next_slash-key.length()));
+			std::wstring potential_match = left(right(k,key.length()),(k_next_slash-key.length()));
 			potential_match = addSpaces(chk_str.length())+potential_match;
 			for(const auto& match : (**ppMatches))//Ensure match list is unique
 				if(match == potential_match) return;
@@ -44,7 +44,7 @@ void addKeyToMatches(std::vector<std::string>** ppMatches, std::string k, std::s
 		}
 	}
 }
-void addKeysToMatches(std::vector<std::string>* pMatches, Scope scope, std::string chk_str, std::string key, char type)
+void addKeysToMatches(std::vector<std::wstring>* pMatches, Scope scope, std::wstring chk_str, std::wstring key, char type)
 {
 	switch(type)
 	{
@@ -66,14 +66,14 @@ void addKeysToMatches(std::vector<std::string>* pMatches, Scope scope, std::stri
 			break;
 	}
 }
-void addPropertyToMatches(std::vector<std::string>** ppMatches, std::string chk_str, std::string property,
-			  std::string property_str)
+void addPropertyToMatches(std::vector<std::wstring>** ppMatches, std::wstring chk_str, std::wstring property,
+			  std::wstring property_str)
 {
 	if(!stringcasecmp(property,left(property_str,property.length())))
 		(**ppMatches).push_back(addSpaces(chk_str.length())+right(property_str,property.length()));
 }
-void addPropertiesToMatches(std::vector<std::string>* pMatches, Scope scope, std::string chk_str,
-			    std::string k, std::string key, std::string property, char type)
+void addPropertiesToMatches(std::vector<std::wstring>* pMatches, Scope scope, std::wstring chk_str,
+			    std::wstring k, std::wstring key, std::wstring property, char type)
 {
 	if(stringcasecmp(k,key)) return;
 
@@ -90,7 +90,7 @@ void addPropertiesToMatches(std::vector<std::string>* pMatches, Scope scope, std
 	else if(type == WALLET_SIGIL && scope.keyExists<Wallet>(key))
 	{
 		for(auto& m : scope.get<Wallet>(key).Monies)
-			addPropertyToMatches(&pMatches,chk_str,property,std::string(m.c));
+			addPropertyToMatches(&pMatches,chk_str,property,std::wstring(m.c));
 	}
 	else if(type == CURRENCY_SIGIL && scope.keyExists<Currency>(key))
 	{
@@ -135,7 +135,7 @@ void moveCursorForward(winsize w, long unsigned int start, long unsigned int end
 	}
 	fprintf(stdout,CURSOR_SHOW);
 }
-std::string inputHandler()
+std::wstring inputHandler()
 {
 	#define KB_TAB		9
 	#define KB_ENTER	10
@@ -157,9 +157,9 @@ std::string inputHandler()
 	char esc_char = 0;
 	long unsigned int cur_pos = 0;
 	int tab_ctr = 0;
-	std::string last_match, last_history;
+	std::wstring last_match, last_history;
 	std::vector<char> input;
-	std::vector<std::string> history = getAppOutput("history").output;
+	std::vector<std::wstring> history = getAppOutput("history").output;
 	long unsigned int last_prompt_line_length;
 
 	if(c.keyExists<Var>(DOT_PROMPT))
@@ -167,7 +167,7 @@ std::string inputHandler()
 		for(const auto& line : getAppOutput("print -r "+c.getStr<Var>(DOT_PROMPT)).output)
 		{
 			if(line.length() <= 1) continue;
-			last_prompt_line_length = std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(stripFormatting(line)).length();//TODO: Remove when we convert everything to std::wstring
+			last_prompt_line_length = stripFormatting(line).length();
 		}
 	}
 	else
@@ -246,27 +246,27 @@ std::string inputHandler()
 			else tab_ctr--;
 
 			Scope tab_comp_scope;
-			std::string match = "";
-			std::vector<std::string> matches;
+			std::wstring match = "";
+			std::vector<std::wstring> matches;
 
 			//Create the string which is to be completed
-			std::string chk_str = "";
+			std::wstring chk_str = "";
 			for(int i=cur_pos-1; i>=0&&input[i]!=' '; i--)
-				chk_str.insert(0,std::string(1,input[i]));
+				chk_str.insert(0,std::wstring(1,input[i]));
 
 			if(chk_str[0] == '(') chk_str.erase(chk_str.begin());
 
 			if(isalpha(chk_str[0]))//Applications
 			{
 				//Get matches
-				std::string app = "";
+				std::wstring app = "";
 				std::ifstream ifs(rpgsh_programs_cache_path);
 				while(!ifs.eof())
 				{
 					getline(ifs,app);
 					if(app == "") break;
 
-					std::string app_chk_str = app.substr(prefix.length(),
+					std::wstring app_chk_str = app.substr(prefix.length(),
 									     chk_str.length());
 					long unsigned int app_ln = right(app,prefix.length()).length();
 					if(app_chk_str == chk_str && app_ln > chk_str.length())
@@ -277,21 +277,21 @@ std::string inputHandler()
 			else if(chk_str[0] == CHARACTER_SIGIL)//Character variables
 			{
 				tab_comp_scope = Character();
-				std::string xref_path = campaigns_dir+
+				std::wstring xref_path = campaigns_dir+
 							getEnvVariable(ENV_CURRENT_CAMPAIGN)+
 							"characters/";
 
 				if(chk_str[1] == '[' &&
-				   findu(chk_str,']') == std::string::npos &&
-				   findu(chk_str,'/') == std::string::npos)//Complete xref (same campaign)
+				   findu(chk_str,']') == std::wstring::npos &&
+				   findu(chk_str,'/') == std::wstring::npos)//Complete xref (same campaign)
 				{
 					for(auto& c : getDirectoryListing(xref_path))
 					{
 						if(right(c,c.length()-5) != c_ext)//Don't include backup files or non-character files
 							continue;
 
-						std::string xref = left(c,findu(c,c_ext));
-						std::string chk_str_xref = right(chk_str,2);
+						std::wstring xref = left(c,findu(c,c_ext));
+						std::wstring chk_str_xref = right(chk_str,2);
 						if(chk_str.length() == 2 ||
 						   (!stringcasecmp(chk_str_xref,left(xref,chk_str.length()-2)) &&
 						   xref.length() > chk_str_xref.length()))
@@ -299,7 +299,7 @@ std::string inputHandler()
 					}
 					for(auto& m : getDirectoryListing(campaigns_dir))
 					{
-						std::string chk_str_xref = right(chk_str,2);
+						std::wstring chk_str_xref = right(chk_str,2);
 						if(std::filesystem::is_directory(campaigns_dir+m) &&
 						   (chk_str.length() == 2 ||
 						   (!stringcasecmp(chk_str_xref,left(m,chk_str.length()-2)) &&
@@ -308,10 +308,10 @@ std::string inputHandler()
 					}
 				}
 				else if(chk_str[1] == '[' &&
-					findu(chk_str,']') == std::string::npos)//Complete xref (different campaign)
+					findu(chk_str,']') == std::wstring::npos)//Complete xref (different campaign)
 				{
 					//Get campaign name
-					std::string campaign = right(chk_str,findu(chk_str,'[')+1);
+					std::wstring campaign = right(chk_str,findu(chk_str,'[')+1);
 					campaign = left(campaign,findu(campaign,'/'));
 
 					for(auto& m : getDirectoryListing(campaigns_dir))
@@ -323,7 +323,7 @@ std::string inputHandler()
 						}
 					}
 
-					std::string xref_path = campaigns_dir+
+					std::wstring xref_path = campaigns_dir+
 								campaign+"/"+
 								"characters/";
 
@@ -335,8 +335,8 @@ std::string inputHandler()
 						if(right(c,c.length()-5) != c_ext)//Don't include backup files or non-character files
 							continue;
 
-						std::string xref = left(c,findu(c,c_ext));
-						std::string chk_str_xref = right(chk_str,findu(chk_str,'/')+1);
+						std::wstring xref = left(c,findu(c,c_ext));
+						std::wstring chk_str_xref = right(chk_str,findu(chk_str,'/')+1);
 						if(!stringcasecmp(chk_str_xref,left(xref,chk_str.length()-findu(chk_str,'/')-1)) &&
 						   xref.length() > chk_str_xref.length())
 						{
@@ -346,12 +346,12 @@ std::string inputHandler()
 					}
 				}
 				else if(chk_str[1] == '[' &&
-					findu(chk_str,']') != std::string::npos)//Load xref
+					findu(chk_str,']') != std::wstring::npos)//Load xref
 				{
-					if(findu(chk_str,'/') != std::string::npos &&
+					if(findu(chk_str,'/') != std::wstring::npos &&
 					   findu(chk_str,'/') > findu(chk_str,']'))//Same campaign
 					{
-						std::string xref_path = campaigns_dir+
+						std::wstring xref_path = campaigns_dir+
 									getEnvVariable(ENV_CURRENT_CAMPAIGN)+
 									"characters/"+
 									right(left(chk_str,findu(chk_str,']')),findu(chk_str,'[')+1)+
@@ -361,10 +361,10 @@ std::string inputHandler()
 							tab_comp_scope.load(xref_path);
 
 					}
-					else if(findu(chk_str,'/') != std::string::npos &&
+					else if(findu(chk_str,'/') != std::wstring::npos &&
 					   findu(chk_str,'/') < findu(chk_str,']'))//Different campaign
 					{
-						std::string xref_path = campaigns_dir+
+						std::wstring xref_path = campaigns_dir+
 									right(left(chk_str,findu(chk_str,'/')+1),findu(chk_str,'[')+1)+
 									"characters/"+
 									right(left(chk_str,findu(chk_str,']')),findu(chk_str,'/')+1)+
@@ -378,14 +378,14 @@ std::string inputHandler()
 			else if(chk_str[0] == CAMPAIGN_SIGIL)//Campaign variables
 			{
 				tab_comp_scope = Campaign();
-				std::string xref_path = campaigns_dir;
+				std::wstring xref_path = campaigns_dir;
 
 				if(chk_str[1] == '[' &&
-				   findu(chk_str,']') == std::string::npos)//Complete xref
+				   findu(chk_str,']') == std::wstring::npos)//Complete xref
 				{
 					for(auto& m : getDirectoryListing(campaigns_dir))
 					{
-						std::string chk_str_xref = right(chk_str,2);
+						std::wstring chk_str_xref = right(chk_str,2);
 						if(chk_str.length() == 2 ||
 						   (!stringcasecmp(chk_str_xref,left(m,chk_str.length()-2)) &&
 						   m.length() > chk_str_xref.length()))
@@ -393,9 +393,9 @@ std::string inputHandler()
 					}
 				}
 				else if(chk_str[1] == '[' &&
-					findu(chk_str,']') != std::string::npos)//Load xref
+					findu(chk_str,']') != std::wstring::npos)//Load xref
 				{
-					std::string xref_path = campaigns_dir+
+					std::wstring xref_path = campaigns_dir+
 								right(left(chk_str,findu(chk_str,']')),findu(chk_str,'[')+1)+
 								variables_file_name;
 
@@ -412,7 +412,7 @@ std::string inputHandler()
 			int rsqbrkt = findu(chk_str,']');
 			int period = rfindu(chk_str,'.');
 			char type_sigil = chk_str[findu(chk_str,'/',findu(chk_str,']')+1)-1];
-			std::string key = right(chk_str,findu(chk_str,'/',findu(chk_str,']')+1)+1);
+			std::wstring key = right(chk_str,findu(chk_str,'/',findu(chk_str,']')+1)+1);
 			if(slash > rsqbrkt && period < slash)//Keys
 			{
 				if(isTypeSigil(type_sigil))
@@ -430,7 +430,7 @@ std::string inputHandler()
 			else if(slash > rsqbrkt)//Properties
 			{
 				key = left(key,rfindu(key,'.'));
-				std::string property = right(chk_str,findu(chk_str,'.')+1);
+				std::wstring property = right(chk_str,findu(chk_str,'.')+1);
 				if(isTypeSigil(type_sigil))
 				{
 					addPropertiesToMatches(&matches,tab_comp_scope,chk_str,key,key,property,type_sigil);
@@ -451,7 +451,7 @@ std::string inputHandler()
 			if(!matches.size()) continue;
 
 			//Sort and choose match
-			sort<std::string>(&matches);
+			sort<std::wstring>(&matches);
 			match = matches[(tab_ctr-1)%matches.size()];
 
 			//Erase any previous match
@@ -479,7 +479,7 @@ std::string inputHandler()
 			unsigned int spaces = 0;
 			for(const auto& i : match) if(i == ' ') spaces++;
 			unsigned int offset = match.length()-spaces;
-			char base_char = (rfindu(chk_str,'/') == std::string::npos ? '[' : '/');
+			char base_char = (rfindu(chk_str,'/') == std::wstring::npos ? '[' : '/');
 			if(cur_pos+offset < input.size())
 				fprintf(stdout,CURSOR_LEFT_N,input.size()-cur_pos-offset+(chk_str.length()-(rfindu(chk_str,base_char)+1)));
 
@@ -639,7 +639,7 @@ int prompt()
 			for(const auto& line : getAppOutput("print -r "+c.getStr<Var>(DOT_PROMPT)).output)
 			{
 				if(line.length() <= 1) continue;
-				last_prompt_line_length = std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(stripFormatting(line)).length();//TODO: Remove when we convert everything to std::wstring
+				last_prompt_line_length = stripFormatting(line).length();
 				fprintf(stdout,"%s\n",line.c_str());
 			}
 			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)0);
@@ -678,7 +678,7 @@ int prompt()
 	for(unsigned int i=0; i<MAX_BUFFER_SIZE; i++)
 		buffer[i] = '\0';
 
-	std::string in = inputHandler();
+	std::wstring in = inputHandler();
 	if(in.length() > MAX_BUFFER_SIZE)
 	{
 		fprintf(stdout,"\n\n");
@@ -701,7 +701,7 @@ int prompt()
 
 		//Auto-escape colons so as to not cause issues with variable sets
 		std::regex colon(":");
-		std::string tmp_buffer = std::regex_replace(std::string(buffer),colon,"\\:");
+		std::wstring tmp_buffer = std::regex_replace(std::wstring(buffer),colon,"\\:");
 		for(unsigned int i=0; i<tmp_buffer.length(); i++)
 			buffer[i]=tmp_buffer[i];
 
@@ -712,8 +712,8 @@ int prompt()
 		//Handle rpgsh history
 		unsigned long line_count = 0;
 		std::ifstream ifs(history_path);
-		std::vector<std::string> history;
-		std::string data;
+		std::vector<std::wstring> history;
+		std::wstring data;
 		while(!ifs.eof())
 		{
 			std::getline(ifs,data);
@@ -758,14 +758,14 @@ int main()
 	//Generate cache of valid rpgsh programs to speed up "help" program
 	//It takes a noticable amount of time to search through all of /bin even on an i7-4700k
 	fprintf(stdout,"Generating rpgsh program list...");
-	std::vector<std::string> applications = getDirectoryListing(std::string(RPGSH_INSTALL_DIR));
-	std::vector<std::string> rpgsh_apps;
+	std::vector<std::wstring> applications = getDirectoryListing(std::wstring(RPGSH_INSTALL_DIR));
+	std::vector<std::wstring> rpgsh_apps;
 	std::filesystem::remove(rpgsh_programs_cache_path);
 	for(const auto& app : applications)
 		if(!findu(app,prefix)) rpgsh_apps.push_back(app);
 
 	//Basic alphabetical sort, important for tab completion
-	sort<std::string>(&rpgsh_apps);
+	sort<std::wstring>(&rpgsh_apps);
 
 	//Write alphabetized list to file
 	std::ofstream ofs(rpgsh_programs_cache_path);

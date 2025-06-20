@@ -25,9 +25,9 @@ int main(int argc, char** argv)
 	bool print_app_help = argv[1] && !strcasecmp(argv[1],"-a");
 
 	//Generate list of apps from cache file
-	std::vector<std::string> applications;
+	std::vector<std::wstring> applications;
 	std::ifstream ifs(rpgsh_programs_cache_path);
-	std::string line = "";
+	std::wstring line = "";
 	while(!ifs.eof())
 	{
 		getline(ifs,line);
@@ -39,15 +39,15 @@ int main(int argc, char** argv)
 	Config cfg = Config();
 	long unsigned int longest_name_ln = 0;
 	long unsigned int longest_alias_ln = 0;
-	std::string appname;
+	std::wstring appname;
 	for(long unsigned int i=0; i<applications.size(); i++)
 	{
-		std::string app = applications[i];
+		std::wstring app = applications[i];
 		appname = right(app,prefix.length());
 		if(appname.length() > longest_name_ln)
 			longest_name_ln = appname.length();
 
-		std::string aliases = "";
+		std::wstring aliases = "";
 		for(const auto& [k,v] : getSet(cfg.setting[ALIASES]))
 			if(!stringcasecmp(v,appname)) aliases += k;
 
@@ -56,8 +56,8 @@ int main(int argc, char** argv)
 	}
 
 	//Print results
-	std::string name_header_str = "Name";
-	std::string aliases_header_str = "Alias(es)";
+	std::wstring name_header_str = "Name";
+	std::wstring aliases_header_str = "Alias(es)";
 	unsigned char name_spacing = (longest_name_ln > name_header_str.length() ? longest_name_ln-name_header_str.length() : longest_name_ln);
 	unsigned char alias_spacing = (longest_alias_ln > aliases_header_str.length() ? longest_alias_ln-aliases_header_str.length() : longest_alias_ln);
 	fprintf(stdout,"%s%s%s%s%s%s%s%sDescription\n",
@@ -76,11 +76,11 @@ int main(int argc, char** argv)
 	for(const auto& app : applications)
 	{
 		appname = right(app,prefix.length());
-		std::string appdescription = getAppOutput(appname+" "+FLAG_APPDESCRIPTION).output[0];
+		std::wstring appdescription = getAppOutput(appname+" "+FLAG_APPDESCRIPTION).output[0];
 
 		//Print application name, aliases (if applicable), and the description
 		fprintf(stdout,"%s%s%s%s",TEXT_BOLD,TEXT_GREEN,appname.c_str(),TEXT_NORMAL);
-		std::string aliases = "";
+		std::wstring aliases = "";
 		for(const auto& [k,v] : getSet(cfg.setting[ALIASES]))
 			if(!stringcasecmp(v,appname)) aliases += (k+",");
 		if(aliases != "") aliases = left(aliases,aliases.length()-1);
@@ -95,7 +95,7 @@ int main(int argc, char** argv)
 
 		if(print_app_help)
 		{
-			std::vector<std::string>apphelp = getAppOutput(appname+" --help").output;
+			std::vector<std::wstring>apphelp = getAppOutput(appname+" --help").output;
 
 			fprintf(stdout,"\n");
 			for(const auto& line : apphelp)

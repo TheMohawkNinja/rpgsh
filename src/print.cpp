@@ -4,7 +4,7 @@
 #include "../headers/scope.h"
 #include "../headers/text.h"
 
-void printHeader(std::string s)
+void printHeader(std::wstring s)
 {
 	fprintf(stdout,"%s%s %s %s\n",TEXT_GREEN,TEXT_BOLD,s.c_str(),TEXT_NORMAL);
 	fprintf(stdout,"%s",TEXT_WHITE);
@@ -114,7 +114,7 @@ void printData(Scope scope, Var depth=-1, bool raw=false)
 void printCharacterVariables(Var depth=-1, bool raw=false)
 {
 	Character c = Character();
-	std::string sigil(1,CHARACTER_SIGIL);
+	std::wstring sigil(1,CHARACTER_SIGIL);
 	if(!raw) printHeader("("+sigil+") "+c.getName());
 	printData(c, depth, raw);
 }
@@ -122,15 +122,15 @@ void printCampaignVariables(Var depth=-1, bool raw=false)
 {
 	confirmCampaignVariablesFile();
 	Campaign m = Campaign();
-	std::string sigil(1,CAMPAIGN_SIGIL);
-	std::string m_name = getEnvVariable(ENV_CURRENT_CAMPAIGN);
+	std::wstring sigil(1,CAMPAIGN_SIGIL);
+	std::wstring m_name = getEnvVariable(ENV_CURRENT_CAMPAIGN);
 	if(!raw) printHeader("("+sigil+") "+left(m_name,m_name.length()-1));// Omit trailing '/'
 	printData(m, depth, raw);
 }
 void printShellVariables(Var depth=-1, bool raw=false)
 {
 	Shell s = Shell();
-	std::string sigil(1,SHELL_SIGIL);
+	std::wstring sigil(1,SHELL_SIGIL);
 	if(!raw) printHeader("("+sigil+") "+"Shell");
 	printData(s, depth, raw);
 }
@@ -162,7 +162,7 @@ int main(int argc, char** argv)
 	bool raw = false;
 	for(int i=1; i<argc; i++)
 	{
-		std::string arg_str = std::string(argv[i]);
+		std::wstring arg_str = std::wstring(argv[i]);
 
 		if(isTypeSigil(argv[i][0]) && argv[i][1] == '{')
 		{
@@ -221,7 +221,7 @@ int main(int argc, char** argv)
 
 			if(i < argc-1)
 			{
-				depth = Var(std::string(argv[i+1]));
+				depth = Var(std::wstring(argv[i+1]));
 				i++;
 				if(!depth.isInt())
 				{

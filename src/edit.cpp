@@ -6,7 +6,7 @@
 #include "../headers/functions.h"
 #include "../headers/text.h"
 
-unsigned long int getPrintLength(std::string str)//std::string.length() returns character count, not the printed length
+unsigned long int getPrintLength(std::wstring str)//std::wstring.length() returns character count, not the printed length
 {
 	struct winsize w;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
@@ -60,9 +60,9 @@ int main(int argc, char** argv)
 		input.push_back('{');
 		input.push_back('}');
 	}
-	else if(looksLikeVariable(std::string(argv[argc-1])))
+	else if(looksLikeVariable(std::wstring(argv[argc-1])))
 	{
-		vi = parseVariable(std::string(argv[argc-1]));
+		vi = parseVariable(std::wstring(argv[argc-1]));
 
 		if(vi.property != "")
 		{
@@ -70,7 +70,7 @@ int main(int argc, char** argv)
 			return -1;
 		}
 
-		std::string value;
+		std::wstring value;
 		switch(vi.evalType)
 		{
 			case VAR_SIGIL:
@@ -154,27 +154,27 @@ int main(int argc, char** argv)
 			fprintf(stdout,"%s%s%s─",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_BOLD);
 
 		//Remove beginning and end bits of explicit constructor
-		std::string value;
+		std::wstring value;
 		for(unsigned long int i=2; i<input.size()-1; i++)
 			value += input[i];
-		std::string output = makePretty(value);
+		std::wstring output = makePretty(value);
 		fprintf(stdout,"%s\n%s\n",TEXT_NORMAL,CLEAR_LINE);
 
 		//Clear all characters after newlines to remove left over characters from previous buffer if characters in that line were deleted
-		fprintf(stdout,(std::regex_replace(output,std::regex("\\n"),std::string(CLEAR_TO_LINE_END)+std::string(1,'\n')).c_str()));
+		fprintf(stdout,(std::regex_replace(output,std::regex("\\n"),std::wstring(CLEAR_TO_LINE_END)+std::wstring(1,'\n')).c_str()));
 
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
 
 		//Determine number of paragraphs
 		unsigned long int total_paragraph_lines = 0;
-		std::string u_output = stripFormatting(output);
-		if(findu(u_output,'\n') != std::string::npos)
+		std::wstring u_output = stripFormatting(output);
+		if(findu(u_output,'\n') != std::wstring::npos)
 		{
 			for(unsigned long int i=0; i<getPrintLength(output)-1; i++)
 			{
 				unsigned long int next_newline = findu(u_output,'\n',i);
-				if(next_newline != std::string::npos && next_newline != i)
+				if(next_newline != std::wstring::npos && next_newline != i)
 				{
 					total_paragraph_lines += (next_newline-1-i)/w.ws_col;
 				}
@@ -226,16 +226,16 @@ int main(int argc, char** argv)
 				switch(vi.evalType)
 				{
 					case VAR_SIGIL:
-						vi.scope.set<Var>(vi.key,Var(std::string(input.data())));
+						vi.scope.set<Var>(vi.key,Var(std::wstring(input.data())));
 						break;
 					case DICE_SIGIL:
-						vi.scope.set<Dice>(vi.key,Dice(std::string(input.data())));
+						vi.scope.set<Dice>(vi.key,Dice(std::wstring(input.data())));
 						break;
 					case WALLET_SIGIL:
-						vi.scope.set<Wallet>(vi.key,Wallet(std::string(input.data())));
+						vi.scope.set<Wallet>(vi.key,Wallet(std::wstring(input.data())));
 						break;
 					case CURRENCY_SIGIL:
-						vi.scope.set<Currency>(vi.key,Currency(std::string(input.data())));
+						vi.scope.set<Currency>(vi.key,Currency(std::wstring(input.data())));
 						break;
 				}
 				fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);

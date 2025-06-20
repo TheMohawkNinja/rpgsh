@@ -5,7 +5,7 @@
 
 void test()
 {
-	std::string plus = std::string(TEXT_WHITE)+"+";
+	std::wstring plus = std::wstring(TEXT_WHITE)+"+";
 	unsigned int Quantity = 100000;
 	unsigned int Faces = 20;
 	fprintf(stdout,"Initiating roll test of %s%dd%d%s...\n",TEXT_WHITE,Quantity,Faces,TEXT_NORMAL);
@@ -31,8 +31,8 @@ int main(int argc, char** argv)
 	bool only_rolls = false;
 	unsigned int count = 0;
 	unsigned int repeat = 1;
-	std::string dice_str, current_arg;
-	std::string count_expr = "";
+	std::wstring dice_str, current_arg;
+	std::wstring count_expr = "";
 
 	chkFlagAppDesc(argv,"A simple, yet featureful dice rolling program.");
 	chkFlagModifyVariables(argv,false);
@@ -45,7 +45,7 @@ int main(int argc, char** argv)
 
 	for(int arg=1; arg<argc; arg++)
 	{
-		current_arg = std::string(argv[arg]);
+		current_arg = std::wstring(argv[arg]);
 		if(chkFlagHelp(argv))
 		{
 			fprintf(stdout,"USAGE:\n");
@@ -98,7 +98,7 @@ int main(int argc, char** argv)
 		}
 		else if(current_arg == "-l")
 		{
-			std::vector<std::string> lists = getDirectoryListing(dice_lists_dir);
+			std::vector<std::wstring> lists = getDirectoryListing(dice_lists_dir);
 			for(const auto& list : lists)
 				fprintf(stdout,"%s\n",list.c_str());
 			return 0;
@@ -112,7 +112,7 @@ int main(int argc, char** argv)
 			}
 
 			count_expr = "";
-			std::string count_str = "";
+			std::wstring count_str = "";
 
 			try
 			{
@@ -125,11 +125,11 @@ int main(int argc, char** argv)
 			catch(...)
 			{
 				count_str = "";
-				std::string valid_expr[6] = {OP_LE, OP_GE, OP_NE, OP_EQ, OP_LT, OP_GT};
+				std::wstring valid_expr[6] = {OP_LE, OP_GE, OP_NE, OP_EQ, OP_LT, OP_GT};
 
 				for(const auto& expr : valid_expr)
 				{
-					if(std::string(argv[arg+1]) == expr)
+					if(std::wstring(argv[arg+1]) == expr)
 					{
 						count_expr = expr;
 						break;
@@ -151,7 +151,7 @@ int main(int argc, char** argv)
 					return -1;
 				}
 
-				count_str = std::string(argv[arg+2]);
+				count_str = std::wstring(argv[arg+2]);
 				if(!Var(count_str).isInt())
 				{
 					output(Error,"Invalid count amount \"%s\".",count_str.c_str());
@@ -184,7 +184,7 @@ int main(int argc, char** argv)
 	}
 	catch(const std::runtime_error& e)
 	{
-		if(e.what() == std::string(E_INVALID_EXPLICIT_CONSTRUCTOR))
+		if(e.what() == std::wstring(E_INVALID_EXPLICIT_CONSTRUCTOR))
 			output(Error,"Invalid explicit dice constructor: \"%s\".",dice_str.c_str());
 		else
 			output(Error,"Error when attempting to construct dice object with \"%s\": %s.",dice_str.c_str(),e.what());
@@ -194,7 +194,7 @@ int main(int argc, char** argv)
 	if(!only_rolls && !only_total && dice.List == "")
 		fprintf(stdout,"Rolling a %s%d%s-sided die %s%d%s time(s) with a modifier of %s%d%s...\n\n",TEXT_WHITE,dice.Faces,TEXT_NORMAL,TEXT_WHITE,dice.Quantity,TEXT_NORMAL,TEXT_WHITE,dice.Modifier,TEXT_NORMAL);
 	else if(!only_rolls && !only_total)
-		fprintf(stdout,"Getting %s from list \"%s%s%s\"...\n\n",repeat > 1 ? (std::string(TEXT_WHITE)+std::to_string(repeat)+std::string(TEXT_NORMAL)+" values").c_str() : "a value",TEXT_WHITE,dice.List.c_str(),TEXT_NORMAL);
+		fprintf(stdout,"Getting %s from list \"%s%s%s\"...\n\n",repeat > 1 ? (std::wstring(TEXT_WHITE)+std::to_string(repeat)+std::wstring(TEXT_NORMAL)+" values").c_str() : "a value",TEXT_WHITE,dice.List.c_str(),TEXT_NORMAL);
 
 	RollResults results;
 	for(unsigned int i=0; i<repeat; i++)
@@ -205,11 +205,11 @@ int main(int argc, char** argv)
 		}
 		catch(const std::runtime_error& e)
 		{
-			if(e.what() == std::string(E_NO_PRNG_FILE))
+			if(e.what() == std::wstring(E_NO_PRNG_FILE))
 				output(Error,"Cannot seed pRNG for dice roll. \"%s\" and \"%s\" do not exist. If your system uses a different path for pRNG, please report your system's pRNG file path to the rpgsh GitHub issues page.",prng_path,backup_prng_path);
-			else if(e.what() == std::string(E_FILE_NOT_FOUND))
+			else if(e.what() == std::wstring(E_FILE_NOT_FOUND))
 				output(Error,"List file not found at \"%s\".",(dice_lists_dir+dice.List).c_str());
-			else if(e.what() == std::string(E_BAD_FS))
+			else if(e.what() == std::wstring(E_BAD_FS))
 				output(Error,"Unable to read list file at \"%s\".",(dice_lists_dir+dice.List).c_str());
 			else
 				output(Error,"An error occured when attempting to roll \"%s\": %s.",dice_str.c_str(),e.what());
@@ -235,8 +235,8 @@ int main(int argc, char** argv)
 		long roll = 0;
 		for(const auto& r : results)
 		{
-			std::string nat_roll = r.first;
-			std::string mod_roll = r.second;
+			std::wstring nat_roll = r.first;
+			std::wstring mod_roll = r.second;
 			roll++;
 			total += std::stol(nat_roll);
 
@@ -249,7 +249,7 @@ int main(int argc, char** argv)
 			  (count_expr == OP_NE && std::stol(mod_roll) != count)))
 				total_count++;
 
-			std::string color;
+			std::wstring color;
 			if     (std::stol(nat_roll) == 1)		color = TEXT_RED;
 			else if(std::stol(nat_roll) == dice.Faces)	color = TEXT_GREEN;
 			else						color = TEXT_WHITE;
@@ -260,9 +260,9 @@ int main(int argc, char** argv)
 			}
 			else if(!only_total)
 			{
-				std::string q_str = std::to_string(dice.Quantity);
-				std::string roll_str = std::to_string(roll);
-				std::string f_str = std::to_string(dice.Faces);
+				std::wstring q_str = std::to_string(dice.Quantity);
+				std::wstring roll_str = std::to_string(roll);
+				std::wstring f_str = std::to_string(dice.Faces);
 				fprintf(stdout,"Roll");
 				fprintf(stdout,"%s",addSpaces(q_str.length()-roll_str.length()+1).c_str());
 				fprintf(stdout,"%ld: ",roll);
