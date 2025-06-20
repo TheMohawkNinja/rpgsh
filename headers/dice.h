@@ -4,15 +4,15 @@
 #include <vector>
 #include "../headers/var.h"
 
-typedef std::vector<std::pair<std::string,std::string>> RollResults;
+typedef std::vector<std::pair<std::wstring,std::wstring>> RollResults;
 class Dice
 {
 	private:
 		bool is_list = false;
-		std::string Quantity_str = "";
-		std::string Faces_str = "";
+		std::wstring Quantity_str = L"";
+		std::wstring Faces_str = L"";
 
-	int getValue(std::string d, long unsigned int start, std::string terminator, bool allow_sign, bool required);
+	int getValue(std::wstring d, long unsigned int start, std::wstring terminator, bool allow_sign, bool required);
 
 	public:
 		unsigned int	Quantity	=	0;
@@ -22,10 +22,10 @@ class Dice
 
 	Dice();
 	Dice(const Dice& b);
-	Dice(std::string str);
+	Dice(std::wstring str);
 	Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier);
 
-	explicit operator std::string() const;
+	explicit operator std::wstring() const;
 	explicit operator bool() const;
 	Dice& operator = ([[maybe_unused]] const int b);
 	Dice& operator = (const std::string b);
@@ -40,31 +40,31 @@ class Dice
 	Dice& operator += ([[maybe_unused]] const Wallet b);
 	Dice& operator += ([[maybe_unused]] const Currency b);
 	Dice& operator -= (const int b);
-	Dice& operator -= (const std::string b);
+	Dice& operator -= (const std::wstring b);
 	Dice& operator -= (const Var b);
 	Dice& operator -= (const Dice b);
 	Dice& operator -= ([[maybe_unused]] const Wallet b);
 	Dice& operator -= ([[maybe_unused]] const Currency b);
 	Dice& operator *= (const int b);
-	Dice& operator *= ([[maybe_unused]] const std::string b);
+	Dice& operator *= ([[maybe_unused]] const std::wstring b);
 	Dice& operator *= (const Var b);
 	Dice& operator *= ([[maybe_unused]] const Dice b);
 	Dice& operator *= ([[maybe_unused]] const Wallet b);
 	Dice& operator *= ([[maybe_unused]] const Currency b);
 	Dice& operator /= (const int b);
-	Dice& operator /= ([[maybe_unused]] const std::string b);
+	Dice& operator /= ([[maybe_unused]] const std::wstring b);
 	Dice& operator /= (const Var b);
 	Dice& operator /= ([[maybe_unused]] const Dice b);
 	Dice& operator /= ([[maybe_unused]] const Wallet b);
 	Dice& operator /= ([[maybe_unused]] const Currency b);
 	Dice& operator ^= ([[maybe_unused]] const int b);
-	Dice& operator ^= ([[maybe_unused]] const std::string b);
+	Dice& operator ^= ([[maybe_unused]] const std::wstring b);
 	Dice& operator ^= (const Var b);
 	Dice& operator ^= ([[maybe_unused]] const Dice b);
 	Dice& operator ^= ([[maybe_unused]] const Wallet b);
 	Dice& operator ^= ([[maybe_unused]] const Currency b);
 	Dice& operator %= (const int b);
-	Dice& operator %= ([[maybe_unused]] const std::string b);
+	Dice& operator %= ([[maybe_unused]] const std::wstring b);
 	Dice& operator %= (const Var b);
 	Dice& operator %= ([[maybe_unused]] const Dice b);
 	Dice& operator %= ([[maybe_unused]] const Wallet b);
@@ -76,79 +76,79 @@ class Dice
 	Dice operator + (const Wallet b);
 	Dice operator + (const Currency b);
 	Dice operator - (const int b);
-	Dice operator - (const std::string b);
+	Dice operator - (const std::wstring b);
 	Dice operator - (const Var b);
 	Dice operator - (const Dice b);
 	Dice operator - (const Wallet b);
 	Dice operator - (const Currency b);
 	Dice operator * (const int b);
-	Dice operator * (const std::string b);
+	Dice operator * (const std::wstring b);
 	Dice operator * (const Var b);
 	Dice operator * (const Dice b);
 	Dice operator * (const Wallet b);
 	Dice operator * (const Currency b);
 	Dice operator / (const int b);
-	Dice operator / (const std::string b);
+	Dice operator / (const std::wstring b);
 	Dice operator / (const Var b);
 	Dice operator / (const Dice b);
 	Dice operator / (const Wallet b);
 	Dice operator / (const Currency b);
 	Dice operator ^ (const int b);
-	Dice operator ^ (const std::string b);
+	Dice operator ^ (const std::wstring b);
 	Dice operator ^ (const Var b);
 	Dice operator ^ (const Dice b);
 	Dice operator ^ (const Wallet b);
 	Dice operator ^ (const Currency b);
 	Dice operator % (const int b);
-	Dice operator % (const std::string b);
+	Dice operator % (const std::wstring b);
 	Dice operator % (const Var b);
 	Dice operator % (const Dice b);
 	Dice operator % (const Wallet b);
 	Dice operator % (const Currency b);
 	bool operator == ([[maybe_unused]] const int& b) const;
-	bool operator == (const std::string& b) const;
+	bool operator == (const std::wstring& b) const;
 	bool operator == (const Var& b) const;
 	bool operator == (const Dice& b) const;
 	bool operator == ([[maybe_unused]] const Wallet& b) const;
 	bool operator == ([[maybe_unused]] const Currency& b) const;
 	bool operator < ([[maybe_unused]] const int& b) const;
-	bool operator < (const std::string& b) const;
+	bool operator < (const std::wstring& b) const;
 	bool operator < (const Var& b) const;
 	bool operator < (const Dice& b) const;
 	bool operator < ([[maybe_unused]] const Wallet& b) const;
 	bool operator < ([[maybe_unused]] const Currency& b) const;
 	bool operator > ([[maybe_unused]] const int& b) const;
-	bool operator > (const std::string& b) const;
+	bool operator > (const std::wstring& b) const;
 	bool operator > (const Var& b) const;
 	bool operator > (const Dice& b) const;
 	bool operator > ([[maybe_unused]] const Wallet& b) const;
 	bool operator > ([[maybe_unused]] const Currency& b) const;
 	bool operator <= (const int& b) const;
-	bool operator <= (const std::string& b) const;
+	bool operator <= (const std::wstring& b) const;
 	bool operator <= (const Var& b) const;
 	bool operator <= (const Dice& b) const;
 	bool operator <= (const Wallet& b) const;
 	bool operator <= (const Currency& b) const;
 	bool operator >= (const int& b) const;
-	bool operator >= (const std::string& b) const;
+	bool operator >= (const std::wstring& b) const;
 	bool operator >= (const Var& b) const;
 	bool operator >= (const Dice& b) const;
 	bool operator >= (const Wallet& b) const;
 	bool operator >= (const Currency& b) const;
 	bool operator != (const int& b) const;
-	bool operator != (const std::string& b) const;
+	bool operator != (const std::wstring& b) const;
 	bool operator != (const Var& b) const;
 	bool operator != (const Dice& b) const;
 	bool operator != (const Wallet& b) const;
 	bool operator != (const Currency& b) const;
 	bool operator && (const int b);
-	bool operator && (const std::string b);
+	bool operator && (const std::wstring b);
 	bool operator && (const Var b);
 	bool operator && (const Dice b);
 	bool operator && (const Wallet b);
 	bool operator && (const Currency b);
 	bool operator || (const int b);
-	bool operator || (const std::string b);
+	bool operator || (const std::wstring b);
 	bool operator || (const Var b);
 	bool operator || (const Dice b);
 	bool operator || (const Wallet b);
@@ -156,7 +156,7 @@ class Dice
 	Dice& operator ++ (int);
 	Dice& operator -- (int);
 
-	std::string dice() const;
-	const char* c_str() const;
+	std::wstring dice() const;
+	const wchar_t* c_str() const;
 	RollResults roll();
 };

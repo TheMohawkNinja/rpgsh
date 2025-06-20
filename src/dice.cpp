@@ -6,10 +6,10 @@
 #include "../headers/functions.h"
 #include "../headers/text.h"
 
-int Dice::getValue(std::string d, long unsigned int start, std::string terminator, bool allow_sign, bool required)
+int Dice::getValue(std::wstring d, long unsigned int start, std::wstring terminator, bool allow_sign, bool required)
 {
-	std::string value_str = "";
-	if(terminator != "")
+	std::wstring value_str = L"";
+	if(terminator != L"")
 	{
 		for(int i=start; d.substr(i,1)!=terminator; i++)
 		{
@@ -17,7 +17,7 @@ int Dice::getValue(std::string d, long unsigned int start, std::string terminato
 			{
 				if(!allow_sign)
 				{
-					if(d.substr(i,1) == "+" || d.substr(i,1) == "-")
+					if(d.substr(i,1) == L"+" || d.substr(i,1) == L"-")
 						break;
 
 					std::stoi(d.substr(i,1));
@@ -25,7 +25,7 @@ int Dice::getValue(std::string d, long unsigned int start, std::string terminato
 				}
 				else
 				{
-					if(d.substr(i,1) != "+" && d.substr(i,1) != "-")
+					if(d.substr(i,1) != L"+" && d.substr(i,1) != L"-")
 						std::stoi(d.substr(i,1));
 
 					value_str += d.substr(i,1);
@@ -60,14 +60,14 @@ int Dice::getValue(std::string d, long unsigned int start, std::string terminato
 			{
 				if(!allow_sign)
 				{
-					if(d.substr(i,1) == "+" || d.substr(i,1) == "-")
+					if(d.substr(i,1) == L"+" || d.substr(i,1) == L"-")
 						break;
 					std::stoi(d.substr(i,1));
 					value_str += d.substr(i,1);
 				}
 				else
 				{
-					if(d.substr(i,1) != "+" && d.substr(i,1) != "-")
+					if(d.substr(i,1) != L"+" && d.substr(i,1) != L"-")
 						std::stoi(d.substr(i,1));
 					value_str += d.substr(i,1);
 				}
@@ -98,16 +98,16 @@ Dice::Dice(const Dice& b)
 	Modifier = b.Modifier;
 	List = b.List;
 }
-Dice::Dice(std::string str)
+Dice::Dice(std::wstring str)
 {
 	//
 	// Determine if we are working with an explicit constructor or an string
 	//
 
-	std::string d(1,DICE_SIGIL);
-	if(left(str,2) == (d+"{"))// Explicit constructor
+	std::wstring d(1,DICE_SIGIL);
+	if(left(str,2) == (d+L"{"))// Explicit constructor
 	{
-		if(findu(str,'}') == std::string::npos)
+		if(findu(str,'}') == std::wstring::npos)
 			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 
 		// Get number of commas in explicit constructor
@@ -144,9 +144,9 @@ Dice::Dice(std::string str)
 	{
 		try
 		{
-			Quantity = getValue(str,0,"d",false,true);
-			Faces = getValue(str,findu(str,'d')+1,"",false,true);
-			Modifier = getValue(str,findu(str,std::to_string(Faces),findu(str,'d'))+std::to_string(Faces).length(),"",true,false);
+			Quantity = getValue(str,0,L"d",false,true);
+			Faces = getValue(str,findu(str,'d')+1,L"",false,true);
+			Modifier = getValue(str,findu(str,std::to_wstring(Faces),findu(str,'d'))+std::to_wstring(Faces).length(),L"",true,false);
 		}
 		catch(...)
 		{
@@ -158,8 +158,8 @@ Dice::Dice(std::string str)
 		try
 		{
 			Quantity = 1;
-			Faces = getValue(str,findu(str,'d')+1,"",false,true);
-			Modifier = getValue(str,findu(str,std::to_string(Faces),findu(str,'d'))+std::to_string(Faces).length(),"",true,false);
+			Faces = getValue(str,findu(str,'d')+1,L"",false,true);
+			Modifier = getValue(str,findu(str,std::to_wstring(Faces),findu(str,'d'))+std::to_wstring(Faces).length(),L"",true,false);
 		}
 		catch(...)
 		{
@@ -174,15 +174,15 @@ Dice::Dice(unsigned int _Quantity, unsigned int _Faces, int _Modifier)
 	Modifier = _Modifier;
 }
 
-Dice::operator std::string() const
+Dice::operator std::wstring() const
 {
-	if(List == "")
-		return std::string(1,DICE_SIGIL)+"{"+
-		       std::to_string(Quantity)+","+
-		       std::to_string(Faces)+","+
-		       std::to_string(Modifier)+"}";
+	if(List == L"")
+		return std::wstring(1,DICE_SIGIL)+L"{"+
+		       std::to_wstring(Quantity)+L","+
+		       std::to_wstring(Faces)+L","+
+		       std::to_wstring(Modifier)+L"}";
 	else
-		return std::string(1,DICE_SIGIL)+"{"+List+"}";
+		return std::wstring(1,DICE_SIGIL)+L"{"+List+L"}";
 }
 Dice::operator bool() const
 {
@@ -272,7 +272,7 @@ Dice& Dice::operator -= (const int b)
 	Modifier -= b;
 	return *this;
 }
-Dice& Dice::operator -= ([[maybe_unused]] const std::string b)
+Dice& Dice::operator -= ([[maybe_unused]] const std::wstring b)
 {
 	try{*this -= Dice(b);}
 	catch(...){throw std::runtime_error(E_INVALID_OPERATION);}
@@ -308,7 +308,7 @@ Dice& Dice::operator *= (const int b)
 	Quantity *= b;
 	return *this;
 }
-Dice& Dice::operator *= ([[maybe_unused]] const std::string b)
+Dice& Dice::operator *= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -336,7 +336,7 @@ Dice& Dice::operator /= (const int b)
 	Quantity /= b;
 	return *this;
 }
-Dice& Dice::operator /= ([[maybe_unused]] const std::string b)
+Dice& Dice::operator /= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -363,7 +363,7 @@ Dice& Dice::operator ^= ([[maybe_unused]] const int b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
-Dice& Dice::operator ^= ([[maybe_unused]] const std::string b)
+Dice& Dice::operator ^= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -391,7 +391,7 @@ Dice& Dice::operator %= (const int b)
 	Quantity %= b;
 	return *this;
 }
-Dice& Dice::operator %= ([[maybe_unused]] const std::string b)
+Dice& Dice::operator %= ([[maybe_unused]] const std::wstring b)
 {
 	throw std::runtime_error(E_INVALID_OPERATION);
 }
@@ -442,7 +442,7 @@ Dice Dice::operator - (const int b)
 {
 	return *this -= b;
 }
-Dice Dice::operator - (const std::string b)
+Dice Dice::operator - (const std::wstring b)
 {
 	return *this -= b;
 }
@@ -466,7 +466,7 @@ Dice Dice::operator * (const int b)
 {
 	return *this *= b;
 }
-Dice Dice::operator * (const std::string b)
+Dice Dice::operator * (const std::wstring b)
 {
 	return *this *= b;
 }
@@ -490,7 +490,7 @@ Dice Dice::operator / (const int b)
 {
 	return *this /= b;
 }
-Dice Dice::operator / (const std::string b)
+Dice Dice::operator / (const std::wstring b)
 {
 	return *this /= b;
 }
@@ -514,7 +514,7 @@ Dice Dice::operator ^ (const int b)
 {
 	return *this ^= b;
 }
-Dice Dice::operator ^ (const std::string b)
+Dice Dice::operator ^ (const std::wstring b)
 {
 	return *this ^= b;
 }
@@ -538,7 +538,7 @@ Dice Dice::operator % (const int b)
 {
 	return *this %= b;
 }
-Dice Dice::operator % (const std::string b)
+Dice Dice::operator % (const std::wstring b)
 {
 	return *this %= b;
 }
@@ -562,7 +562,7 @@ bool Dice::operator == ([[maybe_unused]] const int& b) const
 {
 	return false;
 }
-bool Dice::operator == (const std::string& b) const
+bool Dice::operator == (const std::wstring& b) const
 {
 	try{return *this == Dice(b);}
 	catch(...){return false;}
@@ -591,7 +591,7 @@ bool Dice::operator < ([[maybe_unused]] const int& b) const
 {
 	return false;
 }
-bool Dice::operator < (const std::string& b) const
+bool Dice::operator < (const std::wstring& b) const
 {
 	try{return *this < Dice(b);}
 	catch(...){return false;}
@@ -617,7 +617,7 @@ bool Dice::operator > ([[maybe_unused]] const int& b) const
 {
 	return false;
 }
-bool Dice::operator > (const std::string& b) const
+bool Dice::operator > (const std::wstring& b) const
 {
 	try{return *this > Dice(b);}
 	catch(...){return false;}
@@ -643,7 +643,7 @@ bool Dice::operator <= (const int& b) const
 {
 	return (*this < b || *this == b);
 }
-bool Dice::operator <= (const std::string& b) const
+bool Dice::operator <= (const std::wstring& b) const
 {
 	try{return *this <= Dice(b);}
 	catch(...){return (*this < b || *this == b);}
@@ -669,7 +669,7 @@ bool Dice::operator >= (const int& b) const
 {
 	return (*this > b || *this == b);
 }
-bool Dice::operator >= (const std::string& b) const
+bool Dice::operator >= (const std::wstring& b) const
 {
 	try{return *this >= Dice(b);}
 	catch(...){return (*this > b || *this == b);}
@@ -695,7 +695,7 @@ bool Dice::operator != (const int& b) const
 {
 	return !(*this == b);
 }
-bool Dice::operator != (const std::string& b) const
+bool Dice::operator != (const std::wstring& b) const
 {
 	return !(*this == b);
 }
@@ -719,9 +719,9 @@ bool Dice::operator && (const int b)
 {
 	return bool(*this) && (b != 0);
 }
-bool Dice::operator && (const std::string b)
+bool Dice::operator && (const std::wstring b)
 {
-	return bool(*this) && (b != "" && stringcasecmp(b,"false"));
+	return bool(*this) && (b != L"" && stringcasecmp(b,L"false"));
 }
 bool Dice::operator && (const Var b)
 {
@@ -743,9 +743,9 @@ bool Dice::operator || (const int b)
 {
 	return bool(*this) || (b != 0);
 }
-bool Dice::operator || (const std::string b)
+bool Dice::operator || (const std::wstring b)
 {
-	return bool(*this) || (b != "" && stringcasecmp(b,"false"));
+	return bool(*this) || (b != L"" && stringcasecmp(b,L"false"));
 }
 bool Dice::operator || (const Var b)
 {
@@ -774,24 +774,24 @@ Dice& Dice::operator -- (int)
 	return *this;
 }
 
-std::string Dice::dice() const
+std::wstring Dice::dice() const
 {
-	std::string ret = "";
+	std::wstring ret = L"";
 	if(Quantity)
 	{
-		ret += std::to_string(Quantity);
+		ret += std::to_wstring(Quantity);
 	}
-	ret += "d"+std::to_string(Faces);
+	ret += L"d"+std::to_wstring(Faces);
 	if(Modifier)
 	{
-		ret += (Modifier>0) ? "+" : "";
+		ret += (Modifier>0) ? L"+" : L"";
 		ret += Modifier;
 	}
 	return ret;
 }
-const char* Dice::c_str() const
+const wchar_t* Dice::c_str() const
 {
-	return std::string(*this).c_str();
+	return std::wstring(*this).c_str();
 }
 RollResults Dice::roll()
 {
@@ -808,7 +808,7 @@ RollResults Dice::roll()
 	if(List != "")
 	{
 		std::string list_line = "";
-		std::ifstream fs;
+		std::wifstream fs;
 
 		//Check if we are using explicitly define list or built-in list
 		if(List[0] != '/' && left(List,2) != "./" && left(List,3) != "../")
@@ -818,19 +818,19 @@ RollResults Dice::roll()
 		fs.open(List);
 		if(!fs.good()) throw std::runtime_error(E_BAD_FS);
 
-		std::vector<std::string> list_values;
-		std::string line;
+		std::vector<std::wstring> list_values;
+		std::wstring line;
 		while(std::getline(fs,line))
 		{
-			if(line != "" && findu(line,COMMENT) == std::string::npos)
+			if(line != L"" && findu(line,COMMENT) == std::wstring::npos)
 				list_values.push_back(line);
-			else if(line != "")
+			else if(line != L"")
 				list_values.push_back(left(line,findu(line,COMMENT)));
 		}
 		fs.close();
 
 		fs.open(e_prng_path);
-		std::string data, seed;
+		std::wstring data, seed;
 		do
 		{
 			std::getline(fs,data);
@@ -841,14 +841,14 @@ RollResults Dice::roll()
 		std::srand((int)seed[0] * (int)seed[seed.length() - 1]);
 		std::srand(std::rand());//Mitigates apparent roll biasing when Faces%result=0
 		long pick = std::rand() % list_values.size();
-		results.push_back({std::to_string(pick),list_values[pick]});
+		results.push_back({std::to_wstring(pick),list_values[pick]});
 
 		return results;
 	}
 	else if(Quantity > 0 && Faces > 0)
 	{
-		std::ifstream fs(e_prng_path);
-		std::string data, seed;
+		std::wifstream fs(e_prng_path);
+		std::wstring data, seed;
 
 		while(seed.length() < Quantity)
 		{
@@ -864,7 +864,7 @@ RollResults Dice::roll()
 			std::srand(std::rand());//Mitigates apparent roll biasing when Faces%result=0
 			natural = std::rand() % Faces + 1;
 
-			results.push_back({std::to_string(natural),std::to_string(natural+Modifier)});
+			results.push_back({std::to_wstring(natural),std::to_wstring(natural+Modifier)});
 		}
 
 		fs.close();
