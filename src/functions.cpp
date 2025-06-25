@@ -391,6 +391,17 @@ long unsigned int countu(std::string str, char ch)
 	return count;
 }
 
+long unsigned int getDisplayLength(std::string str)
+{
+	int len = 0;
+	for(long unsigned int i = 0; i<str.length(); i++)
+	{
+		unsigned char c = static_cast<unsigned char>(str[i]);
+		if(c < 0x80 || (c&0xe0) == 0xc0 || (c&0xf0) == 0xe0 || (c&0xf8) == 0xf0) len++;
+	}
+	return len;
+}
+
 std::string addSpaces(unsigned int n)
 {
 	std::string ret = "";

@@ -77,6 +77,8 @@ std::string right(std::string str, int n);
 
 long unsigned int countu(std::string str, char ch);
 
+long unsigned int getDisplayLength(std::string str);
+
 std::string addSpaces(unsigned int n);
 
 std::string mergeQuotes(std::string str);
