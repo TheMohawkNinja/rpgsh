@@ -167,7 +167,7 @@ std::string inputHandler()
 		for(const auto& line : getAppOutput("print -r "+c.getStr<Var>(DOT_PROMPT)).output)
 		{
 			if(line.length() <= 1) continue;
-			last_prompt_line_length = std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(stripFormatting(line)).length();//TODO: Remove when we convert everything to std::wstring
+			last_prompt_line_length = getDisplayLength(stripFormatting(line));
 		}
 	}
 	else
@@ -639,7 +639,7 @@ int prompt()
 			for(const auto& line : getAppOutput("print -r "+c.getStr<Var>(DOT_PROMPT)).output)
 			{
 				if(line.length() <= 1) continue;
-				last_prompt_line_length = std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(stripFormatting(line)).length();//TODO: Remove when we convert everything to std::wstring
+				last_prompt_line_length = getDisplayLength(stripFormatting(line));
 				fprintf(stdout,"%s\n",line.c_str());
 			}
 			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)0);
