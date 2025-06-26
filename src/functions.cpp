@@ -581,7 +581,7 @@ void loadXRef(std::string* arg, VariableInfo* p_vi)
 	// Remove external reference string so we can continue to use the current arg under the new context
 	*arg = (*arg)[0]+left(*arg,findu(*arg,'[')-1)+right(*arg,findu(*arg,']')+1);
 }
-VariableInfo parseVariable(std::string v)// Derive information about variable from string
+VariableInfo parseVariable(std::string v)
 {
 	VariableInfo vi;
 
@@ -846,7 +846,7 @@ int runApp(std::string arg_str, bool redirect_output)
 		argv.push_back((char*)arg.c_str());
 
 	//Add a NULL because posix_spawn() needs that for some reason
-	argv[args.size()] = NULL;
+	argv.push_back(NULL);
 
 	int status = 0;
 	int exit_code = 0;
