@@ -1,13 +1,8 @@
 #include <cstring>
 #include <regex>
-#include "../headers/chkflag.h"
 #include "../headers/functions.h"
-#include "../headers/output.h"
-#include "../headers/pretty.h"
 #include "../headers/scope.h"
-#include "../headers/string.h"
 #include "../headers/text.h"
-#include "../headers/variable.h"
 
 void printHeader(std::string s)
 {

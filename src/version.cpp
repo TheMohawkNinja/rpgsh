@@ -1,10 +1,8 @@
 #include <cstring>
 #include <stdio.h>
-#include "../headers/chkflag.h"
 #include "../headers/define.h"
 #include "../headers/text.h"
 #include "../headers/functions.h"
-#include "../headers/output.h"
 
 int main(int argc, char** argv)
 {
