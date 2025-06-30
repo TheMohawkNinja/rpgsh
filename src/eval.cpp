@@ -145,11 +145,9 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 				bool keyFound = false;
 				for(const auto& [lhs_k,lhs_v] : getSet(getSetStr(*p_vi)))
 				{
-					if(lhs_k == rhs_k)
-					{
-						keyFound = true;
-						break;
-					}
+					if(lhs_k != rhs_k) continue;
+					keyFound = true;
+					break;
 				}
 				if(!keyFound)
 				{
