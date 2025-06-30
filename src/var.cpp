@@ -9,7 +9,7 @@ Var::Var(std::string str)
 	std::string v(1,VAR_SIGIL);
 
 	//If second character isn't a '{', this isn't an explicit constructor, so just treat it as a normal value
-	if(str[1] != '{')
+	if(str.length() < 2 || str[1] != '{')
 	{
 		Value = str;
 		return;
