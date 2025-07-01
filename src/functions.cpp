@@ -14,6 +14,15 @@
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 
+void printHeader(std::string s)
+{
+	fprintf(stdout,"%s%s %s %s\n",TEXT_GREEN,TEXT_BOLD,s.c_str(),TEXT_NORMAL);
+	fprintf(stdout,"%s",TEXT_WHITE);
+	for(long unsigned int i=0; i<s.length()+2; i++)
+		fprintf(stdout,"─");
+	fprintf(stdout,"%s\n",TEXT_NORMAL);
+}
+
 std::string defaultPrompt(Character c)
 {
 	return std::string(TEXT_BOLD)+std::string(TEXT_RED)+c.getName()+std::string(TEXT_WHITE)+"> "+std::string(TEXT_NORMAL);
