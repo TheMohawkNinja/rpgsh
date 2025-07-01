@@ -70,6 +70,8 @@ if [[ $EUID -eq 0 ]]; then
 	g++ $flags src/edit.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-edit
 	echo -e "\tsrc/eval.cpp\t\t->\t$bold_white""/bin/rpgsh-eval"$normal
 	g++ $flags src/eval.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-eval
+	echo -e "\tsrc/find.cpp\t\t->\t$bold_white""/bin/rpgsh-find"$normal
+	g++ $flags src/find.cpp -L $lib_dir $libs $fs $debug -o /bin/rpgsh-find
 	echo -e "\tsrc/help.cpp\t\t->\t$bold_white""/bin/rpgsh-help"$normal
 	g++ $flags src/help.cpp -L $lib_dir $libs $debug -o /bin/rpgsh-help
 	echo -e "\tsrc/history.cpp\t\t->\t$bold_white""/bin/rpgsh-history"$normal
