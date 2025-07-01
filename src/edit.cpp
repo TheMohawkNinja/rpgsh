@@ -6,23 +6,6 @@
 #include "../headers/functions.h"
 #include "../headers/text.h"
 
-unsigned long int getPrintLength(std::string str)//std::string.length() returns character count, not the printed length
-{
-	struct winsize w;
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-
-	unsigned long int length = 0;
-	for(unsigned long int i=0; i<str.length(); i++)
-	{
-		if(str[i] == ESC_SEQ) i = str.find('m',i);
-		else if(str[i] == '\t' && (length+(8-(length%8)))/w.ws_col == length/w.ws_col)	length += 8-(length%8);
-		else if(str[i] == '\t' && (length+(8-(length%8)))/w.ws_col > length/w.ws_col)	length += w.ws_col-length-1;
-		else if(str[i] == '\b')  length--;
-		else if(isprint(str[i])) length++;
-	}
-	return length;
-}
-
 int main(int argc, char** argv)
 {
 	if(argc > 2)
@@ -171,7 +154,7 @@ int main(int argc, char** argv)
 		std::string u_output = stripFormatting(output);
 		if(findu(u_output,'\n') != std::string::npos)
 		{
-			for(unsigned long int i=0; i<getPrintLength(output)-1; i++)
+			for(unsigned long int i=0; i<getDisplayLength(output)-1; i++)
 			{
 				unsigned long int next_newline = findu(u_output,'\n',i);
 				if(next_newline != std::string::npos && next_newline != i)
@@ -187,7 +170,7 @@ int main(int argc, char** argv)
 			}
 		}
 
-		unsigned long int output_length = getPrintLength(output)-1-(countu(output,'%')/2);
+		unsigned long int output_length = getDisplayLength(output)-1-(countu(output,'%')/2);
 		unsigned long int cursor_vert_offset = 4+countu(output,'\n')+countu(output,'\f')+countu(output,'\v');//TODO: Take into account the lengths of last line of paragraph, appears to be related to cursor position though
 		if(total_paragraph_lines)
 			cursor_vert_offset += total_paragraph_lines;

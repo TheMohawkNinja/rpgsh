@@ -6,7 +6,9 @@
 #include <spawn.h>
 #include <string.h>
 #include <strings.h>
+#include <sys/ioctl.h>
 #include <sys/wait.h>
+#include <termios.h>
 #include "../headers/colors.h"
 #include "../headers/config.h"
 #include "../headers/functions.h"
@@ -393,11 +395,24 @@ long unsigned int countu(std::string str, char ch)
 
 long unsigned int getDisplayLength(std::string str)
 {
+	struct winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 	int len = 0;
+
 	for(long unsigned int i = 0; i<str.length(); i++)
 	{
 		unsigned char c = static_cast<unsigned char>(str[i]);
-		if(c < 0x80 || (c&0xe0) == 0xc0 || (c&0xf0) == 0xe0 || (c&0xf8) == 0xf0) len++;
+
+		if(str[i] == ESC_SEQ)
+			i = str.find('m',i);
+		else if(str[i] == '\t' && (len+(8-(len%8)))/w.ws_col == len/w.ws_col)
+			len += 8-(len%8);
+		else if(str[i] == '\t' && (len+(8-(len%8)))/w.ws_col > len/w.ws_col)
+			len += w.ws_col-len-1;
+		else if(str[i] == '\b')
+			len--;
+		else if(c < 0x80 || (c&0xe0) == 0xc0 || (c&0xf0) == 0xe0 || (c&0xf8) == 0xf0)
+			len++;
 	}
 	return len;
 }
