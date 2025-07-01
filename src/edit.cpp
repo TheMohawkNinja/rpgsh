@@ -69,7 +69,16 @@ int main(int argc, char** argv)
 				value = vi.scope.getStr<Currency>(vi.key);
 				break;
 		}
-		for(const auto& ch : value) input.push_back(ch);
+		bool warned = false;
+		for(const auto& ch : value)
+		{
+			if(ch < 0 && !warned)
+			{
+				output(Warning,"Non-ASCII character detected, edit may not function properly.\n");
+				warned = true;
+			}
+			input.push_back(ch);
+		}
 	}
 	else
 	{
