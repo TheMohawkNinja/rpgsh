@@ -411,7 +411,9 @@ std::string inputHandler()
 			int slash = findu(chk_str,'/',findu(chk_str,']')+1);
 			int rsqbrkt = findu(chk_str,']');
 			int period = rfindu(chk_str,'.');
-			char type_sigil = chk_str[findu(chk_str,'/',findu(chk_str,']')+1)-1];
+			char type_sigil = '\0';
+			if(findu(chk_str,'/') != std::string::npos)
+				type_sigil = chk_str[findu(chk_str,'/',findu(chk_str,']')+1)-1];
 			std::string key = right(chk_str,findu(chk_str,'/',findu(chk_str,']')+1)+1);
 			if(slash > rsqbrkt && period < slash)//Keys
 			{
