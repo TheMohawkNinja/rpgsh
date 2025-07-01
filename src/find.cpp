@@ -29,14 +29,14 @@ int main(int argc, char** argv)
 	Campaign m = Campaign();
 	Shell s = Shell();
 
-	printHeader("Camapigns");
+	printHeader("Campaigns");
 	std::vector<std::string> campaigns = getDirectoryListing(campaigns_dir);
 	for(const auto& campaign : campaigns)
 	{
 		std::sregex_iterator it(campaign.begin(),campaign.end(),pattern);
 		std::sregex_iterator it_end;
 
-		if(it != it_end)
+		if(it != it_end && std::filesystem::is_directory(campaigns_dir+campaign))
 			fprintf(stdout,"%s\n",campaign.c_str());
 	}
 	fprintf(stdout,"\n");
@@ -44,13 +44,13 @@ int main(int argc, char** argv)
 	printHeader("Characters");
 	std::string m_dir = left(m.getDatasource(),rfindu(m.getDatasource(),'/'));
 	std::vector<std::string> characters = getDirectoryListing(m_dir+"/characters");
-	for(const auto& character : campaigns)
+	for(const auto& character : characters)
 	{
 		std::sregex_iterator it(character.begin(),character.end(),pattern);
 		std::sregex_iterator it_end;
 
-		if(it != it_end)
-			fprintf(stdout,"%s\n",character.c_str());
+		if(it != it_end && right(character,character.length()-c_ext.length()) == c_ext)
+			fprintf(stdout,"%s\n",left(character,c_ext.length()).c_str());
 	}
 	fprintf(stdout,"\n");
 
