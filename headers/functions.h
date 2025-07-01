@@ -36,6 +36,8 @@ struct MCStr
 	std::string m, c;
 };
 
+void printHeader(std::string s);
+
 std::string defaultPrompt(Character c);
 
 void output(OutputLevel level, const char* format, ...);
