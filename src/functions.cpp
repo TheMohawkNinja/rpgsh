@@ -474,6 +474,14 @@ std::string escapeSpaces(std::string str)
 
 	return ret;
 }
+std::string escapeRegexGroupChars(std::string str)
+{
+	std::vector<std::string> patterns = {"\\[","\\]","\\(","\\)","\\{","\\}"};
+	for(const auto& p : patterns)
+		str = std::regex_replace(str,std::regex(p),p);
+
+	return str;
+}
 
 void confirmEnvVariablesFile()
 {
@@ -779,11 +787,7 @@ int runApp(std::string arg_str, bool redirect_output)
 			output(Error,"%s is not a valid variable string.",match.c_str());
 			return -1;
 		}
-		std::string v_str_it_pattern = match;
-		std::vector<std::string> patterns = {"\\[","\\]","\\(","\\)","\\{","\\}"};
-		for(const auto& p : patterns)
-			v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex(p),p);
-		arg_str = std::regex_replace(arg_str,std::regex(v_str_it_pattern),getAppOutput(match).output[0]);
+		arg_str = std::regex_replace(arg_str,std::regex(escapeRegexGroupChars(match)),getAppOutput(match).output[0]);
 	}
 
 	//Get args for program
