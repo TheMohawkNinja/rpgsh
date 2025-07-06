@@ -3,6 +3,7 @@
 #include <regex>
 #include "../headers/functions.h"
 
+const std::string replace = std::string(TEXT_RED)+"$&"+std::string(TEXT_NORMAL);
 enum Option
 {
 	All,
@@ -18,36 +19,15 @@ void printMatches(datamap<T> map, std::regex pattern, char sigil, Option opt)
 	for(const auto& [k,v] : map)
 	{
 		std::string k_out = k;
-		std::string v_out = escapeRegexGroupChars(std::string(v));
-		bool k_match = false;
-		bool v_match = false;
+		std::string v_out = std::string(v);
 
-		std::sregex_iterator k_it(k.begin(),k.end(),pattern);
-		std::sregex_iterator k_it_end;
-		while(k_it != k_it_end && (long unsigned int)k_it->position() < k.length())
-		{
-			std::string replace = std::string(TEXT_RED)+k_it->str()+std::string(TEXT_NORMAL);
-			k_out = std::regex_replace(k_out,std::regex(k_it->str()),replace);
-			k_match = true;
-			k_it++;
-		}
+		k_out = std::regex_replace(k_out,pattern,replace);
+		if(opt == All || opt == KeysAndValues)
+			v_out = std::regex_replace(v_out,pattern,replace);
 
-		if(opt == KeysAndValues)
-		{
-			std::sregex_iterator v_it(v_out.begin(),v_out.end(),pattern);
-			std::sregex_iterator v_it_end;
-			while(v_it != v_it_end && (long unsigned int)v_it->position() < v_out.length())
-			{
-				std::string replace = std::string(TEXT_RED)+v_it->str()+std::string(TEXT_NORMAL);
-				v_out = std::regex_replace(v_out,std::regex(v_it->str()),replace);
-				v_match = true;
-				v_it++;
-			}
-		}
-
-		if(opt == Keys && k_match)
+		if(opt == Keys && k_out != k)
 			fprintf(stdout,"%c/%s\n",sigil,k_out.c_str());
-		else if(opt == KeysAndValues && (k_match || v_match))
+		else if((opt == All || opt == KeysAndValues) && (k_out != k || v_out != std::string(v)))
 			fprintf(stdout,"%c/%s\n\t%s\n",sigil,k_out.c_str(),v_out.c_str());
 	}
 }
@@ -142,11 +122,13 @@ int main(int argc, char** argv)
 		std::vector<std::string> campaigns = getDirectoryListing(campaigns_dir);
 		for(const auto& campaign : campaigns)
 		{
-			std::sregex_iterator it(campaign.begin(),campaign.end(),pattern);
-			std::sregex_iterator it_end;
+			if(!std::filesystem::is_directory(campaigns_dir+campaign)) continue;
 
-			if(it != it_end && std::filesystem::is_directory(campaigns_dir+campaign))
-				fprintf(stdout,"%s\n",campaign.c_str());
+			std::string m_out = campaign;
+			m_out = std::regex_replace(campaign,pattern,replace);
+
+			if(m_out != campaign)
+				fprintf(stdout,"%s\n",m_out.c_str());
 		}
 		fprintf(stdout,"\n");
 	}
@@ -159,11 +141,12 @@ int main(int argc, char** argv)
 		for(const auto& character : characters)
 		{
 			if(right(character,character.length()-c_ext.length()) != c_ext) continue;
-			std::sregex_iterator it(character.begin(),character.end()-c_ext.length(),pattern);
-			std::sregex_iterator it_end;
 
-			if(it != it_end)
-				fprintf(stdout,"%s\n",left(character,findu(character,c_ext)).c_str());
+			std::string c_out = character;
+			c_out = std::regex_replace(character,pattern,replace);
+
+			if(c_out != character)
+				fprintf(stdout,"%s\n",left(c_out,findu(c_out,'.')).c_str());
 		}
 		fprintf(stdout,"\n");
 	}
