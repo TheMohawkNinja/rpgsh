@@ -339,7 +339,10 @@ std::vector<std::string> split(std::string str, char delimiter)
 	while(true)
 	{
 		if(findu(str,delimiter) == std::string::npos)
+		{
+			list.push_back(str);
 			return list;
+		}
 
 		list.push_back(left(str,findu(str,delimiter)));
 		str = right(str,findu(str,delimiter)+1);
