@@ -8,6 +8,7 @@
 
 Features include:
 - Tab completion
+
   <img src="tab_completion.gif" width="320" height="180" border="10"/>
 - Four different variable data types: Var, Dice, Currency, and Wallet
 	- Support for common operations with similar and differing data types
