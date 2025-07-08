@@ -9,12 +9,12 @@
 
 enum Action
 {
-	Read,
-	Write,
-	SetAdd,
-	SetRemove,
-	SetAddA,
-	SetRemoveA
+	read,
+	write,
+	set_add,
+	set_remove,
+	set_add_a,
+	set_remove_a
 };
 
 // Operator precedence, later string vectors = lower precedence
@@ -51,85 +51,85 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 		if(p_vi->evalType == VAR_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<Var>(p_vi->key);
-			if(action == Read && keyExists && p_vi->property == "")
+			if(action == read && keyExists && p_vi->property == "")
 				return p_vi->scope.getStr<Var>(p_vi->key);
-			else if(action == Write && p_vi->property == "")
+			else if(action == write && p_vi->property == "")
 				p_vi->scope.set<Var>(p_vi->key,Var(v));
-			else if(action == Read && keyExists && !stringcasecmp(p_vi->property,"Value"))
+			else if(action == read && keyExists && !stringcasecmp(p_vi->property,"Value"))
 				return p_vi->scope.getProperty<Var>(p_vi->key,p_vi->property);
-			else if(action == Write && !stringcasecmp(p_vi->property,"Value"))
+			else if(action == write && !stringcasecmp(p_vi->property,"Value"))
 				p_vi->scope.setProperty<Var,std::string>(p_vi->key,p_vi->property,v);
 		}
 		else if(p_vi->evalType == DICE_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<Dice>(p_vi->key);
-			if(action == Read && keyExists && p_vi->property == "")
+			if(action == read && keyExists && p_vi->property == "")
 				return p_vi->scope.getStr<Dice>(p_vi->key);
-			else if(action == Write && p_vi->property == "")
+			else if(action == write && p_vi->property == "")
 				p_vi->scope.set<Dice>(p_vi->key,Dice(v));
-			else if(action == Read && keyExists &&
+			else if(action == read && keyExists &&
 				(!stringcasecmp(p_vi->property,"Quantity") ||
 			         !stringcasecmp(p_vi->property,"Faces") ||
 			         !stringcasecmp(p_vi->property,"Modifier") ||
 				 !stringcasecmp(p_vi->property,"List")))
 				return p_vi->scope.getProperty<Dice>(p_vi->key,p_vi->property);
-			else if(action == Write && !stringcasecmp(p_vi->property,"Quantity"))
+			else if(action == write && !stringcasecmp(p_vi->property,"Quantity"))
 				p_vi->scope.setProperty<Dice,int>(p_vi->key,p_vi->property,std::stoi(v));
-			else if(action == Write && !stringcasecmp(p_vi->property,"Faces"))
+			else if(action == write && !stringcasecmp(p_vi->property,"Faces"))
 				p_vi->scope.setProperty<Dice,int>(p_vi->key,p_vi->property,std::stoi(v));
-			else if(action == Write && !stringcasecmp(p_vi->property,"Modifier"))
+			else if(action == write && !stringcasecmp(p_vi->property,"Modifier"))
 				p_vi->scope.setProperty<Dice,int>(p_vi->key,p_vi->property,std::stoi(v));
-			else if(action == Write && !stringcasecmp(p_vi->property,"List"))
+			else if(action == write && !stringcasecmp(p_vi->property,"List"))
 				p_vi->scope.setProperty<Dice,std::string>(p_vi->key,p_vi->property,v);
 		}
 		else if(p_vi->evalType == WALLET_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<Wallet>(p_vi->key);
-			if(action == Read && keyExists && p_vi->property == "")
+			if(action == read && keyExists && p_vi->property == "")
 				return p_vi->scope.getStr<Wallet>(p_vi->key);
-			else if(action == Write && p_vi->property == "")
+			else if(action == write && p_vi->property == "")
 				p_vi->scope.set<Wallet>(p_vi->key,Wallet(v));
-			else if(action == Read && keyExists && p_vi->scope.get<Wallet>(p_vi->key).containsCurrency(p_vi->property))
+			else if(action == read && keyExists && p_vi->scope.get<Wallet>(p_vi->key).containsCurrency(p_vi->property))
 				return p_vi->scope.getProperty<Wallet>(p_vi->key,p_vi->property);
-			else if(action == Write)
+			else if(action == write)
 				p_vi->scope.setProperty<Wallet,int>(p_vi->key,p_vi->property,std::stoi(v));
 		}
 		else if(p_vi->evalType == CURRENCY_SIGIL)
 		{
 			bool keyExists = p_vi->scope.keyExists<Currency>(p_vi->key);
-			if(action == Read && keyExists && p_vi->property == "")
+			if(action == read && keyExists && p_vi->property == "")
 				return p_vi->scope.getStr<Currency>(p_vi->key);
-			else if(action == Write && p_vi->property == "")
+			else if(action == write && p_vi->property == "")
 				p_vi->scope.set<Currency>(p_vi->key,Currency(v));
-			else if(action == Read && keyExists &&
+			else if(action == read && keyExists &&
 				(!stringcasecmp(p_vi->property,"CurrencySystem") ||
 				 !stringcasecmp(p_vi->property,"Name") ||
 				 !stringcasecmp(p_vi->property,"SmallerAmount") ||
 				 !stringcasecmp(p_vi->property,"Smaller") ||
 				 !stringcasecmp(p_vi->property,"Larger")))
 				return p_vi->scope.getProperty<Currency>(p_vi->key,p_vi->property);
-			else if(action == Write && !stringcasecmp(p_vi->property,"CurrencySystem"))
+			else if(action == write && !stringcasecmp(p_vi->property,"CurrencySystem"))
 				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,v);
-			else if(action == Write && !stringcasecmp(p_vi->property,"Name"))
+			else if(action == write && !stringcasecmp(p_vi->property,"Name"))
 				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,v);
-			else if(action == Write && !stringcasecmp(p_vi->property,"Smaller"))
+			else if(action == write && !stringcasecmp(p_vi->property,"Smaller"))
 				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,v);
-			else if(action == Write && !stringcasecmp(p_vi->property,"Larger"))
+			else if(action == write && !stringcasecmp(p_vi->property,"Larger"))
 				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,v);
-			else if(action == Write && !stringcasecmp(p_vi->property,"SmallerAmount"))
+			else if(action == write && !stringcasecmp(p_vi->property,"SmallerAmount"))
 				p_vi->scope.setProperty<Currency,int>(p_vi->key,p_vi->property,std::stoi(v));
 		}
 
-		// Should only execute if action == Write
+		// Should only execute if action == write
 		p_vi->scope.save();
 		return "";
 	}
-	else if(action == Read)// If the last character is a '/' and we are just printing the value, print a list of keys and constructors
+	else if(action == read)// If the last character is a '/' and we are just printing the value, print a list of keys and constructors
 	{
 		return getSetStr(*p_vi);
 	}
-	else if(action == SetAdd || action == SetAddA ||
-		action == SetRemove || action == SetRemoveA)// Perform write operation on variable set
+	else if(action == set_add || action == set_add_a ||
+		action == set_remove || action == set_remove_a)// Perform write operation on variable set
 	{
 		struct RemovedKey
 		{
@@ -138,7 +138,7 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 		};
 
 		//Make sure we don't remove keys that aren't part of the set being altered
-		if(action == SetRemove || action == SetRemoveA)
+		if(action == set_remove || action == set_remove_a)
 		{
 			for(const auto& [rhs_k,rhs_v] : getSet(value))
 			{
@@ -165,28 +165,28 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 			{
 				case VAR_SIGIL:
 					if((p_vi->type == '/' || p_vi->type == VAR_SIGIL) &&
-					   (action == SetAdd || action == SetAddA))
+					   (action == set_add || action == set_add_a))
 						p_vi->scope.set<Var>(p_vi->key+k,v);
 					else if(p_vi->type == '/' || p_vi->type == VAR_SIGIL)
 						rk = {p_vi->scope.remove<Var>(k),VAR_SIGIL};
 					break;
 				case DICE_SIGIL:
 					if((p_vi->type == '/' || p_vi->type == DICE_SIGIL) &&
-					   (action == SetAdd || action == SetAddA))
+					   (action == set_add || action == set_add_a))
 						p_vi->scope.set<Dice>(p_vi->key+k,v);
 					else if(p_vi->type == '/' || p_vi->type == DICE_SIGIL)
 						rk = {p_vi->scope.remove<Dice>(k),DICE_SIGIL};
 					break;
 				case WALLET_SIGIL:
 					if((p_vi->type == '/' || p_vi->type == WALLET_SIGIL) &&
-					   (action == SetAdd || action == SetAddA))
+					   (action == set_add || action == set_add_a))
 						p_vi->scope.set<Wallet>(p_vi->key+k,v);
 					else if(p_vi->type == '/' || p_vi->type == WALLET_SIGIL)
 						rk = {p_vi->scope.remove<Wallet>(k),WALLET_SIGIL};
 					break;
 				case CURRENCY_SIGIL:
 					if((p_vi->type == '/' || p_vi->type == CURRENCY_SIGIL) &&
-					   (action == SetAdd || action == SetAddA))
+					   (action == set_add || action == set_add_a))
 						p_vi->scope.set<Currency>(p_vi->key+k,v);
 					else if(p_vi->type == '/' || p_vi->type == CURRENCY_SIGIL)
 						rk = {p_vi->scope.remove<Currency>(k),CURRENCY_SIGIL};
@@ -194,14 +194,14 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 			}
 
 			std::string xref = (p_vi->xref != "" ? "["+p_vi->xref+"]" : "");
-			if(action == SetAddA)
+			if(action == set_add_a)
 				output(info,"Set \"%c%s%c/%s\" to \"%s\"",p_vi->scope.sigil,xref.c_str(),p_vi->evalType,(p_vi->key+k).c_str(),v.c_str());
-			else if(action == SetRemoveA && rk.isRemoved)
+			else if(action == set_remove_a && rk.isRemoved)
 				output(info,"Variable \"%c%s%c/%s\" (value: \"%s\") has been deleted.",p_vi->scope.sigil,xref.c_str(),rk.type,k.c_str(),v.c_str());
 		}
 
-		if (action == SetAdd || action == SetRemove) return getSetStr(*p_vi);
-		else if(action == SetAddA || action == SetRemoveA) p_vi->scope.save();
+		if (action == set_add || action == set_remove) return getSetStr(*p_vi);
+		else if(action == set_add_a || action == set_remove_a) p_vi->scope.save();
 	}
 
 	return ""; // Supress -Wreturn-type
@@ -452,7 +452,7 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 	// If the first arg is a variable and we are assigning it, we'll need to save the result
 	if(lhs_pos == 0 && vi->key != "" &&
 	  (findInVect<std::string>(assignOps,(*v)[op_pos]) > -1 || findInVect<std::string>(unaryOps,(*v)[op_pos]) > -1))
-		(void)doAction(vi, Write, result);
+		(void)doAction(vi, write, result);
 
 	// Replace operators and operands with result
 	if(rhs_pos < UINT_MAX)
@@ -541,7 +541,7 @@ int main(int argc, char** argv)
 			}
 		}
 
-		std::string str = doAction(&vi, Read, "");
+		std::string str = doAction(&vi, read, "");
 		if(str != "") fprintf(stdout,"%s\n",str.c_str());
 	}
 	else if(vi.variable == "" || vi.variable.back() != '/')// Perform operation on variable
@@ -745,13 +745,13 @@ int main(int argc, char** argv)
 		}
 
 		if(!strcasecmp(argv[2],OP_ADD))
-			fprintf(stdout,"%s\n",doAction(&vi, SetAdd, rhs).c_str());
+			fprintf(stdout,"%s\n",doAction(&vi, set_add, rhs).c_str());
 		else if(!strcasecmp(argv[2],OP_ADDA))
-			(void)doAction(&vi, SetAddA, rhs);
+			(void)doAction(&vi, set_add_a, rhs);
 		else if(!strcasecmp(argv[2],OP_SUB))
-			fprintf(stdout,"%s\n",doAction(&vi, SetRemove, rhs).c_str());
+			fprintf(stdout,"%s\n",doAction(&vi, set_remove, rhs).c_str());
 		else if(!strcasecmp(argv[2],OP_SUBA))
-			(void)doAction(&vi, SetRemoveA, rhs);
+			(void)doAction(&vi, set_remove_a, rhs);
 	}
 	return 0;
 }
