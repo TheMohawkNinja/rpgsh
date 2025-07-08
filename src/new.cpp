@@ -5,7 +5,7 @@
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 
-enum newFileScope
+enum NewFileScope
 {
 	character,
 	campaign
@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 	Config cfg = Config();
 	std::string campaign_name;
 	std::string template_name;
-	newFileScope nfs;
+	NewFileScope nfs;
 
 	if(!strcmp(argv[1],"-c"))
 	{
