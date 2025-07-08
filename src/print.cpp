@@ -4,14 +4,6 @@
 #include "../headers/scope.h"
 #include "../headers/text.h"
 
-void printHeader(std::string s)
-{
-	fprintf(stdout,"%s%s %s %s\n",TEXT_GREEN,TEXT_BOLD,s.c_str(),TEXT_NORMAL);
-	fprintf(stdout,"%s",TEXT_WHITE);
-	for(long unsigned int i=0; i<s.length()+2; i++)
-		fprintf(stdout,"─");
-	fprintf(stdout,"%s\n",TEXT_NORMAL);
-}
 template <typename T>
 void getLongestKey(datamap<T> m, unsigned int* p_current_longest_len)
 {

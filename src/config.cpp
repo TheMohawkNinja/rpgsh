@@ -95,7 +95,9 @@ Config::Config()
 	{
 		std::string data;
 		std::getline(fs,data);
-		if(data.length() && data[0] != COMMENT)//TODO: Setup for inline comments
+		if(findu(data,COMMENT) != std::string::npos)
+			data = left(data,findu(data,COMMENT));
+		if(data.length() && data[0] != COMMENT)
 			setting[getConfigItem(data)] = getConfigValue(data);
 	}
 	fs.close();

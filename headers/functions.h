@@ -36,6 +36,8 @@ struct MCStr
 	std::string m, c;
 };
 
+void printHeader(std::string s);
+
 std::string defaultPrompt(Character c);
 
 void output(OutputLevel level, const char* format, ...);
@@ -84,6 +86,7 @@ std::string addSpaces(unsigned int n);
 std::string mergeQuotes(std::string str);
 
 std::string escapeSpaces(std::string str);
+std::string escapeRegexGroupChars(std::string str);
 
 void confirmEnvVariablesFile();
 

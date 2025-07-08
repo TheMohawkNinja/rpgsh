@@ -14,6 +14,15 @@
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 
+void printHeader(std::string s)
+{
+	fprintf(stdout,"%s%s %s %s\n",TEXT_GREEN,TEXT_BOLD,s.c_str(),TEXT_NORMAL);
+	fprintf(stdout,"%s",TEXT_WHITE);
+	for(long unsigned int i=0; i<s.length()+2; i++)
+		fprintf(stdout,"─");
+	fprintf(stdout,"%s\n",TEXT_NORMAL);
+}
+
 std::string defaultPrompt(Character c)
 {
 	return std::string(TEXT_BOLD)+std::string(TEXT_RED)+c.getName()+std::string(TEXT_WHITE)+"> "+std::string(TEXT_NORMAL);
@@ -330,7 +339,10 @@ std::vector<std::string> split(std::string str, char delimiter)
 	while(true)
 	{
 		if(findu(str,delimiter) == std::string::npos)
+		{
+			list.push_back(str);
 			return list;
+		}
 
 		list.push_back(left(str,findu(str,delimiter)));
 		str = right(str,findu(str,delimiter)+1);
@@ -464,6 +476,14 @@ std::string escapeSpaces(std::string str)
 	}
 
 	return ret;
+}
+std::string escapeRegexGroupChars(std::string str)
+{
+	std::vector<std::string> patterns = {"\\[","\\]","\\(","\\)","\\{","\\}"};
+	for(const auto& p : patterns)
+		str = std::regex_replace(str,std::regex(p),p);
+
+	return str;
 }
 
 void confirmEnvVariablesFile()
@@ -770,11 +790,7 @@ int runApp(std::string arg_str, bool redirect_output)
 			output(Error,"%s is not a valid variable string.",match.c_str());
 			return -1;
 		}
-		std::string v_str_it_pattern = match;
-		std::vector<std::string> patterns = {"\\[","\\]","\\(","\\)","\\{","\\}"};
-		for(const auto& p : patterns)
-			v_str_it_pattern = std::regex_replace(v_str_it_pattern,std::regex(p),p);
-		arg_str = std::regex_replace(arg_str,std::regex(v_str_it_pattern),getAppOutput(match).output[0]);
+		arg_str = std::regex_replace(arg_str,std::regex(escapeRegexGroupChars(match)),getAppOutput(match).output[0]);
 	}
 
 	//Get args for program

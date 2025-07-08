@@ -7,16 +7,17 @@
 `rpgsh` is an interactive and extensible shell purpose-built for table-top RPGs like Dungeons and Dragons®, Pathfinder®, and more!
 
 Features include:
-- Tab completion  
+- Tab completion
+
   <img src="tab_completion.gif" width="320" height="180" border="10"/>
-- Get/set/modify variables of differing data types
-- Variable substitution
-- Dice rolling program
+- Four different variable data types: Var, Dice, Currency, and Wallet
+	- Support for common operations with similar and differing data types
 - Templates to allow support for new games to be added easily and by the user
+- Automation via scripting
 
 ## Disclaimer
 
-This project is entirely developed independantly. I am not associated in anyway with Wizards of the Coast, Paizo, or any other game development company. To any lawyers eyeing me up, I will not be adding information that would negate the need for players to puchase your products.
+This project is entirely developed independantly. I am not associated in anyway with Wizards of the Coast, Paizo, or any other game development company.
 
 ## Install
 
@@ -26,8 +27,8 @@ Run `sudo ./install.sh; ./install.sh`
 
 Once the project is installed, run the program with the `rpgsh` command.
 
-**WIP:** See `docs/rpgsh-userguide.pdf` for detailed instructions on how everything works.
+See `docs/rpgsh-userguide.pdf` for detailed instructions on how everything works.
 
-## Programming Third-Party Applications
+## Note To Developers
 
-**TODO:** See `docs/rpgsh-programmingguide.pdf` for full details.
+This project is designed to be modular, with each program acting as its' own standalone binary. Anyone is more than welcome to create their own programs for use with rpgsh.

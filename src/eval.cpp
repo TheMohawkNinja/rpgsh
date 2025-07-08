@@ -397,7 +397,6 @@ std::string parseRHSAndDoOp(std::vector<std::string> v, unsigned int lhs_pos, un
 	// Exceptions to the "return type is always LHS"
 	try
 	{
-		//TODO: Handle exceptions on constructors
 		if(std::is_same_v<TL,Currency> && (left(v[rhs_pos],2) == std::string(1,VAR_SIGIL)+"{" || v[rhs_pos][1] != '{') && Var(v[rhs_pos]).isInt() && v[op_pos] == OP_MUL)
 			return escapeSpaces(std::string(Currency(v[lhs_pos]) * Var(v[rhs_pos])));
 		else if(std::is_same_v<TL,Var> && left(v[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{" && Var(v[lhs_pos]).isInt() && v[op_pos] == OP_MUL)

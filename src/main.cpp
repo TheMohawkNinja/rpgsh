@@ -411,7 +411,9 @@ std::string inputHandler()
 			int slash = findu(chk_str,'/',findu(chk_str,']')+1);
 			int rsqbrkt = findu(chk_str,']');
 			int period = rfindu(chk_str,'.');
-			char type_sigil = chk_str[findu(chk_str,'/',findu(chk_str,']')+1)-1];
+			char type_sigil = '\0';
+			if(findu(chk_str,'/') != std::string::npos)
+				type_sigil = chk_str[findu(chk_str,'/',findu(chk_str,']')+1)-1];
 			std::string key = right(chk_str,findu(chk_str,'/',findu(chk_str,']')+1)+1);
 			if(slash > rsqbrkt && period < slash)//Keys
 			{
@@ -784,6 +786,7 @@ int main()
 		fprintf(stdout,"%s%sTIP: %sType %s%shelp%s for a list of currently supported commands.\n",TEXT_BOLD,TEXT_CYAN,TEXT_NORMAL,TEXT_BOLD,TEXT_GREEN,TEXT_NORMAL);
 		fprintf(stdout,"%s%sTIP: %sFor more info about a given command, try using the %s%s-?%s or %s%s--help%s flags.\n\n",TEXT_BOLD,TEXT_CYAN,TEXT_NORMAL,TEXT_BOLD,TEXT_GREEN,TEXT_NORMAL,TEXT_BOLD,TEXT_GREEN,TEXT_NORMAL);
 	}
+	else fprintf(stdout,"\n");
 
 	while(prompt() == 0);
 
