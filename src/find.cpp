@@ -6,11 +6,11 @@
 const std::string replace = std::string(TEXT_RED)+"$&"+std::string(TEXT_NORMAL);
 enum Option
 {
-	All,
-	Campaigns,
-	Characters,
-	Keys,
-	KeysAndValues
+	all,
+	campaigns,
+	characters,
+	keys,
+	keys_and_values
 };
 
 template <typename T>
@@ -22,12 +22,12 @@ void printMatches(datamap<T> map, std::regex pattern, char sigil, Option opt)
 		std::string v_out = std::string(v);
 
 		k_out = std::regex_replace(k_out,pattern,replace);
-		if(opt == All || opt == KeysAndValues)
+		if(opt == all || opt == keys_and_values)
 			v_out = std::regex_replace(v_out,pattern,replace);
 
-		if(opt == Keys && k_out != k)
+		if(opt == keys && k_out != k)
 			fprintf(stdout,"%c/%s\n",sigil,k_out.c_str());
-		else if((opt == All || opt == KeysAndValues) && (k_out != k || v_out != std::string(v)))
+		else if((opt == all || opt == keys_and_values) && (k_out != k || v_out != std::string(v)))
 			fprintf(stdout,"%c/%s\n\t%s\n",sigil,k_out.c_str(),v_out.c_str());
 	}
 }
@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 	if(argc == 2)
 	{
 		p = std::string(argv[1]);
-		opt = All;
+		opt = all;
 	}
 	else if(argv[1][0] == '-')
 	{
@@ -84,16 +84,16 @@ int main(int argc, char** argv)
 		switch(argv[1][1])
 		{
 			case('m'):
-				opt = Campaigns;
+				opt = campaigns;
 				break;
 			case('c'):
-				opt = Characters;
+				opt = characters;
 				break;
 			case('k'):
-				opt = Keys;
+				opt = keys;
 				break;
 			case('v'):
-				opt = KeysAndValues;
+				opt = keys_and_values;
 				break;
 			default:
 				output(error,"Unknown option \"%s\".",argv[1]);
@@ -116,9 +116,9 @@ int main(int argc, char** argv)
 	Campaign m = Campaign();
 	Shell s = Shell();
 
-	if(opt == All || opt == Campaigns)
+	if(opt == all || opt == campaigns)
 	{
-		printHeader("Campaigns");
+		printHeader("campaigns");
 		std::vector<std::string> campaigns = getDirectoryListing(campaigns_dir);
 		for(const auto& campaign : campaigns)
 		{
@@ -133,9 +133,9 @@ int main(int argc, char** argv)
 		fprintf(stdout,"\n");
 	}
 
-	if(opt == All || opt == Characters)
+	if(opt == all || opt == characters)
 	{
-		printHeader("Characters");
+		printHeader("characters");
 		std::string m_dir = left(m.getDatasource(),rfindu(m.getDatasource(),'/'));
 		std::vector<std::string> characters = getDirectoryListing(m_dir+"/characters");
 		for(const auto& character : characters)
@@ -151,7 +151,7 @@ int main(int argc, char** argv)
 		fprintf(stdout,"\n");
 	}
 
-	if(opt == All || opt == Keys || opt == KeysAndValues)
+	if(opt == all || opt == keys || opt == keys_and_values)
 	{
 		printHeader("Variables");
 		printScopeMatches(s,pattern,opt);
