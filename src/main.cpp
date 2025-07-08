@@ -707,9 +707,13 @@ int prompt()
 		for(unsigned int i=0; i<tmp_buffer.length(); i++)
 			buffer[i]=tmp_buffer[i];
 
+		for(const auto& app : split(cfg.setting[PRE_RUN_APPS],','))
+			if(app.length()) (void)runApp(app.c_str(),false);
 		padding();
 		(void)runApp(buffer,false);
 		padding();
+		for(const auto& app : split(cfg.setting[POST_RUN_APPS],','))
+			if(app.length()) (void)runApp(app.c_str(),false);
 
 		//Handle rpgsh history
 		unsigned long line_count = 0;
@@ -778,7 +782,7 @@ int main()
 	fprintf(stdout,CLEAR_ENTIRE_LINE);//Delete "Generating..." line from start of main()
 
 	for(const auto& app : split(cfg.setting[STARTUP_APPS],','))
-		(void)runApp(app.c_str(),false);
+		if(app.length()) (void)runApp(app.c_str(),false);
 
 	if(!stob(cfg.setting[HIDE_TIPS]))
 	{

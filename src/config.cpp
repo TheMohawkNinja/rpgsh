@@ -50,9 +50,10 @@ Config::Config()
 	setting[DEFAULT_GAME]	=	"dnd5e";
 	setting[HIDE_TIPS]	=	"false";
 	setting[HISTORY_LENGTH]	=	"100";
-	setting[ALIASES]	=	"?::help::-::del";
+	setting[ALIASES]	=	"cp::copy::-::del::ls::list::?::help::ver::version";
 	setting[STARTUP_APPS]	=	"banner,version";
-	setting[POST_RUN_APPS]	=	"";
+	setting[PRE_RUN_APPS]	=	"";
+	setting[POST_RUN_APPS]	=	"autorun";
 
 	// Create default config file if one does not exist
 	if(!std::filesystem::exists(config_path.c_str()))
@@ -85,9 +86,13 @@ Config::Config()
 		fs<<COMMENT<<" Default: "<<setting[STARTUP_APPS]<<"\n";
 		fs<<STARTUP_APPS<<"="<<setting[STARTUP_APPS]<<"\n";
 		fs<<"\n";
+		fs<<COMMENT<<" Comma-delimited list of programs to run before a command is entered into the prompt.\n";
+		fs<<COMMENT<<" Default: "<<setting[PRE_RUN_APPS]<<"\n";
+		fs<<PRE_RUN_APPS<<"="<<setting[PRE_RUN_APPS]<<"\n";
+		fs<<"\n";
 		fs<<COMMENT<<" Comma-delimited list of programs to run after a command is entered into the prompt.\n";
 		fs<<COMMENT<<" Default: "<<setting[POST_RUN_APPS]<<"\n";
-		fs<<STARTUP_APPS<<"="<<setting[POST_RUN_APPS]<<"\n";
+		fs<<POST_RUN_APPS<<"="<<setting[POST_RUN_APPS]<<"\n";
 		fs.close();
 	}
 	std::ifstream fs(config_path.c_str());
