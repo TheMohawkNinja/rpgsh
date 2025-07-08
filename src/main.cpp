@@ -711,9 +711,9 @@ int prompt()
 			if(app.length()) (void)runApp(app.c_str(),false);
 		padding();
 		(void)runApp(buffer,false);
-		padding();
 		for(const auto& app : split(cfg.setting[POST_RUN_APPS],','))
 			if(app.length()) (void)runApp(app.c_str(),false);
+		padding();
 
 		//Handle rpgsh history
 		unsigned long line_count = 0;
