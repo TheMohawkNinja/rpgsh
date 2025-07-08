@@ -641,7 +641,7 @@ int main(int argc, char** argv)
 		// PEMDAS
 		for(int start=0; start<args_size-1; start++)
 		{
-			if(findu(args[start],'(') != std::string::npos)
+			if((long unsigned int)start < args.size() && findu(args[start],'(') != std::string::npos)
 			{
 				for(int end=start; end<args_size; end++)
 				{
