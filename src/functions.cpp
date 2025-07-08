@@ -38,17 +38,17 @@ void output(OutputLevel level, const char* format, ...)
 
 	switch(level)
 	{
-		case Info:
+		case info:
 			stream = stdout;
 			prefix = "%s%s[%sINFO%s]%s    ";
 			color = TEXT_CYAN;
 			break;
-		case Warning:
+		case warning:
 			stream = stderr;
 			prefix = "%s%s[%sWARNING%s]%s ";
 			color = TEXT_YELLOW;
 			break;
-		case Error:
+		case error:
 			stream = stderr;
 			prefix = "%s%s[%sERROR%s]%s   ";
 			color = TEXT_RED;
