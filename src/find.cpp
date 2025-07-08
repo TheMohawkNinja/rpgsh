@@ -42,11 +42,11 @@ int main(int argc, char** argv)
 {
 	if(argc == 1)
 	{
-		output(Error,"No pattern or options specified.");
+		output(error,"No pattern or options specified.");
 		exit(-1);
 	}
 	if(argc > 3)
-		output(Warning,"find only expects 1 or 2 arguments, ignoring all other arguments.");
+		output(warning,"find only expects 1 or 2 arguments, ignoring all other arguments.");
 
 	chkFlagAppDesc(argv,"Searches campaigns, characters, keys, and values for matches to a pattern, case-insensitive.");
 	chkFlagModifyVariables(argv,true);
@@ -77,7 +77,7 @@ int main(int argc, char** argv)
 	{
 		if(!argv[1][1])
 		{
-			output(Error,"Unknown option \"%s\".",argv[1]);
+			output(error,"Unknown option \"%s\".",argv[1]);
 			exit(-1);
 		}
 		p = std::string(argv[2]);
@@ -96,7 +96,7 @@ int main(int argc, char** argv)
 				opt = KeysAndValues;
 				break;
 			default:
-				output(Error,"Unknown option \"%s\".",argv[1]);
+				output(error,"Unknown option \"%s\".",argv[1]);
 				exit(-1);
 		}
 	}
@@ -108,7 +108,7 @@ int main(int argc, char** argv)
 	}
 	catch(...)
 	{
-		output(Error,"\"%s\" is not a valid regular expression.",p.c_str());
+		output(error,"\"%s\" is not a valid regular expression.",p.c_str());
 		exit(-1);
 	}
 

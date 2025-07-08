@@ -6,11 +6,11 @@ int main(int argc, char** argv)
 {
 	if(argc == 1)
 	{
-		output(Error,"copy expects at least 1 argument.");
+		output(error,"copy expects at least 1 argument.");
 		exit(-1);
 	}
 	if(argc > 5)
-		output(Warning,"copy expects no more than 5 arguments, ignoring all other arguments");
+		output(warning,"copy expects no more than 5 arguments, ignoring all other arguments");
 
 	chkFlagAppDesc(argv,"Copies a character or campaign, appending an incrementing number to each copy.");
 	chkFlagModifyVariables(argv,true);
@@ -35,12 +35,12 @@ int main(int argc, char** argv)
 	{
 		if((!strcmp(argv[i],"-c") || !strcmp(argv[i],"-m") || !strcmp(argv[i],"-n")) && (i == argc-1 || argv[i+1][0] == '-'))
 		{
-			output(Error,"Missing argument for \"%s\".",argv[i]);
+			output(error,"Missing argument for \"%s\".",argv[i]);
 			return -1;
 		}
 		else if(argv[i][0] == '-' && (argv[i][1] != 'c' && argv[i][1] != 'm' && argv[i][1] != 'n'))
 		{
-			output(Error,"Unknown option \"%s\".",argv[i]);
+			output(error,"Unknown option \"%s\".",argv[i]);
 			return -1;
 		}
 		else if(!strcmp(argv[i],"-c"))
@@ -87,7 +87,7 @@ int main(int argc, char** argv)
 				}
 				if(!campaign_exists)
 				{
-					output(Error,"Source campaign \"%s\" does not exist.",src_mc.m.c_str());
+					output(error,"Source campaign \"%s\" does not exist.",src_mc.m.c_str());
 					return -1;
 				}
 			}
@@ -101,7 +101,7 @@ int main(int argc, char** argv)
 				}
 				if(!campaign_exists)
 				{
-					output(Error,"Source campaign \"%s\" does not exist.",dst_mc.m.c_str());
+					output(error,"Source campaign \"%s\" does not exist.",dst_mc.m.c_str());
 					return -1;
 				}
 			}
@@ -115,7 +115,7 @@ int main(int argc, char** argv)
 			}
 			if(!character_exists)
 			{
-				output(Error,"Character \"%s\" does not exist to be copied.",src.c_str());
+				output(error,"Character \"%s\" does not exist to be copied.",src.c_str());
 				return -1;
 			}
 
@@ -150,7 +150,7 @@ int main(int argc, char** argv)
 			}
 			if(!campaign_exists)
 			{
-				output(Error,"Campaign \"%s\" does not exist to be copied.",src.c_str());
+				output(error,"Campaign \"%s\" does not exist to be copied.",src.c_str());
 				return -1;
 			}
 		}
@@ -158,7 +158,7 @@ int main(int argc, char** argv)
 		{
 			if(!Var(argv[i+1]).isInt())
 			{
-				output(Error,"Number of copies specified is not a number.");
+				output(error,"Number of copies specified is not a number.");
 				return -1;
 			}
 			copies = atoi(argv[i+1]);
@@ -167,7 +167,7 @@ int main(int argc, char** argv)
 
 	if(!copy_c && !copy_m)
 	{
-		output(Error,"Expected \"-c\" or \"-m\".");
+		output(error,"Expected \"-c\" or \"-m\".");
 		return -1;
 	}
 
@@ -186,7 +186,7 @@ int main(int argc, char** argv)
 		}
 		catch(...)//Should only trigger if the number is >INT_MAX, but doesn't hurt to catch other issues
 		{
-			output(Error,"Unable to get starting copy index.");
+			output(error,"Unable to get starting copy index.");
 			return -1;
 		}
 	}
@@ -195,13 +195,13 @@ int main(int argc, char** argv)
 	if(copy_c && (src_mc.m != dst_mc.m || src_mc.c != dst_mc.c) && copies == 1)
 	{
 		std::filesystem::copy(src_character_path,left(dst_character_path,dst_character_path.length()-5)+c_ext);
-		output(Info,"Character \"%s\" has been created.",dst.c_str());
+		output(info,"Character \"%s\" has been created.",dst.c_str());
 		return 0;
 	}
 	if(copy_m && src != dst && copies == 1)
 	{
 		std::filesystem::copy(src_campaign_path,dst_campaign_path,std::filesystem::copy_options::recursive);
-		output(Info,"Campaign \"%s\" has been created.",dst.c_str());
+		output(info,"Campaign \"%s\" has been created.",dst.c_str());
 		return 0;
 	}
 
@@ -211,12 +211,12 @@ int main(int argc, char** argv)
 		if(copy_c)
 		{
 			std::filesystem::copy(src_character_path,left(dst_character_path,dst_character_path.length()-5)+copy_num+c_ext);
-			output(Info,"Character \"%s\" has been created.",(dst+copy_num).c_str());
+			output(info,"Character \"%s\" has been created.",(dst+copy_num).c_str());
 		}
 		else if(copy_m)
 		{
 			std::filesystem::copy(src_campaign_path,dst_campaign_path+copy_num,std::filesystem::copy_options::recursive);
-			output(Info,"Campaign \"%s\" has been created.",(dst+copy_num).c_str());
+			output(info,"Campaign \"%s\" has been created.",(dst+copy_num).c_str());
 		}
 	}
 

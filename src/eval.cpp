@@ -44,7 +44,7 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 	{
 		if(p_vi->type != '/' && !isTypeSigil(p_vi->type))
 		{
-			output(Error,"Unknown type specifier \'%c\' in \"%s\"",p_vi->type,p_vi->variable.c_str());
+			output(error,"Unknown type specifier \'%c\' in \"%s\"",p_vi->type,p_vi->variable.c_str());
 			exit(-1);
 		}
 
@@ -151,7 +151,7 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 				}
 				if(!keyFound)
 				{
-					output(Error,"\"%s\" is not contained within the LHS set.",rhs_k.c_str());
+					output(error,"\"%s\" is not contained within the LHS set.",rhs_k.c_str());
 					exit(-1);
 				}
 			}
@@ -195,9 +195,9 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 
 			std::string xref = (p_vi->xref != "" ? "["+p_vi->xref+"]" : "");
 			if(action == SetAddA)
-				output(Info,"Set \"%c%s%c/%s\" to \"%s\"",p_vi->scope.sigil,xref.c_str(),p_vi->evalType,(p_vi->key+k).c_str(),v.c_str());
+				output(info,"Set \"%c%s%c/%s\" to \"%s\"",p_vi->scope.sigil,xref.c_str(),p_vi->evalType,(p_vi->key+k).c_str(),v.c_str());
 			else if(action == SetRemoveA && rk.isRemoved)
-				output(Info,"Variable \"%c%s%c/%s\" (value: \"%s\") has been deleted.",p_vi->scope.sigil,xref.c_str(),rk.type,k.c_str(),v.c_str());
+				output(info,"Variable \"%c%s%c/%s\" (value: \"%s\") has been deleted.",p_vi->scope.sigil,xref.c_str(),rk.type,k.c_str(),v.c_str());
 		}
 
 		if (action == SetAdd || action == SetRemove) return getSetStr(*p_vi);
@@ -350,9 +350,9 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 		catch(const std::runtime_error& e)
 		{
 			if(e.what() == std::string(E_INVALID_EXPLICIT_CONSTRUCTOR))
-				output(Error,"Invalid LHS explicit constructor: \"%s\"",lhs.c_str());
+				output(error,"Invalid LHS explicit constructor: \"%s\"",lhs.c_str());
 			else
-				output(Error,"Error constructing LHS: %s",e.what());
+				output(error,"Error constructing LHS: %s",e.what());
 		}
 		if(rhs != "")
 		{
@@ -360,9 +360,9 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 			catch(const std::runtime_error& e)
 			{
 				if(e.what() == std::string(E_INVALID_EXPLICIT_CONSTRUCTOR))
-					output(Error,"Invalid RHS explicit constructor: \"%s\"",rhs.c_str());
+					output(error,"Invalid RHS explicit constructor: \"%s\"",rhs.c_str());
 				else
-					output(Error,"Error constructing RHS: %s",e.what());
+					output(error,"Error constructing RHS: %s",e.what());
 			}
 		}
 		try
@@ -375,13 +375,13 @@ std::string getResult(std::string lhs, std::string op, std::string rhs)
 		catch(const std::runtime_error& e)
 		{
 			if(e.what() == std::string(E_INVALID_OPERATION))
-				output(Error,"Invalid operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
+				output(error,"Invalid operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
 			else if(e.what() == std::string(E_UNKNOWN_OPERATION))
-				output(Error,"Unknown operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
+				output(error,"Unknown operation: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
 			else if(e.what() == std::string(E_INSUFFICIENT_FUNDS))
-				output(Error,"Insufficient funds: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
+				output(error,"Insufficient funds: \"%s %s %s\"",lhs.c_str(),op.c_str(),rhs.c_str());
 			else
-				output(Error,"Error during operation: \"%s %s %s\" (%s)",lhs.c_str(),op.c_str(),rhs.c_str(),e.what());
+				output(error,"Error during operation: \"%s %s %s\" (%s)",lhs.c_str(),op.c_str(),rhs.c_str(),e.what());
 
 			exit(-1);
 		}
@@ -409,9 +409,9 @@ std::string parseRHSAndDoOp(std::vector<std::string> v, unsigned int lhs_pos, un
 	catch(const std::runtime_error& e)
 	{
 		if(e.what() == std::string(E_INVALID_EXPLICIT_CONSTRUCTOR))
-			output(Error,"Invalid RHS explicit constructor: %s\n",v[rhs_pos].c_str());
+			output(error,"Invalid RHS explicit constructor: %s\n",v[rhs_pos].c_str());
 		else
-			output(Error,"Error during operation: \"%s %s %s\" (%s)",v[lhs_pos].c_str(),v[op_pos].c_str(),v[rhs_pos].c_str(),e.what());
+			output(error,"Error during operation: \"%s %s %s\" (%s)",v[lhs_pos].c_str(),v[op_pos].c_str(),v[rhs_pos].c_str(),e.what());
 
 		exit(-1);
 	}
@@ -481,7 +481,7 @@ int main(int argc, char** argv)
 
 	if(argc == 1)
 	{
-		output(Error,"eval expects at least one argument.");
+		output(error,"eval expects at least one argument.");
 		return -1;
 	}
 
@@ -507,7 +507,7 @@ int main(int argc, char** argv)
 	if(!looksLikeVariable(std::string(argv[1])) && argv[2] &&
 	   findInVect<std::string>(assignOps,std::string(argv[2])) != -1)
 	{
-		output(Error,"Values cannot be assigned to constants.");
+		output(error,"Values cannot be assigned to constants.");
 		return -1;
 	}
 
@@ -535,7 +535,7 @@ int main(int argc, char** argv)
 				if(!strcmp(e.what(),E_INVALID_EXPLICIT_CONSTRUCTOR))
 					fprintf(stdout,"%s\n",Var(argv[1]).c_str());
 				else
-					output(Error,"An error occured while attempting to see if %s was a valid Dice constructor: %s",argv[1],e.what());
+					output(error,"An error occured while attempting to see if %s was a valid Dice constructor: %s",argv[1],e.what());
 
 				return 0;
 			}
@@ -625,12 +625,12 @@ int main(int argc, char** argv)
 
 		if(open_paren_ctr > close_paren_ctr)
 		{
-			output(Error,"Missing close parenthesis to match open parenthesis.");
+			output(error,"Missing close parenthesis to match open parenthesis.");
 			return -1;
 		}
 		else if(open_paren_ctr < close_paren_ctr)
 		{
-			output(Error,"Missing open parenthesis to match close parenthesis.");
+			output(error,"Missing open parenthesis to match close parenthesis.");
 			return -1;
 		}
 
@@ -672,7 +672,7 @@ int main(int argc, char** argv)
 						}
 						else if(op_pos == INT_MAX)
 						{
-							output(Error,"Unknown operator \"%s\"",args[start+1].c_str());
+							output(error,"Unknown operator \"%s\"",args[start+1].c_str());
 							return -1;
 						}
 
@@ -716,13 +716,13 @@ int main(int argc, char** argv)
 		std::string xref = (vi.xref != "" ? "["+vi.xref+"]" : "");
 		std::string p = vi.property;
 		if(old_value == "")
-			output(Info,"%c%s%c/%s has been initialized to %s",
+			output(info,"%c%s%c/%s has been initialized to %s",
 			       vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str(),new_value.c_str());
 		else if(old_value != new_value)
-			output(Info,"%c%s%c/%s%s has changed from %s to %s",
+			output(info,"%c%s%c/%s%s has changed from %s to %s",
 			       vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str(),(p == "" ? "" : "."+p).c_str(),old_value.c_str(),new_value.c_str());
 		else
-			output(Info,"%c%s%c/%s%s is unchanged, current value: %s",
+			output(info,"%c%s%c/%s%s is unchanged, current value: %s",
 			       vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str(),(p == "" ? "" : "."+p).c_str(),old_value.c_str());
 	}
 	else// Perform operation on set
@@ -731,7 +731,7 @@ int main(int argc, char** argv)
 		   (strcasecmp(argv[2],OP_ADD) && strcasecmp(argv[2],OP_SUB) &&
 		    strcasecmp(argv[2],OP_ADDA) && strcasecmp(argv[2],OP_SUBA)))
 		{
-			output(Error,"Variable set modification only supports the following operators: %s, %s, %s, %s",
+			output(error,"Variable set modification only supports the following operators: %s, %s, %s, %s",
 			       OP_ADD,OP_SUB,OP_ADDA,OP_SUBA);
 			return -1;
 		}
@@ -740,7 +740,7 @@ int main(int argc, char** argv)
 
 		if(!looksLikeSet(rhs))
 		{
-			output(Error,"Variable set modifications can only be performed with other variable sets.");
+			output(error,"Variable set modifications can only be performed with other variable sets.");
 			return -1;
 		}
 

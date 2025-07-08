@@ -663,13 +663,13 @@ int prompt()
 	{
 		if(!backup)
 		{
-			output(Warning,"Error while displaying prompt. One or more character attributes is not a valid integer. Attempting to load backup.");
+			output(warning,"Error while displaying prompt. One or more character attributes is not a valid integer. Attempting to load backup.");
 			backup = true;
 			goto prompt;
 		}
 		else
 		{
-			output(Error,"Loading from backup was unsuccessful. Manual intervention required to restore file.\n\nGood luck.\n");
+			output(error,"Loading from backup was unsuccessful. Manual intervention required to restore file.\n\nGood luck.\n");
 			exit(-1);
 		}
 	}
@@ -684,7 +684,7 @@ int prompt()
 	if(in.length() > MAX_BUFFER_SIZE)
 	{
 		fprintf(stdout,"\n\n");
-		output(Error,"Input too big (%llu characters)! Please enter <= %lu characters.",in.length(),MAX_BUFFER_SIZE);
+		output(error,"Input too big (%llu characters)! Please enter <= %lu characters.",in.length(),MAX_BUFFER_SIZE);
 		strcpy(buffer,"");
 	}
 	else
@@ -733,7 +733,7 @@ int prompt()
 		}
 		catch(...)
 		{
-			output(Error,"Invalid value for \"%s\" setting: %s\n",HISTORY_LENGTH,cfg.setting[HISTORY_LENGTH].c_str());
+			output(error,"Invalid value for \"%s\" setting: %s\n",HISTORY_LENGTH,cfg.setting[HISTORY_LENGTH].c_str());
 			exit(-1);
 		}
 

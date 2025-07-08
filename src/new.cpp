@@ -7,8 +7,8 @@
 
 enum newFileScope
 {
-	CHARACTER,
-	CAMPAIGN
+	character,
+	campaign
 };
 
 template<typename T>
@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 {
 	if(argc == 1)
 	{
-		output(Error,"New expects at least one argument.");
+		output(error,"New expects at least one argument.");
 		return -1;
 	}
 
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
 		else
 			template_name = std::string(argv[2]);
 
-		nfs = CHARACTER;
+		nfs = character;
 	}
 	else if(!strcmp(argv[1],"-m"))
 	{
@@ -90,15 +90,15 @@ int main(int argc, char** argv)
 			campaign_name = std::string(argv[2]);
 		}
 
-		nfs = CAMPAIGN;
+		nfs = campaign;
 	}
 	else if(argv[1][0] == '-')
 	{
-		output(Error,"Unknown option \"%s\"\n",argv[1]);
+		output(error,"Unknown option \"%s\"\n",argv[1]);
 		return -1;
 	}
 
-	if(nfs == CHARACTER)
+	if(nfs == character)
 	{
 		bool exists = false;
 		for(const auto& file : getDirectoryListing(templates_dir))
@@ -112,7 +112,7 @@ int main(int argc, char** argv)
 		}
 		if(!exists)
 		{
-			output(Error,"Template file \"%s\" does not exist.",template_name.c_str());
+			output(error,"Template file \"%s\" does not exist.",template_name.c_str());
 			return -1;
 		}
 
@@ -122,7 +122,7 @@ int main(int argc, char** argv)
 		fillCharacterSheet<Dice>(&c);
 		fillCharacterSheet<Wallet>(&c);
 		fillCharacterSheet<Currency>(&c);
-		c.setDatasource(campaigns_dir+getEnvVariable(ENV_CURRENT_CAMPAIGN)+"characters/"+c.getProperty<Var>(c.getName(),"Value")+c_ext);
+		c.setDatasource(campaigns_dir+getEnvVariable(ENV_CURRENT_campaign)+"characters/"+c.getProperty<Var>(c.getName(),"Value")+c_ext);
 		if(std::filesystem::exists(c.getDatasource()))
 		{
 			fprintf(stdout,"Character file \"%s\" exists, do you want to overwrite? (y/N): ",c.getDatasource().c_str());
@@ -130,7 +130,7 @@ int main(int argc, char** argv)
 			fprintf(stdout,"\n");
 		}
 		c.save();
-		output(Info,"Character \"%s\" has been created.",c.getName().c_str());
+		output(info,"Character \"%s\" has been created.",c.getName().c_str());
 	}
 	else
 	{
@@ -156,7 +156,7 @@ int main(int argc, char** argv)
 			ofs.close();
 			Campaign m = Campaign(campaign_variables_file);
 			m.save();
-			output(Info,"Campaign \"%s\" has been created.",campaign_name.c_str());
+			output(info,"Campaign \"%s\" has been created.",campaign_name.c_str());
 		}
 	}
 

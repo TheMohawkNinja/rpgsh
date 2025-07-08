@@ -7,7 +7,7 @@
 int main(int argc, char** argv)
 {
 	if(argc > 2)
-		output(Warning,"version only expects 0 or 1 arguments, ignoring all other arguments.");
+		output(warning,"version only expects 0 or 1 arguments, ignoring all other arguments.");
 
 	chkFlagAppDesc(argv,"Prints version information.");
 	chkFlagModifyVariables(argv,false);
@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 	else if(argv[1] && !strcmp(argv[1],"-v"))
 		fprintf(stdout,"%d.%d.%d\n",MAJOR_VERSION,MINOR_VERSION,PATCH_VERSION);
 	else if(argv[1])
-		output(Error,"Unknown option: %s\n",argv[1]);
+		output(error,"Unknown option: %s\n",argv[1]);
 	else
 		fprintf(stdout,"Version %d.%d.%d\n",MAJOR_VERSION,MINOR_VERSION,PATCH_VERSION);
 

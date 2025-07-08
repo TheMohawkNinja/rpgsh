@@ -9,7 +9,7 @@
 int main(int argc, char** argv)
 {
 	if(argc > 2)
-		output(Warning,"edit only expects 0 or 1 arguments, ignoring all other arguments.");
+		output(warning,"edit only expects 0 or 1 arguments, ignoring all other arguments.");
 
 	chkFlagAppDesc(argv,"Barebones WYSIWYG text editor for variables. Useful for long and/or heavily formatted text.");
 	chkFlagModifyVariables(argv,true);
@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 
 		if(vi.property != "")
 		{
-			output(Error,"Edit cannot be used to modify properties");
+			output(error,"Edit cannot be used to modify properties");
 			return -1;
 		}
 
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
 		{
 			if(ch < 0 && !warned)
 			{
-				output(Warning,"Non-ASCII character detected, edit may not function properly.\n");
+				output(warning,"Non-ASCII character detected, edit may not function properly.\n");
 				warned = true;
 			}
 			input.push_back(ch);
@@ -82,7 +82,7 @@ int main(int argc, char** argv)
 	}
 	else
 	{
-		output(Error,"Edit expects either a variable or help flags for an argument.");
+		output(error,"Edit expects either a variable or help flags for an argument.");
 		return -1;
 	}
 	bool insert_mode = false;

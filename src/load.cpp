@@ -6,7 +6,7 @@ int main(int argc, char** argv)
 {
 	if(argc == 1)
 	{
-		output(Error,"Load expects at least one argument.");
+		output(error,"Load expects at least one argument.");
 		return -1;
 	}
 
@@ -26,17 +26,17 @@ int main(int argc, char** argv)
 
 	if(!strcmp(argv[1],"-c") && argc == 2)
 	{
-		output(Error,"Missing character name.");
+		output(error,"Missing character name.");
 		return -1;
 	}
 	else if(!strcmp(argv[1],"-m") && argc == 2)
 	{
-		output(Error,"Missing campaign name.");
+		output(error,"Missing campaign name.");
 		return -1;
 	}
 	else if(argc == 2)
 	{
-		output(Error,"Unknown option \"%s\"",argv[1]);
+		output(error,"Unknown option \"%s\"",argv[1]);
 		return -1;
 	}
 
@@ -45,35 +45,35 @@ int main(int argc, char** argv)
 	if(mc.m != "" &&
 		(!std::filesystem::exists(campaigns_dir+mc.m) || (std::filesystem::exists(campaigns_dir+mc.m) && !std::filesystem::is_directory(campaigns_dir+mc.m))))
 	{
-		output(Error,"Campaign \"%s\" does not exist.",mc.m.c_str());
+		output(error,"Campaign \"%s\" does not exist.",mc.m.c_str());
 		return -1;
 	}
 	else if(!strcmp(argv[1],"-c") && mc.c != "" && mc.m == "" &&
 		!std::filesystem::exists(campaigns_dir+getEnvVariable(ENV_CURRENT_CAMPAIGN)+"/characters/"+mc.c+c_ext))
 	{
-		output(Error,"Character \"%s\" does not exist in this campaign.",mc.c.c_str());
+		output(error,"Character \"%s\" does not exist in this campaign.",mc.c.c_str());
 		return -1;
 	}
 	else if(mc.c != "" && mc.m != "" && !std::filesystem::exists(campaigns_dir+mc.m+"/characters/"+mc.c+c_ext))
 	{
-		output(Error,"Character \"%s\" does not exist in the \"%s\" camapign.",mc.c.c_str(),mc.m.c_str());
+		output(error,"Character \"%s\" does not exist in the \"%s\" camapign.",mc.c.c_str(),mc.m.c_str());
 		return -1;
 	}
 
 	if(mc.m != "")
 	{
 		setEnvVariable(ENV_CURRENT_CAMPAIGN,mc.m+"/");
-		output(Info,"Loaded campaign \"%s\".",mc.m.c_str());
+		output(info,"Loaded campaign \"%s\".",mc.m.c_str());
 	}
 	else if(!strcmp(argv[1],"-m"))
 	{
 		setEnvVariable(ENV_CURRENT_CAMPAIGN,std::string(argv[2])+"/");
-		output(Info,"Loaded campaign \"%s\".",argv[2]);
+		output(info,"Loaded campaign \"%s\".",argv[2]);
 	}
 	if(!strcmp(argv[1],"-c") && mc.c != "")
 	{
 		setEnvVariable(ENV_CURRENT_CHARACTER,mc.c);
-		output(Info,"Loaded character \"%s\".",mc.c.c_str());
+		output(info,"Loaded character \"%s\".",mc.c.c_str());
 	}
 
 	return 0;

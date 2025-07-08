@@ -490,7 +490,7 @@ void confirmEnvVariablesFile()
 {
 	if(std::filesystem::exists(rpgsh_env_variables_path.c_str())) return;
 
-	output(Info,"Environment variables file not found, creating file at \"%s\".",rpgsh_env_variables_path.c_str());
+	output(info,"Environment variables file not found, creating file at \"%s\".",rpgsh_env_variables_path.c_str());
 	std::ofstream ofs(rpgsh_env_variables_path.c_str());
 	ofs.close();
 
@@ -505,7 +505,7 @@ void confirmShellVariablesFile()
 {
 	if(std::filesystem::exists(shell_variables_path.c_str())) return;
 
-	output(Info,"Shell variables file not found, creating file at \"%s\".",shell_variables_path.c_str());
+	output(info,"Shell variables file not found, creating file at \"%s\".",shell_variables_path.c_str());
 	std::ofstream ofs(shell_variables_path.c_str());
 	ofs.close();
 }
@@ -518,7 +518,7 @@ void confirmCampaignVariablesFile()
 
 	if(std::filesystem::exists(campaign_variables_file.c_str())) return;
 
-	output(Info,"Campaign variables file not found, creating file at \'%s\'.",campaign_variables_file.c_str());
+	output(info,"Campaign variables file not found, creating file at \'%s\'.",campaign_variables_file.c_str());
 	std::ofstream ofs(campaign_variables_file.c_str());
 	ofs.close();
 }
@@ -527,7 +527,7 @@ void confirmHistoryFile()
 {
 	if(std::filesystem::exists(history_path.c_str())) return;
 
-	output(Info,"rpgsh history file not found, creating file at \"%s\".",history_path.c_str());
+	output(info,"rpgsh history file not found, creating file at \"%s\".",history_path.c_str());
 	std::ofstream ofs(history_path.c_str());
 	ofs.close();
 }
@@ -536,12 +536,12 @@ std::vector<std::string> getDirectoryListing(std::string path)
 {
 	if(!std::filesystem::exists(path))
 	{
-		output(Error,"Directory \"%s\" does not exist.",path.c_str());
+		output(error,"Directory \"%s\" does not exist.",path.c_str());
 		exit(-1);
 	}
 	else if(!std::filesystem::is_directory(path))
 	{
-		output(Error,"\"%s\" is not a directory.",path.c_str());
+		output(error,"\"%s\" is not a directory.",path.c_str());
 		exit(-1);
 	}
 
@@ -564,7 +564,7 @@ std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir
 			std::filesystem::is_regular_file(chk_dir+entry))
 			return entry;
 	}
-	output(Error,"Invalid xref \"%s\".",xref.c_str());
+	output(error,"Invalid xref \"%s\".",xref.c_str());
 	exit(-1);
 }
 void loadXRef(std::string* arg, VariableInfo* p_vi)
@@ -572,7 +572,7 @@ void loadXRef(std::string* arg, VariableInfo* p_vi)
 	// Ending square bracket not found
 	if(findu(*arg,']') == std::string::npos)
 	{
-		output(Error,"No terminating \']\' found for xref.");
+		output(error,"No terminating \']\' found for xref.");
 		exit(-1);
 	}
 
@@ -609,7 +609,7 @@ void loadXRef(std::string* arg, VariableInfo* p_vi)
 			p_vi->scope.load();
 			break;
 		case SHELL_SIGIL:
-			output(Error,"Cannot use xref with shell scope.");
+			output(error,"Cannot use xref with shell scope.");
 			exit(-1);
 	}
 
@@ -633,7 +633,7 @@ VariableInfo parseVariable(std::string v)
 			vi.scope = Shell();
 			break;
 		default:
-			output(Error,"Unknown scope sigil \'%c\'.",v[0]);
+			output(error,"Unknown scope sigil \'%c\'.",v[0]);
 			exit(-1);
 	}
 
@@ -643,7 +643,7 @@ VariableInfo parseVariable(std::string v)
 	// Check type sigil
 	if(!isTypeSigil(v[1]) && v[1] != '/')
 	{
-		output(Error,"Unknown type sigil \'%c\'.",v[1]);
+		output(error,"Unknown type sigil \'%c\'.",v[1]);
 		exit(-1);
 	}
 
@@ -707,7 +707,7 @@ void padding()
 	}
 	catch(...)
 	{
-		output(Error,"Invalid value \"%s\" for \"%s\".",config.setting[PADDING].c_str(),PADDING);
+		output(error,"Invalid value \"%s\" for \"%s\".",config.setting[PADDING].c_str(),PADDING);
 		exit(-1);
 	}
 }
@@ -787,7 +787,7 @@ int runApp(std::string arg_str, bool redirect_output)
 	{
 		if(runApp(match,true))
 		{
-			output(Error,"%s is not a valid variable string.",match.c_str());
+			output(error,"%s is not a valid variable string.",match.c_str());
 			return -1;
 		}
 		arg_str = std::regex_replace(arg_str,std::regex(escapeRegexGroupChars(match)),getAppOutput(match).output[0]);
@@ -887,13 +887,13 @@ int runApp(std::string arg_str, bool redirect_output)
 		//https://unix.stackexchange.com/questions/252901/get-output-of-posix-spawn
 
 		if(posix_spawn_file_actions_init(&fa))
-			output(Error,"Error code %d during posix_spawn_file_actions_init(): %s",status,strerror(status));
+			output(error,"Error code %d during posix_spawn_file_actions_init(): %s",status,strerror(status));
 
 		if(posix_spawn_file_actions_addopen(&fa, 1, rpgsh_output_redirect_path, O_CREAT | O_TRUNC | O_WRONLY, 0644))
-			output(Error,"Error code %d during posix_spawn_file_actions_addopen(): %s",status,strerror(status));
+			output(error,"Error code %d during posix_spawn_file_actions_addopen(): %s",status,strerror(status));
 
 		if(posix_spawn_file_actions_adddup2(&fa, 1, 2))
-			output(Error,"Error code %d during posix_spawn_file_actions_adddup2(): %s",status,strerror(status));
+			output(error,"Error code %d during posix_spawn_file_actions_adddup2(): %s",status,strerror(status));
 
 		status = posix_spawn(&pid, argv[0], &fa, NULL, &argv[0], environ);
 	}
@@ -916,16 +916,16 @@ int runApp(std::string arg_str, bool redirect_output)
 		std::string displayed_command = std::string(argv[0]).substr(prefix.length()+path.length(),
 							    std::string(argv[0]).length()-prefix.length()-path.length());
 		if(status == 2)//File not found
-			output(Error,"Error code %d while attempting to run \"%s\": Not a valid rpgsh command.",status,displayed_command.c_str());
+			output(error,"Error code %d while attempting to run \"%s\": Not a valid rpgsh command.",status,displayed_command.c_str());
 		else
-			output(Error,"Error code %d while attempting to run \"%s\": %s",status,displayed_command.c_str(),strerror(status));
+			output(error,"Error code %d while attempting to run \"%s\": %s",status,displayed_command.c_str(),strerror(status));
 
 		return status;
 	}
 
 	if(redirect_output && posix_spawn_file_actions_destroy(&fa))
 	{
-		output(Error,"Error code %d during posix_spawn_file_actions_destroy(): %s",status,strerror(status));
+		output(error,"Error code %d during posix_spawn_file_actions_destroy(): %s",status,strerror(status));
 
 		return status;
 	}
@@ -1111,7 +1111,7 @@ std::string getSetStr(VariableInfo vi)
 			appendMap<Wallet>(vi.scope,&w_map);
 			break;
 		default:
-			output(Error,"Unknown type specifier \'%c\' in \"%s\"",vi.variable[1],vi.variable.c_str());
+			output(error,"Unknown type specifier \'%c\' in \"%s\"",vi.variable[1],vi.variable.c_str());
 			exit(-1);
 	}
 

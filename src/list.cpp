@@ -7,7 +7,7 @@ int main(int argc, char** argv)
 {
 	if(argc > 3)
 	{
-		output(Error,"list only expects 1, or 2 arguments.");
+		output(error,"list only expects 1, or 2 arguments.");
 		return -1;
 	}
 
@@ -42,7 +42,7 @@ int main(int argc, char** argv)
 		}
 		else if(argv[i][0] == '-' && argv[i][1] != 'm')
 		{
-			output(Error,"Unknown option \"%s\"",argv[i]);
+			output(error,"Unknown option \"%s\"",argv[i]);
 			return -1;
 		}
 	}

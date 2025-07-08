@@ -6,11 +6,11 @@ int main(int argc, char** argv)
 {
 	if(argc == 1)
 	{
-		output(Error,"del expects at least 1 argument.");
+		output(error,"del expects at least 1 argument.");
 		exit(-1);
 	}
 	if(argc > 3)
-		output(Warning,"del only expects 1, 2, or 3 arguments, ignoring all other arguments");
+		output(warning,"del only expects 1, 2, or 3 arguments, ignoring all other arguments");
 
 	chkFlagAppDesc(argv,"Deletes a variable, variable set, character, or campaign.");
 	chkFlagModifyVariables(argv,true);
@@ -31,12 +31,12 @@ int main(int argc, char** argv)
 
 	if((onlyChkC || onlyChkM) && argc == 2)
 	{
-		output(Error,"Missing argument for \"%s\".",argv[1]);
+		output(error,"Missing argument for \"%s\".",argv[1]);
 		return -1;
 	}
 	else if(argv[1][0] == '-' && !onlyChkC && !onlyChkM)
 	{
-		output(Error,"Unknown option \"%s\".",argv[1]);
+		output(error,"Unknown option \"%s\".",argv[1]);
 		return -1;
 	}
 
@@ -48,7 +48,7 @@ int main(int argc, char** argv)
 	{
 		if(!looksLikeVariable(vi.variable) && vi.variable.back() != '/')
 		{
-			output(Error,"\"%s\" does not look like a variable or variable set.",argv[1]);
+			output(error,"\"%s\" does not look like a variable or variable set.",argv[1]);
 			return -1;
 		}
 
@@ -60,7 +60,7 @@ int main(int argc, char** argv)
 
 			if(vi.property != "")
 			{
-				output(Error,"Properties cannot be deleted.");
+				output(error,"Properties cannot be deleted.");
 				return -1;
 			}
 
@@ -81,8 +81,8 @@ int main(int argc, char** argv)
 			}
 
 			vi.scope.save();
-			if(deleted)	output(Info,"Variable \"%c%s%c/%s\" (value: \"%s\") has been deleted.",vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str(),value.c_str());
-			else		output(Error,"Variable \"%c%s%c/%s\" does not exist to be deleted.",vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str());
+			if(deleted)	output(info,"Variable \"%c%s%c/%s\" (value: \"%s\") has been deleted.",vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str(),value.c_str());
+			else		output(error,"Variable \"%c%s%c/%s\" does not exist to be deleted.",vi.scope.sigil,xref.c_str(),vi.evalType,vi.key.c_str());
 		}
 		else
 		{
@@ -120,14 +120,14 @@ int main(int argc, char** argv)
 
 				if(rk.isRemoved)
 				{
-					output(Info,"Variable \"%c%s%c/%s\" (value: \"%s\") has been deleted.",vi.scope.sigil,xref.c_str(),rk.type,k.c_str(),v.c_str());
+					output(info,"Variable \"%c%s%c/%s\" (value: \"%s\") has been deleted.",vi.scope.sigil,xref.c_str(),rk.type,k.c_str(),v.c_str());
 					atLeastOneKeyRemoved = true;
 				}
 			}
 
 			vi.scope.save();
 			if(!atLeastOneKeyRemoved)
-				output(Error,"Variable set \"%s\" appears to be empty.",vi.variable.c_str());
+				output(error,"Variable set \"%s\" appears to be empty.",vi.variable.c_str());
 		}
 	}
 	else if(onlyChkC)
@@ -152,11 +152,11 @@ int main(int argc, char** argv)
 			for(const auto& file : getDirectoryListing(campaign_path))
 			if(!stringcasecmp(left(file,findu(file,'.')),mc.c))
 				std::filesystem::remove(campaign_path+file);
-			output(Info,"Character \"%s\" has been deleted.",(campaign_name+"/"+left(entry,entry.length()-5)).c_str());
+			output(info,"Character \"%s\" has been deleted.",(campaign_name+"/"+left(entry,entry.length()-5)).c_str());
 			return 0;
 		}
 
-		output(Error,"Character \"%s\" does not exist to be deleted.",(campaign_name+"/"+mc.c).c_str());
+		output(error,"Character \"%s\" does not exist to be deleted.",(campaign_name+"/"+mc.c).c_str());
 		return -1;
 	}
 	else
@@ -170,11 +170,11 @@ int main(int argc, char** argv)
 			if(getchar() != 'y') return 0;
 
 			std::filesystem::remove_all(campaigns_dir+entry);
-			output(Info,"Campaign \"%s\" has been deleted.",entry.c_str());
+			output(info,"Campaign \"%s\" has been deleted.",entry.c_str());
 			return 0;
 		}
 
-		output(Error,"Campaign \"%s\" does not exist to be deleted.",m_to_be_deleted.c_str());
+		output(error,"Campaign \"%s\" does not exist to be deleted.",m_to_be_deleted.c_str());
 		return -1;
 	}
 

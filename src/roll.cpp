@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 
 	if(argc == 1)
 	{
-		output(Error,"roll expects at least one argument.");
+		output(error,"roll expects at least one argument.");
 		exit(-1);
 	}
 
@@ -79,17 +79,17 @@ int main(int argc, char** argv)
 		{
 			if(!argv[arg+1])
 			{
-				output(Error,"No repeat value specified.");
+				output(error,"No repeat value specified.");
 				return -1;
 			}
 			else if(!Var(argv[arg+1]).isInt())
 			{
-				output(Error,"Can't parse repeat value. \"%s\" is not a number.",argv[arg+1]);
+				output(error,"Can't parse repeat value. \"%s\" is not a number.",argv[arg+1]);
 				return -1;
 			}
 			else if(Var(argv[arg+1]) < 1)
 			{
-				output(Error,"Repeat value must be greater than 0.");
+				output(error,"Repeat value must be greater than 0.");
 				return -1;
 			}
 
@@ -107,7 +107,7 @@ int main(int argc, char** argv)
 		{
 			if(!argv[arg+1])
 			{
-				output(Error,"No count expression specified.");
+				output(error,"No count expression specified.");
 				return -1;
 			}
 
@@ -138,7 +138,7 @@ int main(int argc, char** argv)
 
 				if(count_expr == "")
 				{
-					output(Error,"Invalid count expression in argument \"%s\".",argv[arg+1]);
+					output(error,"Invalid count expression in argument \"%s\".",argv[arg+1]);
 					return -1;
 				}
 			}
@@ -147,14 +147,14 @@ int main(int argc, char** argv)
 			{
 				if(!argv[arg+2])
 				{
-					output(Error,"No count quantity specified.");
+					output(error,"No count quantity specified.");
 					return -1;
 				}
 
 				count_str = std::string(argv[arg+2]);
 				if(!Var(count_str).isInt())
 				{
-					output(Error,"Invalid count amount \"%s\".",count_str.c_str());
+					output(error,"Invalid count amount \"%s\".",count_str.c_str());
 					return -1;
 				}
 
@@ -185,9 +185,9 @@ int main(int argc, char** argv)
 	catch(const std::runtime_error& e)
 	{
 		if(e.what() == std::string(E_INVALID_EXPLICIT_CONSTRUCTOR))
-			output(Error,"Invalid explicit dice constructor: \"%s\".",dice_str.c_str());
+			output(error,"Invalid explicit dice constructor: \"%s\".",dice_str.c_str());
 		else
-			output(Error,"Error when attempting to construct dice object with \"%s\": %s.",dice_str.c_str(),e.what());
+			output(error,"Error when attempting to construct dice object with \"%s\": %s.",dice_str.c_str(),e.what());
 		exit(-1);
 	}
 
@@ -206,13 +206,13 @@ int main(int argc, char** argv)
 		catch(const std::runtime_error& e)
 		{
 			if(e.what() == std::string(E_NO_PRNG_FILE))
-				output(Error,"Cannot seed pRNG for dice roll. \"%s\" and \"%s\" do not exist. If your system uses a different path for pRNG, please report your system's pRNG file path to the rpgsh GitHub issues page.",prng_path,backup_prng_path);
+				output(error,"Cannot seed pRNG for dice roll. \"%s\" and \"%s\" do not exist. If your system uses a different path for pRNG, please report your system's pRNG file path to the rpgsh GitHub issues page.",prng_path,backup_prng_path);
 			else if(e.what() == std::string(E_FILE_NOT_FOUND))
-				output(Error,"List file not found at \"%s\".",(dice_lists_dir+dice.List).c_str());
+				output(error,"List file not found at \"%s\".",(dice_lists_dir+dice.List).c_str());
 			else if(e.what() == std::string(E_BAD_FS))
-				output(Error,"Unable to read list file at \"%s\".",(dice_lists_dir+dice.List).c_str());
+				output(error,"Unable to read list file at \"%s\".",(dice_lists_dir+dice.List).c_str());
 			else
-				output(Error,"An error occured when attempting to roll \"%s\": %s.",dice_str.c_str(),e.what());
+				output(error,"An error occured when attempting to roll \"%s\": %s.",dice_str.c_str(),e.what());
 			exit(-1);
 		}
 

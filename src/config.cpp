@@ -14,7 +14,7 @@ std::string Config::getConfigItem(std::string s)
 	}
 	else//No '='
 	{
-		output(Warning,"No \'=\' found for config item \"%s\", ignoring...",s.c_str());
+		output(warning,"No \'=\' found for config item \"%s\", ignoring...",s.c_str());
 		return "";
 	}
 }
@@ -27,10 +27,10 @@ std::string Config::getConfigValue(std::string s)
 		{
 			if(stringcasecmp(left(s,s.find("=")),k)) continue;
 
-			output(Warning,"Found blank value for config setting \"%s\"",setting[s].c_str());
+			output(warning,"Found blank value for config setting \"%s\"",setting[s].c_str());
 			return setting[s];
 		}
-		output(Warning,"Unknown config setting \"%s\", ignoring...",s.c_str());
+		output(warning,"Unknown config setting \"%s\", ignoring...",s.c_str());
 		return "";
 	}
 	else if(s.find("=") != std::string::npos)//Found value
@@ -57,7 +57,7 @@ Config::Config()
 	// Create default config file if one does not exist
 	if(!std::filesystem::exists(config_path.c_str()))
 	{
-		output(Info,"Config file not found, creating default at \"%s\".",config_path.c_str());
+		output(info,"Config file not found, creating default at \"%s\".",config_path.c_str());
 		std::ofstream fs(config_path.c_str());
 		fs<<COMMENT<<" Places a newline character before and after command output.\n";
 		fs<<COMMENT<<" Default: "<<setting[PADDING]<<"\n";

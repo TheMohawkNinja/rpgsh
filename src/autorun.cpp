@@ -8,7 +8,7 @@ void confirmPath(std::string path, std::string scope)
 	{
 		std::ofstream ofs(path);
 		ofs.close();
-		output(Info,"Created %s autorun file at \"%s\"",scope.c_str(),path.c_str());
+		output(info,"Created %s autorun file at \"%s\"",scope.c_str(),path.c_str());
 		return;
 	}
 }
@@ -21,7 +21,7 @@ void execAutorun(std::string path, std::string scope, bool verbose)
 		getline(ifs,command);
 		if(command == "") continue;
 		if(verbose)
-			output(Info,"Running %s autorun command \"%s\"",scope.c_str(),command.c_str());
+			output(info,"Running %s autorun command \"%s\"",scope.c_str(),command.c_str());
 		runApp(command,false);
 	}
 	ifs.close();
@@ -37,7 +37,7 @@ void saveAutorun(std::string path, std::string scope)
 
 		std::ofstream ofs(path);
 		ofs<<command+"\n";
-		output(Info,"Added \"%s\" to %s autorun file",command.c_str(),scope.c_str());
+		output(info,"Added \"%s\" to %s autorun file",command.c_str(),scope.c_str());
 		return;
 	}
 }
@@ -96,7 +96,7 @@ bool removeCommand(std::string path, int* index, std::string scope)
 		for(const auto& command : commands)
 			ofs<<command+"\n";
 		ofs.close();
-		output(Info,"Removed \"%s\" from %s autorun file",deletedCommand.c_str(),scope.c_str());
+		output(info,"Removed \"%s\" from %s autorun file",deletedCommand.c_str(),scope.c_str());
 	}
 
 	return thisFile;
@@ -104,7 +104,7 @@ bool removeCommand(std::string path, int* index, std::string scope)
 int main(int argc, char** argv)
 {
 	if(argc > 2)
-		output(Warning,"autorun only expects 0 or 1 arguments, ignoring all other arguments.");
+		output(warning,"autorun only expects 0 or 1 arguments, ignoring all other arguments.");
 
 	chkFlagAppDesc(argv,"Sets and executes commands designated by the user on a per-scope basis.");
 	chkFlagModifyVariables(argv,false);
@@ -199,13 +199,13 @@ int main(int argc, char** argv)
 		   !removeCommand(m_path,&index,"campaign") &&
 		   !removeCommand(c_path,&index,"character"))
 		{
-			output(Error,"No command exists at position %s",index_str.c_str());
+			output(error,"No command exists at position %s",index_str.c_str());
 			return -1;
 		}
 	}
 	else
 	{
-		output(Error,"Unknown option \"%s\"",argv[1]);
+		output(error,"Unknown option \"%s\"",argv[1]);
 		return -1;
 	}
 

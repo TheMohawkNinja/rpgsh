@@ -5,11 +5,11 @@ int main(int argc, char** argv)
 {
 	if(argc == 1)
 	{
-		output(Error,"valueof expects at least 1 argument.");
+		output(error,"valueof expects at least 1 argument.");
 		exit(-1);
 	}
 	if(argc > 3)
-		output(Warning,"valueof expects no more than 2 arguments, ignoring all other arguments");
+		output(warning,"valueof expects no more than 2 arguments, ignoring all other arguments");
 
 	chkFlagAppDesc(argv,"Returns the value of the given wallet in the requested currency.");
 	chkFlagModifyVariables(argv,false);
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 			}
 			catch(const std::runtime_error& e)
 			{
-				output(Error,"Unable to construct a Wallet from \"%s\": %s",argv[i],e.what());
+				output(error,"Unable to construct a Wallet from \"%s\": %s",argv[i],e.what());
 				return -1;
 			}
 		}
@@ -50,19 +50,19 @@ int main(int argc, char** argv)
 			}
 			catch(const std::runtime_error& e)
 			{
-				output(Error,"Unable to construct a Currency from \"%s\": %s",argv[i],e.what());
+				output(error,"Unable to construct a Currency from \"%s\": %s",argv[i],e.what());
 				return -1;
 			}
 		}
 		else if(argv[i][0] == '-')
 		{
-			output(Warning,"Unknown option \"%s\"",argv[i]);
+			output(warning,"Unknown option \"%s\"",argv[i]);
 		}
 	}
 
 	if(!hasWallet)
 	{
-		output(Error,"valueof expects a wallet for an argument.");
+		output(error,"valueof expects a wallet for an argument.");
 		return -1;
 	}
 	if(currency == Currency())
@@ -74,7 +74,7 @@ int main(int argc, char** argv)
 	}
 	else if(!w_in.containsCurrency(currency.Name))
 	{
-		output(Error,"Currency \"%s\" is not contained within the inputted Wallet.",currency.c_str());
+		output(error,"Currency \"%s\" is not contained within the inputted Wallet.",currency.c_str());
 		return -1;
 	}
 	else

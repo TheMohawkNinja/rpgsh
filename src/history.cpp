@@ -17,7 +17,7 @@ int main(int argc, char** argv)
 	}
 	catch(...)
 	{
-		output(Error,"Invalid value for \"%s\" setting: %s",HISTORY_LENGTH,config.setting[HISTORY_LENGTH].c_str());
+		output(error,"Invalid value for \"%s\" setting: %s",HISTORY_LENGTH,config.setting[HISTORY_LENGTH].c_str());
 		return -1;
 	}
 
@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 		}
 		catch(...)
 		{
-			output(Error,"Invalid value for line number: %s",argv[1]);
+			output(error,"Invalid value for line number: %s",argv[1]);
 			return -1;
 		}
 	}
@@ -65,13 +65,13 @@ int main(int argc, char** argv)
 		}
 		catch(...)
 		{
-			output(Error,"Invalid value for line count: %s",argv[1]);
+			output(error,"Invalid value for line count: %s",argv[1]);
 			return -1;
 		}
 	}
 	else if(strcmp(argv[1],"-c"))
 	{
-		output(Error,"Unknown arg \"%s\".",argv[1]);
+		output(error,"Unknown arg \"%s\".",argv[1]);
 		return -1;
 	}
 

@@ -11,12 +11,12 @@ int main(int argc, char** argv)
 
 	if(argc < 2)
 	{
-		output(Error,"setname requires at least one argument to function!");
+		output(error,"setname requires at least one argument to function!");
 		exit(-1);
 	}
 	else if(argc > 2)
 	{
-		output(Warning,"Expected only one argument. All args past \"%s\" will be ignored.",argv[1]);
+		output(warning,"Expected only one argument. All args past \"%s\" will be ignored.",argv[1]);
 	}
 
 	if(!strcmp(argv[1],"-l"))
@@ -40,11 +40,11 @@ int main(int argc, char** argv)
 
 	Character c = Character();
 
-	if(std::string(argv[1]) == "") output(Warning,"%s is empty.",argv[1]);
+	if(std::string(argv[1]) == "") output(warning,"%s is empty.",argv[1]);
 
 	c.set<Var>(DOT_NAME,std::string(argv[1]));
 	c.save();
-	output(Info,"Current character's name is now set to the key \"%s\" (Current value: \"%s\")",argv[1],c.getStr<Var>(argv[1]).c_str());
+	output(info,"Current character's name is now set to the key \"%s\" (Current value: \"%s\")",argv[1],c.getStr<Var>(argv[1]).c_str());
 
 	return 0;
 }

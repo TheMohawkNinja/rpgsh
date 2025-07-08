@@ -1148,7 +1148,7 @@ Wallet& Wallet::operator -= (const Money b)
 	}
 	else if(get(b.c)-b.q < 0 && b.c.System != "")//TODO: Maybe create option to allow users to go into debt?
 	{
-		output(Error,"Insufficient funds!");
+		output(error,"Insufficient funds!");
 	}
 	else if(get(b.c)-b.q >= 0)
 	{
@@ -1172,7 +1172,7 @@ Wallet& Wallet::operator -= (const Wallet b)
 	{
 		if(!HasEffectivelyAtLeast(m.q,m.c))
 		{
-			output(Error,"Insufficient funds!");
+			output(error,"Insufficient funds!");
 			return *this;
 		}
 	}

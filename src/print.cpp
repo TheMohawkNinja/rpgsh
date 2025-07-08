@@ -132,7 +132,7 @@ int main(int argc, char** argv)
 	chkFlagModifyVariables(argv,false);
 
 	if(argc > 4)
-		output(Warning,"Print expects no more than four arguments. All args past \"%s\" will be ignored.",argv[5]);
+		output(warning,"Print expects no more than four arguments. All args past \"%s\" will be ignored.",argv[5]);
 
 	if(chkFlagHelp(argv))
 	{
@@ -178,7 +178,7 @@ int main(int argc, char** argv)
 			}
 			catch(const std::runtime_error& e)
 			{
-				output(Error,"Unable to pretty-print explicit constructor \"%s\": %s",arg_str.c_str(),e.what());
+				output(error,"Unable to pretty-print explicit constructor \"%s\": %s",arg_str.c_str(),e.what());
 				return -1;
 			}
 		}
@@ -207,7 +207,7 @@ int main(int argc, char** argv)
 		{
 			if(i == argc)
 			{
-				output(Error,"Missing value for print depth.");
+				output(error,"Missing value for print depth.");
 				return -1;
 			}
 
@@ -217,7 +217,7 @@ int main(int argc, char** argv)
 				i++;
 				if(!depth.isInt())
 				{
-					output(Error,"Invalid value \'%s\" for depth.",depth.c_str());
+					output(error,"Invalid value \'%s\" for depth.",depth.c_str());
 					return -1;
 				}
 			}
@@ -228,7 +228,7 @@ int main(int argc, char** argv)
 		}
 		else
 		{
-			output(Error,"Unknown option \"%s\".",argv[i]);
+			output(error,"Unknown option \"%s\".",argv[i]);
 			return -1;
 		}
 	}

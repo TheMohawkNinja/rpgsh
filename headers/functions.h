@@ -12,9 +12,9 @@
 
 enum OutputLevel
 {
-	Info,
-	Warning,
-	Error
+	info,
+	warning,
+	error
 };
 struct VariableInfo
 {

@@ -423,7 +423,7 @@ void Scope::load(std::string path, bool loadVar, bool loadDice, bool loadCurrenc
 		*/
 		if(findu(data,DS) > 1)
 		{
-			output(Warning,"Multi-character type specifier \"%s\" at \"%s:%d\", skipping line...",left(data,findu(data,DS)).c_str(),path.c_str(),linenum);
+			output(warning,"Multi-character type specifier \"%s\" at \"%s:%d\", skipping line...",left(data,findu(data,DS)).c_str(),path.c_str(),linenum);
 			continue;
 		}
 
@@ -436,7 +436,7 @@ void Scope::load(std::string path, bool loadVar, bool loadDice, bool loadCurrenc
 		}
 		catch(...)
 		{
-			output(Warning,"Unable to get variable key at \"%s:%d\", skipping line...",path.c_str(),linenum);
+			output(warning,"Unable to get variable key at \"%s:%d\", skipping line...",path.c_str(),linenum);
 			break;
 		}
 
@@ -446,7 +446,7 @@ void Scope::load(std::string path, bool loadVar, bool loadDice, bool loadCurrenc
 		}
 		catch(...)
 		{
-			output(Warning,"Unable to get variable value at \"%s:%d\", skipping line...",path.c_str(),linenum);
+			output(warning,"Unable to get variable value at \"%s:%d\", skipping line...",path.c_str(),linenum);
 			break;
 		}
 
@@ -461,11 +461,11 @@ void Scope::load(std::string path, bool loadVar, bool loadDice, bool loadCurrenc
 			else if(type == WALLET_SIGIL && loadWallet)
 				wallets[key] = Wallet(value);
 			else if(!isTypeSigil(type))
-				output(Warning,"Unknown type specifier \'%c\' in \"%s:%d\"",type,path.c_str(),linenum);
+				output(warning,"Unknown type specifier \'%c\' in \"%s:%d\"",type,path.c_str(),linenum);
 		}
 		catch(const std::runtime_error& e)
 		{
-			output(Error,"Unable to load \"%s\" into the character at \"%s:%d\": %s.",data.c_str(),path.c_str(),linenum,e.what());
+			output(error,"Unable to load \"%s\" into the character at \"%s:%d\": %s.",data.c_str(),path.c_str(),linenum,e.what());
 			exit(-1);
 		}
 	}
@@ -518,7 +518,7 @@ void Scope::save()
 	}
 	catch(const std::runtime_error& e)
 	{
-		output(Error,"Exception thrown while attempting to save character: %s",e.what());
+		output(error,"Exception thrown while attempting to save character: %s",e.what());
 		throw;
 	}
 
