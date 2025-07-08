@@ -91,14 +91,14 @@ int main(int argc, char** argv)
 	long unsigned int cur_pos = 2;
 	long unsigned int prev_cur_pos = cur_pos;
 
-	enum save_text_state
+	enum SaveTextState
 	{
-		UNSAVED,
-		SHOW_SAVE_TEXT,
-		REMOVE_SAVE_TEXT
+		unsaved,
+		show_save_text,
+		remove_save_text
 	};
 
-	save_text_state sts = UNSAVED;
+	SaveTextState sts = unsaved;
 
 	fprintf(stdout,"%s%s%sCTRL%s+%sALT%s+%sESC%s or %sESC%s+%sESC%s Exit w/o saving   %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_ITALIC,TEXT_NOITALIC,TEXT_ITALIC,TEXT_NOITALIC,TEXT_ITALIC,TEXT_NOITALIC,TEXT_ITALIC,TEXT_NOITALIC,TEXT_ITALIC,TEXT_NOITALIC,TEXT_NORMAL);
 	fprintf(stdout,"%s%s%sESC%s+s                   Save              %s\n",TEXT_BG_DARKGRAY,TEXT_WHITE,TEXT_ITALIC,TEXT_NOITALIC,TEXT_NORMAL);
@@ -122,20 +122,20 @@ int main(int argc, char** argv)
 		//Move cursor to beginning of input
 		if(cur_pos && (cur_pos-1)/w.ws_col) fprintf(stdout,CURSOR_UP_N,((cur_pos-1)/w.ws_col));
 
-		if(sts == REMOVE_SAVE_TEXT)
+		if(sts == remove_save_text)
 		{
 			fprintf(stdout,CURSOR_UP);
 			fprintf(stdout,CLEAR_LINE);
 		}
 		//fprintf(stdout,CLEAR_TO_SCREEN_END);
-		if(sts == SHOW_SAVE_TEXT)
+		if(sts == show_save_text)
 		{
-			sts = REMOVE_SAVE_TEXT;
+			sts = remove_save_text;
 		}
-		else if(sts == REMOVE_SAVE_TEXT)
+		else if(sts == remove_save_text)
 		{
 			fprintf(stdout,CURSOR_DOWN);
-			sts = UNSAVED;
+			sts = unsaved;
 		}
 
 		for(const auto& ch : input) fprintf(stdout,"%c",ch);
@@ -240,7 +240,7 @@ int main(int argc, char** argv)
 					fprintf(stdout,CURSOR_RIGHT_N,cur_pos%w.ws_col);
 
 				vi.scope.save();
-				sts = SHOW_SAVE_TEXT;
+				sts = show_save_text;
 				esc_char = 0;
 			}
 			else
