@@ -35,19 +35,12 @@ void saveAutorun(std::string path, std::string scope)
 		getline(std::cin,command);
 		if(command == "") continue;
 
-		std::ofstream ofs(path);
+		std::ofstream ofs(path,std::ios::app);
 		ofs<<command+"\n";
 		output(info,"Added \"%s\" to %s autorun file",command.c_str(),scope.c_str());
+		ofs.close();
 		return;
 	}
-}
-void printHeader(std::string s)
-{
-	fprintf(stdout,"%s%s %s %s\n",TEXT_GREEN,TEXT_BOLD,s.c_str(),TEXT_NORMAL);
-	fprintf(stdout,"%s",TEXT_WHITE);
-	for(long unsigned int i=0; i<s.length()+2; i++)
-		fprintf(stdout,"─");
-	fprintf(stdout,"%s\n",TEXT_NORMAL);
 }
 void printCommands(std::string path, bool print_index, int* cmd_ctr)
 {
@@ -64,6 +57,7 @@ void printCommands(std::string path, bool print_index, int* cmd_ctr)
 		(*cmd_ctr)++;
 		fprintf(stdout,"%s%s\n",(print_index ? "["+std::to_string(*cmd_ctr)+"] " : "").c_str(),command.c_str());
 	}
+	ifs.close();
 }
 bool removeCommand(std::string path, int* index, std::string scope)
 {
@@ -92,7 +86,7 @@ bool removeCommand(std::string path, int* index, std::string scope)
 	if(thisFile)
 	{
 		std::filesystem::remove(path);
-		std::ofstream ofs(path);
+		std::ofstream ofs(path,std::ios::app);
 		for(const auto& command : commands)
 			ofs<<command+"\n";
 		ofs.close();
