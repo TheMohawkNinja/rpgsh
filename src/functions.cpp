@@ -777,20 +777,25 @@ int runApp(std::string arg_str, bool redirect_output)
 	// results in the iterator getting in some way lost causing it to not replace all the variables.
 	// Seems to be limited to cases when the value length > variable length
 	// Either way, using a std::vector<std::string> is an effective work around.
-	std::vector<std::string> matches;
+	std::vector<std::pair<std::string,long unsigned int>> matches;
 	while(v_str_it != v_str_end)
 	{
-		matches.push_back(v_str_it->str());
+		matches.push_back(std::pair<std::string,long unsigned int>(v_str_it->str(),v_str_it->position()));
 		v_str_it++;
 	}
+	long unsigned int offset = 0;
 	for(const auto& match : matches)
 	{
-		if(runApp(match,true))
+		GetAppOutputInfo info = getAppOutput(match.first);
+		if(info.status)
 		{
-			output(error,"%s is not a valid variable string.",match.c_str());
+			output(error,"%s is not a valid variable string.",match.first.c_str());
 			return -1;
 		}
-		arg_str = std::regex_replace(arg_str,std::regex(escapeRegexGroupChars(match)),getAppOutput(match).output[0]);
+		arg_str = left(arg_str,match.second-offset)+
+			  std::regex_replace(match.first,std::regex(escapeRegexGroupChars(match.first)),info.output[0])+
+			  right(arg_str,match.second+match.first.length()-offset);
+		offset += match.first.length()-info.output[0].length();
 	}
 
 	//Get args for program
