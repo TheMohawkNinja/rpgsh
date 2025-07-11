@@ -635,6 +635,7 @@ int main(int argc, char** argv)
 		}
 
 		// Wrap everything in parenthesis just to make below code simpler
+		bool added_rparens = false;
 		args[0] = '('+args[0];
 		args.back() += ')';
 
@@ -651,6 +652,13 @@ int main(int argc, char** argv)
 						std::string rparens = right(args[end],findu(args[end],')')+1);
 						args[start] = right(args[start],rfindu(args[start],'(')+1);
 						args[end] = left(args[end],findu(args[end],')'));
+						std::vector<std::string> current_set_of_operations;
+						for(int i=start; i<=end; i++)
+						{
+							current_set_of_operations.push_back(args[i]);
+							fprintf(stdout,"Pushing back %s\n",current_set_of_operations.back().c_str());
+						}
+						fprintf(stdout,"\n");
 
 						// Vectors for each operation type are in order of operator precedence
 						// INT_MAX as a maximum for op_pos should be fine given that would be a massively complex equation.
@@ -659,7 +667,7 @@ int main(int argc, char** argv)
 						{
 							for(const auto& op : precedence)
 							{
-								int found_op = findInVect<std::string>(args,op,start);
+								int found_op = findInVect<std::string>(current_set_of_operations,op);
 								if(found_op > -1 && found_op < op_pos)
 									op_pos = found_op;
 							}
@@ -669,6 +677,7 @@ int main(int argc, char** argv)
 						{
 							parseLHSAndDoOp(&vi,&args,op_pos-1,op_pos,op_pos+1);
 							args[start] += rparens;// Maintain end parens
+							added_rparens = true;
 						}
 						else if(op_pos == INT_MAX)
 						{
@@ -681,7 +690,7 @@ int main(int argc, char** argv)
 					}
 					else if(findu(args[end],'(') != std::string::npos && end>start)// Nested '('
 					{
-						start = end - 1;
+						start = end-1;
 						break;
 					}
 				}
@@ -704,6 +713,8 @@ int main(int argc, char** argv)
 				}
 			}
 		}
+
+		if(added_rparens) args[0] = left(args[0],findu(args[0],')'));
 
 		// Print result
 		if(findInVect<std::string>(assignOps,final_op) == -1 && findInVect<std::string>(unaryOps,final_op) == -1)
