@@ -546,12 +546,20 @@ int main(int argc, char** argv)
 	}
 	else if(vi.variable == "" || vi.variable.back() != '/')// Perform operation on variable
 	{
+		struct LParenInfo
+		{
+			long unsigned int pos = 0;
+			unsigned int depth = 0;
+		};
+		std::vector<LParenInfo> lpi;
+
+
 		std::string old_value;
 		if(vi.variable != "") old_value = getAppOutput(vi.variable).output[0];
 
 		std::vector<std::string> args;
-		long unsigned int open_paren_ctr = 0;
-		long unsigned int close_paren_ctr = 0;
+		//long unsigned int open_paren_ctr = 0;
+		//long unsigned int close_paren_ctr = 0;
 
 		// Need to know final operation to determine whether we print to screen or not
 		std::string final_op = std::string(argv[2]);
@@ -561,13 +569,16 @@ int main(int argc, char** argv)
 			final_op = left(final_op,final_op.length()-1);
 
 		// Generate vector of operators and operands, while also determining number of parentheses
+		std::string arg_str;
+		long unsigned int pos = 0;
 		for(int i=1; i<argc; i++)
 		{
 			std::string arg = std::string(argv[i]);
+			arg_string += arg+" ";
 			long unsigned int open_paren = findu(arg,'(');
 			long unsigned int close_paren = rfindu(arg,')');
-			open_paren_ctr += countu(arg,'(');
-			close_paren_ctr += countu(arg,')');
+			//open_paren_ctr += countu(arg,'(');
+			//close_paren_ctr += countu(arg,')');
 
 			if(open_paren != std::string::npos && close_paren != std::string::npos)
 				args.push_back(arg.substr(open_paren,close_paren+1-open_paren));
@@ -577,6 +588,20 @@ int main(int argc, char** argv)
 				args.push_back(arg.substr(0,close_paren+1));
 			else
 				args.push_back(arg);
+		}
+		arg_str = left(arg_str,arg_str.length()-1);
+		unsigned int depth = 0;
+		for(long unsigned int i=0; i<arg_str.length(); i++)
+		{
+			if(arg_str[i] == '(')
+			{
+				lpi.push_back({i,depth});
+				depth++;
+			}
+			else if(arg_str[i] == ')')
+			{
+				depth--;
+			}
 		}
 
 		int args_size = args.size();
@@ -623,12 +648,12 @@ int main(int argc, char** argv)
 			args[0] = std::string(Var(args[0]));
 		}
 
-		if(open_paren_ctr > close_paren_ctr)
+		if(/*open_paren_ctr > close_paren_ctr*/ depth > 0)
 		{
 			output(error,"Missing close parenthesis to match open parenthesis.");
 			return -1;
 		}
-		else if(open_paren_ctr < close_paren_ctr)
+		else if(/*open_paren_ctr < close_paren_ctr*/ depth < 0)
 		{
 			output(error,"Missing open parenthesis to match close parenthesis.");
 			return -1;
