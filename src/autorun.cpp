@@ -19,7 +19,8 @@ void execAutorun(std::string path, std::string scope, bool verbose)
 	{
 		std::string command;
 		getline(ifs,command);
-		if(command == "") continue;
+		if(!command.length() || command[0] == COMMENT) continue;
+		if(findu(command,COMMENT)) command = left(command,findu(command,COMMENT));
 		if(verbose)
 			output(info,"Running %s autorun command \"%s\"",scope.c_str(),command.c_str());
 		runApp(command,false);
@@ -33,7 +34,7 @@ void saveAutorun(std::string path, std::string scope)
 		std::string command;
 		fprintf(stdout,"Please enter a command: ");
 		getline(std::cin,command);
-		if(command == "") continue;
+		if(!command.length()) continue;
 
 		std::ofstream ofs(path,std::ios::app);
 		ofs<<command+"\n";
@@ -54,6 +55,7 @@ void printCommands(std::string path, bool print_index, int* cmd_ctr)
 			fprintf(stdout,"\n");
 			return;
 		}
+		if(!command.length()) continue;
 		(*cmd_ctr)++;
 		fprintf(stdout,"%s%s\n",(print_index ? "["+std::to_string(*cmd_ctr)+"] " : "").c_str(),command.c_str());
 	}
@@ -61,7 +63,7 @@ void printCommands(std::string path, bool print_index, int* cmd_ctr)
 }
 bool removeCommand(std::string path, int* index, std::string scope)
 {
-	bool thisFile = false;
+	bool removingCommand = false;
 	std::ifstream ifs(path);
 	std::string deletedCommand;
 	std::vector<std::string> commands;
@@ -70,6 +72,7 @@ bool removeCommand(std::string path, int* index, std::string scope)
 		std::string command;
 		getline(ifs,command);
 		if(ifs.eof()) break;
+		if(!command.length()) continue;
 		if((*index) != 1)
 		{
 			commands.push_back(command);
@@ -77,13 +80,14 @@ bool removeCommand(std::string path, int* index, std::string scope)
 		}
 		else
 		{
-			thisFile = true;
+			removingCommand = true;
 			deletedCommand = command;
+			break;
 		}
 
 	}
 	ifs.close();
-	if(thisFile)
+	if(removingCommand)
 	{
 		std::filesystem::remove(path);
 		std::ofstream ofs(path,std::ios::app);
@@ -93,7 +97,7 @@ bool removeCommand(std::string path, int* index, std::string scope)
 		output(info,"Removed \"%s\" from %s autorun file",deletedCommand.c_str(),scope.c_str());
 	}
 
-	return thisFile;
+	return removingCommand;
 }
 int main(int argc, char** argv)
 {
