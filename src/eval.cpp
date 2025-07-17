@@ -7,6 +7,8 @@
 #include "../headers/text.h"
 #include "../headers/var.h"
 
+#define OP_NOT_FOUND INT_MAX
+
 enum Action
 {
 	read,
@@ -549,17 +551,14 @@ int main(int argc, char** argv)
 		struct LParenInfo
 		{
 			long unsigned int pos = 0;
-			unsigned int depth = 0;
+			int depth = 0;
 		};
+
 		std::vector<LParenInfo> lpi;
-
-
 		std::string old_value;
 		if(vi.variable != "") old_value = getAppOutput(vi.variable).output[0];
 
 		std::vector<std::string> args;
-		//long unsigned int open_paren_ctr = 0;
-		//long unsigned int close_paren_ctr = 0;
 
 		// Need to know final operation to determine whether we print to screen or not
 		std::string final_op = std::string(argv[2]);
@@ -570,41 +569,16 @@ int main(int argc, char** argv)
 
 		// Generate vector of operators and operands, while also determining number of parentheses
 		std::string arg_str;
-		long unsigned int pos = 0;
+		unsigned int lparen_ctr = 0;
+		unsigned int rparen_ctr = 0;
 		for(int i=1; i<argc; i++)
 		{
 			std::string arg = std::string(argv[i]);
-			arg_string += arg+" ";
-			long unsigned int open_paren = findu(arg,'(');
-			long unsigned int close_paren = rfindu(arg,')');
-			//open_paren_ctr += countu(arg,'(');
-			//close_paren_ctr += countu(arg,')');
+			lparen_ctr += countu(arg,'(');
+			rparen_ctr += countu(arg,')');
 
-			if(open_paren != std::string::npos && close_paren != std::string::npos)
-				args.push_back(arg.substr(open_paren,close_paren+1-open_paren));
-			else if(open_paren != std::string::npos)
-				args.push_back(arg.substr(open_paren,arg.length()-open_paren));
-			else if(close_paren != std::string::npos)
-				args.push_back(arg.substr(0,close_paren+1));
-			else
-				args.push_back(arg);
+			args.push_back(arg);
 		}
-		arg_str = left(arg_str,arg_str.length()-1);
-		unsigned int depth = 0;
-		for(long unsigned int i=0; i<arg_str.length(); i++)
-		{
-			if(arg_str[i] == '(')
-			{
-				lpi.push_back({i,depth});
-				depth++;
-			}
-			else if(arg_str[i] == ')')
-			{
-				depth--;
-			}
-		}
-
-		int args_size = args.size();
 
 		// Replace first arg with value if it's a variable
 		if(vi.key != "" && vi.property != "")
@@ -645,93 +619,133 @@ int main(int argc, char** argv)
 		}
 		else
 		{
-			args[0] = std::string(Var(args[0]));
+			std::string lparens, rparens;
+			if(findu(args[0],'(') != std::string::npos)
+			{
+				lparens = left(args[0],rfindu(args[0],'(')+1);
+				args[0] = right(args[0],rfindu(args[0],'(')+1);
+			}
+			if(findu(args[0],')') != std::string::npos)
+			{
+				rparens = right(args[0],findu(args[0],')')+1);
+				args[0] = left(args[0],findu(args[0],')')+1);
+			}
+
+			args[0] = lparens+std::string(Var(args[0]))+rparens;
 		}
 
-		if(/*open_paren_ctr > close_paren_ctr*/ depth > 0)
+		if(lparen_ctr > rparen_ctr)
 		{
 			output(error,"Missing close parenthesis to match open parenthesis.");
 			return -1;
 		}
-		else if(/*open_paren_ctr < close_paren_ctr*/ depth < 0)
+		else if(lparen_ctr < rparen_ctr)
 		{
 			output(error,"Missing open parenthesis to match close parenthesis.");
 			return -1;
 		}
 
 		// Wrap everything in parenthesis just to make below code simpler
+		bool added_lparens = false;
 		bool added_rparens = false;
 		args[0] = '('+args[0];
 		args.back() += ')';
 
 		// PEMDAS
-		for(int start=0; start<args_size-1; start++)
+		long unsigned int pos = 0;
+		for(int start=0; start<(int)args.size()-1; start++)
 		{
-			if((long unsigned int)start < args.size() && findu(args[start],'(') != std::string::npos)
+			arg_str = "";
+			for(const auto& arg : args)
+				arg_str += arg+" ";
+			arg_str = left(arg_str,arg_str.length()-1);
+
+			int depth = 0;
+			lpi.clear();
+			for(long unsigned int i=0; i<arg_str.length(); i++)
 			{
-				for(int end=start; end<args_size; end++)
+				if(arg_str[i] == '(')
+				{
+					lpi.push_back({i,depth});
+					depth++;
+				}
+				else if(arg_str[i] == ')')
+				{
+					depth--;
+				}
+			}
+
+			LParenInfo current_lpi = {0,0};
+			for(const auto& i : lpi)
+				if(i.depth > current_lpi.depth) current_lpi = i;
+
+			if((long unsigned int)start < args.size() && pos <= current_lpi.pos && (pos+args[start].length()) > current_lpi.pos)
+			{
+				for(int end=start; end < (int)args.size(); end++)
 				{
 					if(args[end].back() == ')' && !isEscaped(args[end],args[end].length()-1))
 					{
 						// Strip parenthesis off args to ensure good parsing
+						std::string lparens = left(args[start],rfindu(args[start],'('));
 						std::string rparens = right(args[end],findu(args[end],')')+1);
 						args[start] = right(args[start],rfindu(args[start],'(')+1);
 						args[end] = left(args[end],findu(args[end],')'));
-						std::vector<std::string> current_set_of_operations;
+
+						std::vector<std::string> current_ops;
 						for(int i=start; i<=end; i++)
-						{
-							current_set_of_operations.push_back(args[i]);
-							fprintf(stdout,"Pushing back %s\n",current_set_of_operations.back().c_str());
-						}
-						fprintf(stdout,"\n");
+							current_ops.push_back(args[i]);
 
 						// Vectors for each operation type are in order of operator precedence
 						// INT_MAX as a maximum for op_pos should be fine given that would be a massively complex equation.
-						int op_pos = INT_MAX;
+						int op_pos = OP_NOT_FOUND;
 						for(const auto& precedence : operations)
 						{
 							for(const auto& op : precedence)
 							{
-								int found_op = findInVect<std::string>(current_set_of_operations,op);
-								if(found_op > -1 && found_op < op_pos)
-									op_pos = found_op;
+								int next_op = findInVect<std::string>(current_ops,op);
+								if(next_op > -1 && next_op < op_pos)
+									op_pos = next_op+start;
 							}
-							if(op_pos < INT_MAX) break;
+							if(op_pos != OP_NOT_FOUND) break;
 						}
-						if(op_pos > start && op_pos <= end)
+						if(op_pos != OP_NOT_FOUND)
 						{
 							parseLHSAndDoOp(&vi,&args,op_pos-1,op_pos,op_pos+1);
-							args[start] += rparens;// Maintain end parens
+							if(lparens[0] == '(')
+							{
+								args[start] = lparens+args[start];
+								added_lparens = true;
+							}
+							args[start] += rparens;
 							added_rparens = true;
 						}
-						else if(op_pos == INT_MAX)
+						else
 						{
-							output(error,"Unknown operator \"%s\"",args[start+1].c_str());
+							output(error,"Unknown operator \"%s\"",args[op_pos].c_str());
 							return -1;
 						}
 
+						pos = 0;
 						start = -1;
-						break;
-					}
-					else if(findu(args[end],'(') != std::string::npos && end>start)// Nested '('
-					{
-						start = end-1;
 						break;
 					}
 				}
 			}
+			if(start > -1)
+				pos += args[start].length()+1;
 
 			// Check if parenthesis still exist, and re-wrap if needed. Restart loop to go back through PEMDAS if needed
 			if(args.size() > 1 && args[0][0] != '(')
 				args[0] = '(' + args[0];
 			if(args.size() > 1 && args.back().back() != ')')
 				args.back() += ')';
-			if(start == args_size-1)
+			if(start == (int)args.size()-1)
 			{
 				for(const auto& arg : args)
 				{
 					if(arg[0] == '(')
 					{
+						pos = 0;
 						start = -1;
 						break;
 					}
@@ -739,6 +753,7 @@ int main(int argc, char** argv)
 			}
 		}
 
+		if(added_lparens) args[0] = right(args[0],rfindu(args[0],'(')+1);
 		if(added_rparens) args[0] = left(args[0],findu(args[0],')'));
 
 		// Print result
