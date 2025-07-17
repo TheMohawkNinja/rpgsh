@@ -126,9 +126,9 @@ int main(int argc, char** argv)
 
 	Character c = Character();
 	Campaign m = Campaign();
-	std::string s_path = root_dir+".autorun";
-	std::string m_path = left(m.getDatasource(),rfindu(m.getDatasource(),".variables"))+".autorun";
-	std::string c_path = left(c.getDatasource(),rfindu(c.getDatasource(),'/')+1)+c.getName()+".autorun";
+	std::string s_path = root_dir+autorun_ext;
+	std::string m_path = left(m.getDatasource(),rfindu(m.getDatasource(),variables_file_name))+autorun_ext;
+	std::string c_path = left(c.getDatasource(),rfindu(c.getDatasource(),'/')+1)+c.getName()+autorun_ext;
 
 	confirmPath(s_path,"shell");
 	confirmPath(m_path,"campaign");
