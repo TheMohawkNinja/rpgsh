@@ -7,7 +7,7 @@
 #include "../headers/text.h"
 #include "../headers/var.h"
 
-#define OP_NOT_FOUND INT_MAX
+#define OP_NOT_FOUND INT_MAX // INT_MAX as a maximum for op_pos should be fine given that would be a massively complex equation.
 
 enum Action
 {
@@ -696,7 +696,6 @@ int main(int argc, char** argv)
 							current_ops.push_back(args[i]);
 
 						// Vectors for each operation type are in order of operator precedence
-						// INT_MAX as a maximum for op_pos should be fine given that would be a massively complex equation.
 						int op_pos = OP_NOT_FOUND;
 						for(const auto& precedence : operations)
 						{
