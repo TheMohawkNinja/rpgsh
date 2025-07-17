@@ -57,7 +57,8 @@ void printCommands(std::string path, bool print_index, int* cmd_ctr)
 		}
 		if(!command.length()) continue;
 		(*cmd_ctr)++;
-		fprintf(stdout,"%s%s\n",(print_index ? "["+std::to_string(*cmd_ctr)+"] " : "").c_str(),command.c_str());
+		std::string index_str = std::string(TEXT_BOLD)+std::string(TEXT_WHITE)+"["+std::string(TEXT_GREEN)+std::to_string(*cmd_ctr)+std::string(TEXT_WHITE)+"]"+std::string(TEXT_NORMAL);
+		fprintf(stdout,"%s%s\n",(print_index ? index_str+" " : "").c_str(),command.c_str());
 	}
 	ifs.close();
 }
@@ -164,7 +165,6 @@ int main(int argc, char** argv)
 		printCommands(m_path,false,&cmd_ctr);
 		printHeader("("+std::string(1,CHARACTER_SIGIL)+") "+c.getName());
 		printCommands(c_path,false,&cmd_ctr);
-		fprintf(stdout,"\b");
 	}
 	else if(!strcasecmp(argv[1],"-r"))
 	{
