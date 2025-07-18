@@ -76,7 +76,6 @@ int main(int argc, char** argv)
 			}
 			fprintf(stdout,"\n");
 		}
-		fprintf(stdout,"\b");
 	}
 	else
 	{
