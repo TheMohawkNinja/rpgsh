@@ -11,15 +11,13 @@ v::Background::v{<NO_BACKGROUND>}
 v::Backstory::v{<NO_BACKSTORY>}
 v::Bonds::v{<NO_BONDS>}
 v::Charisma::v{0}
-v::Charisma/Modifier::v{0}
 v::Class::v{<NO_CLASS>}
 v::Constitution::v{0}
-v::Constitution/Modifier::v{0}
 v::DeathSaves/Failed::v{0}
 v::DeathSaves/Succeeded::v{0}
 v::Dexterity::v{0}
-v::Dexterity/Modifier::v{0}
 v::EyeColor::v{<NO_EYE_COLOR>}
+v::ExperiencePoints::v{0}
 v::FeaturesAndTraits::v{<NO_FEATURES_AND_TRAITS>}
 v::Flaws::v{<NO_FLAWS>}
 v::HitPoints/Current::v{0}
@@ -31,7 +29,6 @@ v::Ideals::v{<NO_IDEALS>}
 v::Initiative::v{0}
 v::Inspiration::v{false}
 v::Intelligence::v{0}
-v::Intelligence/Modifier::v{0}
 v::Level::v{1}
 v::Name::v{<NO_NAME>}
 v::PersonalityTraits::v{<NO_PERSONALITY_TRAITS>}
@@ -44,9 +41,6 @@ v::SpellAttackBonus::v{0}
 v::SpellSaveDC::v{0}
 v::SpellcastingAbility::v{<NO_SPELLCASTING_ABILITY>}
 v::Strength::v{0}
-v::Strength/Modifier::v{0}
 v::Treasure::v{<NO_TREASURE>}
 v::Weight::v{0}
 v::Wisdom::v{0}
-v::Wisdom/Modifier::v{0}
-v::ExperiencePoints::v{0}
