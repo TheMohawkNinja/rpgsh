@@ -101,36 +101,39 @@ int main(int argc, char** argv)
 	if(nfs == character)
 	{
 		bool exists = false;
+		std::string dst_dir = campaigns_dir+getEnvVariable(ENV_CURRENT_CAMPAIGN)+"characters/";
+		Character c;
 		for(const auto& file : getDirectoryListing(templates_dir))
 		{
-			if(!stringcasecmp(file,template_name))
+			if(!stringcasecmp(file,template_name+c_ext))
 			{
 				template_name = file;
 				exists = true;
-				break;
+
+				c = Character(templates_dir+template_name);
+				fprintf(stdout,"Please enter values for the following keys (default values in parenthesis):\n");
+				fillCharacterSheet<Var>(&c);
+				fillCharacterSheet<Dice>(&c);
+				fillCharacterSheet<Wallet>(&c);
+				fillCharacterSheet<Currency>(&c);
+				c.setDatasource(dst_dir+c.getProperty<Var>(c.getName(),"Value")+c_ext);
+				if(std::filesystem::exists(c.getDatasource()))
+				{
+					fprintf(stdout,"Character file \"%s\" exists, do you want to overwrite? (y/N): ",c.getDatasource().c_str());
+					if(getchar() != 'y') return -1;
+					fprintf(stdout,"\n");
+				}
+				c.save();
+				output(info,"Character \"%s\" has been created.",c.getName().c_str());
 			}
+			else if(!stringcasecmp(left(file,findu(file,'.')-1),template_name))
+				std::filesystem::copy(templates_dir+file,dst_dir+file,std::filesystem::copy_options::overwrite_existing);
 		}
 		if(!exists)
 		{
 			output(error,"Template file \"%s\" does not exist.",template_name.c_str());
 			return -1;
 		}
-
-		Character c = Character(templates_dir+template_name);
-		fprintf(stdout,"Please enter values for the following keys (default values in parenthesis):\n");
-		fillCharacterSheet<Var>(&c);
-		fillCharacterSheet<Dice>(&c);
-		fillCharacterSheet<Wallet>(&c);
-		fillCharacterSheet<Currency>(&c);
-		c.setDatasource(campaigns_dir+getEnvVariable(ENV_CURRENT_CAMPAIGN)+"characters/"+c.getProperty<Var>(c.getName(),"Value")+c_ext);
-		if(std::filesystem::exists(c.getDatasource()))
-		{
-			fprintf(stdout,"Character file \"%s\" exists, do you want to overwrite? (y/N): ",c.getDatasource().c_str());
-			if(getchar() != 'y') return -1;
-			fprintf(stdout,"\n");
-		}
-		c.save();
-		output(info,"Character \"%s\" has been created.",c.getName().c_str());
 	}
 	else
 	{
