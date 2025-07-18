@@ -551,11 +551,15 @@ Character::Character(bool backup)
 	else
 	{
 		confirmDefaultCampaign();
-		Config config = Config();
-		std::string src = templates_dir+config.setting[DEFAULT_GAME]+c_ext;
-		std::string dst = campaigns_dir+"default/characters/"+getName()+c_ext;
-		load(src);
-		std::filesystem::copy(src,dst,std::filesystem::copy_options::update_existing);
+		Config cfg = Config();
+		load(templates_dir+cfg.setting[DEFAULT_GAME]+c_ext);
+		std::string dst = campaigns_dir+"default/characters/"+getName();
+		for(const auto& file : getDirectoryListing(templates_dir))
+		{
+			if(left(file,findu(file,'.')) == cfg.setting[DEFAULT_GAME])
+				std::filesystem::copy(templates_dir+file,dst+right(file,findu(file,'.')),std::filesystem::copy_options::update_existing);
+		}
+		setDatasource(dst+c_ext);
 		setEnvVariable(ENV_CURRENT_CHARACTER,getName());
 		save();
 	}
