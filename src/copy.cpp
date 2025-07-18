@@ -200,6 +200,9 @@ int main(int argc, char** argv)
 			if(left(entry,rfindu(entry,'.')) == src_mc.c.c_str())
 				std::filesystem::copy(src_character_dir+entry,left(dst_character_path,rfindu(dst_character_path,'.'))+right(entry,rfindu(entry,'.')));
 		}
+		Character dst_c = Character(dst_character_path);
+		dst_c.setName(dst_mc.c);
+		dst_c.save();
 		output(info,"Character \"%s\" has been created.",dst.c_str());
 		return 0;
 	}
@@ -215,11 +218,15 @@ int main(int argc, char** argv)
 		std::string copy_num = std::to_string(i+copy_start);
 		if(copy_c)
 		{
-			dst_character_path = left(dst_character_path,dst_character_path.length()-c_ext.length())+copy_num+c_ext;
-			std::filesystem::copy(src_character_path,dst_character_path);
-			std::string src_autorun_path = left(src_character_path,src_character_path.length()-c_ext.length())+autorun_ext;
-			std::string dst_autorun_path = left(dst_character_path,dst_character_path.length()-c_ext.length())+autorun_ext;
-			//TODO: Implement the same copy code we used for one copy
+			std::string src_character_dir = left(src_character_path,rfindu(src_character_path,'/')+1);
+			for(const auto& entry : getDirectoryListing(src_character_dir))
+			{
+				if(left(entry,rfindu(entry,'.')) == src_mc.c.c_str())
+					std::filesystem::copy(src_character_dir+entry,left(dst_character_path,rfindu(dst_character_path,'.'))+copy_num+right(entry,rfindu(entry,'.')));
+			}
+			Character dst_c = Character(left(dst_character_path,rfindu(dst_character_path,'.'))+copy_num+c_ext);
+			dst_c.setName(dst_mc.c+copy_num);
+			dst_c.save();
 			output(info,"Character \"%s\" has been created.",(dst+copy_num).c_str());
 		}
 		else if(copy_m)
