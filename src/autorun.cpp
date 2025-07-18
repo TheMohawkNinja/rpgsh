@@ -21,9 +21,10 @@ void execAutorun(std::string path, std::string scope, bool verbose)
 		getline(ifs,command);
 		if(!command.length() || command[0] == COMMENT) continue;
 		if(findu(command,COMMENT)) command = left(command,findu(command,COMMENT));
+		bool echo = stob(left(command,findu(command,',')-1));
 		if(verbose)
 			output(info,"Running %s autorun command \"%s\"",scope.c_str(),command.c_str());
-		runApp(command,false);
+		runApp(right(command,findu(command,',')+1),!echo);
 	}
 	ifs.close();
 }
@@ -31,14 +32,20 @@ void saveAutorun(std::string path, std::string scope)
 {
 	while(true)
 	{
-		std::string command;
+		std::string command, echo;
 		fprintf(stdout,"Please enter a command: ");
 		getline(std::cin,command);
 		if(!command.length()) continue;
+		do
+		{
+			fprintf(stdout,"Echo output when running command? [Y/n]: ");
+			getline(std::cin,echo);
+		}while(stringcasecmp(echo,"y") && stringcasecmp(echo,"n"));
 
+		echo = (!stringcasecmp(echo,"n") ? "true," : "false,");
 		std::ofstream ofs(path,std::ios::app);
-		ofs<<command+"\n";
-		output(info,"Added \"%s\" to %s autorun file",command.c_str(),scope.c_str());
+		ofs<<echo+command+"\n";
+		output(info,"Added \"%s%s\" to %s autorun file",echo.c_str(),command.c_str(),scope.c_str());
 		ofs.close();
 		return;
 	}
