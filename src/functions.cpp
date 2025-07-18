@@ -445,7 +445,7 @@ std::string mergeQuotes(std::string str)
 	// Therefore, we shouldn't need to check for odd inputs
 
 	// If neither end has quotes, just return the string as is.
-	if(str.front() != '\"' && (str.back() != '\"' || isEscaped(str,str.length()-1)))
+	if(!str.length() || (str.front() != '\"' && (str.back() != '\"' || isEscaped(str,str.length()-1))))
 		return str;
 
 	// Strip unescaped quote marks out from anywhere else but the ends of the string
