@@ -126,8 +126,8 @@ int main(int argc, char** argv)
 				c.save();
 				output(info,"Character \"%s\" has been created.",c.getName().c_str());
 			}
-			else if(!stringcasecmp(left(file,findu(file,'.')-1),template_name))
-				std::filesystem::copy(templates_dir+file,dst_dir+file,std::filesystem::copy_options::overwrite_existing);
+			else if(!stringcasecmp(left(file,findu(file,'.')),left(template_name,findu(template_name,'.'))))
+				std::filesystem::copy(templates_dir+file,dst_dir+c.getName()+right(file,findu(file,'.')),std::filesystem::copy_options::overwrite_existing);
 		}
 		if(!exists)
 		{
