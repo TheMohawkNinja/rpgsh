@@ -228,8 +228,14 @@ int main(int argc, char** argv)
 		}
 		else
 		{
-			output(error,"Unknown option \"%s\".",argv[i]);
-			return -1;
+			std::regex dice_pattern(d_imp_const_pattern_str);
+			std::sregex_iterator dice_it(arg_str.begin(),arg_str.end(),dice_pattern);
+			std::sregex_iterator dice_end;
+
+			if(dice_it != dice_end && dice_it->str() == arg_str)
+				data.set<Dice>("",arg_str);
+			else
+				data.set<Var>("",arg_str);
 		}
 	}
 
