@@ -117,6 +117,7 @@ extern std::string autorun_ext;
 extern std::string arg_pattern_str;
 extern std::string variable_pattern_str;
 extern std::string exp_const_pattern_str;
+extern std::string d_imp_const_pattern_str;
 extern std::string set_pattern_str;
 
 //Data separator string. Name shortened for brevity in the code.
