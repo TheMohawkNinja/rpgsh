@@ -759,7 +759,7 @@ int prompt()
 	}
 	return 0;
 }
-int main()
+int main(int argc, char** argv)
 {
 	//Generate cache of valid rpgsh programs to speed up "help" program
 	//It takes a noticable amount of time to search through all of /bin even on an i7-4700k
@@ -781,6 +781,63 @@ int main()
 
 	fprintf(stdout,CLEAR_ENTIRE_LINE);//Delete "Generating..." line from start of main()
 
+	//Handle arguments
+	if(argc > 3) output(warning,"rpgsh expects 0, 1, or 2 arguments. Ignoring everything past \"%s\".",argv[2]);
+	if(chkFlagHelp(argv))
+	{
+		fprintf(stdout,"\n");
+		fprintf(stdout,"USAGE:\n");
+		fprintf(stdout,"\trpgsh [%sOPTIONS%s]\n\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"OPTIONS:\n");
+		fprintf(stdout,"\t%snone%s\t\tStarts rpgsh normally.\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t-c %scommand%s\tExecutes rpgsh command %scommand%s.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t-s %spath%s\t\tExecutes rpgsh script at path %spath%s.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t%s | %s\tPrints this help text.\n",FLAG_HELPSHORT,FLAG_HELPLONG);
+		return 0;
+	}
+	else if(argv[1] && strcmp(argv[1],"-c") && strcmp(argv[1],"-s"))
+	{
+		output(error,"Unknown option \"%s\".",argv[1]);
+		return -1;
+	}
+
+	//Handle commands
+	if(argc > 2 && !strcmp(argv[1],"-c"))
+	{
+		runApp(std::string(argv[2]),false);
+		return 0;
+	}
+	else if(argv[1] && !strcmp(argv[1],"-c"))
+	{
+		output(error,"No rpgsh command specified.");
+		return -1;
+	}
+
+	//Handle scripts
+	if(argc > 2 && !strcmp(argv[1],"-s") && std::filesystem::exists(argv[2]))
+	{
+		std::string cmd;
+		std::ifstream ifs(argv[2]);
+		while(!ifs.eof())
+		{
+			getline(ifs,cmd);
+			if(cmd != "" && (cmd.length() < 3 || (cmd.length() >= 3 && left(cmd,3) != "#!/")))
+				runApp(cmd,false);
+		}
+		return 0;
+	}
+	else if(argc > 2 && !strcmp(argv[1],"-s"))
+	{
+		output(error,"rpgsh script \"%s\" does not exist.");
+		return -1;
+	}
+	else if(argv[1] && !strcmp(argv[1],"-s"))
+	{
+		output(error,"No rpgsh script specified.");
+		return -1;
+	}
+
+	//Normal operation (no args)
 	for(const auto& app : split(cfg.setting[STARTUP_APPS],','))
 		if(app.length()) (void)runApp(app,false);
 
@@ -792,7 +849,7 @@ int main()
 	}
 	else fprintf(stdout,"\n");
 
-	while(prompt() == 0);
+	while(!prompt());
 
 	return 0;
 }
