@@ -25,24 +25,25 @@ std::string c_ext =				".char";
 std::string autorun_ext =			".autorun";
 
 //RegEx patterns
-std::string arg_pattern_str =			"[^\\s]{1,}";
+std::string arg_pattern_str =			"[^\\s]+";
 std::string variable_pattern_str =		"["+
 						std::string(1,CHARACTER_SIGIL)+
 						std::string(1,CAMPAIGN_SIGIL)+
 						std::string(1,SHELL_SIGIL)+
-						"]{1}["+
+						"]["+
 						std::string(1,VAR_SIGIL)+
 						std::string(1,DICE_SIGIL)+
 						std::string(1,CURRENCY_SIGIL)+
 						std::string(1,WALLET_SIGIL)+
-						"]?[\\w\\/\\.]{1,}";
+						"]?[\\w\\/\\.]+";
 std::string exp_const_pattern_str =		"["+
 						std::string(1,VAR_SIGIL)+
 						std::string(1,DICE_SIGIL)+
 						std::string(1,CURRENCY_SIGIL)+
 						std::string(1,WALLET_SIGIL)+
 						"]{1}\\{.*\\}";
-std::string set_pattern_str =			"(([\\.a-zA-Z0-9]{1,}\\/*)*::["+
+std::string d_imp_const_pattern_str =		"[0-9]*d[0-9]+[+-]?[0-9]*";
+std::string set_pattern_str =			"(([\\.a-zA-Z0-9]+\\/*)*::["+
 						std::string(1,VAR_SIGIL)+
 						std::string(1,DICE_SIGIL)+
 						std::string(1,CURRENCY_SIGIL)+
