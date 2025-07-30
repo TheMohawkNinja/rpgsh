@@ -153,33 +153,33 @@ int main(int argc, char** argv)
 		fprintf(stdout,"%s\n%s\n",TEXT_NORMAL,CLEAR_LINE);
 
 		//Clear all characters after newlines to remove left over characters from previous buffer if characters in that line were deleted
-		fprintf(stdout,(std::regex_replace(output,std::regex("\\n"),std::string(CLEAR_TO_LINE_END)+std::string(1,'\n')).c_str()));
-
+		if(!(input.size()%w.ws_col)) fprintf(stdout,CLEAR_TO_SCREEN_END);
+		fprintf(stdout,output.c_str());
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
 
 		//Determine number of paragraphs
 		unsigned long int total_paragraph_lines = 0;
-		std::string u_output = stripFormatting(output);
-		if(findu(u_output,'\n') != std::string::npos)
+		std::string strippedOutput = stripFormatting(output);
+		if(findu(strippedOutput,'\n') != std::string::npos)
 		{
-			for(unsigned long int i=0; i<getDisplayLength(output)-1; i++)
+			for(unsigned long int i=0; i<getDisplayLength(strippedOutput)-1; i++)
 			{
-				unsigned long int next_newline = findu(u_output,'\n',i);
+				unsigned long int next_newline = findu(strippedOutput,'\n',i);
 				if(next_newline != std::string::npos && next_newline != i)
 				{
 					total_paragraph_lines += (next_newline-1-i)/w.ws_col;
 				}
-				else
+				else if(next_newline == std::string::npos && next_newline != i)
 				{
-					total_paragraph_lines += (u_output.length()-i)/w.ws_col;
+					total_paragraph_lines += (getDisplayLength(strippedOutput)-1-i)/w.ws_col;
 					break;
 				}
 				i = next_newline;
 			}
 		}
 
-		unsigned long int output_length = getDisplayLength(output)-1-(countu(output,'%')/2);
+		unsigned long int output_length = getDisplayLength(output)-1;
 		unsigned long int cursor_vert_offset = 4+countu(output,'\n')+countu(output,'\f')+countu(output,'\v');//TODO: Take into account the lengths of last line of paragraph, appears to be related to cursor position though
 		if(total_paragraph_lines)
 			cursor_vert_offset += total_paragraph_lines;
@@ -197,9 +197,9 @@ int main(int argc, char** argv)
 			if(cur_pos % w.ws_col)
 				fprintf(stdout,CURSOR_RIGHT_N,cur_pos%w.ws_col);
 		}
-		fprintf(stdout,CURSOR_SHOW);
 
 		esc_char = 0;
+		fprintf(stdout,CURSOR_SHOW);
 		k = getchar();
 		fprintf(stdout,CURSOR_HIDE);
 
