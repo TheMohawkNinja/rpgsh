@@ -151,19 +151,24 @@ int main(int argc, char** argv)
 			value += input[i];
 		std::string output = makePretty(value);
 		fprintf(stdout,"%s\n%s\n",TEXT_NORMAL,CLEAR_LINE);
+		std::string input_str;
+		for(const auto& ch : input) input_str += ch; //std::string(input.data()) does not provide correct value, so we have to construct a string manually to derive correct display length
+		unsigned long int input_display_length = getDisplayLength(input_str);
+		//fprintf(stdout,"%s\n%sw.ws_col = %d, input.size() = %lu, input_display_length = %lu, output.length() = %lu, strippedOutput.length() = %lu, getDisplayLength(strippedOutput) = %lu, cur_pos = %lu\n",TEXT_NORMAL,CLEAR_LINE,w.ws_col,input.size(),input_display_length,output.length(),stripFormatting(output).length(),getDisplayLength(stripFormatting(output)),cur_pos);
 
 		//Clear all characters after newlines to remove left over characters from previous buffer if characters in that line were deleted
 		if(!(input.size()%w.ws_col)) fprintf(stdout,CLEAR_TO_SCREEN_END);
-		fprintf(stdout,output.c_str());
+		fprintf(stdout,std::regex_replace(output,std::regex("\n"),std::string(CLEAR_TO_LINE_END)+"\n").c_str());//If input prior to '\n' was shortened, this removes trailing characters
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
 		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
 
 		//Determine number of paragraphs
-		unsigned long int total_paragraph_lines = 0;
 		std::string strippedOutput = stripFormatting(output);
+		unsigned long int output_display_length = getDisplayLength(strippedOutput);
+		unsigned long int total_paragraph_lines = 0;
 		if(findu(strippedOutput,'\n') != std::string::npos)
 		{
-			for(unsigned long int i=0; i<getDisplayLength(strippedOutput)-1; i++)
+			for(unsigned long int i=0; i<output_display_length-1; i++)
 			{
 				unsigned long int next_newline = findu(strippedOutput,'\n',i);
 				if(next_newline != std::string::npos && next_newline != i)
@@ -172,20 +177,19 @@ int main(int argc, char** argv)
 				}
 				else if(next_newline == std::string::npos && next_newline != i)
 				{
-					total_paragraph_lines += (getDisplayLength(strippedOutput)-1-i)/w.ws_col;
+					total_paragraph_lines += (output_display_length-1-i)/w.ws_col;
 					break;
 				}
 				i = next_newline;
 			}
 		}
 
-		unsigned long int output_length = getDisplayLength(output)-1;
-		unsigned long int cursor_vert_offset = 4+countu(output,'\n')+countu(output,'\f')+countu(output,'\v');//TODO: Take into account the lengths of last line of paragraph, appears to be related to cursor position though
+		unsigned long int cursor_vert_offset = 4+countu(strippedOutput,'\n')+countu(strippedOutput,'\f')+countu(strippedOutput,'\v');
 		if(total_paragraph_lines)
 			cursor_vert_offset += total_paragraph_lines;
 		else
-			cursor_vert_offset += output_length/w.ws_col;
-		fprintf(stdout,CURSOR_UP_N,(long unsigned int)(input.size()/w.ws_col)+cursor_vert_offset);
+			cursor_vert_offset += (output_display_length-1)/w.ws_col;
+		fprintf(stdout,CURSOR_UP_N,(long unsigned int)(input_display_length/w.ws_col)+cursor_vert_offset);
 		if(cur_pos > 0 && cur_pos < w.ws_col)
 		{
 			fprintf(stdout,CURSOR_RIGHT_N,cur_pos);
@@ -208,7 +212,7 @@ int main(int argc, char** argv)
 			char next_char = getchar();
 			if(next_char == ESC_SEQ)//Consume '[', exiting if key combo is entered.
 			{
-				fprintf(stdout,CURSOR_DOWN_N,(long unsigned int)((input.size()-cur_pos)/w.ws_col)+cursor_vert_offset);
+				fprintf(stdout,CURSOR_DOWN_N,(long unsigned int)((input_display_length-cur_pos)/w.ws_col)+cursor_vert_offset);
 				fprintf(stdout,"\n");
 				fprintf(stdout,CURSOR_SHOW);
 				return 0;
@@ -251,20 +255,17 @@ int main(int argc, char** argv)
 
 		prev_cur_pos = cur_pos;
 
-		if(isprint(k))//Printable characters
-		{
-			if(insert_mode)	//If the "Insert" key is toggled
-				input[cur_pos] = k;
-			else
-				input.insert(input.begin()+cur_pos,k);
-			cur_pos++;
-		}
-		else if(k == KB_BACKSPACE && cur_pos > 0)//Backspace
+		if(k == KB_BACKSPACE && cur_pos > 0)//Backspace
 		{
 			if(cur_pos > 1 && (!(cur_pos%w.ws_col) || cur_pos%w.ws_col == 1))
 				fprintf(stdout,CURSOR_UP);
 			cur_pos--;
 			input.erase(input.begin()+cur_pos);
+			if(input[cur_pos] < 0)
+			{
+				for(unsigned long i=cur_pos; input[i] < 0; i++)
+					input.erase(input.begin()+cur_pos);
+			}
 		}
 		else if(k == KB_TAB || k == KB_ENTER)
 		{
@@ -429,6 +430,15 @@ int main(int argc, char** argv)
 					input.erase(input.begin()+cur_pos);
 					break;
 			}
+		}
+		else
+		{
+			if(insert_mode)	//If the "Insert" key is toggled
+				input[cur_pos] = k;
+			else
+				input.insert(input.begin()+cur_pos,k);
+
+			if(k > 0) cur_pos++;
 		}
 
 		//Reset terminal flags in-case of sudden program termination
