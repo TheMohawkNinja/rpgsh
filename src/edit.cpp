@@ -89,6 +89,7 @@ int main(int argc, char** argv)
 	char k = 0;
 	char esc_char = 0;
 	long unsigned int cur_pos = 2;
+	//long unsigned int char_pos = cur_pos;
 	long unsigned int prev_cur_pos = cur_pos;
 
 	enum SaveTextState
@@ -126,16 +127,12 @@ int main(int argc, char** argv)
 		{
 			fprintf(stdout,CURSOR_UP);
 			fprintf(stdout,CLEAR_LINE);
-		}
-		//fprintf(stdout,CLEAR_TO_SCREEN_END);
-		if(sts == show_save_text)
-		{
-			sts = remove_save_text;
-		}
-		else if(sts == remove_save_text)
-		{
 			fprintf(stdout,CURSOR_DOWN);
 			sts = unsaved;
+		}
+		else if(sts == show_save_text)
+		{
+			sts = remove_save_text;
 		}
 
 		for(const auto& ch : input) fprintf(stdout,"%c",ch);
@@ -149,12 +146,12 @@ int main(int argc, char** argv)
 		std::string value;
 		for(unsigned long int i=2; i<input.size()-1; i++)
 			value += input[i];
+
 		std::string output = makePretty(value);
 		fprintf(stdout,"%s\n%s\n",TEXT_NORMAL,CLEAR_LINE);
 		std::string input_str;
 		for(const auto& ch : input) input_str += ch; //std::string(input.data()) does not provide correct value, so we have to construct a string manually to derive correct display length
 		unsigned long int input_display_length = getDisplayLength(input_str);
-		//fprintf(stdout,"%s\n%sw.ws_col = %d, input.size() = %lu, input_display_length = %lu, output.length() = %lu, strippedOutput.length() = %lu, getDisplayLength(strippedOutput) = %lu, cur_pos = %lu\n",TEXT_NORMAL,CLEAR_LINE,w.ws_col,input.size(),input_display_length,output.length(),stripFormatting(output).length(),getDisplayLength(stripFormatting(output)),cur_pos);
 
 		//Clear all characters after newlines to remove left over characters from previous buffer if characters in that line were deleted
 		if(!(input.size()%w.ws_col)) fprintf(stdout,CLEAR_TO_SCREEN_END);
