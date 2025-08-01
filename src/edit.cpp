@@ -89,7 +89,7 @@ int main(int argc, char** argv)
 	char k = 0;
 	char esc_char = 0;
 	long unsigned int cur_pos = 2;
-	//long unsigned int char_pos = cur_pos;
+	long unsigned int char_pos = cur_pos;
 	long unsigned int prev_cur_pos = cur_pos;
 
 	enum SaveTextState
@@ -148,7 +148,8 @@ int main(int argc, char** argv)
 			value += input[i];
 
 		std::string output = makePretty(value);
-		fprintf(stdout,"%s\n%s\n",TEXT_NORMAL,CLEAR_LINE);
+		//fprintf(stdout,"%s\n%s\n",TEXT_NORMAL,CLEAR_LINE);
+		fprintf(stdout,"%s\n%scur_pos = %lu, char_pos = %lu\n",TEXT_NORMAL,CLEAR_LINE,cur_pos,char_pos);
 		std::string input_str;
 		for(const auto& ch : input) input_str += ch; //std::string(input.data()) does not provide correct value, so we have to construct a string manually to derive correct display length
 		unsigned long int input_display_length = getDisplayLength(input_str);
@@ -256,13 +257,20 @@ int main(int argc, char** argv)
 		{
 			if(cur_pos > 1 && (!(cur_pos%w.ws_col) || cur_pos%w.ws_col == 1))
 				fprintf(stdout,CURSOR_UP);
+
 			cur_pos--;
-			input.erase(input.begin()+cur_pos);
-			if(input[cur_pos] < 0)
+			char_pos--;
+			if(getCharLength(input[char_pos]) == 1)
 			{
-				for(unsigned long i=cur_pos; input[i] < 0; i++)
-					input.erase(input.begin()+cur_pos);
+				input.erase(input.begin()+char_pos);
+				continue;
 			}
+			for(unsigned long i=char_pos; !getCharLength(input[i]); i--)
+			{
+				input.erase(input.begin()+i);
+				char_pos--;
+			}
+			input.erase(input.begin()+char_pos);
 		}
 		else if(k == KB_TAB || k == KB_ENTER)
 		{
@@ -290,11 +298,16 @@ int main(int argc, char** argv)
 		}
 		else if(k == ESC_SEQ)//Escape sequences
 		{
+			long unsigned int up_end = cur_pos-w.ws_col;
+			long unsigned int down_end = cur_pos+w.ws_col;
+			long unsigned int del_end = cur_pos+getCharLength(input[char_pos]);
 			switch(esc_char)
 			{
 				case 'A':	//Up
 					if(cur_pos < w.ws_col) break;
-					cur_pos -= w.ws_col;
+					for(long unsigned int i=cur_pos; i>up_end; i--)
+						char_pos -= getCharLength(input[i]);
+					cur_pos = up_end;
 					fprintf(stdout,CURSOR_UP);
 					if(cur_pos >= w.ws_col  && !(prev_cur_pos%w.ws_col))
 						fprintf(stdout,CURSOR_UP);
@@ -302,25 +315,36 @@ int main(int argc, char** argv)
 				case 'B':	//Down
 					if(cur_pos && !(cur_pos%w.ws_col)) fprintf(stdout,CURSOR_UP);
 					if(cur_pos+w.ws_col > input.size()) break;
-					cur_pos += w.ws_col;
+					for(long unsigned int i=cur_pos; i<down_end; i++)
+						char_pos += getCharLength(input[i]);
+					cur_pos = down_end;
 					if(cur_pos > w.ws_col) fprintf(stdout,CURSOR_DOWN);
 					break;
 				case 'C':	//Right
 					if(cur_pos == input.size()) break;
 					cur_pos++;
+					char_pos+=getCharLength(input[char_pos]);
 					break;
 				case 'D':	//Left
 					if(cur_pos == 0) break;
 					cur_pos--;
+					char_pos--;
+					while(!getCharLength(input[char_pos])) char_pos--;
 					if(cur_pos && (cur_pos/w.ws_col < prev_cur_pos/w.ws_col || !(cur_pos%w.ws_col)))
 						fprintf(stdout,CURSOR_UP);
 					break;
 				case 'c':	//Shift+Right
 					if(cur_pos == input.size()) break;
 					for(long unsigned int i=cur_pos; input[i]!=' ' && i<input.size(); i++)
+					{
 						cur_pos++;
+						char_pos+=getCharLength(input[char_pos]);
+					}
 					for(long unsigned int i=cur_pos; input[i]==' ' && i<input.size(); i++)
+					{
 						cur_pos++;
+						char_pos+=getCharLength(input[char_pos]);
+					}
 
 					if(cur_pos/(long unsigned int)w.ws_col > prev_cur_pos/(long unsigned int)w.ws_col && cur_pos%w.ws_col)
 						fprintf(stdout,CURSOR_DOWN_N,(cur_pos/w.ws_col)-(prev_cur_pos/w.ws_col));
@@ -328,17 +352,33 @@ int main(int argc, char** argv)
 				case 'd':	//Shift+Left
 					if(cur_pos == 0) break;
 					for(long unsigned int i=cur_pos; input[i]!=' ' && i>0; i--)
+					{
 						cur_pos--;
+						char_pos--;
+						while(!getCharLength(input[char_pos])) char_pos--;
+					}
 					for(long unsigned int i=cur_pos; input[i]==' ' && i>0; i--)
+					{
 						cur_pos--;
+						char_pos--;
+						while(!getCharLength(input[char_pos])) char_pos--;
+					}
 					for(long unsigned int i=cur_pos; input[i]!=' ' && i>0; i--)
+					{
 						cur_pos--;
-					if(cur_pos > 0) cur_pos++;
+						char_pos--;
+						while(!getCharLength(input[char_pos])) char_pos--;
+					}
+					if(cur_pos > 0)
+					{
+						cur_pos++;
+						char_pos+=getCharLength(input[char_pos]);
+					}
 
 					if(cur_pos/(long unsigned int)w.ws_col < prev_cur_pos/(long unsigned int)w.ws_col)
 						fprintf(stdout,CURSOR_UP_N,(prev_cur_pos/w.ws_col)-(cur_pos/w.ws_col));
 
-					if(!(cur_pos % w.ws_col)) fprintf(stdout,CURSOR_UP);
+					if(cur_pos && !(cur_pos % w.ws_col)) fprintf(stdout,CURSOR_UP);
 					break;
 				case 'H':	//Home
 					if(cur_pos == 0) break;
@@ -424,18 +464,20 @@ int main(int argc, char** argv)
 					break;
 				case '3':	//Delete
 					if(getchar() != '~' || cur_pos >= input.size()) break;
-					input.erase(input.begin()+cur_pos);
+					for(long unsigned int i=cur_pos; i<del_end; i++)
+						input.erase(input.begin()+cur_pos);
 					break;
 			}
 		}
-		else
+		else //Printable character, probably
 		{
 			if(insert_mode)	//If the "Insert" key is toggled
-				input[cur_pos] = k;
+				input[char_pos] = k;
 			else
-				input.insert(input.begin()+cur_pos,k);
+				input.insert(input.begin()+char_pos,k);
 
-			if(k > 0) cur_pos++;
+			char_pos++;
+			if(getCharLength(k)) cur_pos++;
 		}
 
 		//Reset terminal flags in-case of sudden program termination
