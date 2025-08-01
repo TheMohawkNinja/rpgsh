@@ -428,6 +428,15 @@ long unsigned int getDisplayLength(std::string str)
 	}
 	return len;
 }
+int getCharLength(char c)
+{
+	unsigned char uc = static_cast<unsigned char>(c);
+	if(uc < 0x80) return 1;
+	else if((uc&0xe0) == 0xc0) return 2;
+	else if((uc&0xf0) == 0xe0) return 3;
+	else if((uc&0xf8) == 0xf0) return 4;
+	else return 0;
+}
 
 std::string addSpaces(unsigned int n)
 {
