@@ -146,6 +146,7 @@ int main(int argc, char** argv)
 		for(unsigned long int i=2; i<input.size()-1; i++)
 			value += input[i];
 
+		replaceVariables(&value,false);
 		std::string output = makePretty(value);
 		fprintf(stdout,"%s\n%s\n",TEXT_NORMAL,CLEAR_LINE);
 		unsigned long int input_display_length = getInputDisplayLength(input);
