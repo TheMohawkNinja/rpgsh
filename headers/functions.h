@@ -108,7 +108,8 @@ void printBadOpAndThrow(std::string bad_op);
 
 void padding();
 
-int runApp(std::string args, bool redirect_output);
+int replaceVariables(std::string* p_arg_str, bool preserveSecondArg);
+int runApp(std::string arg_str, bool redirect_output);
 GetAppOutputInfo getAppOutput(std::string prog);
 
 void chkFlagAppDesc(char** _argv, std::string description);

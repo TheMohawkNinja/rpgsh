@@ -721,6 +721,56 @@ void padding()
 	}
 }
 
+int replaceVariables(std::string* p_arg_str, bool preserveSecondArg)
+{
+	std::regex variable_pattern = std::regex(variable_pattern_str);
+	std::sregex_iterator v_str_it = std::sregex_iterator((*p_arg_str).begin(),(*p_arg_str).end(),variable_pattern);
+	std::regex arg_pattern(arg_pattern_str);
+	std::sregex_iterator p_arg_str_it((*p_arg_str).begin(),(*p_arg_str).end(),arg_pattern);
+	std::sregex_iterator end;
+
+	if(p_arg_str_it != end) p_arg_str_it++;
+
+	if(preserveSecondArg && v_str_it != end && p_arg_str_it != end && v_str_it->str() == p_arg_str_it->str())
+		v_str_it++;
+
+	// For some reason, attempting to just use v_str_it in the std::regex_replace line to replace variables with their values
+	// results in the iterator getting in some way lost causing it to not replace all the variables.
+	// Seems to be limited to cases when the value length > variable length
+	// Either way, using a std::vector<std::string> is an effective work around.
+	std::vector<std::pair<std::string,long unsigned int>> matches;
+	while(v_str_it != end)
+	{
+		matches.push_back(std::pair<std::string,long unsigned int>(v_str_it->str(),v_str_it->position()));
+		v_str_it++;
+	}
+	long unsigned int offset = 0;
+	for(const auto& match : matches)
+	{
+		GetAppOutputInfo info = getAppOutput(match.first);
+		if(info.status)
+		{
+			output(error,"%s is not a valid variable string.",match.first.c_str());
+			return -1;
+		}
+		(*p_arg_str) = left((*p_arg_str),match.second-offset)+
+			  std::regex_replace(match.first,std::regex(escapeRegexGroupChars(match.first)),info.output[0])+
+			  right((*p_arg_str),match.second+match.first.length()-offset);
+		offset += match.first.length()-info.output[0].length();
+	}
+
+	//Recursively replace variables
+	v_str_it = std::sregex_iterator((*p_arg_str).begin(),(*p_arg_str).end(),variable_pattern);
+
+	if(preserveSecondArg && v_str_it != end) v_str_it++;
+
+	if(v_str_it != end)
+	{
+		int replaceVariablesResult = replaceVariables(p_arg_str,preserveSecondArg);
+		if(replaceVariablesResult) return replaceVariablesResult;
+	}
+	return 0;
+}
 int runApp(std::string arg_str, bool redirect_output)
 {
 	Config cfg = Config();
@@ -747,8 +797,8 @@ int runApp(std::string arg_str, bool redirect_output)
 	//Check if implicitly running eval
 	std::regex variable_pattern(d_imp_const_pattern_str+"|"+variable_pattern_str);
 	std::sregex_iterator v_str_it(first_arg.begin(),first_arg.end(),variable_pattern);
-	std::sregex_iterator v_str_end;
-	if(v_str_it != v_str_end && v_str_it->str() == first_arg) arg_str = "eval " + arg_str;
+	std::sregex_iterator end;
+	if(v_str_it != end && v_str_it->str() == first_arg) arg_str = "eval " + arg_str;
 
 	if(findu(arg_str," ") != std::string::npos) first_arg = left(arg_str,findu(arg_str," "));
 	else					    first_arg = arg_str;
@@ -767,50 +817,16 @@ int runApp(std::string arg_str, bool redirect_output)
 	std::string path = std::string(RPGSH_INSTALL_DIR);
 	args.push_back(path+prefix+left(arg_str,findu(arg_str," ")));
 
-	//Replaces all instances of variables with their respective value
-	variable_pattern = std::regex(variable_pattern_str);
-	v_str_it = std::sregex_iterator(arg_str.begin(), arg_str.end(), variable_pattern);
-	std::regex arg_pattern(arg_pattern_str);
-	std::sregex_iterator arg_str_it(arg_str.begin(), arg_str.end(), arg_pattern);
-	std::sregex_iterator arg_str_end;
-
-	if(arg_str_it != arg_str_end) arg_str_it++;
-
-	if(preserveSecondArg &&
-	   v_str_it != v_str_end &&
-	   arg_str_it != arg_str_end &&
-	   v_str_it->str() == arg_str_it->str()) v_str_it++;
-
-	// For some reason, attempting to just use v_str_it in the std::regex_replace line to replace variables with their values
-	// results in the iterator getting in some way lost causing it to not replace all the variables.
-	// Seems to be limited to cases when the value length > variable length
-	// Either way, using a std::vector<std::string> is an effective work around.
-	std::vector<std::pair<std::string,long unsigned int>> matches;
-	while(v_str_it != v_str_end)
-	{
-		matches.push_back(std::pair<std::string,long unsigned int>(v_str_it->str(),v_str_it->position()));
-		v_str_it++;
-	}
-	long unsigned int offset = 0;
-	for(const auto& match : matches)
-	{
-		GetAppOutputInfo info = getAppOutput(match.first);
-		if(info.status)
-		{
-			output(error,"%s is not a valid variable string.",match.first.c_str());
-			return -1;
-		}
-		arg_str = left(arg_str,match.second-offset)+
-			  std::regex_replace(match.first,std::regex(escapeRegexGroupChars(match.first)),info.output[0])+
-			  right(arg_str,match.second+match.first.length()-offset);
-		offset += match.first.length()-info.output[0].length();
-	}
+	//Replace variables
+	int replaceVariablesResult = replaceVariables(&arg_str,preserveSecondArg);
+	if(replaceVariablesResult) return replaceVariablesResult;
 
 	//Get args for program
-	arg_str_it = std::sregex_iterator(arg_str.begin(), arg_str.end(), arg_pattern);
+	std::regex arg_pattern(arg_pattern_str);
+	std::sregex_iterator arg_str_it = std::sregex_iterator(arg_str.begin(),arg_str.end(),arg_pattern);
 	arg_str_it++;
 
-	while(arg_str_it != arg_str_end)
+	while(arg_str_it != end)
 	{
 		std::string arg = arg_str_it->str();
 		while(arg.back() == '\\')//Merge args with escaped spaces
