@@ -76,16 +76,8 @@ int main(int argc, char** argv)
 				value = vi.scope.getStr<Currency>(vi.key);
 				break;
 		}
-		bool warned = false;
 		for(const auto& ch : value)
-		{
-			if(ch < 0 && !warned)
-			{
-				output(warning,"Non-ASCII character detected, edit may not function properly.\n");
-				warned = true;
-			}
 			input.push_back(ch);
-		}
 	}
 	else
 	{
@@ -155,8 +147,7 @@ int main(int argc, char** argv)
 			value += input[i];
 
 		std::string output = makePretty(value);
-		//fprintf(stdout,"%s\n%s\n",TEXT_NORMAL,CLEAR_LINE);
-		fprintf(stdout,"%s\n%sgetInputDisplayLength(input) = %lu, cur_pos = %lu, char_pos = %lu\n",TEXT_NORMAL,CLEAR_LINE,getInputDisplayLength(input),cur_pos,char_pos);
+		fprintf(stdout,"%s\n%s\n",TEXT_NORMAL,CLEAR_LINE);
 		unsigned long int input_display_length = getInputDisplayLength(input);
 
 		//Clear all characters after newlines to remove left over characters from previous buffer if characters in that line were deleted
