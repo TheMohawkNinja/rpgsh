@@ -6,6 +6,13 @@
 #include "../headers/functions.h"
 #include "../headers/text.h"
 
+long unsigned int getInputDisplayLength(std::vector<char> input) //std::string(input.data()) does not provide correct value, so we have to construct a string manually to derive correct display length
+{
+	std::string str;
+	for(const auto& ch : input) str += ch;
+
+	return getDisplayLength(str);
+}
 int main(int argc, char** argv)
 {
 	if(argc > 2)
@@ -149,10 +156,8 @@ int main(int argc, char** argv)
 
 		std::string output = makePretty(value);
 		//fprintf(stdout,"%s\n%s\n",TEXT_NORMAL,CLEAR_LINE);
-		fprintf(stdout,"%s\n%scur_pos = %lu, char_pos = %lu\n",TEXT_NORMAL,CLEAR_LINE,cur_pos,char_pos);
-		std::string input_str;
-		for(const auto& ch : input) input_str += ch; //std::string(input.data()) does not provide correct value, so we have to construct a string manually to derive correct display length
-		unsigned long int input_display_length = getDisplayLength(input_str);
+		fprintf(stdout,"%s\n%sgetInputDisplayLength(input) = %lu, cur_pos = %lu, char_pos = %lu\n",TEXT_NORMAL,CLEAR_LINE,getInputDisplayLength(input),cur_pos,char_pos);
+		unsigned long int input_display_length = getInputDisplayLength(input);
 
 		//Clear all characters after newlines to remove left over characters from previous buffer if characters in that line were deleted
 		if(!(input.size()%w.ws_col)) fprintf(stdout,CLEAR_TO_SCREEN_END);
@@ -277,10 +282,10 @@ int main(int argc, char** argv)
 			char char_to_insert = (k == KB_TAB ? 't' : 'n');
 			if(insert_mode)	//If the "Insert" key is toggled
 			{
-				if(cur_pos < input.size())
+				if(cur_pos < getInputDisplayLength(input))
 				{
-					input[cur_pos] = '\\';
-					input.insert(input.begin()+cur_pos+1,char_to_insert);
+					input[char_pos] = '\\';
+					input.insert(input.begin()+char_pos+1,char_to_insert);
 				}
 				else
 				{
@@ -290,23 +295,27 @@ int main(int argc, char** argv)
 			}
 			else
 			{
-				input.insert(input.begin()+cur_pos,'\\');
-				input.insert(input.begin()+cur_pos+1,char_to_insert);
+				input.insert(input.begin()+char_pos,'\\');
+				input.insert(input.begin()+char_pos+1,char_to_insert);
 			}
 
 			cur_pos+=2;
+			char_pos+=2;
 		}
 		else if(k == ESC_SEQ)//Escape sequences
 		{
 			long unsigned int up_end = cur_pos-w.ws_col;
 			long unsigned int down_end = cur_pos+w.ws_col;
-			long unsigned int del_end = cur_pos+getCharLength(input[char_pos]);
+			long unsigned int del_end = (cur_pos < getInputDisplayLength(input) ? cur_pos+getCharLength(input[char_pos]) : 0);
 			switch(esc_char)
 			{
 				case 'A':	//Up
 					if(cur_pos < w.ws_col) break;
 					for(long unsigned int i=cur_pos; i>up_end; i--)
-						char_pos -= getCharLength(input[i]);
+					{
+						char_pos--;
+						while(!getCharLength(input[char_pos])) char_pos--;
+					}
 					cur_pos = up_end;
 					fprintf(stdout,CURSOR_UP);
 					if(cur_pos >= w.ws_col  && !(prev_cur_pos%w.ws_col))
@@ -314,14 +323,14 @@ int main(int argc, char** argv)
 					break;
 				case 'B':	//Down
 					if(cur_pos && !(cur_pos%w.ws_col)) fprintf(stdout,CURSOR_UP);
-					if(cur_pos+w.ws_col > input.size()) break;
+					if(cur_pos+w.ws_col > getInputDisplayLength(input)) break;
 					for(long unsigned int i=cur_pos; i<down_end; i++)
 						char_pos += getCharLength(input[i]);
 					cur_pos = down_end;
 					if(cur_pos > w.ws_col) fprintf(stdout,CURSOR_DOWN);
 					break;
 				case 'C':	//Right
-					if(cur_pos == input.size()) break;
+					if(cur_pos == getInputDisplayLength(input)) break;
 					cur_pos++;
 					char_pos+=getCharLength(input[char_pos]);
 					break;
@@ -386,19 +395,24 @@ int main(int argc, char** argv)
 					{
 						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
 						cur_pos = 0;
+						char_pos = 0;
 					}
 					else
 					{
 						if(cur_pos % w.ws_col)
 							fprintf(stdout,CURSOR_LEFT_N,cur_pos%w.ws_col);
 						fprintf(stdout,CURSOR_UP);
+						for(long unsigned int i=0; i<cur_pos%w.ws_col; i++)
+						{
+							char_pos--;
+							while(!getCharLength(input[char_pos-i])) char_pos--;
+						}
 						cur_pos -= cur_pos%w.ws_col;
 					}
-					cur_pos = 0;
 					break;
 				case '5':	//PgUp
 					if(getchar() != '~' || cur_pos == 0) break;
-					if(input.size() < w.ws_col)
+					if(getInputDisplayLength(input) < w.ws_col)
 					{
 						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
 					}
@@ -410,10 +424,11 @@ int main(int argc, char** argv)
 							fprintf(stdout,CURSOR_LEFT_N,cur_pos%w.ws_col);
 					}
 					cur_pos = 0;
+					char_pos = 0;
 					break;
 				case '6':	//PgDown
 					if(getchar() != '~' || cur_pos == input.size()) break;
-					if(input.size() < w.ws_col)
+					if(getInputDisplayLength(input) < w.ws_col)
 					{
 						fprintf(stdout,CURSOR_RIGHT_N,w.ws_col-cur_pos);
 					}
@@ -424,7 +439,8 @@ int main(int argc, char** argv)
 						if(cur_pos % w.ws_col)
 							fprintf(stdout,CURSOR_RIGHT_N,cur_pos%w.ws_col);
 					}
-					cur_pos = input.size();
+					cur_pos = getInputDisplayLength(input);
+					char_pos = input.size();
 					break;
 				case '7':	//Home
 					if(getchar() != '~' || cur_pos == 0) break;
@@ -432,40 +448,68 @@ int main(int argc, char** argv)
 					{
 						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
 						cur_pos = 0;
+						char_pos = 0;
 					}
 					else
 					{
 						if(cur_pos % w.ws_col)
 							fprintf(stdout,CURSOR_LEFT_N,cur_pos%w.ws_col);
 						fprintf(stdout,CURSOR_UP);
+						for(long unsigned int i=0; i<cur_pos%w.ws_col; i++)
+						{
+							char_pos--;
+							while(!getCharLength(input[char_pos-i])) char_pos--;
+						}
 						cur_pos -= cur_pos%w.ws_col;
 					}
 					break;
 				case 'F':	//End
-					if(cur_pos == input.size() || !((cur_pos+1)%w.ws_col)) break;
-					if((long unsigned int)(cur_pos+w.ws_col) > input.size())
-						cur_pos = input.size();
+					if(cur_pos == getInputDisplayLength(input) || !((cur_pos+1)%w.ws_col)) break;
+					if((long unsigned int)(cur_pos+w.ws_col) > getInputDisplayLength(input))
+					{
+						cur_pos = getInputDisplayLength(input);
+						char_pos = input.size();
+					}
 					else if(cur_pos < w.ws_col)
+					{
+						for(long unsigned int i=0; i<w.ws_col-1-cur_pos; i++)
+							char_pos += getCharLength(input[char_pos]);
 						cur_pos = w.ws_col-1;
+					}
 					else
+					{
+						for(long unsigned int i=0; i<w.ws_col-(cur_pos%w.ws_col)-1; i++)
+							char_pos += getCharLength(input[char_pos]);
 						cur_pos += w.ws_col-(cur_pos%w.ws_col)-1;
+					}
 					break;
 				case '8':	//End
 					if(getchar() != '~' || cur_pos == input.size() || !((cur_pos+1)%w.ws_col)) break;
-					if((long unsigned int)(cur_pos+w.ws_col) > input.size())
-						cur_pos = input.size();
+					if((long unsigned int)(cur_pos+w.ws_col) > getInputDisplayLength(input))
+					{
+						cur_pos = getInputDisplayLength(input);
+						char_pos = input.size();
+					}
 					else if(cur_pos < w.ws_col)
+					{
+						for(long unsigned int i=0; i<w.ws_col-1-cur_pos; i++)
+							char_pos += getCharLength(input[char_pos]);
 						cur_pos = w.ws_col-1;
+					}
 					else
+					{
+						for(long unsigned int i=0; i<w.ws_col-(cur_pos%w.ws_col)-1; i++)
+							char_pos += getCharLength(input[char_pos]);
 						cur_pos += w.ws_col-(cur_pos%w.ws_col)-1;
+					}
 					break;
 				case '2':	//Insert
 					if(getchar() == '~') insert_mode = !insert_mode;
 					break;
 				case '3':	//Delete
-					if(getchar() != '~' || cur_pos >= input.size()) break;
-					for(long unsigned int i=cur_pos; i<del_end; i++)
-						input.erase(input.begin()+cur_pos);
+					if(getchar() != '~' || cur_pos >= getInputDisplayLength(input)) break;
+					for(long unsigned int i=char_pos; i<del_end; i++)
+						input.erase(input.begin()+char_pos);
 					break;
 			}
 		}
