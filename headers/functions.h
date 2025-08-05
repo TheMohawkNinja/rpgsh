@@ -96,7 +96,7 @@ void addPropertiesToMatches(std::vector<std::string>* pMatches, Scope scope, std
 			    std::string k, std::string key, std::string property, char type);
 void moveCursorBack(winsize w, long unsigned int start, long unsigned int end=0);
 void moveCursorForward(winsize w, long unsigned int start, long unsigned int end);
-void inputHandler(std::vector<char>* pInput, winsize w, long unsigned int offset=0);
+void inputHandler(std::string* pInput, long unsigned int offset=0);
 
 std::string addSpaces(unsigned int n);
 

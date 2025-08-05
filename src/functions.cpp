@@ -567,17 +567,28 @@ void moveCursorForward(winsize w, long unsigned int start, long unsigned int end
 	}
 	fprintf(stdout,CURSOR_SHOW);
 }
-void inputHandler(std::vector<char>* pInput, winsize w, long unsigned int offset)
+void inputHandler(std::string* pInput, long unsigned int offset)
 {
 	#define KB_TAB		9
 	#define KB_ENTER	10
 	#define KB_BACKSPACE	127
 
+	//Set terminal flags for non-buffered reading required for handling keyboard input
+	struct termios t_old, t_new;
+	tcgetattr(fileno(stdin), &t_old);
+	t_new = t_old;
+	t_new.c_lflag &= ~(ICANON | ECHO);
+	tcsetattr(fileno(stdin), TCSANOW, &t_new);
+
+	//Get terminal dimensions
+	struct winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
 	bool insert_mode = false;
 	char k = 0;
 	char esc_char = 0;
 	int tab_ctr = 0;
-	std::string last_match, last_history;;
+	std::string last_match, last_history;
 	std::vector<std::string> history = getAppOutput("history").output;
 	long unsigned int cur_pos = 0;
 	//long unsigned int char_pos = 0;
@@ -599,10 +610,10 @@ void inputHandler(std::vector<char>* pInput, winsize w, long unsigned int offset
 		//Reset tab completion variables
 		if(k != KB_TAB && esc_char != 'Z')//Z for shift+tab
 		{
-			if(containsNonSpaceChar(last_match) && findInVect<char>((*pInput),' ',cur_pos) == -1)
+			if(containsNonSpaceChar(last_match) && (*pInput).find(' ',cur_pos) == std::string::npos)
 				cur_pos += ((*pInput).size()-cur_pos);
 			else if(containsNonSpaceChar(last_match))
-				cur_pos = findInVect<char>((*pInput),' ',cur_pos);
+				cur_pos = (*pInput).find(' ',cur_pos) == std::string::npos;
 			tab_ctr = 0;
 			last_match = "";
 		}
@@ -1020,6 +1031,9 @@ void inputHandler(std::vector<char>* pInput, winsize w, long unsigned int offset
 			}
 		}
 	}
+	//Reset terminal flags
+	tcsetattr(fileno(stdin), TCSANOW, &t_old);
+
 }
 
 std::string addSpaces(unsigned int n)

@@ -4,8 +4,8 @@
 #include <fstream>
 #include <map>
 #include <regex>
-#include <sys/ioctl.h>
-#include <termios.h>
+//#include <sys/ioctl.h>
+//#include <termios.h>
 #include <unistd.h>
 #include "../headers/config.h"
 #include "../headers/functions.h"
@@ -17,18 +17,6 @@ Character c = Character();
 
 std::string getBufferStr()
 {
-	//Set terminal flags for non-buffered reading required for handling keyboard input
-	struct termios t_old, t_new;
-	tcgetattr(fileno(stdin), &t_old);
-	t_new = t_old;
-	t_new.c_lflag &= ~(ICANON | ECHO);
-	tcsetattr(fileno(stdin), TCSANOW, &t_new);
-
-	//Get terminal dimensions
-	struct winsize w;
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
-
-	std::vector<char> input;
 	long unsigned int last_prompt_line_length;
 
 	//Print prompt
@@ -46,14 +34,10 @@ std::string getBufferStr()
 	}
 
 	//Get input
-	inputHandler(&input, w, last_prompt_line_length);
+	std::string input;
+	inputHandler(&input, last_prompt_line_length);
 
-	//Reset terminal flags in-case of sudden program termination
-	tcsetattr(fileno(stdin), TCSANOW, &t_old);
-
-	//Strings need to be null-terminated
-	input.push_back('\0');
-	return input.data();
+	return input;
 }
 int prompt()
 {
