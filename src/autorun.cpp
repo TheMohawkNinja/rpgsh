@@ -33,8 +33,9 @@ void saveAutorun(std::string path, std::string scope)
 	while(true)
 	{
 		std::string command, echo;
-		fprintf(stdout,"Please enter a command: ");
-		getline(std::cin,command);
+		std::string prompt = "Please enter a command: ";
+		fprintf(stdout,"%s",prompt.c_str());
+		inputHandler(&command,prompt.length());
 		if(!command.length()) continue;
 		do
 		{
