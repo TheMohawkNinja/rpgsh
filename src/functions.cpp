@@ -587,7 +587,7 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 	std::string last_match, last_history;
 	std::vector<std::string> history = getAppOutput("history").output;
 	long unsigned int cur_pos = 0;
-	//long unsigned int char_pos = 0;
+	//long unsigned int char_pos = cur_pos;
 	long unsigned int history_len = history.size();
 	long unsigned int history_ctr = history_len-1;
 	long unsigned int combined_offset = offset+last_history.length();
@@ -607,9 +607,9 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 		if(k != KB_TAB && esc_char != 'Z')//Z for shift+tab
 		{
 			if(containsNonSpaceChar(last_match) && (*pInput).find(' ',cur_pos) == std::string::npos)
-				cur_pos += ((*pInput).size()-cur_pos);
+				cur_pos = (*pInput).size();
 			else if(containsNonSpaceChar(last_match))
-				cur_pos = (*pInput).find(' ',cur_pos) == std::string::npos;
+				cur_pos = (*pInput).find(' ',cur_pos+1);
 			tab_ctr = 0;
 			last_match = "";
 		}
