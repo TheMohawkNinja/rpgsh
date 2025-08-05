@@ -428,6 +428,13 @@ long unsigned int getDisplayLength(std::string str)
 	}
 	return len;
 }
+long unsigned int getInputDisplayLength(std::vector<char> input)
+{
+	std::string str;
+	for(const auto& ch : input) str += ch;
+
+	return getDisplayLength(str);
+}
 int getCharLength(char c)
 {
 	unsigned char uc = static_cast<unsigned char>(c);

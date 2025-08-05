@@ -6,13 +6,6 @@
 #include "../headers/functions.h"
 #include "../headers/text.h"
 
-long unsigned int getInputDisplayLength(std::vector<char> input) //std::string(input.data()) does not provide correct value, so we have to construct a string manually to derive correct display length
-{
-	std::string str;
-	for(const auto& ch : input) str += ch;
-
-	return getDisplayLength(str);
-}
 int main(int argc, char** argv)
 {
 	if(argc > 2)

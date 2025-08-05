@@ -80,6 +80,7 @@ std::string right(std::string str, int n);
 long unsigned int countu(std::string str, char ch);
 
 long unsigned int getDisplayLength(std::string str);
+long unsigned int getInputDisplayLength(std::vector<char> input);
 int getCharLength(char c);
 
 std::string addSpaces(unsigned int n);
