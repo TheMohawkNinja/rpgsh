@@ -25,10 +25,6 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	#define KB_TAB		9
-	#define KB_ENTER	10
-	#define KB_BACKSPACE	127
-
 	//Get terminal dimensions
 	struct winsize w;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);

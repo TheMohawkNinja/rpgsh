@@ -47,6 +47,11 @@
 #define OP_EXPA				"^="
 #define OP_MODA				"%="
 
+//Useful keyboard macros
+#define KB_TAB				9
+#define KB_ENTER			10
+#define KB_BACKSPACE			127
+
 //Environment variables
 #define ENV_CURRENT_CHARACTER		"CURRENT_CHARACTER"
 #define ENV_CURRENT_CAMPAIGN		"CURRENT_CAMPAIGN"

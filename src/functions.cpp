@@ -569,10 +569,6 @@ void moveCursorForward(winsize w, long unsigned int start, long unsigned int end
 }
 void inputHandler(std::string* pInput, long unsigned int offset)
 {
-	#define KB_TAB		9
-	#define KB_ENTER	10
-	#define KB_BACKSPACE	127
-
 	//Set terminal flags for non-buffered reading required for handling keyboard input
 	struct termios t_old, t_new;
 	tcgetattr(fileno(stdin), &t_old);
