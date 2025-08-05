@@ -4,6 +4,8 @@
 #include <fstream>
 #include <filesystem>
 #include <string>
+#include <sys/ioctl.h>
+#include <termios.h>
 #include <vector>
 #include "define.h"
 #include "scope.h"
@@ -82,6 +84,19 @@ long unsigned int countu(std::string str, char ch);
 long unsigned int getDisplayLength(std::string str);
 long unsigned int getInputDisplayLength(std::vector<char> input);
 int getCharLength(char c);
+
+bool containsNonSpaceChar(std::string str);
+void addKeyToMatches(std::vector<std::string>** ppMatches, std::string k, std::string chk_str,
+		     std::string key);
+void addKeysToMatches(std::vector<std::string>* pMatches, Scope scope, std::string chk_str,
+		      std::string key, char type);
+void addPropertyToMatches(std::vector<std::string>** ppMatches, std::string chk_str,
+			  std::string property,std::string property_str);
+void addPropertiesToMatches(std::vector<std::string>* pMatches, Scope scope, std::string chk_str,
+			    std::string k, std::string key, std::string property, char type);
+void moveCursorBack(winsize w, long unsigned int start, long unsigned int end=0);
+void moveCursorForward(winsize w, long unsigned int start, long unsigned int end);
+void inputHandler(std::vector<char>* pInput, winsize w, long unsigned int offset=0);
 
 std::string addSpaces(unsigned int n);
 
