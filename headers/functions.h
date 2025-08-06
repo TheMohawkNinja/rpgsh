@@ -83,6 +83,7 @@ long unsigned int countu(std::string str, char ch);
 
 long unsigned int getDisplayLength(std::string str);
 long unsigned int getInputDisplayLength(std::vector<char> input);
+long unsigned int getInputDisplayLength(std::string input);
 int getCharLength(char c);
 
 bool containsNonSpaceChar(std::string str);
