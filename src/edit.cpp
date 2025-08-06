@@ -31,7 +31,7 @@ int main(int argc, char** argv)
 
 	struct termios t_old, t_new;
 
-	std::vector<char> input;
+	std::string input;
 	VariableInfo vi;
 	if(argc == 1)
 	{
