@@ -929,8 +929,8 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 						(*pInput).push_back(c);
 					fprintf(stdout,"%s",history[history_ctr].c_str());
 					last_history = history[history_ctr];
-					cur_pos = (*pInput).size();
-					char_pos = getInputDisplayLength(*pInput);
+					cur_pos = getInputDisplayLength(*pInput);
+					char_pos = (*pInput).size();
 					combined_offset = offset+last_history.length();
 					break;
 				case 'C':	//Right
