@@ -138,7 +138,7 @@ int main(int argc, char** argv)
 		replaceVariables(&value,false);
 		std::string output = makePretty(value);
 		fprintf(stdout,"%s\n%s\n",TEXT_NORMAL,CLEAR_LINE);
-		unsigned long int input_display_length = getInputDisplayLength(input);
+		unsigned long int input_display_length = getDisplayLength(input);
 
 		//Clear all characters after newlines to remove left over characters from previous buffer if characters in that line were deleted
 		if(!(input.size()%w.ws_col)) fprintf(stdout,CLEAR_TO_SCREEN_END);
@@ -263,7 +263,7 @@ int main(int argc, char** argv)
 			char char_to_insert = (k == KB_TAB ? 't' : 'n');
 			if(insert_mode)	//If the "Insert" key is toggled
 			{
-				if(cur_pos < getInputDisplayLength(input))
+				if(cur_pos < getDisplayLength(input))
 				{
 					input[char_pos] = '\\';
 					input.insert(input.begin()+char_pos+1,char_to_insert);
@@ -287,7 +287,7 @@ int main(int argc, char** argv)
 		{
 			long unsigned int up_end = cur_pos-w.ws_col;
 			long unsigned int down_end = cur_pos+w.ws_col;
-			long unsigned int del_end = (cur_pos < getInputDisplayLength(input) ? cur_pos+getCharLength(input[char_pos]) : 0);
+			long unsigned int del_end = (cur_pos < getDisplayLength(input) ? cur_pos+getCharLength(input[char_pos]) : 0);
 			switch(esc_char)
 			{
 				case 'A':	//Up
@@ -304,14 +304,14 @@ int main(int argc, char** argv)
 					break;
 				case 'B':	//Down
 					if(cur_pos && !(cur_pos%w.ws_col)) fprintf(stdout,CURSOR_UP);
-					if(cur_pos+w.ws_col > getInputDisplayLength(input)) break;
+					if(cur_pos+w.ws_col > getDisplayLength(input)) break;
 					for(long unsigned int i=cur_pos; i<down_end; i++)
 						char_pos += getCharLength(input[i]);
 					cur_pos = down_end;
 					if(cur_pos > w.ws_col) fprintf(stdout,CURSOR_DOWN);
 					break;
 				case 'C':	//Right
-					if(cur_pos == getInputDisplayLength(input)) break;
+					if(cur_pos == getDisplayLength(input)) break;
 					cur_pos++;
 					char_pos+=getCharLength(input[char_pos]);
 					break;
@@ -393,7 +393,7 @@ int main(int argc, char** argv)
 					break;
 				case '5':	//PgUp
 					if(getchar() != '~' || cur_pos == 0) break;
-					if(getInputDisplayLength(input) < w.ws_col)
+					if(getDisplayLength(input) < w.ws_col)
 					{
 						fprintf(stdout,CURSOR_LEFT_N,cur_pos);
 					}
@@ -409,7 +409,7 @@ int main(int argc, char** argv)
 					break;
 				case '6':	//PgDown
 					if(getchar() != '~' || cur_pos == input.size()) break;
-					if(getInputDisplayLength(input) < w.ws_col)
+					if(getDisplayLength(input) < w.ws_col)
 					{
 						fprintf(stdout,CURSOR_RIGHT_N,w.ws_col-cur_pos);
 					}
@@ -420,7 +420,7 @@ int main(int argc, char** argv)
 						if(cur_pos % w.ws_col)
 							fprintf(stdout,CURSOR_RIGHT_N,cur_pos%w.ws_col);
 					}
-					cur_pos = getInputDisplayLength(input);
+					cur_pos = getDisplayLength(input);
 					char_pos = input.size();
 					break;
 				case '7':	//Home
@@ -445,10 +445,10 @@ int main(int argc, char** argv)
 					}
 					break;
 				case 'F':	//End
-					if(cur_pos == getInputDisplayLength(input) || !((cur_pos+1)%w.ws_col)) break;
-					if((long unsigned int)(cur_pos+w.ws_col) > getInputDisplayLength(input))
+					if(cur_pos == getDisplayLength(input) || !((cur_pos+1)%w.ws_col)) break;
+					if((long unsigned int)(cur_pos+w.ws_col) > getDisplayLength(input))
 					{
-						cur_pos = getInputDisplayLength(input);
+						cur_pos = getDisplayLength(input);
 						char_pos = input.size();
 					}
 					else if(cur_pos < w.ws_col)
@@ -466,9 +466,9 @@ int main(int argc, char** argv)
 					break;
 				case '8':	//End
 					if(getchar() != '~' || cur_pos == input.size() || !((cur_pos+1)%w.ws_col)) break;
-					if((long unsigned int)(cur_pos+w.ws_col) > getInputDisplayLength(input))
+					if((long unsigned int)(cur_pos+w.ws_col) > getDisplayLength(input))
 					{
-						cur_pos = getInputDisplayLength(input);
+						cur_pos = getDisplayLength(input);
 						char_pos = input.size();
 					}
 					else if(cur_pos < w.ws_col)
@@ -488,7 +488,7 @@ int main(int argc, char** argv)
 					if(getchar() == '~') insert_mode = !insert_mode;
 					break;
 				case '3':	//Delete
-					if(getchar() != '~' || cur_pos >= getInputDisplayLength(input)) break;
+					if(getchar() != '~' || cur_pos >= getDisplayLength(input)) break;
 					for(long unsigned int i=char_pos; i<del_end; i++)
 						input.erase(input.begin()+char_pos);
 					break;
