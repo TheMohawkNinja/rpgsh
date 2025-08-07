@@ -428,19 +428,9 @@ long unsigned int getDisplayLength(std::string str)
 	}
 	return len;
 }
-long unsigned int getInputDisplayLength(std::vector<char> input)
+long unsigned int getDisplayLength(std::vector<char> v)
 {
-	std::string str;
-	for(const auto& ch : input) str += ch;
-
-	return getDisplayLength(str);
-}
-long unsigned int getInputDisplayLength(std::string input)
-{
-	std::vector<char> v;
-	for(const auto& ch : input) v.push_back(ch);
-
-	return getInputDisplayLength(v);
+	return getDisplayLength(std::string(v.data()));
 }
 int getCharLength(char c)
 {
@@ -651,8 +641,8 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 
 			fprintf(stdout,"%s",(*pInput).data());
 
-			if(cur_pos < getInputDisplayLength(*pInput))
-				moveCursorBack(w,getInputDisplayLength(*pInput)+offset,cur_pos+offset);
+			if(cur_pos < getDisplayLength(*pInput))
+				moveCursorBack(w,getDisplayLength(*pInput)+offset,cur_pos+offset);
 		}
 		else if((k == KB_TAB || esc_char == 'Z') && (*pInput).size() &&
 			(cur_pos == (*pInput).size() || (*pInput)[cur_pos] == ')' || (*pInput)[cur_pos] == ' ' || last_match != ""))//Tab (completion)
@@ -904,7 +894,7 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 		}
 		else if(k == ESC_SEQ)//Escape sequences
 		{
-			long unsigned int del_end = (cur_pos < getInputDisplayLength(*pInput) ? cur_pos+getCharLength((*pInput)[char_pos]) : 0);
+			long unsigned int del_end = (cur_pos < getDisplayLength(*pInput) ? char_pos+getCharLength((*pInput)[char_pos]) : 0);
 			switch(esc_char)
 			{
 				case 'A':	//Up
@@ -929,12 +919,12 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 						(*pInput).push_back(c);
 					fprintf(stdout,"%s",history[history_ctr].c_str());
 					last_history = history[history_ctr];
-					cur_pos = getInputDisplayLength(*pInput);
+					cur_pos = getDisplayLength(*pInput);
 					char_pos = (*pInput).size();
 					combined_offset = offset+last_history.length();
 					break;
 				case 'C':	//Right
-					if(cur_pos == getInputDisplayLength((*pInput))) continue;
+					if(cur_pos == getDisplayLength((*pInput))) continue;
 					cur_pos++;
 					char_pos+=getCharLength((*pInput)[char_pos]);
 					moveCursorForward(w,offset+cur_pos,offset+cur_pos+1);
@@ -973,7 +963,7 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 						(*pInput).push_back(c);
 					fprintf(stdout,"%s",(*pInput).data());
 					cur_pos = (*pInput).size();
-					char_pos = getInputDisplayLength(*pInput);
+					char_pos = getDisplayLength(*pInput);
 					break;
 				case '7':	//Home
 					if(getchar() != '~' || cur_pos == 0) continue;
@@ -991,43 +981,44 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 					char_pos = 0;
 					break;
 				case 'F':	//End
-					if(cur_pos >= (*pInput).size()) continue;
+					if(cur_pos >= getDisplayLength(*pInput)) continue;
 					if((*pInput).size()-cur_pos>=w.ws_col)
 					{
-						fprintf(stdout,CURSOR_DOWN_N,((*pInput).size()-cur_pos)/w.ws_col);
-						fprintf(stdout,CURSOR_RIGHT_N,((*pInput).size()-cur_pos)%w.ws_col);
+						fprintf(stdout,CURSOR_DOWN_N,(getDisplayLength(*pInput)-cur_pos)/w.ws_col);
+						fprintf(stdout,CURSOR_RIGHT_N,(getDisplayLength(*pInput)-cur_pos)%w.ws_col);
 					}
 					else
 					{
-						fprintf(stdout,CURSOR_RIGHT_N,(*pInput).size()-cur_pos);
+						fprintf(stdout,CURSOR_RIGHT_N,getDisplayLength(*pInput)-cur_pos);
 					}
-					cur_pos = (*pInput).size();
-					char_pos = getInputDisplayLength(*pInput);
+					cur_pos = getDisplayLength(*pInput);
+					char_pos = (*pInput).size();
 					break;
 				case '8':	//End
-					if(getchar() != '~' || cur_pos >= (*pInput).size()) continue;
-					if((*pInput).size()-cur_pos>=w.ws_col)
+					if(getchar() != '~' || cur_pos >= getDisplayLength(*pInput)) continue;
+					if(getDisplayLength(*pInput)-cur_pos>=w.ws_col)
 					{
-						fprintf(stdout,CURSOR_DOWN_N,((*pInput).size()-cur_pos)/w.ws_col);
-						fprintf(stdout,CURSOR_RIGHT_N,((*pInput).size()-cur_pos)%w.ws_col);
+						fprintf(stdout,CURSOR_DOWN_N,(getDisplayLength(*pInput)-cur_pos)/w.ws_col);
+						fprintf(stdout,CURSOR_RIGHT_N,(getDisplayLength(*pInput)-cur_pos)%w.ws_col);
 					}
 					else
 					{
-						fprintf(stdout,CURSOR_RIGHT_N,(*pInput).size()-cur_pos);
+						fprintf(stdout,CURSOR_RIGHT_N,getDisplayLength(*pInput)-cur_pos);
 					}
-					cur_pos = (*pInput).size();
-					char_pos = getInputDisplayLength(*pInput);
+					cur_pos = getDisplayLength(*pInput);
+					char_pos = (*pInput).size();
 					break;
 				case '2':	//Insert
 					if(getchar() == '~') insert_mode = !insert_mode;
 					break;
 				case '3':	//Delete
-					if(getchar() != '~' || cur_pos >= getInputDisplayLength((*pInput))) continue;
+					if(getchar() != '~' || cur_pos >= getDisplayLength((*pInput))) continue;
 					fprintf(stdout,CLEAR_TO_SCREEN_END);
 					for(long unsigned int i=char_pos; i<del_end; i++)
 						(*pInput).erase((*pInput).begin()+char_pos);
+					moveCursorBack(w,cur_pos);
 					fprintf(stdout,"%s",(*pInput).data());
-					moveCursorBack(w,(*pInput).size()-cur_pos);
+					moveCursorBack(w,getDisplayLength(*pInput)-cur_pos);
 					if(!((cur_pos+offset+1)%w.ws_col))
 					{
 						fprintf(stdout,CURSOR_UP);
@@ -1048,7 +1039,7 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 			fprintf(stdout,"%s",(*pInput).data());
 
 			if(char_pos < (*pInput).size()-1)
-				moveCursorBack(w,getInputDisplayLength(*pInput)+offset,cur_pos+offset+(getCharLength(k) > 0));
+				moveCursorBack(w,getDisplayLength(*pInput)+offset,cur_pos+offset+(getCharLength(k) > 0));
 
 			char_pos++;
 			if(getCharLength(k)) cur_pos++;
