@@ -428,10 +428,6 @@ long unsigned int getDisplayLength(std::string str)
 	}
 	return len;
 }
-/*long unsigned int getDisplayLength(std::vector<char> v)
-{
-	return getDisplayLength(std::string(v.data()));
-}*/
 int getCharLength(char c)
 {
 	unsigned char uc = static_cast<unsigned char>(c);
@@ -605,10 +601,16 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 		//Reset tab completion variables
 		if(k != KB_TAB && esc_char != 'Z')//Z for shift+tab
 		{
-			if(containsNonSpaceChar(last_match) && (*pInput).find(' ',cur_pos) == std::string::npos)
-				cur_pos = (*pInput).size();
+			if(containsNonSpaceChar(last_match) && findu((*pInput),' ',char_pos) == std::string::npos)
+			{
+				cur_pos = getDisplayLength(*pInput);
+				char_pos = (*pInput).size();
+			}
 			else if(containsNonSpaceChar(last_match))
-				cur_pos = (*pInput).find(' ',cur_pos+1);
+			{
+				cur_pos = getDisplayLength(left(*pInput,findu((*pInput),' ',char_pos+1)));
+				char_pos = findu((*pInput),' ',char_pos+1);
+			}
 			tab_ctr = 0;
 			last_match = "";
 		}
@@ -644,9 +646,11 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 			if(cur_pos < getDisplayLength(*pInput))
 				moveCursorBack(w,getDisplayLength(*pInput)+offset,cur_pos+offset);
 		}
-		else if((k == KB_TAB || esc_char == 'Z') && (*pInput).size() &&
+		else if((k == KB_TAB || esc_char == 'Z') &&
 			(cur_pos == (*pInput).size() || (*pInput)[cur_pos] == ')' || (*pInput)[cur_pos] == ' ' || last_match != ""))//Tab (completion)
 		{
+			if(!(*pInput).size()) continue;
+
 			if(k == KB_TAB) tab_ctr++;
 			else tab_ctr--;
 
@@ -865,21 +869,21 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 			if(last_match != "")
 			{
 				for(long unsigned int i=0; i<last_match.length()-chk_str.length(); i++)
-					(*pInput).erase((*pInput).begin()+cur_pos);
+					(*pInput).erase((*pInput).begin()+char_pos);
 			}
 
 			//Insert match into (*pInput)
 			for(long unsigned int i=0; i<match.length()-chk_str.length(); i++)
-				(*pInput).insert((*pInput).begin()+cur_pos+i,match[i+chk_str.length()]);
+				(*pInput).insert((*pInput).begin()+char_pos+i,match[i+chk_str.length()]);
 
 			//Reprint (*pInput)
 			if(last_match != "" && match != "" && containsNonSpaceChar(match))
 			{
-				moveCursorBack(w,last_match.length()-chk_str.length());
+				moveCursorBack(w,getDisplayLength(last_match)-getDisplayLength(chk_str));
 				fprintf(stdout,CLEAR_TO_SCREEN_END);
 			}
 
-			for(long unsigned int i=cur_pos; i<(*pInput).size(); i++)
+			for(long unsigned int i=char_pos; i<(*pInput).size(); i++)
 				fprintf(stdout,"%c",(*pInput)[i]);
 
 			//CURSOR_LEFT_N(0) still pushes cursor to the left, so we need to check
@@ -887,8 +891,8 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 			for(const auto& i : match) if(i == ' ') spaces++;
 			unsigned int offset = match.length()-spaces;
 			char base_char = (rfindu(chk_str,'/') == std::string::npos ? '[' : '/');
-			if(cur_pos+offset < (*pInput).size())
-				fprintf(stdout,CURSOR_LEFT_N,(*pInput).size()-cur_pos-offset+(chk_str.length()-(rfindu(chk_str,base_char)+1)));
+			if(cur_pos+offset < getDisplayLength(*pInput))
+				fprintf(stdout,CURSOR_LEFT_N,getDisplayLength(*pInput)-cur_pos-offset+(getDisplayLength(chk_str)-(rfindu(chk_str,base_char)+1)));
 
 			last_match = match;
 		}
