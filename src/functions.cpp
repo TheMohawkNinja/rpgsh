@@ -386,6 +386,18 @@ long unsigned int rfindu(std::string str, char ch, long unsigned int start)
 {
 	return rfindu(str, std::string(1,ch), start);
 }
+long unsigned int nfindu(std::string str, std::string match, long unsigned int start)
+{
+	if(match.length() > str.length()) return std::string::npos;
+	for(long unsigned int i=start; i<str.length()-(match.length()-1); i++)
+		if(str.substr(i,match.length()) != match && !isEscaped(str.substr(i,match.length()),i)) return i;
+
+	return std::string::npos;
+}
+long unsigned int nfindu(std::string str, char ch, long unsigned int start)
+{
+	return nfindu(str, std::string(1,ch), start);
+}
 
 std::string left(std::string str, int n)
 {
@@ -438,13 +450,6 @@ int getCharLength(char c)
 	else return 0;
 }
 
-bool containsNonSpaceChar(std::string str)
-{
-	for(const auto& ch : str)
-		if(ch != ' ') return true;
-
-	return false;
-}
 void addKeyToMatches(std::vector<std::string>** ppMatches, std::string k, std::string chk_str,
 		     std::string key)
 {
@@ -601,12 +606,13 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 		//Reset tab completion variables
 		if(k != KB_TAB && esc_char != 'Z')//Z for shift+tab
 		{
-			if(containsNonSpaceChar(last_match) && findu((*pInput),' ',char_pos) == std::string::npos)
+			if(nfindu(last_match,' ') != std::string::npos &&
+			   findu((*pInput),' ',char_pos) == std::string::npos)
 			{
 				cur_pos = getDisplayLength(*pInput);
 				char_pos = (*pInput).size();
 			}
-			else if(containsNonSpaceChar(last_match))
+			else if(nfindu(last_match,' ') != std::string::npos)
 			{
 				cur_pos = getDisplayLength(left(*pInput,findu((*pInput),' ',char_pos+1)));
 				char_pos = findu((*pInput),' ',char_pos+1);
@@ -877,7 +883,7 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 				(*pInput).insert((*pInput).begin()+char_pos+i,match[i+chk_str.length()]);
 
 			//Reprint (*pInput)
-			if(last_match != "" && match != "" && containsNonSpaceChar(match))
+			if(last_match != "" && match != "" && nfindu(match,' ') != std::string::npos)
 			{
 				moveCursorBack(w,getDisplayLength(last_match)-getDisplayLength(chk_str));
 				fprintf(stdout,CLEAR_TO_SCREEN_END);

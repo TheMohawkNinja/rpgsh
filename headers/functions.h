@@ -75,6 +75,8 @@ long unsigned int findu(std::string str, std::string match, long unsigned int st
 long unsigned int findu(std::string str, char ch, long unsigned int start=0);
 long unsigned int rfindu(std::string str, std::string match, long unsigned int start=UINT_MAX);
 long unsigned int rfindu(std::string str, char ch, long unsigned int start=UINT_MAX);
+long unsigned int nfindu(std::string str, std::string match, long unsigned int start=0);
+long unsigned int nfindu(std::string str, char ch, long unsigned int start=0);
 
 std::string left(std::string str, int n);
 std::string right(std::string str, int n);
@@ -84,7 +86,6 @@ long unsigned int countu(std::string str, char ch);
 long unsigned int getDisplayLength(std::string str);
 int getCharLength(char c);
 
-bool containsNonSpaceChar(std::string str);
 void addKeyToMatches(std::vector<std::string>** ppMatches, std::string k, std::string chk_str,
 		     std::string key);
 void addKeysToMatches(std::vector<std::string>* pMatches, Scope scope, std::string chk_str,
