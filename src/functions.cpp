@@ -428,10 +428,10 @@ long unsigned int getDisplayLength(std::string str)
 	}
 	return len;
 }
-long unsigned int getDisplayLength(std::vector<char> v)
+/*long unsigned int getDisplayLength(std::vector<char> v)
 {
 	return getDisplayLength(std::string(v.data()));
-}
+}*/
 int getCharLength(char c)
 {
 	unsigned char uc = static_cast<unsigned char>(c);
