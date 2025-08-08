@@ -30,7 +30,7 @@ std::string variable_pattern_str =		"["+
 						std::string(1,CHARACTER_SIGIL)+
 						std::string(1,CAMPAIGN_SIGIL)+
 						std::string(1,SHELL_SIGIL)+
-						"]["+
+						"](\\[[^\\]]{1,}\\])?["+
 						std::string(1,VAR_SIGIL)+
 						std::string(1,DICE_SIGIL)+
 						std::string(1,CURRENCY_SIGIL)+
