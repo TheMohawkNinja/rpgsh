@@ -1474,6 +1474,43 @@ int runApp(std::string arg_str, bool redirect_output)
 		}
 	}
 
+	//Merge explicit constructors containing spaces
+	for(long unsigned i=0; i<args.size(); i++)
+	{
+		long unsigned exp_con_start = std::string::npos;
+		for(long unsigned ch=0; ch<args[i].length(); ch++)
+		{
+			if(ch<args[i].length()-1 && isTypeSigil(args[i][ch]) && args[i][ch+1] == '{')
+			{
+				exp_con_start = ch;
+				break;
+			}
+		}
+		if(exp_con_start == std::string::npos) continue;
+		long unsigned exp_con_end = findu(args[i],'}',exp_con_start+2);
+
+		std::string from_exp_con_start = right(args[i],exp_con_start+2);
+		if(exp_con_end != std::string::npos)//Quotes contained in same arg
+		{
+			args[i] = left(from_exp_con_start,findu(from_exp_con_start,'}'));
+		}
+		else
+		{
+			args[i] = from_exp_con_start;
+			i++;
+			while(i < args.size())
+			{
+				exp_con_end = findu(args[i],'}');
+				if(exp_con_end == std::string::npos)
+					args[i-1] += " "+args[i];
+				else
+					args[i-1] += " "+left(args[i],exp_con_end);
+				args.erase(args.begin()+i);
+				if(exp_con_end != std::string::npos) break;
+			}
+		}
+	}
+
 	//Merge args wrapped in quotes
 	for(long unsigned i=0; i<args.size(); i++)
 	{
