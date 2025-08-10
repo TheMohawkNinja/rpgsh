@@ -253,7 +253,7 @@ std::string makePretty(std::string value)
 }
 std::string stripFormatting(std::string str)
 {
-	for(unsigned long int i=0; i<str.length(); i++)
+	for(long unsigned i=0; i<str.length(); i++)
 	{
 		const std::string::iterator cur_it = str.begin()+i;
 		if(str[i] == ESC_SEQ)
@@ -639,7 +639,7 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 			}
 			else
 			{
-				for(unsigned long i=char_pos; !getCharLength((*pInput)[i]); i--)
+				for(long unsigned i=char_pos; !getCharLength((*pInput)[i]); i--)
 				{
 					(*pInput).erase((*pInput).begin()+i);
 					char_pos--;
@@ -1312,7 +1312,7 @@ VariableInfo parseVariable(std::string v)
 MCStr parseMCStr(std::string s)
 {
 	MCStr mc;
-	unsigned long int slash = findu(s,'/');
+	long unsigned slash = findu(s,'/');
 	if(slash == std::string::npos)
 	{
 		mc.c = s;
@@ -1475,13 +1475,13 @@ int runApp(std::string arg_str, bool redirect_output)
 	}
 
 	//Merge args wrapped in quotes
-	unsigned long int quote_begin = std::string::npos;
-	unsigned long int quote_end = std::string::npos;
-	unsigned long int quote_start_arg = 0;
-	for(unsigned long int i=0; i<args.size(); i++)
+	long unsigned quote_begin = std::string::npos;
+	long unsigned quote_end = std::string::npos;
+	long unsigned quote_start_arg = 0;
+	for(long unsigned i=0; i<args.size(); i++)
 	{
 		//Find unescaped quote marks
-		for(unsigned long int c=0; c<args[i].length(); c++)
+		for(long unsigned c=0; c<args[i].length(); c++)
 		{
 			if(quote_begin == std::string::npos && args[i][c] == '\"' && !isEscaped(args[i],c))
 			{
@@ -1505,7 +1505,7 @@ int runApp(std::string arg_str, bool redirect_output)
 			{
 				quote_end = c;
 
-				for(unsigned long int q=quote_start_arg+1; q<=i;)
+				for(long unsigned q=quote_start_arg+1; q<=i;)
 				{
 					if(q < i) args[quote_start_arg] += " "+args[q];
 					else args[quote_start_arg] += " "+left(args[q],quote_end);

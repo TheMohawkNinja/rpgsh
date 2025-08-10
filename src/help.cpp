@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 		TEXT_NORMAL,
 		addSpaces(alias_spacing+COLUMN_PADDING).c_str());
 	fprintf(stdout,"%s%s",TEXT_BOLD,TEXT_WHITE);
-	for(unsigned long int i=0; i<longest_name_ln+longest_alias_ln+(2*COLUMN_PADDING)+25; i++)//25 is arbitrary, just looks fine
+	for(long unsigned i=0; i<longest_name_ln+longest_alias_ln+(2*COLUMN_PADDING)+25; i++)//25 is arbitrary, just looks fine
 		fprintf(stdout,"─");
 	fprintf(stdout,"%s\n",TEXT_NORMAL);
 	for(const auto& app : applications)

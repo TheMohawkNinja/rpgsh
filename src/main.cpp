@@ -133,7 +133,7 @@ int prompt()
 		padding();
 
 		//Handle rpgsh history
-		unsigned long line_count = 0;
+		long unsigned line_count = 0;
 		std::ifstream ifs(history_path);
 		std::vector<std::string> history;
 		std::string data;
@@ -147,7 +147,7 @@ int prompt()
 		ifs.close();
 
 		history.push_back(buffer);
-		unsigned long history_len = 0;
+		long unsigned history_len = 0;
 		try
 		{
 			history_len = std::stol(cfg.setting[HISTORY_LENGTH]);
@@ -162,14 +162,14 @@ int prompt()
 		{
 			line_count = line_count-history_len+1;
 			std::ofstream ofs(history_path);
-			for(unsigned long i=line_count; i<=history_len; i++)
+			for(long unsigned i=line_count; i<=history_len; i++)
 				ofs<<history[i]+"\n";
 			ofs.close();
 		}
 		else
 		{
 			std::ofstream ofs(history_path);
-			for(unsigned long i=0; i<history.size(); i++)
+			for(long unsigned i=0; i<history.size(); i++)
 				ofs<<history[i]+"\n";
 			ofs.close();
 		}

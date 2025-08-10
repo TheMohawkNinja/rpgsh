@@ -106,7 +106,7 @@ int main(int argc, char** argv)
 		t_new.c_lflag &= ~(ICANON | ECHO);
 		tcsetattr(fileno(stdin), TCSANOW, &t_new);
 
-		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
+		fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)0);
 
 		//Move cursor to beginning of input
 		if(cur_pos && (cur_pos-1)/w.ws_col) fprintf(stdout,CURSOR_UP_N,((cur_pos-1)/w.ws_col));
@@ -132,29 +132,29 @@ int main(int argc, char** argv)
 
 		//Remove beginning and end bits of explicit constructor
 		std::string value;
-		for(unsigned long int i=2; i<input.size()-1; i++)
+		for(long unsigned i=2; i<input.size()-1; i++)
 			value += input[i];
 
 		replaceVariables(&value,false);
 		std::string output = makePretty(value);
 		fprintf(stdout,"%s\n%s\n",TEXT_NORMAL,CLEAR_LINE);
-		unsigned long int input_display_length = getDisplayLength(input);
+		long unsigned input_display_length = getDisplayLength(input);
 
 		//Clear all characters after newlines to remove left over characters from previous buffer if characters in that line were deleted
 		if(!(input.size()%w.ws_col)) fprintf(stdout,CLEAR_TO_SCREEN_END);
 		fprintf(stdout,std::regex_replace(output,std::regex("\n"),std::string(CLEAR_TO_LINE_END)+"\n").c_str());//If input prior to '\n' was shortened, this removes trailing characters
 		fprintf(stdout,CLEAR_TO_SCREEN_END);
-		fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
+		fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)0);
 
 		//Determine number of paragraphs
 		std::string strippedOutput = stripFormatting(output);
-		unsigned long int output_display_length = getDisplayLength(strippedOutput);
-		unsigned long int total_paragraph_lines = 0;
+		long unsigned output_display_length = getDisplayLength(strippedOutput);
+		long unsigned total_paragraph_lines = 0;
 		if(findu(strippedOutput,'\n') != std::string::npos)
 		{
-			for(unsigned long int i=0; i<output_display_length-1; i++)
+			for(long unsigned i=0; i<output_display_length-1; i++)
 			{
-				unsigned long int next_newline = findu(strippedOutput,'\n',i);
+				long unsigned next_newline = findu(strippedOutput,'\n',i);
 				if(next_newline != std::string::npos && next_newline != i)
 				{
 					total_paragraph_lines += (next_newline-1-i)/w.ws_col;
@@ -168,7 +168,7 @@ int main(int argc, char** argv)
 			}
 		}
 
-		unsigned long int cursor_vert_offset = 4+countu(strippedOutput,'\n')+countu(strippedOutput,'\f')+countu(strippedOutput,'\v');
+		long unsigned cursor_vert_offset = 4+countu(strippedOutput,'\n')+countu(strippedOutput,'\f')+countu(strippedOutput,'\v');
 		if(total_paragraph_lines)
 			cursor_vert_offset += total_paragraph_lines;
 		else
@@ -218,7 +218,7 @@ int main(int argc, char** argv)
 						vi.scope.set<Currency>(vi.key,Currency(std::string(input.data())));
 						break;
 				}
-				fprintf(stdout,CURSOR_SET_COL_N,(unsigned long int)0);
+				fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)0);
 				fprintf(stdout,CURSOR_UP_N,(cur_pos/w.ws_col)+1);
 				fprintf(stdout,"%s%s%c%c/%s has been saved%s",TEXT_BOLD,TEXT_CYAN,vi.scope.sigil,vi.evalType,vi.key.c_str(),TEXT_NORMAL);
 				fprintf(stdout,CURSOR_DOWN_N,(cur_pos/w.ws_col)+1);
@@ -251,7 +251,7 @@ int main(int argc, char** argv)
 				input.erase(input.begin()+char_pos);
 				continue;
 			}
-			for(unsigned long i=char_pos; !getCharLength(input[i]); i--)
+			for(long unsigned i=char_pos; !getCharLength(input[i]); i--)
 			{
 				input.erase(input.begin()+i);
 				char_pos--;

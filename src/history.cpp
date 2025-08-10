@@ -21,7 +21,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	unsigned long value;
+	long unsigned value;
 	if(argc == 1)
 	{
 		value = rpgsh_history_length;
@@ -76,7 +76,7 @@ int main(int argc, char** argv)
 	}
 
 	confirmHistoryFile();
-	unsigned long line_count = 0;
+	long unsigned line_count = 0;
 	std::ifstream ifs(history_path.c_str());
 	std::string data;
 	std::vector<std::string> history;
@@ -94,7 +94,7 @@ int main(int argc, char** argv)
 		fprintf(stdout,"%ld\n",line_count);
 		return 0;
 	}
-	for(unsigned long i=0; i<line_count; i++)
+	for(long unsigned i=0; i<line_count; i++)
 	{
 		if(argc == 1)
 		{
