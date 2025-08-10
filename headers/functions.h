@@ -56,34 +56,34 @@ bool isTypeSigil(char c);
 bool looksLikeSet(std::string s);
 bool looksLikeVariable(std::string s);
 
-bool isEscaped(std::string str, long unsigned int pos);
+bool isEscaped(std::string str, long unsigned pos);
 
 int stringcasecmp(std::string a, std::string b);
 
 std::vector<std::string> split(std::string str, char delimiter);
 
 template <typename T>
-long long int findInVect(std::vector<T> v, T match, long unsigned int start=0)
+long long findInVect(std::vector<T> v, T match, long unsigned start=0)
 {
-	for(long unsigned int i=start; i<v.size(); i++)
+	for(long unsigned i=start; i<v.size(); i++)
 		if(v[i] == match) return i;
 
 	return -1;
 }
 
-long unsigned int findu(std::string str, std::string match, long unsigned int start=0);
-long unsigned int findu(std::string str, char ch, long unsigned int start=0);
-long unsigned int rfindu(std::string str, std::string match, long unsigned int start=UINT_MAX);
-long unsigned int rfindu(std::string str, char ch, long unsigned int start=UINT_MAX);
-long unsigned int nfindu(std::string str, std::string match, long unsigned int start=0);
-long unsigned int nfindu(std::string str, char ch, long unsigned int start=0);
+long unsigned findu(std::string str, std::string match, long unsigned start=0);
+long unsigned findu(std::string str, char ch, long unsigned start=0);
+long unsigned rfindu(std::string str, std::string match, long unsigned start=UINT_MAX);
+long unsigned rfindu(std::string str, char ch, long unsigned start=UINT_MAX);
+long unsigned nfindu(std::string str, std::string match, long unsigned start=0);
+long unsigned nfindu(std::string str, char ch, long unsigned start=0);
 
 std::string left(std::string str, int n);
 std::string right(std::string str, int n);
 
-long unsigned int countu(std::string str, char ch);
+long unsigned countu(std::string str, char ch);
 
-long unsigned int getDisplayLength(std::string str);
+long unsigned getDisplayLength(std::string str);
 int getCharLength(char c);
 
 void addKeyToMatches(std::vector<std::string>** ppMatches, std::string k, std::string chk_str,
@@ -94,9 +94,9 @@ void addPropertyToMatches(std::vector<std::string>** ppMatches, std::string chk_
 			  std::string property,std::string property_str);
 void addPropertiesToMatches(std::vector<std::string>* pMatches, Scope scope, std::string chk_str,
 			    std::string k, std::string key, std::string property, char type);
-void moveCursorBack(winsize w, long unsigned int start, long unsigned int end=0);
-void moveCursorForward(winsize w, long unsigned int start, long unsigned int end);
-void inputHandler(std::string* pInput, long unsigned int offset=0);
+void moveCursorBack(winsize w, long unsigned start, long unsigned end=0);
+void moveCursorForward(winsize w, long unsigned start, long unsigned end);
+void inputHandler(std::string* pInput, long unsigned offset=0);
 
 std::string addSpaces(unsigned int n);
 
@@ -147,9 +147,9 @@ std::string getSetStr(VariableInfo vi);
 template <typename T>
 void sort(std::vector<T>* v)
 {
-	for(long unsigned int i=0; i<v->size()-1; i++)
+	for(long unsigned i=0; i<v->size()-1; i++)
 	{
-		for(long unsigned int j=i+1; j<v->size(); j++)
+		for(long unsigned j=i+1; j<v->size(); j++)
 		{
 			if((*v)[j] < (*v)[i])
 			{
