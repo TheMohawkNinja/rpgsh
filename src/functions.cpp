@@ -18,7 +18,7 @@ void printHeader(std::string s)
 {
 	fprintf(stdout,"%s%s %s %s\n",TEXT_GREEN,TEXT_BOLD,s.c_str(),TEXT_NORMAL);
 	fprintf(stdout,"%s",TEXT_WHITE);
-	for(long unsigned int i=0; i<s.length()+2; i++)
+	for(long unsigned i=0; i<s.length()+2; i++)
 		fprintf(stdout,"─");
 	fprintf(stdout,"%s\n",TEXT_NORMAL);
 }
@@ -146,7 +146,7 @@ std::string makePretty(std::string value)
 	{"bgwhite",		TEXT_BG_WHITE},
 	{"/bgwhite",		TEXT_BG_DEFAULTCOLOR}};
 
-	for(long unsigned int i=0; i<value.length(); i++)
+	for(long unsigned i=0; i<value.length(); i++)
 	{
 		if(value[i] == '\\' && i == value.length())
 		{
@@ -316,7 +316,7 @@ bool looksLikeVariable(std::string s)
 		return false;
 }
 
-bool isEscaped(std::string str, long unsigned int pos)
+bool isEscaped(std::string str, long unsigned pos)
 {
 	if(pos <= 0 || pos >= str.length()) return false;
 	else return str[pos-1] == '\\';
@@ -351,25 +351,25 @@ std::vector<std::string> split(std::string str, char delimiter)
 	return list;
 }
 
-long unsigned int findu(std::string str, std::string match, long unsigned int start)
+long unsigned findu(std::string str, std::string match, long unsigned start)
 {
 	if(match.length() > str.length()) return std::string::npos;
-	for(long unsigned int i=start; i<str.length()-(match.length()-1); i++)
+	for(long unsigned i=start; i<str.length()-(match.length()-1); i++)
 		if(str.substr(i,match.length()) == match && !isEscaped(str.substr(i,match.length()),i)) return i;
 
 	return std::string::npos;
 }
-long unsigned int findu(std::string str, char ch, long unsigned int start)
+long unsigned findu(std::string str, char ch, long unsigned start)
 {
 	return findu(str, std::string(1,ch), start);
 }
-long unsigned int rfindu(std::string str, std::string match, long unsigned int start)
+long unsigned rfindu(std::string str, std::string match, long unsigned start)
 {
 	if(match.length() > str.length()) return std::string::npos;
 	if(start == UINT_MAX) start = str.length();
 
 	bool last_check = false;
-	for(long unsigned int i=start-match.length(); i>0; i--)
+	for(long unsigned i=start-match.length(); i>0; i--)
 	{
 		if(str.substr(i-last_check,match.length()) == match &&
 		   !isEscaped(str.substr(i-last_check,match.length()),i-last_check)) return i-last_check;
@@ -382,19 +382,19 @@ long unsigned int rfindu(std::string str, std::string match, long unsigned int s
 
 	return std::string::npos;
 }
-long unsigned int rfindu(std::string str, char ch, long unsigned int start)
+long unsigned rfindu(std::string str, char ch, long unsigned start)
 {
 	return rfindu(str, std::string(1,ch), start);
 }
-long unsigned int nfindu(std::string str, std::string match, long unsigned int start)
+long unsigned nfindu(std::string str, std::string match, long unsigned start)
 {
 	if(match.length() > str.length()) return std::string::npos;
-	for(long unsigned int i=start; i<str.length()-(match.length()-1); i++)
+	for(long unsigned i=start; i<str.length()-(match.length()-1); i++)
 		if(str.substr(i,match.length()) != match && !isEscaped(str.substr(i,match.length()),i)) return i;
 
 	return std::string::npos;
 }
-long unsigned int nfindu(std::string str, char ch, long unsigned int start)
+long unsigned nfindu(std::string str, char ch, long unsigned start)
 {
 	return nfindu(str, std::string(1,ch), start);
 }
@@ -408,22 +408,22 @@ std::string right(std::string str, int n)
 	return str.substr(n,str.length()-n);
 }
 
-long unsigned int countu(std::string str, char ch)
+long unsigned countu(std::string str, char ch)
 {
-	long unsigned int count = 0;
-	for(long unsigned int i=0; i<str.length(); i++)
+	long unsigned count = 0;
+	for(long unsigned i=0; i<str.length(); i++)
 		if(str[i] == ch && !isEscaped(str,i)) count++;
 
 	return count;
 }
 
-long unsigned int getDisplayLength(std::string str)
+long unsigned getDisplayLength(std::string str)
 {
 	struct winsize w;
 	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 	int len = 0;
 
-	for(long unsigned int i = 0; i<str.length(); i++)
+	for(long unsigned i = 0; i<str.length(); i++)
 	{
 		unsigned char c = static_cast<unsigned char>(str[i]);
 
@@ -456,8 +456,8 @@ void addKeyToMatches(std::vector<std::string>** ppMatches, std::string k, std::s
 	//Limit keys to one level past current
 	if(!stringcasecmp(left(k,key.length()),key) && k[0] != '.')
 	{
-		long unsigned int key_last_slash = rfindu(key,'/');
-		long unsigned int k_next_slash = findu(k,'/',key_last_slash+1);
+		long unsigned key_last_slash = rfindu(key,'/');
+		long unsigned k_next_slash = findu(k,'/',key_last_slash+1);
 		if(k_next_slash < key.length())
 		{
 			(**ppMatches).push_back(addSpaces(chk_str.length())+right(k,key.length()));
@@ -531,15 +531,15 @@ void addPropertiesToMatches(std::vector<std::string>* pMatches, Scope scope, std
 		addPropertyToMatches(&pMatches,chk_str,property,"Larger");
 	}
 }
-void moveCursorBack(winsize w, long unsigned int start, long unsigned int end)
+void moveCursorBack(winsize w, long unsigned start, long unsigned end)
 {
 	fprintf(stdout,CURSOR_HIDE);
-	for(long unsigned int i=start; i>end; i--)
+	for(long unsigned i=start; i>end; i--)
 	{
 		if(i && !(i%w.ws_col))
 		{
 			fprintf(stdout,CURSOR_UP);
-			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)w.ws_col);
+			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)w.ws_col);
 		}
 		else
 		{
@@ -548,15 +548,15 @@ void moveCursorBack(winsize w, long unsigned int start, long unsigned int end)
 	}
 	fprintf(stdout,CURSOR_SHOW);
 }
-void moveCursorForward(winsize w, long unsigned int start, long unsigned int end)
+void moveCursorForward(winsize w, long unsigned start, long unsigned end)
 {
 	fprintf(stdout,CURSOR_HIDE);
-	for(long unsigned int i=start; i<end; i++)
+	for(long unsigned i=start; i<end; i++)
 	{
 		if(i && !(i%w.ws_col))
 		{
 			fprintf(stdout,CURSOR_DOWN);
-			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)0);
+			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)0);
 		}
 		else
 		{
@@ -565,7 +565,7 @@ void moveCursorForward(winsize w, long unsigned int start, long unsigned int end
 	}
 	fprintf(stdout,CURSOR_SHOW);
 }
-void inputHandler(std::string* pInput, long unsigned int offset)
+void inputHandler(std::string* pInput, long unsigned offset)
 {
 	//Set terminal flags for non-buffered reading required for handling keyboard input
 	struct termios t_old, t_new;
@@ -584,11 +584,11 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 	int tab_ctr = 0;
 	std::string last_match, last_history;
 	std::vector<std::string> history = getAppOutput("history").output;
-	long unsigned int cur_pos = 0;
-	long unsigned int char_pos = cur_pos;
-	long unsigned int history_len = history.size();
-	long unsigned int history_ctr = history_len-1;
-	long unsigned int combined_offset = offset+last_history.length();
+	long unsigned cur_pos = 0;
+	long unsigned char_pos = cur_pos;
+	long unsigned history_len = history.size();
+	long unsigned history_ctr = history_len-1;
+	long unsigned combined_offset = offset+last_history.length();
 
 	while(k != KB_ENTER)
 	{
@@ -683,7 +683,7 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 
 					std::string app_chk_str = app.substr(prefix.length(),
 									     chk_str.length());
-					long unsigned int app_ln = right(app,prefix.length()).length();
+					long unsigned app_ln = right(app,prefix.length()).length();
 					if(app_chk_str == chk_str && app_ln > chk_str.length())
 						matches.push_back(right(app,prefix.length()));
 				}
@@ -874,12 +874,12 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 			//Erase any previous match
 			if(last_match != "")
 			{
-				for(long unsigned int i=0; i<last_match.length()-chk_str.length(); i++)
+				for(long unsigned i=0; i<last_match.length()-chk_str.length(); i++)
 					(*pInput).erase((*pInput).begin()+char_pos);
 			}
 
 			//Insert match into (*pInput)
-			for(long unsigned int i=0; i<match.length()-chk_str.length(); i++)
+			for(long unsigned i=0; i<match.length()-chk_str.length(); i++)
 				(*pInput).insert((*pInput).begin()+char_pos+i,match[i+chk_str.length()]);
 
 			//Reprint (*pInput)
@@ -889,7 +889,7 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 				fprintf(stdout,CLEAR_TO_SCREEN_END);
 			}
 
-			for(long unsigned int i=char_pos; i<(*pInput).size(); i++)
+			for(long unsigned i=char_pos; i<(*pInput).size(); i++)
 				fprintf(stdout,"%c",(*pInput)[i]);
 
 			//CURSOR_LEFT_N(0) still pushes cursor to the left, so we need to check
@@ -904,7 +904,7 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 		}
 		else if(k == ESC_SEQ)//Escape sequences
 		{
-			long unsigned int del_end = (cur_pos < getDisplayLength(*pInput) ? char_pos+getCharLength((*pInput)[char_pos]) : 0);
+			long unsigned del_end = (cur_pos < getDisplayLength(*pInput) ? char_pos+getCharLength((*pInput)[char_pos]) : 0);
 			switch(esc_char)
 			{
 				case 'A':	//Up
@@ -950,7 +950,7 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 					if(cur_pos == 0) continue;
 					if(cur_pos+offset>=w.ws_col)
 					{
-						fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)0);
+						fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)0);
 						fprintf(stdout,CURSOR_UP_N,(cur_pos+offset)/w.ws_col);
 						fprintf(stdout,CURSOR_RIGHT_N,offset);
 					}
@@ -979,7 +979,7 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 					if(getchar() != '~' || cur_pos == 0) continue;
 					if(cur_pos+offset>=w.ws_col)
 					{
-						fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)0);
+						fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)0);
 						fprintf(stdout,CURSOR_UP_N,(cur_pos+offset)/w.ws_col);
 						fprintf(stdout,CURSOR_RIGHT_N,offset);
 					}
@@ -1024,7 +1024,7 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 				case '3':	//Delete
 					if(getchar() != '~' || cur_pos >= getDisplayLength((*pInput))) continue;
 					fprintf(stdout,CLEAR_TO_SCREEN_END);
-					for(long unsigned int i=char_pos; i<del_end; i++)
+					for(long unsigned i=char_pos; i<del_end; i++)
 						(*pInput).erase((*pInput).begin()+char_pos);
 					moveCursorBack(w,cur_pos);
 					fprintf(stdout,"%s",(*pInput).data());
@@ -1032,7 +1032,7 @@ void inputHandler(std::string* pInput, long unsigned int offset)
 					if(!((cur_pos+offset+1)%w.ws_col))
 					{
 						fprintf(stdout,CURSOR_UP);
-						fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)w.ws_col);
+						fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)w.ws_col);
 					}
 					break;
 			}
@@ -1080,7 +1080,7 @@ std::string mergeQuotes(std::string str)
 		return str;
 
 	// Strip unescaped quote marks out from anywhere else but the ends of the string
-	for(long unsigned int i=0; i<str.length(); i++)
+	for(long unsigned i=0; i<str.length(); i++)
 	{
 		if(str[i] != '\"' || (str[i] == '\"' && isEscaped(str,i)))
 			ret += str[i];
@@ -1098,7 +1098,7 @@ std::string escapeSpaces(std::string str)
 {
 	std::string ret = "";
 
-	for(long unsigned int i=0; i<str.length(); i++)
+	for(long unsigned i=0; i<str.length(); i++)
 	{
 		if(str[i] == ' ' && !isEscaped(str,i))
 			ret += "\\ ";
@@ -1360,13 +1360,13 @@ int replaceVariables(std::string* p_arg_str, bool preserveSecondArg)
 	// results in the iterator getting in some way lost causing it to not replace all the variables.
 	// Seems to be limited to cases when the value length > variable length
 	// Either way, using a std::vector<std::string> is an effective work around.
-	std::vector<std::pair<std::string,long unsigned int>> matches;
+	std::vector<std::pair<std::string,long unsigned>> matches;
 	while(v_str_it != end)
 	{
-		matches.push_back(std::pair<std::string,long unsigned int>(v_str_it->str(),v_str_it->position()));
+		matches.push_back(std::pair<std::string,long unsigned>(v_str_it->str(),v_str_it->position()));
 		v_str_it++;
 	}
-	long unsigned int offset = 0;
+	long unsigned offset = 0;
 	for(const auto& match : matches)
 	{
 		GetAppOutputInfo info = getAppOutput(match.first);
@@ -1475,49 +1475,30 @@ int runApp(std::string arg_str, bool redirect_output)
 	}
 
 	//Merge args wrapped in quotes
-	long unsigned quote_begin = std::string::npos;
-	long unsigned quote_end = std::string::npos;
-	long unsigned quote_start_arg = 0;
 	for(long unsigned i=0; i<args.size(); i++)
 	{
-		//Find unescaped quote marks
-		for(long unsigned c=0; c<args[i].length(); c++)
+		long unsigned quote_start = findu(args[i],'\"');
+		long unsigned quote_end = findu(args[i],'\"',quote_start+1);
+		if(quote_start == std::string::npos) continue;
+
+		std::string from_quote_start = right(args[i],quote_start+1);
+		if(quote_end != std::string::npos)//Quotes contained in same arg
 		{
-			if(quote_begin == std::string::npos && args[i][c] == '\"' && !isEscaped(args[i],c))
+			args[i] = left(from_quote_start,findu(from_quote_start,'\"'));
+		}
+		else
+		{
+			args[i] = from_quote_start;
+			i++;
+			while(i < args.size())
 			{
-				quote_begin = c;
-				quote_end = findu(args[i],'\"',c+1);
-				quote_start_arg = i;
+				quote_end = findu(args[i],'\"');
 				if(quote_end == std::string::npos)
-				{
-					args[i] = right(args[i],c+1);
-				}
-				else//No spaces in quote-wrapped string
-				{
-					args[i] = mergeQuotes(left(args[i],quote_end));
-					quote_begin = std::string::npos;
-					quote_end = std::string::npos;
-					quote_start_arg = 0;
-					break;
-				}
-			}
-			else if(quote_end == std::string::npos && args[i][c] == '\"' && !isEscaped(args[i],c))
-			{
-				quote_end = c;
-
-				for(long unsigned q=quote_start_arg+1; q<=i;)
-				{
-					if(q < i) args[quote_start_arg] += " "+args[q];
-					else args[quote_start_arg] += " "+left(args[q],quote_end);
-
-					args.erase(args.begin()+q);
-					i--;
-				}
-				args[i] = mergeQuotes(args[i]);
-				quote_begin = std::string::npos;
-				quote_end = std::string::npos;
-				quote_start_arg = 0;
-				break;
+					args[i-1] += " "+args[i];
+				else
+					args[i-1] += " "+left(args[i],quote_end);
+				args.erase(args.begin()+i);
+				if(quote_end != std::string::npos) break;
 			}
 		}
 	}
