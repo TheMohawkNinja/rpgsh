@@ -64,7 +64,7 @@ void printData(Scope scope, Var depth=-1, bool raw=false)
 		if((k[0] == '.') || (depth>=0 && depth<countu(k,'/')+1)) continue;
 
 		//Get longest currency name
-		long unsigned int longest_cur = 0;
+		long unsigned longest_cur = 0;
 		for(auto& m : v.Monies)
 		{
 			if(!m.q) continue;

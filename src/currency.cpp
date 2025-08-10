@@ -18,7 +18,7 @@ void Currency::tryParseCurrencySystem(std::string* str)
 {
 	try
 	{
-		long unsigned int comma_pos = findu(*str,',');
+		long unsigned comma_pos = findu(*str,',');
 		System = left(*str,comma_pos);
 		*str = str->substr(comma_pos+1,str->length()-(comma_pos+1));
 	}
@@ -31,7 +31,7 @@ void Currency::tryParseName(std::string* str)
 {
 	try
 	{
-		long unsigned int comma_pos = findu(*str,',');
+		long unsigned comma_pos = findu(*str,',');
 		Name = left(*str,comma_pos);
 		*str = str->substr(comma_pos+1,str->length()-(comma_pos+1));
 	}
@@ -44,7 +44,7 @@ void Currency::tryParseSmallerAmount(std::string* str)
 {
 	try
 	{
-		long unsigned int comma_pos = findu(*str,',');
+		long unsigned comma_pos = findu(*str,',');
 		std::string SmallerAmountStr = left(*str,comma_pos);
 		*str = str->substr(comma_pos+1,str->length()-(comma_pos+1));
 
@@ -62,7 +62,7 @@ void Currency::tryParseSmaller(std::string* str)
 {
 	try
 	{
-		long unsigned int comma_pos = findu(*str,',');
+		long unsigned comma_pos = findu(*str,',');
 		Smaller = left(*str,comma_pos);
 		*str = str->substr(comma_pos+1,str->length()-(comma_pos+1));
 	}
@@ -897,11 +897,11 @@ Wallet::Wallet(std::string str)
 
 		//Create currency object to be added to wallet
 		std::string c(1,CURRENCY_SIGIL);
-		const long unsigned int c_pos = findu(str,c+"{");
+		const long unsigned c_pos = findu(str,c+"{");
 		if(c_pos == std::string::npos)
 			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 		std::string currency_str = str.substr(c_pos,findu(str,'}')+1-c_pos);
-		const long unsigned int c_str_ln = currency_str.length();
+		const long unsigned c_str_ln = currency_str.length();
 		if(c_str_ln == std::string::npos)
 			throw std::runtime_error(E_INVALID_EXPLICIT_CONSTRUCTOR);
 		currency = Currency(currency_str);
@@ -909,7 +909,7 @@ Wallet::Wallet(std::string str)
 
 		//If we're at the end of the constructor
 		if(findu(str,delimiter) == std::string::npos) delimiter = '}';
-		const long unsigned int next_delimiter = findu(str,delimiter);
+		const long unsigned next_delimiter = findu(str,delimiter);
 
 		//Parse quantity string and try to add it to the wallet
 		std::string quantity_str = left(str,next_delimiter);
@@ -959,7 +959,7 @@ const char* Wallet::c_str() const
 void Wallet::sort()
 {
 	//Sort first by system alphabetically
-	for(long unsigned int i=0; i<Monies.size(); i++)
+	for(long unsigned i=0; i<Monies.size(); i++)
 	{
 		if(i && Monies[i].c.System < Monies[i-1].c.System)
 		{
@@ -971,17 +971,17 @@ void Wallet::sort()
 	}
 
 	//Find where each system starts
-	typedef std::pair<std::string,long unsigned int> sys_index;
+	typedef std::pair<std::string,long unsigned> sys_index;
 	std::vector<sys_index> systems;
-	for(long unsigned int i=0; i<Monies.size(); i++)
+	for(long unsigned i=0; i<Monies.size(); i++)
 		if(!systems.size() || Monies[i].c.System != systems[systems.size()-1].first)
 			systems.push_back(sys_index(Monies[i].c.System,i));
 
 	//Main sorting algorithm
-	for(long unsigned int system=0; system<systems.size(); system++)
+	for(long unsigned system=0; system<systems.size(); system++)
 	{
 		sys_index s = systems[system];
-		for(long unsigned int i=s.second; i<Monies.size()-1 && Monies[i].c.System == s.first; i++)
+		for(long unsigned i=s.second; i<Monies.size()-1 && Monies[i].c.System == s.first; i++)
 		{
 			if(i > s.second && Monies[i].c.Larger == "")
 			{

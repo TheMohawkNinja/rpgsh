@@ -17,7 +17,7 @@ Character c = Character();
 
 std::string getBufferStr()
 {
-	long unsigned int last_prompt_line_length;
+	long unsigned last_prompt_line_length;
 
 	//Print prompt
 	if(c.keyExists<Var>(DOT_PROMPT))
@@ -54,14 +54,14 @@ int prompt()
 	{
 		if(c.keyExists<Var>(DOT_PROMPT))
 		{
-			long unsigned int last_prompt_line_length;
+			long unsigned last_prompt_line_length;
 			for(const auto& line : getAppOutput("print -r "+c.getStr<Var>(DOT_PROMPT)).output)
 			{
 				if(line.length() <= 1) continue;
 				last_prompt_line_length = getDisplayLength(stripFormatting(line));
 				fprintf(stdout,"%s\n",line.c_str());
 			}
-			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned int)0);
+			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)0);
 			fprintf(stdout,CURSOR_UP);
 			fprintf(stdout,CURSOR_RIGHT_N,last_prompt_line_length);
 		}

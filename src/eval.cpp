@@ -344,7 +344,7 @@ bool doBoolOp(TL lhs, std::string op, TR rhs)
 template<typename TL, typename TR>
 std::string getResult(std::string lhs, std::string op, std::string rhs)
 {
-	for(long unsigned int precedence=0; precedence<operations.size(); precedence++)
+	for(long unsigned precedence=0; precedence<operations.size(); precedence++)
 	{
 		int op_match = findInVect<std::string>(operations[precedence],op);
 
@@ -550,7 +550,7 @@ int main(int argc, char** argv)
 	{
 		struct LParenInfo
 		{
-			long unsigned int pos = 0;
+			long unsigned pos = 0;
 			int depth = 0;
 		};
 
@@ -652,7 +652,7 @@ int main(int argc, char** argv)
 		args.back() += ')';
 
 		// PEMDAS
-		long unsigned int pos = 0;
+		long unsigned pos = 0;
 		for(int start=0; start<(int)args.size()-1; start++)
 		{
 			arg_str = "";
@@ -662,7 +662,7 @@ int main(int argc, char** argv)
 
 			int depth = 0;
 			lpi.clear();
-			for(long unsigned int i=0; i<arg_str.length(); i++)
+			for(long unsigned i=0; i<arg_str.length(); i++)
 			{
 				if(arg_str[i] == '(')
 				{
@@ -679,7 +679,7 @@ int main(int argc, char** argv)
 			for(const auto& i : lpi)
 				if(i.depth > current_lpi.depth) current_lpi = i;
 
-			if((long unsigned int)start < args.size() && pos <= current_lpi.pos && (pos+args[start].length()) > current_lpi.pos)
+			if((long unsigned)start < args.size() && pos <= current_lpi.pos && (pos+args[start].length()) > current_lpi.pos)
 			{
 				for(int end=start; end < (int)args.size(); end++)
 				{

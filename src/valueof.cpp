@@ -97,7 +97,7 @@ int main(int argc, char** argv)
 		for(const auto& [k,v] : s)
 			if(!w_out.get(v)) w_out.set(v,0);
 
-		for(long unsigned int i=0; i<w_out.Monies.size(); i++)
+		for(long unsigned i=0; i<w_out.Monies.size(); i++)
 		{
 			Money m = w_out.Monies[i];
 			if(m.c.Larger != "" && m.c.Larger != currency.Larger && m.q >= s[m.c.Larger].SmallerAmount)
@@ -111,7 +111,7 @@ int main(int argc, char** argv)
 			}
 		}
 
-		for(long unsigned int i=0; i<w_out.Monies.size()-1; i++)
+		for(long unsigned i=0; i<w_out.Monies.size()-1; i++)
 		{
 			if(w_out.Monies[i].q) break;
 			w_out.Monies.erase(w_out.Monies.begin()+i);
@@ -121,7 +121,7 @@ int main(int argc, char** argv)
 		if(w_out.Monies.size() > 1)
 		{
 			fprintf(stdout,"\nRemainder: ");
-			for(long unsigned int i=1; i<w_out.Monies.size(); i++)
+			for(long unsigned i=1; i<w_out.Monies.size(); i++)
 				fprintf(stdout,"%d %s, ",w_out.Monies[i].q,w_out.Monies[i].c.Name.c_str());
 			fprintf(stdout,"\b\b%s\n",CLEAR_TO_LINE_END);
 		}

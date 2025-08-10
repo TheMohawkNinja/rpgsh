@@ -76,9 +76,9 @@ int main(int argc, char** argv)
 	bool insert_mode = false;
 	char k = 0;
 	char esc_char = 0;
-	long unsigned int cur_pos = 2;
-	long unsigned int char_pos = cur_pos;
-	long unsigned int prev_cur_pos = cur_pos;
+	long unsigned cur_pos = 2;
+	long unsigned char_pos = cur_pos;
+	long unsigned prev_cur_pos = cur_pos;
 
 	enum SaveTextState
 	{
@@ -173,7 +173,7 @@ int main(int argc, char** argv)
 			cursor_vert_offset += total_paragraph_lines;
 		else
 			cursor_vert_offset += (output_display_length-1)/w.ws_col;
-		fprintf(stdout,CURSOR_UP_N,(long unsigned int)(input_display_length/w.ws_col)+cursor_vert_offset);
+		fprintf(stdout,CURSOR_UP_N,(long unsigned)(input_display_length/w.ws_col)+cursor_vert_offset);
 		if(cur_pos > 0 && cur_pos < w.ws_col)
 		{
 			fprintf(stdout,CURSOR_RIGHT_N,cur_pos);
@@ -196,7 +196,7 @@ int main(int argc, char** argv)
 			char next_char = getchar();
 			if(next_char == ESC_SEQ)//Consume '[', exiting if key combo is entered.
 			{
-				fprintf(stdout,CURSOR_DOWN_N,(long unsigned int)((input_display_length-cur_pos)/w.ws_col)+cursor_vert_offset);
+				fprintf(stdout,CURSOR_DOWN_N,(long unsigned)((input_display_length-cur_pos)/w.ws_col)+cursor_vert_offset);
 				fprintf(stdout,"\n");
 				fprintf(stdout,CURSOR_SHOW);
 				return 0;
@@ -285,14 +285,14 @@ int main(int argc, char** argv)
 		}
 		else if(k == ESC_SEQ)//Escape sequences
 		{
-			long unsigned int up_end = cur_pos-w.ws_col;
-			long unsigned int down_end = cur_pos+w.ws_col;
-			long unsigned int del_end = (cur_pos < getDisplayLength(input) ? cur_pos+getCharLength(input[char_pos]) : 0);
+			long unsigned up_end = cur_pos-w.ws_col;
+			long unsigned down_end = cur_pos+w.ws_col;
+			long unsigned del_end = (cur_pos < getDisplayLength(input) ? cur_pos+getCharLength(input[char_pos]) : 0);
 			switch(esc_char)
 			{
 				case 'A':	//Up
 					if(cur_pos < w.ws_col) break;
-					for(long unsigned int i=cur_pos; i>up_end; i--)
+					for(long unsigned i=cur_pos; i>up_end; i--)
 					{
 						char_pos--;
 						while(!getCharLength(input[char_pos])) char_pos--;
@@ -305,7 +305,7 @@ int main(int argc, char** argv)
 				case 'B':	//Down
 					if(cur_pos && !(cur_pos%w.ws_col)) fprintf(stdout,CURSOR_UP);
 					if(cur_pos+w.ws_col > getDisplayLength(input)) break;
-					for(long unsigned int i=cur_pos; i<down_end; i++)
+					for(long unsigned i=cur_pos; i<down_end; i++)
 						char_pos += getCharLength(input[i]);
 					cur_pos = down_end;
 					if(cur_pos > w.ws_col) fprintf(stdout,CURSOR_DOWN);
@@ -325,35 +325,35 @@ int main(int argc, char** argv)
 					break;
 				case 'c':	//Shift+Right
 					if(cur_pos == input.size()) break;
-					for(long unsigned int i=cur_pos; input[i]!=' ' && i<input.size(); i++)
+					for(long unsigned i=cur_pos; input[i]!=' ' && i<input.size(); i++)
 					{
 						cur_pos++;
 						char_pos+=getCharLength(input[char_pos]);
 					}
-					for(long unsigned int i=cur_pos; input[i]==' ' && i<input.size(); i++)
+					for(long unsigned i=cur_pos; input[i]==' ' && i<input.size(); i++)
 					{
 						cur_pos++;
 						char_pos+=getCharLength(input[char_pos]);
 					}
 
-					if(cur_pos/(long unsigned int)w.ws_col > prev_cur_pos/(long unsigned int)w.ws_col && cur_pos%w.ws_col)
+					if(cur_pos/(long unsigned)w.ws_col > prev_cur_pos/(long unsigned)w.ws_col && cur_pos%w.ws_col)
 						fprintf(stdout,CURSOR_DOWN_N,(cur_pos/w.ws_col)-(prev_cur_pos/w.ws_col));
 					break;
 				case 'd':	//Shift+Left
 					if(cur_pos == 0) break;
-					for(long unsigned int i=cur_pos; input[i]!=' ' && i>0; i--)
+					for(long unsigned i=cur_pos; input[i]!=' ' && i>0; i--)
 					{
 						cur_pos--;
 						char_pos--;
 						while(!getCharLength(input[char_pos])) char_pos--;
 					}
-					for(long unsigned int i=cur_pos; input[i]==' ' && i>0; i--)
+					for(long unsigned i=cur_pos; input[i]==' ' && i>0; i--)
 					{
 						cur_pos--;
 						char_pos--;
 						while(!getCharLength(input[char_pos])) char_pos--;
 					}
-					for(long unsigned int i=cur_pos; input[i]!=' ' && i>0; i--)
+					for(long unsigned i=cur_pos; input[i]!=' ' && i>0; i--)
 					{
 						cur_pos--;
 						char_pos--;
@@ -365,7 +365,7 @@ int main(int argc, char** argv)
 						char_pos+=getCharLength(input[char_pos]);
 					}
 
-					if(cur_pos/(long unsigned int)w.ws_col < prev_cur_pos/(long unsigned int)w.ws_col)
+					if(cur_pos/(long unsigned)w.ws_col < prev_cur_pos/(long unsigned)w.ws_col)
 						fprintf(stdout,CURSOR_UP_N,(prev_cur_pos/w.ws_col)-(cur_pos/w.ws_col));
 
 					if(cur_pos && !(cur_pos % w.ws_col)) fprintf(stdout,CURSOR_UP);
@@ -383,7 +383,7 @@ int main(int argc, char** argv)
 						if(cur_pos % w.ws_col)
 							fprintf(stdout,CURSOR_LEFT_N,cur_pos%w.ws_col);
 						fprintf(stdout,CURSOR_UP);
-						for(long unsigned int i=0; i<cur_pos%w.ws_col; i++)
+						for(long unsigned i=0; i<cur_pos%w.ws_col; i++)
 						{
 							char_pos--;
 							while(!getCharLength(input[char_pos-i])) char_pos--;
@@ -436,7 +436,7 @@ int main(int argc, char** argv)
 						if(cur_pos % w.ws_col)
 							fprintf(stdout,CURSOR_LEFT_N,cur_pos%w.ws_col);
 						fprintf(stdout,CURSOR_UP);
-						for(long unsigned int i=0; i<cur_pos%w.ws_col; i++)
+						for(long unsigned i=0; i<cur_pos%w.ws_col; i++)
 						{
 							char_pos--;
 							while(!getCharLength(input[char_pos-i])) char_pos--;
@@ -446,40 +446,40 @@ int main(int argc, char** argv)
 					break;
 				case 'F':	//End
 					if(cur_pos == getDisplayLength(input) || !((cur_pos+1)%w.ws_col)) break;
-					if((long unsigned int)(cur_pos+w.ws_col) > getDisplayLength(input))
+					if((long unsigned)(cur_pos+w.ws_col) > getDisplayLength(input))
 					{
 						cur_pos = getDisplayLength(input);
 						char_pos = input.size();
 					}
 					else if(cur_pos < w.ws_col)
 					{
-						for(long unsigned int i=0; i<w.ws_col-1-cur_pos; i++)
+						for(long unsigned i=0; i<w.ws_col-1-cur_pos; i++)
 							char_pos += getCharLength(input[char_pos]);
 						cur_pos = w.ws_col-1;
 					}
 					else
 					{
-						for(long unsigned int i=0; i<w.ws_col-(cur_pos%w.ws_col)-1; i++)
+						for(long unsigned i=0; i<w.ws_col-(cur_pos%w.ws_col)-1; i++)
 							char_pos += getCharLength(input[char_pos]);
 						cur_pos += w.ws_col-(cur_pos%w.ws_col)-1;
 					}
 					break;
 				case '8':	//End
 					if(getchar() != '~' || cur_pos == input.size() || !((cur_pos+1)%w.ws_col)) break;
-					if((long unsigned int)(cur_pos+w.ws_col) > getDisplayLength(input))
+					if((long unsigned)(cur_pos+w.ws_col) > getDisplayLength(input))
 					{
 						cur_pos = getDisplayLength(input);
 						char_pos = input.size();
 					}
 					else if(cur_pos < w.ws_col)
 					{
-						for(long unsigned int i=0; i<w.ws_col-1-cur_pos; i++)
+						for(long unsigned i=0; i<w.ws_col-1-cur_pos; i++)
 							char_pos += getCharLength(input[char_pos]);
 						cur_pos = w.ws_col-1;
 					}
 					else
 					{
-						for(long unsigned int i=0; i<w.ws_col-(cur_pos%w.ws_col)-1; i++)
+						for(long unsigned i=0; i<w.ws_col-(cur_pos%w.ws_col)-1; i++)
 							char_pos += getCharLength(input[char_pos]);
 						cur_pos += w.ws_col-(cur_pos%w.ws_col)-1;
 					}
@@ -489,7 +489,7 @@ int main(int argc, char** argv)
 					break;
 				case '3':	//Delete
 					if(getchar() != '~' || cur_pos >= getDisplayLength(input)) break;
-					for(long unsigned int i=char_pos; i<del_end; i++)
+					for(long unsigned i=char_pos; i<del_end; i++)
 						input.erase(input.begin()+char_pos);
 					break;
 			}

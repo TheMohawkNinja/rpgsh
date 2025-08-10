@@ -12,7 +12,7 @@ class Dice
 		std::string Quantity_str = "";
 		std::string Faces_str = "";
 
-	int getValue(std::string d, long unsigned int start, std::string terminator, bool allow_sign, bool required);
+	int getValue(std::string d, long unsigned start, std::string terminator, bool allow_sign, bool required);
 
 	public:
 		unsigned int	Quantity	=	0;

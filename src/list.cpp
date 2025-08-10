@@ -61,7 +61,7 @@ int main(int argc, char** argv)
 			else
 				fprintf(stdout,"%s%s %s %s\n",TEXT_GREEN,TEXT_BOLD,campaign.c_str(),TEXT_NORMAL);
 			fprintf(stdout,"%s",TEXT_WHITE);
-			for(long unsigned int i=0; i<campaign.length()+2; i++)
+			for(long unsigned i=0; i<campaign.length()+2; i++)
 				fprintf(stdout,"─");
 			fprintf(stdout,"%s\n",TEXT_NORMAL);
 			for(const auto& character_entry : getDirectoryListing(campaigns_dir+campaign+"/characters/"))

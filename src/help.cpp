@@ -38,10 +38,10 @@ int main(int argc, char** argv)
 
 	//Determine longest app and alias names for column formatting
 	Config cfg = Config();
-	long unsigned int longest_name_ln = 0;
-	long unsigned int longest_alias_ln = 0;
+	long unsigned longest_name_ln = 0;
+	long unsigned longest_alias_ln = 0;
 	std::string appname;
-	for(long unsigned int i=0; i<applications.size(); i++)
+	for(long unsigned i=0; i<applications.size(); i++)
 	{
 		std::string app = applications[i];
 		appname = right(app,prefix.length());

@@ -6,7 +6,7 @@
 #include "../headers/functions.h"
 #include "../headers/text.h"
 
-int Dice::getValue(std::string d, long unsigned int start, std::string terminator, bool allow_sign, bool required)
+int Dice::getValue(std::string d, long unsigned start, std::string terminator, bool allow_sign, bool required)
 {
 	std::string value_str = "";
 	if(terminator != "")
@@ -54,7 +54,7 @@ int Dice::getValue(std::string d, long unsigned int start, std::string terminato
 			if(!required) return 0;
 			throw;
 		}
-		for(long unsigned int i=start; i<d.length(); i++)
+		for(long unsigned i=start; i<d.length(); i++)
 		{
 			try
 			{
