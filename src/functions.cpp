@@ -1480,7 +1480,7 @@ int runApp(std::string arg_str, bool redirect_output)
 		long unsigned exp_con_start = std::string::npos;
 		for(long unsigned ch=0; ch<args[i].length(); ch++)
 		{
-			if(ch<args[i].length()-1 && isTypeSigil(args[i][ch]) && args[i][ch+1] == '{')
+			if(ch < args[i].length()-1 && isTypeSigil(args[i][ch]) && args[i][ch+1] == '{')
 			{
 				exp_con_start = ch;
 				break;
@@ -1516,7 +1516,9 @@ int runApp(std::string arg_str, bool redirect_output)
 	{
 		long unsigned quote_start = findu(args[i],'\"');
 		long unsigned quote_end = findu(args[i],'\"',quote_start+1);
-		if(quote_start == std::string::npos) continue;
+		long unsigned rcrlybrkt = findu(args[i],'{');
+		if(quote_start == std::string::npos ||
+		   (rcrlybrkt < quote_start && isTypeSigil(args[i][rcrlybrkt-1]))) continue;
 
 		std::string from_quote_start = right(args[i],quote_start+1);
 		if(quote_end != std::string::npos)//Quotes contained in same arg
@@ -1568,7 +1570,7 @@ int runApp(std::string arg_str, bool redirect_output)
 	}
 	else
 	{
-		status = posix_spawn(&pid, argv[0], NULL, NULL, &argv[0], environ);
+			status = posix_spawn(&pid, argv[0], NULL, NULL, &argv[0], environ);
 	}
 
 	if(status == 0)
