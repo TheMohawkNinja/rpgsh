@@ -94,8 +94,8 @@ void addPropertyToMatches(std::vector<std::string>** ppMatches, std::string chk_
 			  std::string property,std::string property_str);
 void addPropertiesToMatches(std::vector<std::string>* pMatches, Scope scope, std::string chk_str,
 			    std::string k, std::string key, std::string property, char type);
-void moveCursorBack(winsize w, long unsigned start, long unsigned end=0);
-void moveCursorForward(winsize w, long unsigned start, long unsigned end);
+void moveCursorBack(winsize w, long unsigned end=0);
+void moveCursorForward(winsize w, long unsigned end);
 void inputHandler(std::string* pInput, long unsigned offset=0);
 
 std::string addSpaces(unsigned int n);
