@@ -130,6 +130,7 @@
 #define CURSOR_SET_HOME			"\033[H"
 #define CURSOR_HIDE			"\033[?25l"
 #define CURSOR_SHOW			"\033[?25h"
+#define CURSOR_GET_POS			"\033[6n"	//Reports cursor position (CPR) in the form "\033[x;yR", where 'x' and 'y' is the row and column
 
 //Screen and line clearing
 #define CLEAR_TO_SCREEN_END		"\033[J"	//Clears to screen end
