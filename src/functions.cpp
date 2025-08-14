@@ -531,34 +531,34 @@ void addPropertiesToMatches(std::vector<std::string>* pMatches, Scope scope, std
 		addPropertyToMatches(&pMatches,chk_str,property,"Larger");
 	}
 }
-void moveCursorBack(winsize w, long unsigned end)
+void moveCursorBack(winsize w, int start, int end)
 {
 	fprintf(stdout,CURSOR_HIDE);
-	for(long unsigned i=0; i<end; i++)
+	for(int i=start; i>end; i--)
 	{
-		if(i && !(i%w.ws_col))
+		if(i < start && (i%w.ws_col) == w.ws_col-1)
 		{
 			fprintf(stdout,CURSOR_UP);
-			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)w.ws_col);
+			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)w.ws_col-1);
 		}
-		else
+		else if(i%w.ws_col >= 1)
 		{
 			fprintf(stdout,CURSOR_LEFT);
 		}
 	}
 	fprintf(stdout,CURSOR_SHOW);
 }
-void moveCursorForward(winsize w, long unsigned end)
+void moveCursorForward(winsize w, int start, int end)
 {
 	fprintf(stdout,CURSOR_HIDE);
-	for(long unsigned i=0; i<end; i++)
+	for(int i=start; i<end; i++)
 	{
-		if(i && !(i%w.ws_col))
+		if(i > start && (i%w.ws_col) == 1)
 		{
 			fprintf(stdout,CURSOR_DOWN);
 			fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)0);
 		}
-		else
+		else if(i%w.ws_col >= 1)
 		{
 			fprintf(stdout,CURSOR_RIGHT);
 		}
@@ -647,10 +647,10 @@ void inputHandler(std::string* pInput, long unsigned offset)
 				(*pInput).erase((*pInput).begin()+char_pos);
 			}
 
-			fprintf(stdout,"%s",(*pInput).data());
+			fprintf(stdout,"%s ",(*pInput).data());
 
 			if(cur_pos < getDisplayLength(*pInput))
-				moveCursorBack(w,getDisplayLength(*pInput)-cur_pos+offset);
+				moveCursorBack(w,getDisplayLength(*pInput)+offset+1,cur_pos+offset+1);
 		}
 		else if((k == KB_TAB || esc_char == 'Z') &&
 			(cur_pos == (*pInput).size() || (*pInput)[cur_pos] == ')' || (*pInput)[cur_pos] == ' ' || last_match != ""))//Tab (completion)
@@ -937,14 +937,24 @@ void inputHandler(std::string* pInput, long unsigned offset)
 					if(cur_pos == getDisplayLength((*pInput))) continue;
 					cur_pos++;
 					char_pos+=getCharLength((*pInput)[char_pos]);
-					moveCursorForward(w,1);
+					fprintf(stdout,CURSOR_RIGHT);
+					if(cur_pos && !((cur_pos+offset)%w.ws_col))
+					{
+						fprintf(stdout,CURSOR_DOWN);
+						fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)0);
+					}
 					break;
 				case 'D':	//Left
 					if(cur_pos == 0) continue;
 					cur_pos--;
 					char_pos--;
 					while(!getCharLength((*pInput)[char_pos])) char_pos--;
-					moveCursorBack(w,1);
+					fprintf(stdout,CURSOR_LEFT);
+					if(cur_pos && !((cur_pos+offset+1)%w.ws_col))
+					{
+						fprintf(stdout,CURSOR_UP);
+						fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)w.ws_col);
+					}
 					break;
 				case 'H':	//Home
 					if(cur_pos == 0) continue;
@@ -1037,32 +1047,31 @@ void inputHandler(std::string* pInput, long unsigned offset)
 					break;
 			}
 		}
-		else //Printable characters, probably
+		else //Printable character, probably
 		{
-			if(insert_mode)	//If the "Insert" key is toggled
+			if(insert_mode)
 				(*pInput)[char_pos] = k;
 			else
 				(*pInput).insert((*pInput).begin()+char_pos,k);
 
 			char_pos++;
 
-			bool first_line = true;
 			bool can_print = false;
-			std::string line;
+			std::string text;
 			long unsigned expected_input_size = 0;
 
 			for(long unsigned i=0; i<(*pInput).size(); i++)
 				expected_input_size += getCharLength((*pInput)[i]);
 
+			//Ensure we have all bytes in the character
 			if(expected_input_size == (*pInput).size())
 			{
-				moveCursorBack(w,cur_pos);
+				moveCursorBack(w,cur_pos+offset,offset);
 				fprintf(stdout,CLEAR_TO_SCREEN_END);
 			}
-
 			for(long unsigned i=0; i<(*pInput).size(); i++)
 			{
-				line += (*pInput)[i];
+				text += (*pInput)[i];
 				int char_length = getCharLength((*pInput)[i]);
 
 				can_print = (char_length == 1);
@@ -1073,26 +1082,31 @@ void inputHandler(std::string* pInput, long unsigned offset)
 					do
 					{
 						i++;
-						line += (*pInput)[i];
+						text += (*pInput)[i];
 					}while(!getCharLength((*pInput)[i+1]));
 					can_print = true;
 				}
-
-				if((first_line && getDisplayLength(line) == w.ws_col-offset) ||
-				   (!first_line && getDisplayLength(line) == w.ws_col))
-				{
-					if(first_line) first_line = false;
-					fprintf(stdout,"%s",line.c_str());
-					cur_pos++;
-					fprintf(stdout,CURSOR_DOWN);
-					fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)0);
-				}
 			}
+
 			if(can_print)
 			{
-				fprintf(stdout,"%s",line.c_str());
+				fprintf(stdout,"%s ",text.c_str());
 				cur_pos++;
-				moveCursorBack(w,getDisplayLength(*pInput)-cur_pos);
+				/*fprintf(stdout,CURSOR_HIDE);
+				for(long unsigned i=getDisplayLength(text)+offset+1; i>cur_pos+offset; i--)
+				{
+					if(i < getDisplayLength(text)+offset+1 && !(i%w.ws_col))
+					{
+						fprintf(stdout,CURSOR_UP);
+						fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)w.ws_col);
+					}
+					else if(i%w.ws_col)
+					{
+						fprintf(stdout,CURSOR_LEFT);
+					}
+				}
+				fprintf(stdout,CURSOR_SHOW);*/
+				moveCursorBack(w,getDisplayLength(text)+offset+1,cur_pos+offset);
 			}
 		}
 	}
