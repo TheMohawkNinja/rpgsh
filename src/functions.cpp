@@ -628,7 +628,7 @@ void inputHandler(std::string* pInput, long unsigned offset)
 		if(k == KB_BACKSPACE)//Backspace
 		{
 			if(!cur_pos) continue;
-			fprintf(stdout,CURSOR_LEFT_N,cur_pos);
+			moveCursorBack(w,cur_pos+offset,offset);
 			fprintf(stdout,CLEAR_TO_SCREEN_END);
 
 			cur_pos--;
@@ -647,10 +647,8 @@ void inputHandler(std::string* pInput, long unsigned offset)
 				(*pInput).erase((*pInput).begin()+char_pos);
 			}
 
-			fprintf(stdout,"%s ",(*pInput).data());
-
-			if(cur_pos < getDisplayLength(*pInput))
-				moveCursorBack(w,getDisplayLength(*pInput)+offset+1,cur_pos+offset+1);
+			fprintf(stdout,"%s ",(*pInput).c_str());
+			moveCursorBack(w,getDisplayLength(*pInput)+offset+1,cur_pos+offset);
 		}
 		else if((k == KB_TAB || esc_char == 'Z') &&
 			(cur_pos == (*pInput).size() || (*pInput)[cur_pos] == ')' || (*pInput)[cur_pos] == ' ' || last_match != ""))//Tab (completion)
@@ -889,8 +887,7 @@ void inputHandler(std::string* pInput, long unsigned offset)
 				fprintf(stdout,CLEAR_TO_SCREEN_END);
 			}
 
-			for(long unsigned i=char_pos; i<(*pInput).size(); i++)
-				fprintf(stdout,"%c",(*pInput)[i]);
+			fprintf(stdout,"%s",right((*pInput),char_pos).c_str());
 
 			//CURSOR_LEFT_N(0) still pushes cursor to the left, so we need to check
 			unsigned int spaces = 0;
@@ -1050,9 +1047,15 @@ void inputHandler(std::string* pInput, long unsigned offset)
 		else //Printable character, probably
 		{
 			if(insert_mode)
+			{
 				(*pInput)[char_pos] = k;
+				while(!getCharLength((*pInput)[char_pos+1]))
+					(*pInput).erase((*pInput).begin()+char_pos+1);
+			}
 			else
+			{
 				(*pInput).insert((*pInput).begin()+char_pos,k);
+			}
 
 			char_pos++;
 
@@ -1060,53 +1063,22 @@ void inputHandler(std::string* pInput, long unsigned offset)
 			std::string text;
 			long unsigned expected_input_size = 0;
 
-			for(long unsigned i=0; i<(*pInput).size(); i++)
-				expected_input_size += getCharLength((*pInput)[i]);
+			for(const auto& ch : (*pInput))
+				expected_input_size += getCharLength(ch);
 
 			//Ensure we have all bytes in the character
 			if(expected_input_size == (*pInput).size())
 			{
 				moveCursorBack(w,cur_pos+offset,offset);
 				fprintf(stdout,CLEAR_TO_SCREEN_END);
-			}
-			for(long unsigned i=0; i<(*pInput).size(); i++)
-			{
-				text += (*pInput)[i];
-				int char_length = getCharLength((*pInput)[i]);
-
-				can_print = (char_length == 1);
-
-				if(char_length > 1)
-				{
-					if(i+char_length-1 >= (*pInput).size()) break;
-					do
-					{
-						i++;
-						text += (*pInput)[i];
-					}while(!getCharLength((*pInput)[i+1]));
-					can_print = true;
-				}
+				can_print = true;
 			}
 
 			if(can_print)
 			{
-				fprintf(stdout,"%s ",text.c_str());
+				fprintf(stdout,"%s ",(*pInput).c_str());
 				cur_pos++;
-				/*fprintf(stdout,CURSOR_HIDE);
-				for(long unsigned i=getDisplayLength(text)+offset+1; i>cur_pos+offset; i--)
-				{
-					if(i < getDisplayLength(text)+offset+1 && !(i%w.ws_col))
-					{
-						fprintf(stdout,CURSOR_UP);
-						fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)w.ws_col);
-					}
-					else if(i%w.ws_col)
-					{
-						fprintf(stdout,CURSOR_LEFT);
-					}
-				}
-				fprintf(stdout,CURSOR_SHOW);*/
-				moveCursorBack(w,getDisplayLength(text)+offset+1,cur_pos+offset);
+				moveCursorBack(w,getDisplayLength((*pInput))+offset+1,cur_pos+offset);
 			}
 		}
 	}
