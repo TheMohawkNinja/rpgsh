@@ -651,7 +651,9 @@ void inputHandler(std::string* pInput, long unsigned offset)
 			moveCursorBack(w,getDisplayLength(*pInput)+offset+1,cur_pos+offset);
 		}
 		else if((k == KB_TAB || esc_char == 'Z') &&
-			(cur_pos == (*pInput).size() || (*pInput)[cur_pos] == ')' || (*pInput)[cur_pos] == ' ' || last_match != ""))//Tab (completion)
+			(cur_pos == getDisplayLength(*pInput) ||
+			(*pInput)[char_pos] == ')' || (*pInput)[char_pos] == ' ' ||
+			last_match != ""))//Tab (completion)
 		{
 			if(!(*pInput).size()) continue;
 
@@ -664,7 +666,7 @@ void inputHandler(std::string* pInput, long unsigned offset)
 
 			//Create the string which is to be completed
 			std::string chk_str = "";
-			for(int i=cur_pos-1; i>=0&&(*pInput)[i]!=' '; i--)
+			for(int i=char_pos-1; i>=0 && (*pInput)[i]!=' '; i--)
 				chk_str.insert(0,std::string(1,(*pInput)[i]));
 
 			if(chk_str[0] == '(') chk_str.erase(chk_str.begin());
@@ -872,30 +874,26 @@ void inputHandler(std::string* pInput, long unsigned offset)
 			//Erase any previous match
 			if(last_match != "")
 			{
-				for(long unsigned i=0; i<last_match.length()-chk_str.length(); i++)
+				for(long unsigned i=0; i<getDisplayLength(last_match)-getDisplayLength(chk_str); i++)
 					(*pInput).erase((*pInput).begin()+char_pos);
 			}
 
 			//Insert match into (*pInput)
-			for(long unsigned i=0; i<match.length()-chk_str.length(); i++)
+			for(long unsigned i=0; i<getDisplayLength(match)-chk_str.length(); i++)
 				(*pInput).insert((*pInput).begin()+char_pos+i,match[i+chk_str.length()]);
 
 			//Reprint (*pInput)
 			if(last_match != "" && match != "" && nfindu(match,' ') != std::string::npos)
 			{
-				moveCursorBack(w,getDisplayLength(last_match)-getDisplayLength(chk_str));
+				moveCursorBack(w,cur_pos+getDisplayLength(last_match)-countu(last_match,' ')+offset+1,cur_pos+offset+1);
 				fprintf(stdout,CLEAR_TO_SCREEN_END);
 			}
 
 			fprintf(stdout,"%s",right((*pInput),char_pos).c_str());
 
-			//CURSOR_LEFT_N(0) still pushes cursor to the left, so we need to check
-			unsigned int spaces = 0;
-			for(const auto& i : match) if(i == ' ') spaces++;
-			unsigned int offset = match.length()-spaces;
-			char base_char = (rfindu(chk_str,'/') == std::string::npos ? '[' : '/');
-			if(cur_pos+offset < getDisplayLength(*pInput))
-				fprintf(stdout,CURSOR_LEFT_N,getDisplayLength(*pInput)-cur_pos-offset+(getDisplayLength(chk_str)-(rfindu(chk_str,base_char)+1)));
+			unsigned int match_offset = getDisplayLength(match)-countu(match,' ');
+			if(cur_pos+match_offset < getDisplayLength(*pInput))
+				moveCursorBack(w,getDisplayLength(*pInput)+offset+1,cur_pos+offset+getDisplayLength(match)-countu(match,' ')+1);
 
 			last_match = match;
 		}
