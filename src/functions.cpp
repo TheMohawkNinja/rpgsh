@@ -906,7 +906,7 @@ void inputHandler(std::string* pInput, long unsigned offset)
 				case 'A':	//Up
 				case 'B':	//Down
 					if(cur_pos > 0) fprintf(stdout,CURSOR_LEFT_N,cur_pos);
-					if(combined_offset>=w.ws_col)
+					if(combined_offset >= w.ws_col)
 					{
 						fprintf(stdout,CURSOR_UP_N,combined_offset/w.ws_col);
 						fprintf(stdout,CURSOR_RIGHT_N,offset);
@@ -954,7 +954,7 @@ void inputHandler(std::string* pInput, long unsigned offset)
 					break;
 				case 'H':	//Home
 					if(cur_pos == 0) continue;
-					if(cur_pos+offset>=w.ws_col)
+					if(cur_pos+offset >= w.ws_col)
 					{
 						fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)0);
 						fprintf(stdout,CURSOR_UP_N,(cur_pos+offset)/w.ws_col);
@@ -983,7 +983,7 @@ void inputHandler(std::string* pInput, long unsigned offset)
 					break;
 				case '7':	//Home
 					if(getchar() != '~' || cur_pos == 0) continue;
-					if(cur_pos+offset>=w.ws_col)
+					if(cur_pos+offset >= w.ws_col)
 					{
 						fprintf(stdout,CURSOR_SET_COL_N,(long unsigned)0);
 						fprintf(stdout,CURSOR_UP_N,(cur_pos+offset)/w.ws_col);
@@ -1012,7 +1012,7 @@ void inputHandler(std::string* pInput, long unsigned offset)
 					break;
 				case '8':	//End
 					if(getchar() != '~' || cur_pos >= getDisplayLength(*pInput)) continue;
-					if(getDisplayLength(*pInput)-cur_pos>=w.ws_col)
+					if(getDisplayLength(*pInput)-cur_pos >= w.ws_col)
 					{
 						fprintf(stdout,CURSOR_DOWN_N,(getDisplayLength(*pInput)-cur_pos)/w.ws_col);
 						fprintf(stdout,CURSOR_RIGHT_N,(getDisplayLength(*pInput)-cur_pos)%w.ws_col);
