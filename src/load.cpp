@@ -11,7 +11,7 @@ int main(int argc, char** argv)
 	}
 
 	chkFlagAppDesc(argv,"Loads a campaign and/or character.");
-	chkFlagPreserveVariables(argv,false);
+	chkFlagPreserveVariables(argv,none);
 
 	if(chkFlagHelp(argv))
 	{

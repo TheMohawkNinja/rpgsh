@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 	}
 
 	chkFlagAppDesc(argv,"Lists characters and/or campaigns.");
-	chkFlagPreserveVariables(argv,true);
+	chkFlagPreserveVariables(argv,first);
 	if(chkFlagHelp(argv))
 	{
 		fprintf(stdout,"USAGE:\n");

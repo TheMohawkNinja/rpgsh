@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 	}
 
 	chkFlagAppDesc(argv,"Creates a new character or campaign.");
-	chkFlagPreserveVariables(argv,false);
+	chkFlagPreserveVariables(argv,none);
 
 	if(chkFlagHelp(argv))
 	{

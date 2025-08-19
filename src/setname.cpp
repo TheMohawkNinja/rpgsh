@@ -7,7 +7,7 @@
 int main(int argc, char** argv)
 {
 	chkFlagAppDesc(argv,"Changes the key used for the loaded character's name.");
-	chkFlagPreserveVariables(argv,false);
+	chkFlagPreserveVariables(argv,none);
 
 	if(argc < 2)
 	{

@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 		output(warning,"valueof expects no more than 2 arguments, ignoring all other arguments");
 
 	chkFlagAppDesc(argv,"Returns the value of the given wallet in the requested currency.");
-	chkFlagPreserveVariables(argv,false);
+	chkFlagPreserveVariables(argv,none);
 	if(chkFlagHelp(argv))
 	{
 		fprintf(stdout,"USAGE:\n");

@@ -12,7 +12,7 @@ int main(int argc, char** argv)
 		output(warning,"edit only expects 0 or 1 arguments, ignoring all other arguments.");
 
 	chkFlagAppDesc(argv,"Barebones WYSIWYG text editor for variables. Useful for long and/or heavily formatted text.");
-	chkFlagPreserveVariables(argv,true);
+	chkFlagPreserveVariables(argv,first);
 
 	if(chkFlagHelp(argv))
 	{

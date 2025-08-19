@@ -129,7 +129,7 @@ void printShellVariables(Var depth=-1, bool raw=false)
 int main(int argc, char** argv)
 {
 	chkFlagAppDesc(argv,"Pretty prints variables, variable sets, and scopes.");
-	chkFlagPreserveVariables(argv,false);
+	chkFlagPreserveVariables(argv,none);
 
 	if(argc > 4)
 		output(warning,"Print expects no more than four arguments. All args past \"%s\" will be ignored.",argv[5]);

@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 		output(warning,"copy expects no more than 5 arguments, ignoring all other arguments");
 
 	chkFlagAppDesc(argv,"Copies a character or campaign, appending an incrementing number to each copy.");
-	chkFlagPreserveVariables(argv,true);
+	chkFlagPreserveVariables(argv,first);
 	if(chkFlagHelp(argv))
 	{
 		fprintf(stdout,"USAGE:\n");
