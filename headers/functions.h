@@ -18,6 +18,12 @@ enum OutputLevel
 	warning,
 	error
 };
+enum PreserveVariableLevel
+{
+	none,
+	first,
+	all
+};
 struct VariableInfo
 {
 	Scope scope = Scope();
@@ -126,7 +132,7 @@ int runApp(std::string arg_str, bool redirect_output);
 GetAppOutputInfo getAppOutput(std::string prog);
 
 void chkFlagAppDesc(char** _argv, std::string description);
-void chkFlagModifyVariables(char** _argv, bool canModify=false);
+void chkFlagPreserveVariables(char** _argv, PreserveVariableLevel pvl=none);
 bool chkFlagHelp(char** _argv);
 
 std::string getEnvVariable(std::string v);

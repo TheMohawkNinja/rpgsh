@@ -1652,11 +1652,13 @@ void chkFlagAppDesc(char** _argv, std::string description)
 		exit(0);
 	}
 }
-void chkFlagModifyVariables(char** _argv, bool canModify)
+void chkFlagPreserveVariables(char** _argv, PreserveVariableLevel pvl)
 {
 	if(_argv[1] && !strcmp(_argv[1],FLAG_MODIFYVARIABLES))
 	{
-		fprintf(stdout,"%s\n",btos(canModify).c_str());
+		if(pvl == none)		fprintf(stdout,"none\n");
+		else if(pvl == first)	fprintf(stdout,"first\n");
+		else			fprintf(stdout,"all\n");
 		exit(0);
 	}
 }
