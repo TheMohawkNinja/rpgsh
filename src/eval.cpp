@@ -479,7 +479,7 @@ int main(int argc, char** argv)
 	assignOps.insert(assignOps.end(),operations[7].begin(),operations[7].end());
 
 	chkFlagAppDesc(argv,"Prints values and evaluates operations. Implicitly called when modifying variables.");
-	chkFlagModifyVariables(argv,true);
+	chkFlagPreserveVariables(argv,true);
 
 	if(argc == 1)
 	{

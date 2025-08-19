@@ -41,7 +41,7 @@ void printSignature()
 int main(int argc, char** argv)
 {
 	chkFlagAppDesc(argv,"Prints pretty banner art and the author's signature.");
-	chkFlagModifyVariables(argv,false);
+	chkFlagPreserveVariables(argv,false);
 
 	bool sword, name, fireball, signature;
 	sword = name = fireball = signature = false;

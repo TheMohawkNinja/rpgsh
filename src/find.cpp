@@ -49,7 +49,7 @@ int main(int argc, char** argv)
 		output(warning,"find only expects 1 or 2 arguments, ignoring all other arguments.");
 
 	chkFlagAppDesc(argv,"Searches campaigns, characters, keys, and values for matches to a pattern, case-insensitive.");
-	chkFlagModifyVariables(argv,true);
+	chkFlagPreserveVariables(argv,true);
 
 	if(chkFlagHelp(argv))
 	{

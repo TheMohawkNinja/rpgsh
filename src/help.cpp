@@ -10,7 +10,7 @@ int main(int argc, char** argv)
 		output(warning,"help only expects 0 or 1 arguments, ignoring all other arguments.");
 
 	chkFlagAppDesc(argv,"Prints this helpful list of applications and what they do.");
-	chkFlagModifyVariables(argv,false);
+	chkFlagPreserveVariables(argv,false);
 
 	if(chkFlagHelp(argv))
 	{

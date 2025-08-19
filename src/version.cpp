@@ -10,7 +10,7 @@ int main(int argc, char** argv)
 		output(warning,"version only expects 0 or 1 arguments, ignoring all other arguments.");
 
 	chkFlagAppDesc(argv,"Prints version information.");
-	chkFlagModifyVariables(argv,false);
+	chkFlagPreserveVariables(argv,false);
 
 	if(chkFlagHelp(argv))
 	{

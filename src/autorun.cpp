@@ -114,7 +114,7 @@ int main(int argc, char** argv)
 		output(warning,"autorun only expects 0 or 1 arguments, ignoring all other arguments.");
 
 	chkFlagAppDesc(argv,"Sets and executes commands designated by the user on a per-scope basis.");
-	chkFlagModifyVariables(argv,false);
+	chkFlagPreserveVariables(argv,false);
 
 	if(chkFlagHelp(argv))
 	{

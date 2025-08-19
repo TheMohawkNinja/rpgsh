@@ -13,7 +13,7 @@ int main(int argc, char** argv)
 		output(warning,"del only expects 1, 2, or 3 arguments, ignoring all other arguments");
 
 	chkFlagAppDesc(argv,"Deletes a variable, variable set, character, or campaign.");
-	chkFlagModifyVariables(argv,true);
+	chkFlagPreserveVariables(argv,true);
 	if(chkFlagHelp(argv))
 	{
 		fprintf(stdout,"USAGE:\n");
