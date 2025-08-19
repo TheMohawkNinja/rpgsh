@@ -7,13 +7,18 @@
 `rpgsh` is an interactive and extensible shell purpose-built for table-top RPGs like Dungeons and Dragons®, Pathfinder®, and more!
 
 Features include:
+- 18 different commands
+- Four different variable data types: Var, Dice, Currency, and Wallet
+	- Support for common operations with similar and differing data types
+- Hierarchical data structure for handing objects with multiple properties (e.g. Item name, description, value, etc.)
 - Tab completion
 
   <img src="tab_completion.gif" width="320" height="180" border="10"/>
-- Four different variable data types: Var, Dice, Currency, and Wallet
-	- Support for common operations with similar and differing data types
 - Templates to allow support for new games to be added easily and by the user
-- Automation via scripting
+- Automation via scripting and special `autorun` command for keeping up with derived values
+- Unicode support
+- Dice rolling using standard RPG syntax (e.g. 2d8+4) or custom lists
+- Text formatting for $\textsf{{\color{red}c}{\color{blue}o}{\color{green}l}{\color{magenta}o}{\color{yellow}r}{\color{cyan}s}}$, **bold**, *italics*, etc.
 
 ## Disclaimer
 
