@@ -106,15 +106,12 @@ std::string escapeSpaces(std::string str);
 std::string escapeRegexGroupChars(std::string str);
 
 void confirmEnvVariablesFile();
-
 void confirmShellVariablesFile();
-
 void confirmCampaignVariablesFile();
-
 void confirmHistoryFile();
 
 std::vector<std::string> getDirectoryListing(std::string path);
-std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir,std::string xref);
+std::string getLikeFileName(std::string chk_file, std::string chk_dir, bool is_dir, std::string xref);
 void loadXRef(std::string* arg, Scope* p_scope);
 VariableInfo parseVariable(std::string v);// Derive information about variable from string
 

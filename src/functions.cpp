@@ -1157,7 +1157,6 @@ void confirmEnvVariablesFile()
 	setEnvVariable(ENV_CURRENT_CHARACTER,c.getName());
 	setEnvVariable(ENV_CURRENT_CAMPAIGN,"default/");
 }
-
 void confirmShellVariablesFile()
 {
 	if(std::filesystem::exists(shell_variables_path.c_str())) return;
@@ -1166,7 +1165,6 @@ void confirmShellVariablesFile()
 	std::ofstream ofs(shell_variables_path.c_str());
 	ofs.close();
 }
-
 void confirmCampaignVariablesFile()
 {
 	std::string campaign_variables_file = campaigns_dir +
@@ -1179,7 +1177,6 @@ void confirmCampaignVariablesFile()
 	std::ofstream ofs(campaign_variables_file.c_str());
 	ofs.close();
 }
-
 void confirmHistoryFile()
 {
 	if(std::filesystem::exists(history_path.c_str())) return;
@@ -1208,7 +1205,7 @@ std::vector<std::string> getDirectoryListing(std::string path)
 
 	return entries;
 }
-std::string getLikeFileName(std::string chk_file,std::string chk_dir,bool is_dir,std::string xref)
+std::string getLikeFileName(std::string chk_file, std::string chk_dir, bool is_dir, std::string xref)
 {
 	for(const auto& entry : getDirectoryListing(chk_dir))
 	{
