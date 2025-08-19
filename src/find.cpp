@@ -6,7 +6,7 @@
 const std::string replace = std::string(TEXT_RED)+"$&"+std::string(TEXT_NORMAL);
 enum Option
 {
-	all,
+	everything,
 	campaigns,
 	characters,
 	keys,
@@ -22,12 +22,12 @@ void printMatches(datamap<T> map, std::regex pattern, char sigil, Option opt)
 		std::string v_out = std::string(v);
 
 		k_out = std::regex_replace(k_out,pattern,replace);
-		if(opt == all || opt == keys_and_values)
+		if(opt == everything || opt == keys_and_values)
 			v_out = std::regex_replace(v_out,pattern,replace);
 
 		if(opt == keys && k_out != k)
 			fprintf(stdout,"%c/%s\n",sigil,k_out.c_str());
-		else if((opt == all || opt == keys_and_values) && (k_out != k || v_out != std::string(v)))
+		else if((opt == everything || opt == keys_and_values) && (k_out != k || v_out != std::string(v)))
 			fprintf(stdout,"%c/%s\n\t%s\n",sigil,k_out.c_str(),v_out.c_str());
 	}
 }
@@ -71,7 +71,7 @@ int main(int argc, char** argv)
 	if(argc == 2)
 	{
 		p = std::string(argv[1]);
-		opt = all;
+		opt = everything;
 	}
 	else if(argv[1][0] == '-')
 	{
@@ -116,7 +116,7 @@ int main(int argc, char** argv)
 	Campaign m = Campaign();
 	Shell s = Shell();
 
-	if(opt == all || opt == campaigns)
+	if(opt == everything || opt == campaigns)
 	{
 		printHeader("campaigns");
 		std::vector<std::string> campaigns = getDirectoryListing(campaigns_dir);
@@ -133,7 +133,7 @@ int main(int argc, char** argv)
 		fprintf(stdout,"\n");
 	}
 
-	if(opt == all || opt == characters)
+	if(opt == everything || opt == characters)
 	{
 		printHeader("characters");
 		std::string m_dir = left(m.getDatasource(),rfindu(m.getDatasource(),'/'));
@@ -151,7 +151,7 @@ int main(int argc, char** argv)
 		fprintf(stdout,"\n");
 	}
 
-	if(opt == all || opt == keys || opt == keys_and_values)
+	if(opt == everything || opt == keys || opt == keys_and_values)
 	{
 		printHeader("Variables");
 		printScopeMatches(s,pattern,opt);
