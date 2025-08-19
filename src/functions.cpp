@@ -269,14 +269,27 @@ std::string stripFormatting(std::string str)
 	return str;
 }
 
-bool stob(std::string s)
-{
-	return !stringcasecmp(s,"true");
-}
 std::string btos(bool b)
 {
 	if(b) return "True";
 	return "False";
+}
+std::string pvltos(PreserveVariableLevel pvl)
+{
+	if(pvl == none) return "none";
+	else if(pvl == first) return "first";
+	else return "all";
+}
+bool stob(std::string s)
+{
+	return !stringcasecmp(s,"true");
+}
+PreserveVariableLevel stopvl(std::string s)
+{
+	if(!stringcasecmp(s,"none")) return none;
+	else if(!stringcasecmp(s,"first")) return first;
+	else if(!stringcasecmp(s,"all")) return all;
+	else throw;
 }
 
 bool isScopeSigil(char c)
@@ -1366,8 +1379,10 @@ void padding()
 	}
 }
 
-int replaceVariables(std::string* p_arg_str, bool preserveSecondArg)
+int replaceVariables(std::string* p_arg_str, PreserveVariableLevel pvl)
 {
+	if(pvl == all) return 0;
+
 	std::regex variable_pattern = std::regex(variable_pattern_str);
 	std::sregex_iterator v_str_it = std::sregex_iterator((*p_arg_str).begin(),(*p_arg_str).end(),variable_pattern);
 	std::regex arg_pattern(arg_pattern_str);
@@ -1376,7 +1391,7 @@ int replaceVariables(std::string* p_arg_str, bool preserveSecondArg)
 
 	if(p_arg_str_it != end) p_arg_str_it++;
 
-	if(preserveSecondArg && v_str_it != end && p_arg_str_it != end && v_str_it->str() == p_arg_str_it->str())
+	if(pvl == first && v_str_it != end && p_arg_str_it != end && v_str_it->str() == p_arg_str_it->str())
 		v_str_it++;
 
 	// For some reason, attempting to just use v_str_it in the std::regex_replace line to replace variables with their values
@@ -1407,11 +1422,11 @@ int replaceVariables(std::string* p_arg_str, bool preserveSecondArg)
 	//Recursively replace variables
 	v_str_it = std::sregex_iterator((*p_arg_str).begin(),(*p_arg_str).end(),variable_pattern);
 
-	if(preserveSecondArg && v_str_it != end) v_str_it++;
+	if(pvl == first && v_str_it != end) v_str_it++;
 
 	if(v_str_it != end)
 	{
-		int replaceVariablesResult = replaceVariables(p_arg_str,preserveSecondArg);
+		int replaceVariablesResult = replaceVariables(p_arg_str,pvl);
 		if(replaceVariablesResult) return replaceVariablesResult;
 	}
 	return 0;
@@ -1449,12 +1464,12 @@ int runApp(std::string arg_str, bool redirect_output)
 	else					    first_arg = arg_str;
 
 	//See if we need to preserve the argv[1] if it is a variable
-	bool preserveSecondArg = false;
+	PreserveVariableLevel pvl = none;
 	if(findu(arg_str,std::string(FLAG_MODIFYVARIABLES)) == std::string::npos)
 	{
 		GetAppOutputInfo info = getAppOutput(first_arg + " " + std::string(FLAG_MODIFYVARIABLES));
 
-		if(!info.status) preserveSecondArg = stob(info.output[0]);
+		if(!info.status) pvl = stopvl(info.output[0]);
 		else return info.status;
 	}
 
@@ -1463,8 +1478,11 @@ int runApp(std::string arg_str, bool redirect_output)
 	args.push_back(path+prefix+left(arg_str,findu(arg_str," ")));
 
 	//Replace variables
-	int replaceVariablesResult = replaceVariables(&arg_str,preserveSecondArg);
-	if(replaceVariablesResult) return replaceVariablesResult;
+	if(pvl != all)
+	{
+		int replaceVariablesResult = replaceVariables(&arg_str,pvl);
+		if(replaceVariablesResult) return replaceVariablesResult;
+	}
 
 	//Get args for program
 	std::regex arg_pattern(arg_pattern_str);
@@ -1656,9 +1674,7 @@ void chkFlagPreserveVariables(char** _argv, PreserveVariableLevel pvl)
 {
 	if(_argv[1] && !strcmp(_argv[1],FLAG_MODIFYVARIABLES))
 	{
-		if(pvl == none)		fprintf(stdout,"none\n");
-		else if(pvl == first)	fprintf(stdout,"first\n");
-		else			fprintf(stdout,"all\n");
+		fprintf(stdout,"%s\n",pvltos(pvl).c_str());
 		exit(0);
 	}
 }

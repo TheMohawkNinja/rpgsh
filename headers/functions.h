@@ -54,7 +54,9 @@ std::string makePretty(std::string value);
 std::string stripFormatting(std::string str);
 
 std::string btos(bool b);
+std::string pvltos(PreserveVariableLevel pvl);
 bool stob(std::string s);
+PreserveVariableLevel stopvl(std::string s);
 
 bool isScopeSigil(char c);
 bool isTypeSigil(char c);
@@ -127,7 +129,7 @@ void printBadOpAndThrow(std::string bad_op);
 
 void padding();
 
-int replaceVariables(std::string* p_arg_str, bool preserveSecondArg);
+int replaceVariables(std::string* p_arg_str, PreserveVariableLevel pvl);
 int runApp(std::string arg_str, bool redirect_output);
 GetAppOutputInfo getAppOutput(std::string prog);
 
