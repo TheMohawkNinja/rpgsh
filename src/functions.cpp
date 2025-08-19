@@ -681,11 +681,10 @@ void inputHandler(std::string* pInput, long unsigned offset)
 					getline(ifs,app);
 					if(app == "") break;
 
-					std::string app_chk_str = app.substr(prefix.length(),
-									     chk_str.length());
-					long unsigned app_ln = right(app,prefix.length()).length();
-					if(app_chk_str == chk_str && app_ln > chk_str.length())
-						matches.push_back(right(app,prefix.length()));
+					std::string app_chk_str = app.substr(getDisplayLength(prefix),getDisplayLength(chk_str));
+					long unsigned app_ln = getDisplayLength(right(app,getDisplayLength(prefix)));
+					if(app_chk_str == chk_str && app_ln > getDisplayLength(chk_str))
+						matches.push_back(right(app,getDisplayLength(prefix)));
 				}
 				ifs.close();
 			}
@@ -702,23 +701,23 @@ void inputHandler(std::string* pInput, long unsigned offset)
 				{
 					for(auto& c : getDirectoryListing(xref_path))
 					{
-						if(right(c,c.length()-5) != c_ext)//Don't include backup files or non-character files
+						if(right(c,getDisplayLength(c)-5) != c_ext)//Don't include backup files or non-character files
 							continue;
 
 						std::string xref = left(c,findu(c,c_ext));
 						std::string chk_str_xref = right(chk_str,2);
-						if(chk_str.length() == 2 ||
-						   (!stringcasecmp(chk_str_xref,left(xref,chk_str.length()-2)) &&
-						   xref.length() > chk_str_xref.length()))
+						if(getDisplayLength(chk_str) == 2 ||
+						   (!stringcasecmp(chk_str_xref,left(xref,getDisplayLength(chk_str)-2)) &&
+						   getDisplayLength(xref) > getDisplayLength(chk_str_xref)))
 							matches.push_back("  "+xref+"]");//Two spaces are sacrificial for formatting
 					}
 					for(auto& m : getDirectoryListing(campaigns_dir))
 					{
 						std::string chk_str_xref = right(chk_str,2);
 						if(std::filesystem::is_directory(campaigns_dir+m) &&
-						   (chk_str.length() == 2 ||
-						   (!stringcasecmp(chk_str_xref,left(m,chk_str.length()-2)) &&
-						   m.length() > chk_str_xref.length())))
+						   (getDisplayLength(chk_str) == 2 ||
+						   (!stringcasecmp(chk_str_xref,left(m,getDisplayLength(chk_str)-2)) &&
+						   m.length() > getDisplayLength(chk_str_xref))))
 							matches.push_back("  "+m+"/");//Two spaces are sacrificial for formatting
 					}
 				}
@@ -747,15 +746,15 @@ void inputHandler(std::string* pInput, long unsigned offset)
 
 					for(auto& c : getDirectoryListing(xref_path))
 					{
-						if(right(c,c.length()-5) != c_ext)//Don't include backup files or non-character files
+						if(right(c,getDisplayLength(c)-5) != c_ext)//Don't include backup files or non-character files
 							continue;
 
 						std::string xref = left(c,findu(c,c_ext));
 						std::string chk_str_xref = right(chk_str,findu(chk_str,'/')+1);
-						if(!stringcasecmp(chk_str_xref,left(xref,chk_str.length()-findu(chk_str,'/')-1)) &&
-						   xref.length() > chk_str_xref.length())
+						if(!stringcasecmp(chk_str_xref,left(xref,getDisplayLength(chk_str)-findu(chk_str,'/')-1)) &&
+						   getDisplayLength(xref) > getDisplayLength(chk_str_xref))
 						{
-							matches.push_back(addSpaces(chk_str.length()-(chk_str.length()-findu(chk_str,'/'))+1)+
+							matches.push_back(addSpaces(getDisplayLength(chk_str)-(getDisplayLength(chk_str)-findu(chk_str,'/'))+1)+
 									  xref+"]");//Padding is sacrificial for formatting
 						}
 					}
@@ -801,9 +800,9 @@ void inputHandler(std::string* pInput, long unsigned offset)
 					for(auto& m : getDirectoryListing(campaigns_dir))
 					{
 						std::string chk_str_xref = right(chk_str,2);
-						if(chk_str.length() == 2 ||
-						   (!stringcasecmp(chk_str_xref,left(m,chk_str.length()-2)) &&
-						   m.length() > chk_str_xref.length()))
+						if(getDisplayLength(chk_str) == 2 ||
+						   (!stringcasecmp(chk_str_xref,left(m,getDisplayLength(chk_str)-2)) &&
+						   getDisplayLength(m) > getDisplayLength(chk_str_xref)))
 							matches.push_back("  "+m+"]");//Two spaces are sacrificial for formatting
 					}
 				}
@@ -879,13 +878,15 @@ void inputHandler(std::string* pInput, long unsigned offset)
 			}
 
 			//Insert match into (*pInput)
-			for(long unsigned i=0; i<getDisplayLength(match)-chk_str.length(); i++)
-				(*pInput).insert((*pInput).begin()+char_pos+i,match[i+chk_str.length()]);
+			for(long unsigned i=0; i<getDisplayLength(match)-getDisplayLength(chk_str); i++)
+				(*pInput).insert((*pInput).begin()+char_pos+i,match[i+getDisplayLength(chk_str)]);
 
 			//Reprint (*pInput)
 			if(last_match != "" && match != "" && nfindu(match,' ') != std::string::npos)
 			{
-				moveCursorBack(w,cur_pos+getDisplayLength(last_match)-countu(last_match,' ')+offset+1,cur_pos+offset+1);
+				long unsigned start = cur_pos+getDisplayLength(last_match)-countu(last_match,' ')+offset+1;
+				long unsigned end = cur_pos+offset+1;
+				moveCursorBack(w,start,end-(start/w.ws_col > end/w.ws_col));
 				fprintf(stdout,CLEAR_TO_SCREEN_END);
 			}
 
@@ -926,7 +927,7 @@ void inputHandler(std::string* pInput, long unsigned offset)
 					last_history = history[history_ctr];
 					cur_pos = getDisplayLength(*pInput);
 					char_pos = (*pInput).size();
-					combined_offset = offset+last_history.length();
+					combined_offset = offset+getDisplayLength(last_history);
 					break;
 				case 'C':	//Right
 					if(cur_pos == getDisplayLength((*pInput))) continue;
