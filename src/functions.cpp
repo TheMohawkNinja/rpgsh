@@ -1515,7 +1515,7 @@ int runApp(std::string arg_str, bool redirect_output)
 		}
 	}
 
-	//Merge explicit constructors containing spaces
+	//Merge explicit constructors containing spaces TODO: This is fucking with things like "print @d/"
 	for(long unsigned i=0; i<args.size(); i++)
 	{
 		long unsigned exp_con_start = std::string::npos;
@@ -1531,7 +1531,7 @@ int runApp(std::string arg_str, bool redirect_output)
 		long unsigned exp_con_end = findu(args[i],'}',exp_con_start+2);
 
 		std::string from_exp_con_start = right(args[i],exp_con_start+2);
-		if(exp_con_end != std::string::npos)//Quotes contained in same arg
+		if(exp_con_end != std::string::npos)//Curly braces contained in same arg
 		{
 			args[i] = left(from_exp_con_start,findu(from_exp_con_start,'}'));
 		}
@@ -1559,7 +1559,7 @@ int runApp(std::string arg_str, bool redirect_output)
 		long unsigned quote_end = findu(args[i],'\"',quote_start+1);
 		long unsigned rcrlybrkt = findu(args[i],'{');
 		if(quote_start == std::string::npos ||
-		   (rcrlybrkt < quote_start && isTypeSigil(args[i][rcrlybrkt-1]))) continue;
+		   (rcrlybrkt && rcrlybrkt < quote_start && isTypeSigil(args[i][rcrlybrkt-1]))) continue;
 
 		std::string from_quote_start = right(args[i],quote_start+1);
 		if(quote_end != std::string::npos)//Quotes contained in same arg
