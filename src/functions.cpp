@@ -1515,39 +1515,45 @@ int runApp(std::string arg_str, bool redirect_output)
 		}
 	}
 
-	//Merge explicit constructors containing spaces TODO: This is fucking with things like "print @d/"
+	//Merge explicit constructors
 	for(long unsigned i=0; i<args.size(); i++)
 	{
-		long unsigned exp_con_start = std::string::npos;
-		for(long unsigned ch=0; ch<args[i].length(); ch++)
-		{
-			if(ch < args[i].length()-1 && isTypeSigil(args[i][ch]) && args[i][ch+1] == '{')
-			{
-				exp_con_start = ch;
-				break;
-			}
-		}
-		if(exp_con_start == std::string::npos) continue;
-		long unsigned exp_con_end = findu(args[i],'}',exp_con_start+2);
+		long unsigned lcrlybrkt_ctr = countu(args[i],'{');
+		long unsigned rcrlybrkt_ctr = countu(args[i],'}');
 
-		std::string from_exp_con_start = right(args[i],exp_con_start+2);
-		if(exp_con_end != std::string::npos)//Curly braces contained in same arg
+		if(lcrlybrkt_ctr == rcrlybrkt_ctr) continue;
+
+		if(lcrlybrkt_ctr < rcrlybrkt_ctr)
 		{
-			args[i] = left(from_exp_con_start,findu(from_exp_con_start,'}'));
+			output(error,"Expected \'{\' before \'}\'.");
+			return -1;
 		}
 		else
 		{
-			args[i] = from_exp_con_start;
 			i++;
 			while(i < args.size())
 			{
-				exp_con_end = findu(args[i],'}');
-				if(exp_con_end == std::string::npos)
+				long unsigned next_rcrlybrkt = -1;
+				do
+				{
+					if(next_rcrlybrkt+1 > args[i].size()) break;
+					next_rcrlybrkt = findu(args[i],'}',next_rcrlybrkt);
+					if(next_rcrlybrkt != std::string::npos) rcrlybrkt_ctr++;
+				}while(lcrlybrkt_ctr < rcrlybrkt_ctr || next_rcrlybrkt != std::string::npos);
+
+				if(lcrlybrkt_ctr < rcrlybrkt_ctr)
 					args[i-1] += " "+args[i];
 				else
-					args[i-1] += " "+left(args[i],exp_con_end);
+					args[i-1] += " "+left(args[i],next_rcrlybrkt);
+
+				if(lcrlybrkt_ctr == rcrlybrkt_ctr && next_rcrlybrkt < args[i].length()-1 &&
+				   findu(args[i],'}',next_rcrlybrkt+1) != std::string::npos)
+				{
+					output(error,"Expected \'{\' before \'}\'.");
+					return -1;
+				}
 				args.erase(args.begin()+i);
-				if(exp_con_end != std::string::npos) break;
+				if(lcrlybrkt_ctr == rcrlybrkt_ctr) break;
 			}
 		}
 	}
