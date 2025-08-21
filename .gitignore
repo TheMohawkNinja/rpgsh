@@ -3,3 +3,7 @@ rpgsh-*
 docs/*
 !docs/rpgsh-userguide.pdf
 notes
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
