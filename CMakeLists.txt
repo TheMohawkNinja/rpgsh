@@ -13,6 +13,12 @@ set(libs "colors;config;currency;define;dice;functions;scope;var")
 set(bins "autorun;banner;clear;copy;del;edit;eval;find;help;history;list;load;new;print;roll;setname;valueof;version")
 set(SRC_DIR src/)
 set(HEADERS_DIR headers/)
+set(RPGSH_INSTALL_DIR_MACRO "#define RPGSH_INSTALL_DIR		")
+
+#Insert the dynamically-generated install path into define.h
+file(READ ${HEADERS_DIR}define.h TEXT)
+string(REGEX REPLACE "${RPGSH_INSTALL_DIR_MACRO}[^\n]+" "${RPGSH_INSTALL_DIR_MACRO}${CMAKE_INSTALL_PREFIX}/bin/" TEXT "${TEXT}" )
+file(GENERATE OUTPUT ${HEADERS_DIR}define.h CONTENT "${TEXT}")
 
 #Library objects
 foreach(lib ${libs})
