@@ -1,5 +1,5 @@
-#include "../headers/define.h"
-#include "../headers/text.h"
+#include "define.h"
+#include "text.h"
 #include <unistd.h>//getlogin()
 
 //Internal file/directory paths
