@@ -26,7 +26,10 @@ This project is entirely developed independantly. I am not associated in anyway 
 
 ## Install
 
-Run `sudo ./install.sh; ./install.sh`
+Run the following commands:
+`cmake`
+`make -j$(nproc)`
+`sudo make install`
 
 ## How to Use
 
