@@ -17,7 +17,7 @@ set(RPGSH_INSTALL_DIR_MACRO "#define RPGSH_INSTALL_DIR		")
 
 #Insert the dynamically-generated install path into define.h
 file(READ ${HEADERS_DIR}define.h TEXT)
-string(REGEX REPLACE "${RPGSH_INSTALL_DIR_MACRO}[^\n]+" "${RPGSH_INSTALL_DIR_MACRO}${CMAKE_INSTALL_PREFIX}/bin/" TEXT "${TEXT}" )
+string(REGEX REPLACE "${RPGSH_INSTALL_DIR_MACRO}[^\n]+" "${RPGSH_INSTALL_DIR_MACRO}\"${CMAKE_INSTALL_PREFIX}/bin/\"" TEXT "${TEXT}" )
 file(GENERATE OUTPUT ${HEADERS_DIR}define.h CONTENT "${TEXT}")
 
 #Library objects
@@ -26,7 +26,8 @@ foreach(lib ${libs})
 	add_library(${lib} SHARED ${HEADERS_DIR}${lib}.h ${SRC_DIR}${lib}.cpp)
 	target_include_directories(${lib} PRIVATE ${HEADERS_DIR} ${SRC_DIR})
 	set_target_properties(${lib} PROPERTIES
-				     BUILD_RPATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+				     BUILD_RPATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
+				     INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 endforeach()
 
 #Binaries
@@ -34,14 +35,16 @@ message("\nAdding main binary")
 add_executable(rpgsh ${SRC_DIR}main.cpp)
 target_link_libraries(rpgsh PUBLIC ${libs})
 set_target_properties(rpgsh PROPERTIES
-			    BUILD_RPATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+			    BUILD_RPATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
+			    INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 list(APPEND prefixed_bins "rpgsh")
 foreach(bin ${bins})
 	message("Adding ${bin} binary")
 	add_executable(${prefix}${bin} ${SRC_DIR}${bin}.cpp)
 	target_link_libraries(${prefix}${bin} PUBLIC ${libs})
 	set_target_properties(${prefix}${bin} PROPERTIES
-					      BUILD_RPATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}")
+					      BUILD_RPATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
+					      INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 	list(APPEND prefixed_bins "${prefix}${bin}")
 endforeach()
 
