@@ -1,6 +1,7 @@
 #include "define.h"
 #include "text.h"
-#include <pwd.h>//getpwuid()
+#include <pwd.h>//getuid()
+#include <unistd.h>//getlogin()
 
 //Internal file/directory paths
 //dir = Directory
