@@ -18,7 +18,7 @@ void printData(Scope scope, Var depth=-1, bool raw=false)
 {
 	for(auto& [k,v] : scope.getDatamap<Var>())
 	{
-		if(k[0] == '.' || (depth>=0 && depth<countu(k,'/')+1)) continue;
+		if(k[0] == '.' || (depth >= 0 && depth < countu(k,'/')+1)) continue;
 		if(!raw)
 		{
 			fprintf(stdout,"%s%sVar%s%s",TEXT_BOLD,VAR_COLOR,TEXT_NORMAL,addSpaces(COLUMN_PADDING).c_str());
@@ -33,7 +33,7 @@ void printData(Scope scope, Var depth=-1, bool raw=false)
 	}
 	for(auto& [k,v] : scope.getDatamap<Dice>())
 	{
-		if((k[0] == '.') || (depth>=0 && depth<countu(k,'/')+1)) continue;
+		if((k[0] == '.') || (depth >= 0 && depth < countu(k,'/')+1)) continue;
 		if(!raw)
 		{
 			fprintf(stdout,"%s%sDice%s%s",TEXT_BOLD,DICE_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
@@ -61,7 +61,7 @@ void printData(Scope scope, Var depth=-1, bool raw=false)
 	}
 	for(auto& [k,v] : scope.getDatamap<Wallet>())
 	{
-		if((k[0] == '.') || (depth>=0 && depth<countu(k,'/')+1)) continue;
+		if((k[0] == '.') || (depth >= 0 && depth < countu(k,'/')+1)) continue;
 
 		//Get longest currency name
 		long unsigned longest_cur = 0;
@@ -88,7 +88,7 @@ void printData(Scope scope, Var depth=-1, bool raw=false)
 	}
 	for(auto& [k,v] : scope.getDatamap<Currency>())
 	{
-		if((k[0] == '.') || (depth>=0 && depth<countu(k,'/')+1)) continue;
+		if((k[0] == '.') || (depth >= 0 && depth < countu(k,'/')+1)) continue;
 		if(!raw)
 		{
 			fprintf(stdout,"%s%sCurrency%s%s",TEXT_BOLD,CURRENCY_COLOR,TEXT_NORMAL,addSpaces(2*COLUMN_PADDING).c_str());
