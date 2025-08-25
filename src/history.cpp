@@ -9,15 +9,15 @@ int main(int argc, char** argv)
 	chkFlagAppDesc(argv,"Prints rpgsh history.");
 	chkFlagPreserveVariables(argv,none);
 
-	Config config = Config();
+	Config cfg = Config();
 	long rpgsh_history_length;
 	try
 	{
-		rpgsh_history_length = std::stol(config.setting[HISTORY_LENGTH]);
+		rpgsh_history_length = std::stol(cfg.setting[HISTORY_LENGTH]);
 	}
 	catch(...)
 	{
-		output(error,"Invalid value for \"%s\" setting: %s",HISTORY_LENGTH,config.setting[HISTORY_LENGTH].c_str());
+		output(error,"Invalid value for \"%s\" setting: %s",HISTORY_LENGTH,cfg.setting[HISTORY_LENGTH].c_str());
 		return -1;
 	}
 

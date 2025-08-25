@@ -1165,8 +1165,8 @@ void confirmEnvVariablesFile()
 	ofs.close();
 
 	//Set default values for built-in env variables
-	Config config = Config();
-	Character c = Character(templates_dir + config.setting[DEFAULT_GAME].c_str());
+	Config cfg = Config();
+	Character c = Character(templates_dir + cfg.setting[DEFAULT_GAME].c_str());
 	setEnvVariable(ENV_CURRENT_CHARACTER,c.getName());
 	setEnvVariable(ENV_CURRENT_CAMPAIGN,"default/");
 }
@@ -1364,17 +1364,17 @@ MCStr parseMCStr(std::string s)
 
 void padding()
 {
-	Config config = Config();
+	Config cfg = Config();
 
 	//Pad output if set
 	try
 	{
-		if(stob(config.setting[PADDING]))
+		if(stob(cfg.setting[PADDING]))
 			fprintf(stdout,"\n");
 	}
 	catch(...)
 	{
-		output(error,"Invalid value \"%s\" for \"%s\".",config.setting[PADDING].c_str(),PADDING);
+		output(error,"Invalid value \"%s\" for \"%s\".",cfg.setting[PADDING].c_str(),PADDING);
 		exit(-1);
 	}
 }
