@@ -7,7 +7,7 @@
 `rpgsh` is an interactive and extensible shell purpose-built for table-top RPGs like Dungeons and Dragons®, Pathfinder®, and more!
 
 Features include:
-- 18 different commands
+- 19 different commands
 - Four different variable data types: Var, Dice, Currency, and Wallet
 	- Support for common operations with similar and differing data types
 - Hierarchical data structure for handing objects with multiple properties (e.g. Item name, description, value, etc.)
