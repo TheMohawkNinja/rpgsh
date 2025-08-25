@@ -1,6 +1,6 @@
 #include <string>
 #include <cstring>
-#include "../headers/config.h"
+#include "../headers/configuration.h"
 #include "../headers/functions.h"
 #include "../headers/text.h"
 
@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 	ifs.close();
 
 	//Determine longest app and alias names for column formatting
-	Config cfg = Config();
+	Configuration cfg = Configuration();
 	long unsigned longest_name_ln = 0;
 	long unsigned longest_alias_ln = 0;
 	std::string appname;

@@ -1,109 +1,120 @@
-#include <filesystem>
 #include <fstream>
-#include <map>
+#include <cstring>
 #include <string>
-#include "../headers/config.h"
-#include "../headers/define.h"
+#include "../headers/configuration.h"
 #include "../headers/functions.h"
+#include "../headers/text.h"
 
-std::string Config::getConfigItem(std::string s)
+int main(int argc, char** argv)
 {
-	if(s.find("=") != std::string::npos)
+	if(argc > 3)
+		output(warning,"config only expects 0, 1, or 2 arguments, ignoring all other arguments.");
+
+	chkFlagAppDesc(argv,"Gets and sets configuration settings.");
+	chkFlagPreserveVariables(argv,none);
+
+	if(chkFlagHelp(argv))
 	{
-		return left(s,s.find("="));
+		fprintf(stdout,"USAGE:\n");
+		fprintf(stdout,"\tconfig [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\nOPTIONS:\n");
+		fprintf(stdout,"\t%snone%s\t\tPrints current configuration settings and their values.\n",TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t%ssetting%s\t\tPrints the current value of the configuration setting %ssetting%s.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t%ssetting%s=%svalue%s\tSets the configuration setting %ssetting%s to the value %svalue%s.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t-d %ssetting%s\t\tDeletes the configuration setting %ssetting%s.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t%s | %s\tPrint this help text.\n",FLAG_HELPSHORT,FLAG_HELPLONG);
+		return 0;
 	}
-	else//No '='
+
+	Configuration cfg = Configuration();
+
+	if(argc == 1)
 	{
-		output(warning,"No \'=\' found for config item \"%s\", ignoring...",s.c_str());
-		return "";
+		unsigned longest_k = 0;
+		for(const auto& [k,v] : cfg.setting)
+			if(k.length() > longest_k) longest_k = k.length();
+
+		for(const auto& [k,v] : cfg.setting)
+			fprintf(stdout,"%s%s%s%s%s%s\n",TEXT_BOLD,TEXT_GREEN,k.c_str(),TEXT_NORMAL,addSpaces(longest_k-k.length()+COLUMN_PADDING).c_str(),(v != "" ? v : empty_str).c_str());
 	}
-}
-std::string Config::getConfigValue(std::string s)
-{
-	if(s.find("=") != std::string::npos && s.find("=") == s.length()-1)//Nothing after '='
+	else if(argc == 2 && findu(std::string(argv[1]),'=') == std::string::npos)
 	{
-		//If the setting exists, return default value for setting, otherwise return blank
-		for(const auto& [k,v] : setting)
+		for(const auto& [k,v] : cfg.setting)
 		{
-			if(stringcasecmp(left(s,s.find("=")),k)) continue;
+			if(std::string(argv[1]) != k) continue;
+			fprintf(stdout,"%s\n",v.c_str());
 
-			output(warning,"Found blank value for config setting \"%s\"",setting[s].c_str());
-			return setting[s];
+			return 0;
 		}
-		output(warning,"Unknown config setting \"%s\", ignoring...",s.c_str());
-		return "";
-	}
-	else if(s.find("=") != std::string::npos)//Found value
-	{
-		return right(s,s.find("=")+1);
-	}
-	else//No '='
-	{
-		return "";
-	}
-}
 
-Config::Config()
-{
-	// Set defaults
-	setting[PADDING]	=	"true";
-	setting[DEFAULT_GAME]	=	"dnd5e";
-	setting[HIDE_TIPS]	=	"false";
-	setting[HISTORY_LENGTH]	=	"100";
-	setting[ALIASES]	=	"cp::copy::-::del::ls::list::?::help::ver::version";
-	setting[STARTUP_APPS]	=	"banner,version";
-	setting[PRE_RUN_APPS]	=	"";
-	setting[POST_RUN_APPS]	=	"autorun";
+		output(error,"\"%s\" is not a configured setting.",argv[1]);
+		return -1;
+	}
+	else if(argc == 2)
+	{
+		bool setSetting = false;
+		std::string k = left(std::string(argv[1]),findu(std::string(argv[1]),'='));
+		std::string v = right(std::string(argv[1]),findu(std::string(argv[1]),'=')+1);
+		cfg.setting[k] = v;
 
-	// Create default config file if one does not exist
-	if(!std::filesystem::exists(config_path.c_str()))
-	{
-		output(info,"Config file not found, creating default at \"%s\".",config_path.c_str());
-		std::ofstream fs(config_path.c_str());
-		fs<<COMMENT<<" Places a newline character before and after command output.\n";
-		fs<<COMMENT<<" Default: "<<setting[PADDING]<<"\n";
-		fs<<PADDING<<"="<<setting[PADDING]<<"\n";
-		fs<<"\n";
-		fs<<COMMENT<<" Sets the default game for use by rpgsh.\n";
-		fs<<COMMENT<<" Will change things like the character sheet used for the \"print\" command, and what attributes will be created for new characters when using default settings.\n";
-		fs<<COMMENT<<" Default: "<<setting[DEFAULT_GAME]<<"\n";
-		fs<<DEFAULT_GAME<<"="<<setting[DEFAULT_GAME]<<"\n";
-		fs<<"\n";
-		fs<<COMMENT<<" If set to \"true\", hides the tip text that appears when launching rpgsh.\n";
-		fs<<COMMENT<<" Default: "<<setting[HIDE_TIPS]<<"\n";
-		fs<<HIDE_TIPS<<"="<<setting[HIDE_TIPS]<<"\n";
-		fs<<"\n";
-		fs<<COMMENT<<" Sets the number of lines to save for rpgsh history.\n";
-		fs<<COMMENT<<" Default: "<<setting[HISTORY_LENGTH]<<"\n";
-		fs<<HISTORY_LENGTH<<"="<<setting[HISTORY_LENGTH]<<"\n";
-		fs<<"\n";
-		fs<<COMMENT<<" Sets the alias(es) to run a given command.\n";
-		fs<<COMMENT<<" Formatted like a variable set where the keys are the aliases and the values are the commands to run when the alias is ran.\n";
-		fs<<COMMENT<<" Default: "<<setting[ALIASES]<<"\n";
-		fs<<ALIASES<<"="<<setting[ALIASES]<<"\n";
-		fs<<"\n";
-		fs<<COMMENT<<" Comma-delimited list of programs to run when rpgsh launches.\n";
-		fs<<COMMENT<<" Default: "<<setting[STARTUP_APPS]<<"\n";
-		fs<<STARTUP_APPS<<"="<<setting[STARTUP_APPS]<<"\n";
-		fs<<"\n";
-		fs<<COMMENT<<" Comma-delimited list of programs to run before a command is entered into the prompt.\n";
-		fs<<COMMENT<<" Default: "<<setting[PRE_RUN_APPS]<<"\n";
-		fs<<PRE_RUN_APPS<<"="<<setting[PRE_RUN_APPS]<<"\n";
-		fs<<"\n";
-		fs<<COMMENT<<" Comma-delimited list of programs to run after a command is entered into the prompt.\n";
-		fs<<COMMENT<<" Default: "<<setting[POST_RUN_APPS]<<"\n";
-		fs<<POST_RUN_APPS<<"="<<setting[POST_RUN_APPS]<<"\n";
-		fs.close();
+		std::vector<std::string> data;
+		std::ifstream ifs(configuration_path.c_str());
+		while(!ifs.eof())
+		{
+			std::string line;
+			std::getline(ifs,line);
+			if(findu(line,'=') != std::string::npos && left(line,findu(line,'=')) == k)
+			{
+				line = k+"="+v;
+				setSetting = true;
+			}
+			data.push_back(line);
+		}
+		ifs.close();
+
+		if(!setSetting) data.push_back(k+"="+v);
+
+		std::ofstream ofs(configuration_path.c_str());
+		for(const auto& line : data) ofs<<line<<"\n";
+		ofs.close();
+
+		output(info,"Set configuration setting \"%s\" to \"%s\".",k.c_str(),cfg.setting[k].c_str());
 	}
-	std::ifstream fs(config_path.c_str());
-	while(!fs.eof())
+	else if(argc == 3 && !strcmp(argv[1],"-d"))
 	{
-		std::string data;
-		std::getline(fs,data);
-		if(findu(data,COMMENT) != std::string::npos)
-			data = left(data,findu(data,COMMENT));
-		if(data.length() && data[0] != COMMENT)
-			setting[getConfigItem(data)] = getConfigValue(data);
+		bool deletedSetting = false;
+		std::string k = std::string(argv[2]);
+		std::vector<std::string> data;
+		std::ifstream ifs(configuration_path.c_str());
+		while(!ifs.eof())
+		{
+			std::string line;
+			std::getline(ifs,line);
+			if(findu(line,'=') == std::string::npos ||
+			   (findu(line,'=') != std::string::npos && left(line,findu(line,'=')) != k))
+				data.push_back(line);
+			else if(findu(line,'=') != std::string::npos && left(line,findu(line,'=')) == k)
+				deletedSetting = true;
+		}
+		ifs.close();
+
+		if(!deletedSetting)
+		{
+			output(error,"Configuration setting \"%s\" does not exist to be deleted.",argv[2]);
+			return -1;
+		}
+
+		std::ofstream ofs(configuration_path.c_str());
+		for(const auto& line : data) ofs<<line<<"\n";
+		ofs.close();
+
+		output(info,"Deleted configuration setting \"%s\".",k.c_str());
 	}
-	fs.close();
+	else
+	{
+		output(error,"Unknown option \"%s\"",argv[1]);
+		return -1;
+	}
+
+	return 0;
 }

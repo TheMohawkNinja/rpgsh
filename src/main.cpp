@@ -7,12 +7,12 @@
 //#include <sys/ioctl.h>
 //#include <termios.h>
 #include <unistd.h>
-#include "../headers/config.h"
+#include "../headers/configuration.h"
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 #include "../headers/text.h"
 
-Config cfg = Config();
+Configuration cfg = Configuration();
 Character c = Character();
 
 std::string getBufferStr()

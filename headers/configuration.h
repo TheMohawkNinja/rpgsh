@@ -3,7 +3,7 @@
 #include <map>
 #include <string>
 
-class Config
+class Configuration
 {
 	// Configuration file definition:
 	//
@@ -13,9 +13,9 @@ class Config
 		std::map<std::string,std::string> setting;
 
 	private:
-	std::string getConfigItem(std::string s);
-	std::string getConfigValue(std::string s);
+	std::string getConfigurationItem(std::string s);
+	std::string getConfigurationValue(std::string s);
 
 	public:
-	Config();
+	Configuration();
 };
