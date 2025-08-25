@@ -54,7 +54,7 @@ bool Var::isInt() const
 	// Therefore, we have to manually check each character to see if the whole string is ACTUALLY an integer -_-
 	for(long unsigned i=0; i<Value.length(); i++)
 		if((i == 0 && Value[i] != '+' && Value[i] != '-' && !isdigit(Value[i])) ||
-		    i > 0 && !isdigit(Value[i])) return false;
+		    (i > 0 && !isdigit(Value[i]))) return false;
 
 	// This should only throw if int(*this) > INT_MAX
 	try{int(*this); return true;}
