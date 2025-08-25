@@ -718,9 +718,14 @@ int main(int argc, char** argv)
 							args[start] += rparens;
 							added_rparens = true;
 						}
+						else if(op_pos == OP_NOT_FOUND && start < end)
+						{
+							output(error,"Unknown operator \"%s\"",args[start+1].c_str());
+							return -1;
+						}
 						else
 						{
-							output(error,"Unknown operator \"%s\"",args[op_pos].c_str());
+							output(error,"Unknown operator \"%s\"",args[start].c_str());
 							return -1;
 						}
 
