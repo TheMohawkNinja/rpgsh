@@ -65,6 +65,8 @@ std::string makePretty(std::string value)
 
 	if(value == "") return empty_str.c_str();
 
+	value = std::regex_replace(value,std::regex("%name%",std::regex_constants::icase),c.getName());
+
 	std::map<std::string,const char*> ansi_esc_seqs = {
 	{"/",			TEXT_NORMAL},
 	{"b",			TEXT_BOLD},
@@ -181,8 +183,6 @@ std::string makePretty(std::string value)
 
 	for(const auto& [k,v] : ansi_esc_seqs)
 		value = std::regex_replace(value,std::regex("%"+k+"%",std::regex_constants::icase),std::string(v));
-
-	value = std::regex_replace(value,std::regex("%name%",std::regex_constants::icase),c.getName());
 
 	std::regex fg_rgb_color_pattern("%fg=[0-9]{1,3},[0-9]{1,3},[0-9]{1,3}%");
 	std::regex fg_html_color_pattern("%fg=[a-zA-Z]{1,}%");

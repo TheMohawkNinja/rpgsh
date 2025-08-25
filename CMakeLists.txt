@@ -1,36 +1,57 @@
 #Header
 cmake_minimum_required(VERSION 3.10)
-project(rpgsh VERSION 0.19.9)
+project(rpgsh)
 
 #Set variables
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 set(CMAKE_CXX_FLAGS_RELEASE "-Wall -Wextra -Wpedantic")
 set(CMAKE_CXX_FLAGS_DEBUG "-Wall -Wextra -Wpedantic -g")
-set(CXX_STD_FLAGS "-lstdc++fs -std=c++20")
-set(libs "-lcolors -lconfig -lcurrency -ldefine -ldice -lfunctions -lscope -lvar")
-set(CMAKE_CURRENT_SOURCE_DIR src/)
-set(CMAKE_CURRENT_HEADERS_DIR headers/)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/lib")
+set(prefix "rpgsh-")
+set(libs "colors;config;currency;define;dice;functions;scope;var")
+set(bins "autorun;banner;clear;copy;del;edit;eval;find;help;history;list;load;new;print;roll;setname;valueof;version")
+set(SRC_DIR src/)
+set(HEADERS_DIR headers/)
+set(RPGSH_INSTALL_DIR_MACRO "#define RPGSH_INSTALL_DIR		")
+
+#Insert the dynamically-generated install path into define.h
+file(READ ${HEADERS_DIR}define.h TEXT)
+string(REGEX REPLACE "${RPGSH_INSTALL_DIR_MACRO}[^\n]+" "${RPGSH_INSTALL_DIR_MACRO}\"${CMAKE_INSTALL_PREFIX}/bin/\"" TEXT "${TEXT}" )
+file(GENERATE OUTPUT ${HEADERS_DIR}define.h CONTENT "${TEXT}")
 
 #Library objects
-foreach(lib colors config currency dice define functions scope var)
+foreach(lib ${libs})
 	message("Adding ${lib} library")
-	add_library(${lib} SHARED ${CMAKE_CURRENT_SOURCE_DIR}${lib}.cpp)
+	add_library(${lib} SHARED ${HEADERS_DIR}${lib}.h ${SRC_DIR}${lib}.cpp)
+	target_include_directories(${lib} PRIVATE ${HEADERS_DIR} ${SRC_DIR})
+	set_target_properties(${lib} PROPERTIES
+				     BUILD_RPATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
+				     INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 endforeach()
-
-message("\n")
 
 #Binaries
-message("Adding main binary")
-add_executable(rpgsh ${CMAKE_CURRENT_SOURCE_DIR}main.cpp)
-target_link_libraries(rpgsh PUBLIC ${CMAKE_CURRENT_HEADERS_DIR})
-target_include_directories(rpgsh PUBLIC "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}${CMAKE_CURRENT_SOURCE_DIR}")
-foreach(bin autorun banner clear copy del edit eval find help history list load new print roll setname valueof version)
+message("\nAdding main binary")
+add_executable(rpgsh ${SRC_DIR}main.cpp)
+target_link_libraries(rpgsh PUBLIC ${libs})
+set_target_properties(rpgsh PROPERTIES
+			    BUILD_RPATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
+			    INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+list(APPEND prefixed_bins "rpgsh")
+foreach(bin ${bins})
 	message("Adding ${bin} binary")
-	add_executable(_${bin} ${CMAKE_CURRENT_SOURCE_DIR}${bin}.cpp)#Use of underscore because "help" is reserved
-	target_link_libraries(_${bin} PUBLIC ${CMAKE_CURRENT_HEADERS_DIR})
-	target_include_directories(_${bin} PUBLIC "${PROJECT_BINARY_DIR}" "${PROJECT_SOURCE_DIR}${CMAKE_CURRENT_SOURCE_DIR}")
+	add_executable(${prefix}${bin} ${SRC_DIR}${bin}.cpp)
+	target_link_libraries(${prefix}${bin} PUBLIC ${libs})
+	set_target_properties(${prefix}${bin} PROPERTIES
+					      BUILD_RPATH "${CMAKE_LIBRARY_OUTPUT_DIRECTORY}"
+					      INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
+	list(APPEND prefixed_bins "${prefix}${bin}")
 endforeach()
+
+#Install
+install(TARGETS ${prefixed_bins} ${libs}
+	RUNTIME DESTINATION bin
+	LIBRARY DESTINATION lib)
 
 #Done!
 message("\nDone!")

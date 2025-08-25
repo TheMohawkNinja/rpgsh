@@ -6,7 +6,7 @@
 //Version info
 #define MAJOR_VERSION			0
 #define MINOR_VERSION			19
-#define PATCH_VERSION			9
+#define PATCH_VERSION			11
 
 //Comment character definition
 #define COMMENT				'!'
@@ -99,7 +99,7 @@
 //dir = Directory
 //file = File name
 //path = Directory + file name
-#define RPGSH_INSTALL_DIR		"/bin/"
+#define RPGSH_INSTALL_DIR		"/usr/local/bin/"
 extern const char* prng_path;
 extern const char* backup_prng_path;
 extern const char* rpgsh_programs_cache_path;

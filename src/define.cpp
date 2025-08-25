@@ -1,5 +1,6 @@
-#include "../headers/define.h"
-#include "../headers/text.h"
+#include "define.h"
+#include "text.h"
+#include <pwd.h>//getuid()
 #include <unistd.h>//getlogin()
 
 //Internal file/directory paths
@@ -11,8 +12,7 @@ const char* backup_prng_path = 			"/dev/urandom";
 const char* rpgsh_programs_cache_path =		"/tmp/rpgsh_proglist";
 const char* rpgsh_output_redirect_path =	"/tmp/rpgsh";
 std::string variables_file_name =		".variables";
-std::string user = 				getlogin();
-std::string root_dir =				"/home/" + user + "/.rpgsh/";
+std::string root_dir =				std::string(getpwuid(getuid())->pw_dir)+"/.rpgsh/";
 std::string shell_variables_path =		root_dir + variables_file_name;
 std::string rpgsh_env_variables_path =		root_dir + ".env_variables";
 std::string config_path = 			root_dir + "config";
