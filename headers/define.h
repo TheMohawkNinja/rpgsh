@@ -5,8 +5,8 @@
 
 //Version info
 #define MAJOR_VERSION			0
-#define MINOR_VERSION			19
-#define PATCH_VERSION			11
+#define MINOR_VERSION			20
+#define PATCH_VERSION			0
 
 //Comment character definition
 #define COMMENT				'!'
