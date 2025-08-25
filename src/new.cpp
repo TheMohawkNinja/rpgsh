@@ -1,7 +1,7 @@
 #include <filesystem>
 #include <iostream>
 #include <string.h>
-#include "../headers/config.h"
+#include "../headers/configuration.h"
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 
@@ -64,7 +64,7 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	Config cfg = Config();
+	Configuration cfg = Configuration();
 	std::string campaign_name;
 	std::string template_name;
 	NewFileScope nfs;

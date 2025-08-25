@@ -2,48 +2,27 @@
 #include <fstream>
 #include <map>
 #include <string>
-#include "../headers/config.h"
+#include "../headers/configuration.h"
 #include "../headers/define.h"
 #include "../headers/functions.h"
 
-std::string Config::getConfigItem(std::string s)
+std::string Configuration::getConfigurationItem(std::string s)
 {
 	if(s.find("=") != std::string::npos)
-	{
 		return left(s,s.find("="));
-	}
-	else//No '='
-	{
-		output(warning,"No \'=\' found for config item \"%s\", ignoring...",s.c_str());
-		return "";
-	}
+	else
+		output(warning,"No \'=\' found for configuration item \"%s\", ignoring...",s.c_str());
+	return "";
 }
-std::string Config::getConfigValue(std::string s)
+std::string Configuration::getConfigurationValue(std::string s)
 {
-	if(s.find("=") != std::string::npos && s.find("=") == s.length()-1)//Nothing after '='
-	{
-		//If the setting exists, return default value for setting, otherwise return blank
-		for(const auto& [k,v] : setting)
-		{
-			if(stringcasecmp(left(s,s.find("=")),k)) continue;
-
-			output(warning,"Found blank value for config setting \"%s\"",setting[s].c_str());
-			return setting[s];
-		}
-		output(warning,"Unknown config setting \"%s\", ignoring...",s.c_str());
-		return "";
-	}
-	else if(s.find("=") != std::string::npos)//Found value
-	{
+	if(s.find("=") != std::string::npos)
 		return right(s,s.find("=")+1);
-	}
-	else//No '='
-	{
+	else
 		return "";
-	}
 }
 
-Config::Config()
+Configuration::Configuration()
 {
 	// Set defaults
 	setting[PADDING]	=	"true";
@@ -55,11 +34,11 @@ Config::Config()
 	setting[PRE_RUN_APPS]	=	"";
 	setting[POST_RUN_APPS]	=	"autorun";
 
-	// Create default config file if one does not exist
-	if(!std::filesystem::exists(config_path.c_str()))
+	// Create default configuration file if one does not exist
+	if(!std::filesystem::exists(configuration_path.c_str()))
 	{
-		output(info,"Config file not found, creating default at \"%s\".",config_path.c_str());
-		std::ofstream fs(config_path.c_str());
+		output(info,"Configuration file not found, creating default at \"%s\".",configuration_path.c_str());
+		std::ofstream fs(configuration_path.c_str());
 		fs<<COMMENT<<" Places a newline character before and after command output.\n";
 		fs<<COMMENT<<" Default: "<<setting[PADDING]<<"\n";
 		fs<<PADDING<<"="<<setting[PADDING]<<"\n";
@@ -95,7 +74,7 @@ Config::Config()
 		fs<<POST_RUN_APPS<<"="<<setting[POST_RUN_APPS]<<"\n";
 		fs.close();
 	}
-	std::ifstream fs(config_path.c_str());
+	std::ifstream fs(configuration_path.c_str());
 	while(!fs.eof())
 	{
 		std::string data;
@@ -103,7 +82,7 @@ Config::Config()
 		if(findu(data,COMMENT) != std::string::npos)
 			data = left(data,findu(data,COMMENT));
 		if(data.length() && data[0] != COMMENT)
-			setting[getConfigItem(data)] = getConfigValue(data);
+			setting[getConfigurationItem(data)] = getConfigurationValue(data);
 	}
 	fs.close();
 }

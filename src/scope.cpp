@@ -1,7 +1,7 @@
 #include <cstring>
 #include <filesystem>
 #include <fstream>
-#include "../headers/config.h"
+#include "../headers/configuration.h"
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 
@@ -551,7 +551,7 @@ Character::Character(bool backup)
 	else
 	{
 		confirmDefaultCampaign();
-		Config cfg = Config();
+		Configuration cfg = Configuration();
 		load(templates_dir+cfg.setting[DEFAULT_GAME]+c_ext);
 		std::string dst = campaigns_dir+"default/characters/"+getName();
 		for(const auto& file : getDirectoryListing(templates_dir))

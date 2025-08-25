@@ -10,7 +10,7 @@
 #include <sys/wait.h>
 #include <termios.h>
 #include "../headers/colors.h"
-#include "../headers/config.h"
+#include "../headers/configuration.h"
 #include "../headers/functions.h"
 #include "../headers/scope.h"
 
@@ -1165,7 +1165,7 @@ void confirmEnvVariablesFile()
 	ofs.close();
 
 	//Set default values for built-in env variables
-	Config cfg = Config();
+	Configuration cfg = Configuration();
 	Character c = Character(templates_dir + cfg.setting[DEFAULT_GAME].c_str());
 	setEnvVariable(ENV_CURRENT_CHARACTER,c.getName());
 	setEnvVariable(ENV_CURRENT_CAMPAIGN,"default/");
@@ -1364,7 +1364,7 @@ MCStr parseMCStr(std::string s)
 
 void padding()
 {
-	Config cfg = Config();
+	Configuration cfg = Configuration();
 
 	//Pad output if set
 	try
@@ -1433,7 +1433,7 @@ int replaceVariables(std::string* p_arg_str, PreserveVariableLevel pvl)
 }
 int runApp(std::string arg_str, bool redirect_output)
 {
-	Config cfg = Config();
+	Configuration cfg = Configuration();
 	Character c = Character();
 	Campaign m = Campaign();
 	Shell s = Shell();

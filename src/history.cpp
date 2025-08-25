@@ -1,6 +1,6 @@
 #include <cstring>
 #include <strings.h>
-#include "../headers/config.h"
+#include "../headers/configuration.h"
 #include "../headers/functions.h"
 #include "../headers/text.h"
 
@@ -9,7 +9,7 @@ int main(int argc, char** argv)
 	chkFlagAppDesc(argv,"Prints rpgsh history.");
 	chkFlagPreserveVariables(argv,none);
 
-	Config cfg = Config();
+	Configuration cfg = Configuration();
 	long rpgsh_history_length;
 	try
 	{
