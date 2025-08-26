@@ -29,7 +29,6 @@ void printData(Scope scope, Var depth=-1, bool raw=false)
 		{
 			fprintf(stdout,"%s\n",makePretty(v.Value).c_str());
 		}
-		fprintf(stdout,"\n");
 	}
 	for(auto& [k,v] : scope.getDatamap<Dice>())
 	{
@@ -57,7 +56,6 @@ void printData(Scope scope, Var depth=-1, bool raw=false)
 			else
 				fprintf(stdout,"%ud%u%s%d\n",v.Quantity,v.Faces,v.Modifier>=0 ? "+" : "",v.Modifier);
 		}
-		fprintf(stdout,"\n");
 	}
 	for(auto& [k,v] : scope.getDatamap<Wallet>())
 	{
@@ -84,7 +82,6 @@ void printData(Scope scope, Var depth=-1, bool raw=false)
 			fprintf(stdout,"%s%s:%s%s",TEXT_ITALIC,m.c.Name.c_str(),TEXT_NORMAL,addSpaces(longest_cur-m.c.Name.length()+COLUMN_PADDING).c_str());
 			fprintf(stdout,"%d\n",m.q);
 		}
-		fprintf(stdout,"\n");
 	}
 	for(auto& [k,v] : scope.getDatamap<Currency>())
 	{
@@ -99,9 +96,7 @@ void printData(Scope scope, Var depth=-1, bool raw=false)
 		fprintf(stdout,"%sSmallerAmount:    %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(std::to_string(v.SmallerAmount)).c_str());
 		fprintf(stdout,"%sSmaller:          %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.Smaller).c_str());
 		fprintf(stdout,"%sLarger:           %s%s\n",TEXT_ITALIC,TEXT_NORMAL,makePretty(v.Larger).c_str());
-		fprintf(stdout,"\n");
 	}
-	fprintf(stdout,"\b");//Remove extraneous newline
 }
 void printCharacterVariables(Var depth=-1, bool raw=false)
 {
