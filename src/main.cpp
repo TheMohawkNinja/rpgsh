@@ -4,8 +4,6 @@
 #include <fstream>
 #include <map>
 #include <regex>
-//#include <sys/ioctl.h>
-//#include <termios.h>
 #include <unistd.h>
 #include "../headers/configuration.h"
 #include "../headers/functions.h"
@@ -221,8 +219,7 @@ int main(int argc, char** argv)
 	//Handle commands
 	if(argc > 2 && !strcmp(argv[1],"-c"))
 	{
-		runApp(std::string(argv[2]),false);
-		return 0;
+		return runApp(std::string(argv[2]),false);;
 	}
 	else if(argv[1] && !strcmp(argv[1],"-c"))
 	{
@@ -231,22 +228,9 @@ int main(int argc, char** argv)
 	}
 
 	//Handle scripts
-	if(argc > 2 && !strcmp(argv[1],"-s") && std::filesystem::exists(argv[2]))
+	if(argc > 2 && !strcmp(argv[1],"-s"))
 	{
-		std::string cmd;
-		std::ifstream ifs(argv[2]);
-		while(!ifs.eof())
-		{
-			getline(ifs,cmd);
-			if(cmd != "" && (cmd.length() < 3 || (cmd.length() >= 3 && left(cmd,3) != "#!/")))
-				runApp(cmd,false);
-		}
-		return 0;
-	}
-	else if(argc > 2 && !strcmp(argv[1],"-s"))
-	{
-		output(error,"rpgsh script \"%s\" does not exist.");
-		return -1;
+		return runScript(std::string(argv[2]));
 	}
 	else if(argv[1] && !strcmp(argv[1],"-s"))
 	{

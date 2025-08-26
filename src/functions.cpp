@@ -1667,6 +1667,25 @@ GetAppOutputInfo getAppOutput(std::string prog)
 
 	return info;
 }
+int runScript(std::string path)
+{
+	if(!std::filesystem::exists(path))
+	{
+		output(error,"rpgsh script \"%s\" does not exist.",path.c_str());
+		return -1;
+	}
+
+	std::string cmd;
+	std::ifstream ifs(path);
+	while(!ifs.eof())
+	{
+		getline(ifs,cmd);
+		if(cmd != "" && (cmd.length() < 3 || (cmd.length() >= 3 && left(cmd,3) != "#!/")))
+			runApp(cmd,false);
+	}
+	ifs.close();
+	return 0;
+}
 
 void chkFlagAppDesc(char** _argv, std::string description)
 {
