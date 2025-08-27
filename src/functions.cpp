@@ -608,6 +608,20 @@ void inputHandler(std::string* pInput, long unsigned offset)
 		esc_char = 0;
 		k = getchar();
 
+		if(k == KB_ENTER && countu(*pInput,'{') > countu(*pInput,'}'))
+		{
+			moveCursorBack(w,cur_pos+offset,offset);
+			long unsigned spaces_to_add = w.ws_col-((getDisplayLength(*pInput)+offset)%w.ws_col);
+			(*pInput).insert((*pInput).begin()+char_pos,spaces_to_add,' ');
+			char_pos += spaces_to_add;
+			cur_pos += spaces_to_add;;
+
+			fprintf(stdout,CLEAR_TO_SCREEN_END);
+			fprintf(stdout,"%s ",(*pInput).c_str());
+			moveCursorBack(w,getDisplayLength((*pInput))+offset+1,cur_pos+offset);
+			k = 0;
+			continue;
+		}
 		if(k == KB_ENTER) break;
 
 		if(k == ESC_SEQ)
