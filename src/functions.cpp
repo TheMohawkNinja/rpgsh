@@ -1689,15 +1689,33 @@ int runScript(std::string path)
 		return -1;
 	}
 
-	std::string cmd;
+	std::string cmd, line;
 	std::ifstream ifs(path);
 	while(!ifs.eof())
 	{
-		getline(ifs,cmd);
-		if(cmd != "" && (cmd.length() < 3 || (cmd.length() >= 3 && left(cmd,3) != "#!/")))
-			runApp(cmd,false);
+		getline(ifs,line);
+		if(line != "" && (line.length() < 3 || (line.length() >= 3 && left(line,3) != "#!/")))
+		{
+			cmd += line;
+			if(countu(cmd,'{') <= countu(cmd,'}'))
+			{
+				runApp(cmd,false);
+				cmd = "";
+			}
+			else
+			{
+				cmd += ' ';
+			}
+		}
 	}
 	ifs.close();
+
+	if(cmd != "")
+	{
+		output(error,"\'}\' not found before EOF.");
+		return -1;
+	}
+
 	return 0;
 }
 
