@@ -59,13 +59,49 @@ void output(OutputLevel level, const char* format, ...)
 	fprintf(stream,"%s\n",TEXT_NORMAL);
 }
 
-std::string makePretty(std::string value)
+std::string handleBackslashEscSeqs(std::string str)
+{
+	for(long unsigned i=0; i<str.length(); i++)
+	{
+		if(str[i] == '\\' && i == str.length())
+		{
+			str.erase(str.begin()+i);
+		}
+		else if(str[i] == '\\')
+		{
+			switch(str[i+1])
+			{
+				case 'a':
+					str[i+1] = '\a'; //Bell
+					break;
+				case 'b':
+					str[i+1] = '\b'; //Backspace
+					break;
+				case 'f':
+					str[i+1] = '\f'; //Form feed
+					break;
+				case 'n':
+					str[i+1] = '\n'; //Newline
+					break;
+				case 't':
+					str[i+1] = '\t'; //Horizontal tab
+					break;
+				case 'v':
+					str[i+1] = '\v'; //Vertical tab
+					break;
+			}
+			str.erase(str.begin()+i);
+		}
+	}
+	return str;
+}
+std::string makePretty(std::string str)
 {
 	Character c = Character();
 
-	if(value == "") return empty_str.c_str();
+	if(str == "") return empty_str.c_str();
 
-	value = std::regex_replace(value,std::regex("%name%",std::regex_constants::icase),c.getName());
+	str = std::regex_replace(str,std::regex("%name%",std::regex_constants::icase),c.getName());
 
 	std::map<std::string,const char*> ansi_esc_seqs = {
 	{"/",			TEXT_NORMAL},
@@ -148,51 +184,20 @@ std::string makePretty(std::string value)
 	{"bgwhite",		TEXT_BG_WHITE},
 	{"/bgwhite",		TEXT_BG_DEFAULTCOLOR}};
 
-	for(long unsigned i=0; i<value.length(); i++)
-	{
-		if(value[i] == '\\' && i == value.length())
-		{
-			value.erase(value.begin()+i);
-		}
-		else if(value[i] == '\\')
-		{
-			switch(value[i+1])
-			{
-				case 'a':
-					value[i+1] = '\a'; //Bell
-					break;
-				case 'b':
-					value[i+1] = '\b'; //Backspace
-					break;
-				case 'f':
-					value[i+1] = '\f'; //Form feed
-					break;
-				case 'n':
-					value[i+1] = '\n'; //Newline
-					break;
-				case 't':
-					value[i+1] = '\t'; //Horizontal tab
-					break;
-				case 'v':
-					value[i+1] = '\v'; //Vertical tab
-					break;
-			}
-			value.erase(value.begin()+i);
-		}
-	}
+	str = handleBackslashEscSeqs(str);
 
 	for(const auto& [k,v] : ansi_esc_seqs)
-		value = std::regex_replace(value,std::regex("%"+k+"%",std::regex_constants::icase),std::string(v));
+		str = std::regex_replace(str,std::regex("%"+k+"%",std::regex_constants::icase),std::string(v));
 
 	std::regex fg_rgb_color_pattern("%fg=[0-9]{1,3},[0-9]{1,3},[0-9]{1,3}%");
 	std::regex fg_html_color_pattern("%fg=[a-zA-Z]{1,}%");
 	std::regex bg_rgb_color_pattern("%bg=[0-9]{1,3},[0-9]{1,3},[0-9]{1,3}%");
 	std::regex bg_html_color_pattern("%bg=[a-zA-Z]{1,}%");
 
-	std::sregex_iterator fg_rgb_it(value.begin(),value.end(),fg_rgb_color_pattern);
-	std::sregex_iterator fg_html_it(value.begin(),value.end(),fg_html_color_pattern);
-	std::sregex_iterator bg_rgb_it(value.begin(),value.end(),bg_rgb_color_pattern);
-	std::sregex_iterator bg_html_it(value.begin(),value.end(),bg_html_color_pattern);
+	std::sregex_iterator fg_rgb_it(str.begin(),str.end(),fg_rgb_color_pattern);
+	std::sregex_iterator fg_html_it(str.begin(),str.end(),fg_html_color_pattern);
+	std::sregex_iterator bg_rgb_it(str.begin(),str.end(),bg_rgb_color_pattern);
+	std::sregex_iterator bg_html_it(str.begin(),str.end(),bg_html_color_pattern);
 
 	std::sregex_iterator it_end;
 
@@ -245,11 +250,11 @@ std::string makePretty(std::string value)
 		bg_html_it++;
 	}
 
-	for(const auto& [k,v] : string_replacements) value = std::regex_replace(value,std::regex(k),v);
-	value = std::regex_replace(value,std::regex("%"),"%%");//Prevent printf() parsing '%' as format specifiers
+	for(const auto& [k,v] : string_replacements) str = std::regex_replace(str,std::regex(k),v);
+	str = std::regex_replace(str,std::regex("%"),"%%");//Prevent printf() parsing '%' as format specifiers
 
-	value += std::string(TEXT_NORMAL); //Make sure we don't carry over any unterminated formatting
-	return value;
+	str += std::string(TEXT_NORMAL); //Make sure we don't carry over any unterminated formatting
+	return str;
 }
 std::string stripFormatting(std::string str)
 {
@@ -331,7 +336,7 @@ bool looksLikeVariable(std::string s)
 
 bool isEscaped(std::string str, long unsigned pos)
 {
-	if(pos <= 0 || pos >= str.length()) return false;
+	if(pos <= 0 || pos > str.length()) return false;
 	else return str[pos-1] == '\\';
 }
 
@@ -368,7 +373,7 @@ long unsigned findu(std::string str, std::string match, long unsigned start)
 {
 	if(match.length() > str.length()) return std::string::npos;
 	for(long unsigned i=start; i<str.length()-(match.length()-1); i++)
-		if(str.substr(i,match.length()) == match && !isEscaped(str.substr(i,match.length()),i)) return i;
+		if(str.substr(i,match.length()) == match && (!i || !isEscaped(str.substr(i-1,match.length()),1))) return i;
 
 	return std::string::npos;
 }
@@ -385,7 +390,7 @@ long unsigned rfindu(std::string str, std::string match, long unsigned start)
 	for(long unsigned i=start-match.length(); i>0; i--)
 	{
 		if(str.substr(i-last_check,match.length()) == match &&
-		   !isEscaped(str.substr(i-last_check,match.length()),i-last_check)) return i-last_check;
+		   !isEscaped(str.substr(i-last_check,match.length()),1)) return i-last_check;
 		else if(i == 1 && !last_check)
 		{
 			i++;
@@ -403,7 +408,7 @@ long unsigned nfindu(std::string str, std::string match, long unsigned start)
 {
 	if(match.length() > str.length()) return std::string::npos;
 	for(long unsigned i=start; i<str.length()-(match.length()-1); i++)
-		if(str.substr(i,match.length()) != match && !isEscaped(str.substr(i,match.length()),i)) return i;
+		if(str.substr(i,match.length()) != match && (!i || !isEscaped(str.substr(i-1,match.length()),1))) return i;
 
 	return std::string::npos;
 }
@@ -1447,6 +1452,11 @@ int replaceVariables(std::string* p_arg_str, PreserveVariableLevel pvl)
 }
 int runApp(std::string arg_str, bool redirect_output)
 {
+	if(arg_str[0] == COMMENT) return 0;
+	if(findu(arg_str,COMMENT) != std::string::npos)
+	{
+		arg_str = left(arg_str,findu(arg_str,COMMENT));
+	}
 	Configuration cfg = Configuration();
 	Character c = Character();
 	Campaign m = Campaign();
@@ -1472,7 +1482,8 @@ int runApp(std::string arg_str, bool redirect_output)
 	std::regex variable_pattern(d_imp_const_pattern_str+"|"+variable_pattern_str);
 	std::sregex_iterator v_str_it(first_arg.begin(),first_arg.end(),variable_pattern);
 	std::sregex_iterator end;
-	if(v_str_it != end && v_str_it->str() == first_arg) arg_str = "eval " + arg_str;
+	if((v_str_it != end && v_str_it->str() == first_arg) || first_arg[0] == '(')
+		arg_str = "eval " + arg_str;
 
 	if(findu(arg_str," ") != std::string::npos) first_arg = left(arg_str,findu(arg_str," "));
 	else					    first_arg = arg_str;
@@ -1537,7 +1548,11 @@ int runApp(std::string arg_str, bool redirect_output)
 
 		if(lcrlybrkt_ctr == rcrlybrkt_ctr) continue;
 
-		if(lcrlybrkt_ctr < rcrlybrkt_ctr)
+		if(args[i] == "{" || args[i] == "}")
+		{
+			i++;
+		}
+		else if(lcrlybrkt_ctr < rcrlybrkt_ctr)
 		{
 			output(error,"Expected \'{\' before \'}\'.");
 			return -1;
@@ -1566,6 +1581,7 @@ int runApp(std::string arg_str, bool redirect_output)
 					output(error,"Expected \'{\' before \'}\'.");
 					return -1;
 				}
+				fprintf(stdout,"Erasing \"%s\"\n",args[i].c_str());
 				args.erase(args.begin()+i);
 				if(lcrlybrkt_ctr == rcrlybrkt_ctr) break;
 			}
