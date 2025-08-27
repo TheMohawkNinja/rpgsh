@@ -50,7 +50,8 @@ std::string defaultPrompt(Character c);
 
 void output(OutputLevel level, const char* format, ...);
 
-std::string makePretty(std::string value);
+std::string handleBackslashEscSeqs(std::string str);
+std::string makePretty(std::string str);
 std::string stripFormatting(std::string str);
 
 std::string btos(bool b);
