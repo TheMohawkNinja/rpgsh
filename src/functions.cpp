@@ -614,7 +614,7 @@ void inputHandler(std::string* pInput, long unsigned offset)
 			long unsigned spaces_to_add = w.ws_col-((getDisplayLength(*pInput)+offset)%w.ws_col);
 			(*pInput).insert((*pInput).begin()+char_pos,spaces_to_add,' ');
 			char_pos += spaces_to_add;
-			cur_pos += spaces_to_add;;
+			cur_pos += spaces_to_add;
 
 			fprintf(stdout,CLEAR_TO_SCREEN_END);
 			fprintf(stdout,"%s ",(*pInput).c_str());
