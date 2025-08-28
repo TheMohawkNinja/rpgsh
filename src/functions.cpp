@@ -1452,9 +1452,15 @@ int replaceVariables(std::string* p_arg_str, PreserveVariableLevel pvl)
 }
 int runApp(std::string arg_str, bool redirect_output)
 {
+	//Special return statuses
 	if(arg_str[0] == COMMENT) return 0;
+	else if(left(arg_str,5) == "break") return STATUS_BREAK;
+	else if(left(arg_str,8) == "continue") return STATUS_CONTINUE;
+
+	//Snip out inline comment
 	if(findu(arg_str,COMMENT) != std::string::npos)
 		arg_str = left(arg_str,findu(arg_str,COMMENT));
+
 	Configuration cfg = Configuration();
 	Character c = Character();
 	Campaign m = Campaign();

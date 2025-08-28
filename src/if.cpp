@@ -105,7 +105,11 @@ int main(int argc, char** argv)
 	if(!stob(getAppOutput("eval "+condition).output[0])) return 0;
 
 	for(auto& command : commands)
-		runApp(handleBackslashEscSeqs(command),false);
+	{
+		int status = runApp(handleBackslashEscSeqs(command),false);
+		if(status == STATUS_BREAK || status == STATUS_CONTINUE)
+			return status;
+	}
 
 	return 0;
 }
