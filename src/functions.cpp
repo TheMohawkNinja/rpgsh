@@ -373,7 +373,7 @@ long unsigned findu(std::string str, std::string match, long unsigned start)
 {
 	if(match.length() > str.length()) return std::string::npos;
 	for(long unsigned i=start; i<str.length()-(match.length()-1); i++)
-		if(str.substr(i,match.length()) == match && (!i || !isEscaped(str.substr(i-1,match.length()),1))) return i;
+		if(str.substr(i,match.length()) == match && (!i || !isEscaped(str.substr(i-1,match.length()+1),1))) return i;
 
 	return std::string::npos;
 }
@@ -408,7 +408,7 @@ long unsigned nfindu(std::string str, std::string match, long unsigned start)
 {
 	if(match.length() > str.length()) return std::string::npos;
 	for(long unsigned i=start; i<str.length()-(match.length()-1); i++)
-		if(str.substr(i,match.length()) != match && (!i || !isEscaped(str.substr(i-1,match.length()),1))) return i;
+		if(str.substr(i,match.length()) != match && (!i || !isEscaped(str.substr(i-1,match.length()+1),1))) return i;
 
 	return std::string::npos;
 }
@@ -1454,9 +1454,7 @@ int runApp(std::string arg_str, bool redirect_output)
 {
 	if(arg_str[0] == COMMENT) return 0;
 	if(findu(arg_str,COMMENT) != std::string::npos)
-	{
 		arg_str = left(arg_str,findu(arg_str,COMMENT));
-	}
 	Configuration cfg = Configuration();
 	Character c = Character();
 	Campaign m = Campaign();
