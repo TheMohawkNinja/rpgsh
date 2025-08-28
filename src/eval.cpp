@@ -9,6 +9,8 @@
 
 #define OP_NOT_FOUND INT_MAX // INT_MAX as a maximum for op_pos should be fine given that would be a massively complex equation.
 
+std::string old_value, new_value;
+
 enum Action
 {
 	a_read,
@@ -61,6 +63,8 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 				return p_vi->scope.getProperty<Var>(p_vi->key,p_vi->property);
 			else if(action == a_write && !stringcasecmp(p_vi->property,"Value"))
 				p_vi->scope.setProperty<Var,std::string>(p_vi->key,p_vi->property,v);
+
+			new_value = p_vi->scope.getStr<Var>(p_vi->key);
 		}
 		else if(p_vi->evalType == DICE_SIGIL)
 		{
@@ -83,18 +87,8 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 				p_vi->scope.setProperty<Dice,int>(p_vi->key,p_vi->property,std::stoi(v));
 			else if(action == a_write && !stringcasecmp(p_vi->property,"List"))
 				p_vi->scope.setProperty<Dice,std::string>(p_vi->key,p_vi->property,v);
-		}
-		else if(p_vi->evalType == WALLET_SIGIL)
-		{
-			bool keyExists = p_vi->scope.keyExists<Wallet>(p_vi->key);
-			if(action == a_read && keyExists && p_vi->property == "")
-				return p_vi->scope.getStr<Wallet>(p_vi->key);
-			else if(action == a_write && p_vi->property == "")
-				p_vi->scope.set<Wallet>(p_vi->key,Wallet(v));
-			else if(action == a_read && keyExists && p_vi->scope.get<Wallet>(p_vi->key).containsCurrency(p_vi->property))
-				return p_vi->scope.getProperty<Wallet>(p_vi->key,p_vi->property);
-			else if(action == a_write)
-				p_vi->scope.setProperty<Wallet,int>(p_vi->key,p_vi->property,std::stoi(v));
+
+			new_value = p_vi->scope.getStr<Dice>(p_vi->key);
 		}
 		else if(p_vi->evalType == CURRENCY_SIGIL)
 		{
@@ -120,10 +114,26 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 				p_vi->scope.setProperty<Currency,std::string>(p_vi->key,p_vi->property,v);
 			else if(action == a_write && !stringcasecmp(p_vi->property,"SmallerAmount"))
 				p_vi->scope.setProperty<Currency,int>(p_vi->key,p_vi->property,std::stoi(v));
+
+			new_value = p_vi->scope.getStr<Currency>(p_vi->key);
+		}
+		else if(p_vi->evalType == WALLET_SIGIL)
+		{
+			bool keyExists = p_vi->scope.keyExists<Wallet>(p_vi->key);
+			if(action == a_read && keyExists && p_vi->property == "")
+				return p_vi->scope.getStr<Wallet>(p_vi->key);
+			else if(action == a_write && p_vi->property == "")
+				p_vi->scope.set<Wallet>(p_vi->key,Wallet(v));
+			else if(action == a_read && keyExists && p_vi->scope.get<Wallet>(p_vi->key).containsCurrency(p_vi->property))
+				return p_vi->scope.getProperty<Wallet>(p_vi->key,p_vi->property);
+			else if(action == a_write)
+				p_vi->scope.setProperty<Wallet,int>(p_vi->key,p_vi->property,std::stoi(v));
+
+			new_value = p_vi->scope.getStr<Wallet>(p_vi->key);
 		}
 
-		// Should only execute if action == a_write
-		p_vi->scope.save();
+		if(old_value != new_value && action == a_write)
+			p_vi->scope.save();
 		return "";
 	}
 	else if(action == a_read)// If the last character is a '/' and we are just printing the value, print a list of keys and constructors
@@ -179,19 +189,19 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 					else if(p_vi->type == '/' || p_vi->type == DICE_SIGIL)
 						rk = {p_vi->scope.remove<Dice>(k),DICE_SIGIL};
 					break;
-				case WALLET_SIGIL:
-					if((p_vi->type == '/' || p_vi->type == WALLET_SIGIL) &&
-					   (action == a_set_add || action == a_set_add_a))
-						p_vi->scope.set<Wallet>(p_vi->key+k,v);
-					else if(p_vi->type == '/' || p_vi->type == WALLET_SIGIL)
-						rk = {p_vi->scope.remove<Wallet>(k),WALLET_SIGIL};
-					break;
 				case CURRENCY_SIGIL:
 					if((p_vi->type == '/' || p_vi->type == CURRENCY_SIGIL) &&
 					   (action == a_set_add || action == a_set_add_a))
 						p_vi->scope.set<Currency>(p_vi->key+k,v);
 					else if(p_vi->type == '/' || p_vi->type == CURRENCY_SIGIL)
 						rk = {p_vi->scope.remove<Currency>(k),CURRENCY_SIGIL};
+					break;
+				case WALLET_SIGIL:
+					if((p_vi->type == '/' || p_vi->type == WALLET_SIGIL) &&
+					   (action == a_set_add || action == a_set_add_a))
+						p_vi->scope.set<Wallet>(p_vi->key+k,v);
+					else if(p_vi->type == '/' || p_vi->type == WALLET_SIGIL)
+						rk = {p_vi->scope.remove<Wallet>(k),WALLET_SIGIL};
 					break;
 			}
 
@@ -202,8 +212,11 @@ std::string doAction(VariableInfo* p_vi, Action action, std::string value)
 				output(info,"Variable \"%c%s%c/%s\" (value: \"%s\") has been deleted.",p_vi->scope.sigil,xref.c_str(),rk.type,k.c_str(),v.c_str());
 		}
 
-		if (action == a_set_add || action == a_remove_add) return getSetStr(*p_vi);
-		else if(action == a_set_add_a || action == a_remove_add_a) p_vi->scope.save();
+		new_value = getSetStr(*p_vi);
+		if (action == a_set_add || action == a_remove_add)
+			return getSetStr(*p_vi);
+		else if((action == a_set_add_a || action == a_remove_add_a) && old_value != new_value)
+			p_vi->scope.save();
 	}
 
 	return ""; // Supress -Wreturn-type
@@ -422,10 +435,10 @@ std::string parseRHSAndDoOp(std::vector<std::string> v, unsigned int lhs_pos, un
 		return getResult<TL,Var>(v[lhs_pos],v[op_pos],v[rhs_pos]);
 	else if(left(v[rhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
 		return getResult<TL,Dice>(v[lhs_pos],v[op_pos],v[rhs_pos]);
-	else if(left(v[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
-		return getResult<TL,Wallet>(v[lhs_pos],v[op_pos],v[rhs_pos]);
 	else if(left(v[rhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
 		return getResult<TL,Currency>(v[lhs_pos],v[op_pos],v[rhs_pos]);
+	else if(left(v[rhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
+		return getResult<TL,Wallet>(v[lhs_pos],v[op_pos],v[rhs_pos]);
 	else if(std::is_same_v<TL,Dice> && !Var(v[rhs_pos]).isInt())
 		return getResult<TL,Dice>(v[lhs_pos],v[op_pos],v[rhs_pos]);
 	else
@@ -444,10 +457,10 @@ void parseLHSAndDoOp(VariableInfo* vi, std::vector<std::string>* v, unsigned int
 		result = parseRHSAndDoOp<Var>(*v, lhs_pos, op_pos, rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,DICE_SIGIL)+"{")
 		result = parseRHSAndDoOp<Dice>(*v, lhs_pos, op_pos, rhs_pos);
-	else if(left((*v)[lhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
-		result = parseRHSAndDoOp<Wallet>(*v, lhs_pos, op_pos, rhs_pos);
 	else if(left((*v)[lhs_pos],2) == std::string(1,CURRENCY_SIGIL)+"{")
 		result = parseRHSAndDoOp<Currency>(*v, lhs_pos, op_pos, rhs_pos);
+	else if(left((*v)[lhs_pos],2) == std::string(1,WALLET_SIGIL)+"{")
+		result = parseRHSAndDoOp<Wallet>(*v, lhs_pos, op_pos, rhs_pos);
 	else
 		result = parseRHSAndDoOp<Var>(*v, lhs_pos, op_pos, rhs_pos);
 
@@ -555,9 +568,6 @@ int main(int argc, char** argv)
 		};
 
 		std::vector<LParenInfo> lpi;
-		std::string old_value;
-		if(vi.variable != "") old_value = getAppOutput(vi.variable).output[0];
-
 		std::vector<std::string> args;
 
 		// Need to know final operation to determine whether we print to screen or not
@@ -587,15 +597,19 @@ int main(int argc, char** argv)
 			{
 				case VAR_SIGIL:
 					args[0] = vi.scope.getProperty<Var>(vi.key,vi.property);
+					old_value = vi.scope.getStr<Var>(vi.key);
 					break;
 				case DICE_SIGIL:
 					args[0] = vi.scope.getProperty<Dice>(vi.key,vi.property);
-					break;
-				case WALLET_SIGIL:
-					args[0] = vi.scope.getProperty<Wallet>(vi.key,vi.property);
+					old_value = vi.scope.getStr<Dice>(vi.key);
 					break;
 				case CURRENCY_SIGIL:
 					args[0] = vi.scope.getProperty<Currency>(vi.key,vi.property);
+					old_value = vi.scope.getStr<Currency>(vi.key);
+					break;
+				case WALLET_SIGIL:
+					args[0] = vi.scope.getProperty<Wallet>(vi.key,vi.property);
+					old_value = vi.scope.getStr<Wallet>(vi.key);
 					break;
 			}
 		}
@@ -605,15 +619,19 @@ int main(int argc, char** argv)
 			{
 				case VAR_SIGIL:
 					args[0] = vi.scope.getStr<Var>(vi.key);
+					old_value = vi.scope.getStr<Var>(vi.key);
 					break;
 				case DICE_SIGIL:
 					args[0] = vi.scope.getStr<Dice>(vi.key);
-					break;
-				case WALLET_SIGIL:
-					args[0] = vi.scope.getStr<Wallet>(vi.key);
+					old_value = vi.scope.getStr<Dice>(vi.key);
 					break;
 				case CURRENCY_SIGIL:
 					args[0] = vi.scope.getStr<Currency>(vi.key);
+					old_value = vi.scope.getStr<Currency>(vi.key);
+					break;
+				case WALLET_SIGIL:
+					args[0] = vi.scope.getStr<Wallet>(vi.key);
+					old_value = vi.scope.getStr<Wallet>(vi.key);
 					break;
 			}
 		}
@@ -633,6 +651,8 @@ int main(int argc, char** argv)
 
 			args[0] = lparens+std::string(Var(args[0]))+rparens;
 		}
+
+		//if(vi.variable != "") old_value = args[0];
 
 		if(lparen_ctr > rparen_ctr)
 		{
@@ -798,6 +818,8 @@ int main(int argc, char** argv)
 			output(error,"Variable set modifications can only be performed with other variable sets.");
 			return -1;
 		}
+
+		old_value = getAppOutput(vi.variable).output[0];
 
 		if(!strcasecmp(argv[2],OP_ADD))
 			fprintf(stdout,"%s\n",doAction(&vi, a_set_add, rhs).c_str());
