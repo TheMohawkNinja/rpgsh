@@ -108,7 +108,7 @@ int main(int argc, char** argv)
 		{
 			int status = runApp(handleBackslashEscSeqs(command),false);
 			if(status == STATUS_BREAK) return 0;
-			if(status == STATUS_CONTINUE) break;;
+			if(status == STATUS_CONTINUE) break;
 		}
 	}
 
