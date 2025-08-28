@@ -1,4 +1,5 @@
 #include <cstring>
+#include <regex>
 #include "../headers/functions.h"
 #include "../headers/text.h"
 
@@ -32,7 +33,7 @@ int main(int argc, char** argv)
 	std::vector<std::string> commands;
 	for(int i=1; i<argc; i++)
 	{
-		if(!found_start && (strcmp(argv[i],"{") && strcmp(argv[i],"{;")))
+		if(!found_start && strcmp(argv[i],"{"))
 		{
 			condition += std::string(argv[i])+" ";
 		}
@@ -45,41 +46,50 @@ int main(int argc, char** argv)
 		{
 			for(int j=argc-1; j>=i; j--)
 			{
-				if(!found_end)
-				{
-					if(strcmp(argv[j],"}") && strcmp(argv[j],"};")) continue;
+				std::string j_arg = std::string(argv[j]);
+				if(found_end)
+					commands_str = j_arg+" "+commands_str;
+				else if(!found_end && j_arg.back() == '}')
 					found_end = true;
-				}
-				commands_str = std::string(argv[j])+" "+commands_str;
 			}
 			break;
 		}
 	}
 
-	fprintf(stdout,"command_str: \"%s\"\n",commands_str.c_str());
 	commands = split(commands_str,';');
-	commands.erase(commands.end()-1);
-	bool nested = false;
-	unsigned nested_level = 0;
+
+	for(unsigned i=0; i<commands.size(); i++)
+	{
+		if(countu(commands[i],'{') > countu(commands[i],'}'))
+		{
+			if(i == commands.size()-1)
+			{
+				output(error,"\t\'}\' not found.");
+				return -1;
+			}
+			else if(findu(commands[i+1],'}') != std::string::npos)
+			{
+				commands[i] += left(commands[i+1],findu(commands[i+1],'}')+1);
+				commands[i+1] = right(commands[i+1],findu(commands[i+1],'}')+1);
+				i=0;
+			}
+			else
+			{
+				commands[i] += ";"+commands[i+1]+";";
+				commands.erase(commands.begin()+i+1);
+				i=0;
+			}
+		}
+	}
+
+	//Cleaup with regex
 	for(auto& command : commands)
 	{
-		if(left(command,3) == " if")
-		{
-			nested = true;
-			nested_level++;
-		}
-
-		if(command.length() >= 2 && right(command,command.length()-2) == "};")
-			nested_level--;
-
-		if(!nested_level)
-			nested = false;
-
-		if(nested)
-			command += ";";
+		command = std::regex_replace(command,std::regex(";{2,}"),";");
+		command = std::regex_replace(command,std::regex("};"),"}");
+		if(findu(command,'{') != std::string::npos)
+			command = std::regex_replace(command,std::regex("\\\\"),"\\\\");
 	}
-	for(auto& command : commands)
-		fprintf(stdout,"Command: \"%s\"\n",command.c_str());
 
 	if(!found_start)
 	{
@@ -92,7 +102,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	if(!stob(getAppOutput(condition).output[0])) return 0;
+	if(!stob(getAppOutput("eval "+condition).output[0])) return 0;
 
 	for(auto& command : commands)
 		runApp(handleBackslashEscSeqs(command),false);
