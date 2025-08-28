@@ -163,11 +163,11 @@ int main(int argc, char** argv)
 					case(DICE_SIGIL):
 						data.set<Dice>("",Dice(arg_str));
 						break;
-					case(WALLET_SIGIL):
-						data.set<Wallet>("",Wallet(arg_str));
-						break;
 					case(CURRENCY_SIGIL):
 						data.set<Currency>("",Currency(arg_str));
+						break;
+					case(WALLET_SIGIL):
+						data.set<Wallet>("",Wallet(arg_str));
 						break;
 				}
 			}
@@ -189,11 +189,11 @@ int main(int argc, char** argv)
 					case DICE_SIGIL:
 						data.set<Dice>(k,v);
 						break;
-					case WALLET_SIGIL:
-						data.set<Wallet>(k,v);
-						break;
 					case CURRENCY_SIGIL:
 						data.set<Currency>(k,v);
+						break;
+					case WALLET_SIGIL:
+						data.set<Wallet>(k,v);
 						break;
 				}
 			}
