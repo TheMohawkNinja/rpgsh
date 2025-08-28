@@ -43,6 +43,11 @@ struct MCStr
 {
 	std::string m, c;
 };
+struct ComplexCommandInfo
+{
+	std::string condition;
+	std::vector<std::string> commands;
+};
 
 void printHeader(std::string s);
 
@@ -122,7 +127,7 @@ void confirmHistoryFile();
 std::vector<std::string> getDirectoryListing(std::string path);
 std::string getLikeFileName(std::string chk_file, std::string chk_dir, bool is_dir, std::string xref);
 void loadXRef(std::string* arg, Scope* p_scope);
-VariableInfo parseVariable(std::string v);// Derive information about variable from string
+VariableInfo parseVariable(std::string v);
 
 MCStr parseMCStr(std::string s);
 
@@ -130,6 +135,7 @@ void printBadOpAndThrow(std::string bad_op);
 
 void padding();
 
+ComplexCommandInfo parseComplexCommandString(int argc, char** argv, bool hasCondition);
 int replaceVariables(std::string* p_arg_str, PreserveVariableLevel pvl);
 int runApp(std::string arg_str, bool redirect_output);
 GetAppOutputInfo getAppOutput(std::string prog);

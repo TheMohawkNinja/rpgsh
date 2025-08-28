@@ -1398,6 +1398,89 @@ void padding()
 	}
 }
 
+ComplexCommandInfo parseComplexCommandString(int argc, char** argv, bool hasCondition)
+{
+	ComplexCommandInfo cci;
+	bool found_start = false;
+	bool found_end = false;
+	std::string commands_str;
+
+	if(hasCondition)
+	{
+		for(int i=1; i<argc; i++)
+		{
+			if(!found_start && strcmp(argv[i],"{"))
+			{
+				cci.condition += std::string(argv[i])+" ";
+			}
+			else if(!found_start)
+			{
+				found_start = true;
+				cci.condition.erase(cci.condition.end()-1);
+			}
+			else
+			{
+				for(int j=argc-1; j>=i; j--)
+				{
+					std::string j_arg = std::string(argv[j]);
+					if(found_end)
+						commands_str = j_arg+" "+commands_str;
+					else if(!found_end && j_arg.back() == '}')
+						found_end = true;
+				}
+				break;
+			}
+		}
+	}
+
+	cci.commands = split(commands_str,';');
+
+	for(unsigned i=0; i<cci.commands.size(); i++)
+	{
+		if(countu(cci.commands[i],'{') > countu(cci.commands[i],'}'))
+		{
+			if(i == cci.commands.size()-1)
+			{
+				output(error,"\t\'}\' not found.");
+				exit(-1);
+			}
+			else if(findu(cci.commands[i+1],'}') != std::string::npos)
+			{
+				cci.commands[i] += left(cci.commands[i+1],findu(cci.commands[i+1],'}')+1);
+				cci.commands[i+1] = right(cci.commands[i+1],findu(cci.commands[i+1],'}')+1);
+				i=0;
+			}
+			else
+			{
+				cci.commands[i] += ";"+cci.commands[i+1]+";";
+				cci.commands.erase(cci.commands.begin()+i+1);
+				i=0;
+			}
+		}
+	}
+
+	//Cleaup with regex
+	for(auto& command : cci.commands)
+	{
+		command = std::regex_replace(command,std::regex(";{2,}"),";");
+		command = std::regex_replace(command,std::regex("};"),"}");
+		if(findu(command,'{') != std::string::npos)
+			command = std::regex_replace(command,std::regex("\\\\"),"\\\\");
+	}
+
+	if(!found_start)
+	{
+		output(error,"No commands specified.");
+		exit(-1);
+	}
+	if(!found_end)
+	{
+		output(error,"End of commands not found.");
+		exit(-1);
+	}
+
+	return cci;
+}
 int replaceVariables(std::string* p_arg_str, PreserveVariableLevel pvl)
 {
 	if(pvl == all) return 0;
