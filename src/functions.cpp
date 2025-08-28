@@ -1467,6 +1467,7 @@ int runApp(std::string arg_str, bool redirect_output)
 	pid_t pid;
 
 	std::string first_arg;
+	while(arg_str[0] == ' ' || arg_str[0] == '\t') arg_str.erase(arg_str.begin());
 	if(findu(arg_str," ") != std::string::npos) first_arg = left(arg_str,findu(arg_str," "));
 	else					    first_arg = arg_str;
 
@@ -1548,7 +1549,8 @@ int runApp(std::string arg_str, bool redirect_output)
 
 		if(lcrlybrkt_ctr == rcrlybrkt_ctr) continue;
 
-		if(args[i] == "{" || args[i] == "}")
+		if(args[i] == "{" || args[i] == "}" ||
+		   args[i] == "{;" || args[i] == "};")
 		{
 			i++;
 		}
@@ -1581,7 +1583,6 @@ int runApp(std::string arg_str, bool redirect_output)
 					output(error,"Expected \'{\' before \'}\'.");
 					return -1;
 				}
-				fprintf(stdout,"Erasing \"%s\"\n",args[i].c_str());
 				args.erase(args.begin()+i);
 				if(lcrlybrkt_ctr == rcrlybrkt_ctr) break;
 			}
