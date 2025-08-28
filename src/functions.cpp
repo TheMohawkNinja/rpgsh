@@ -287,7 +287,7 @@ std::string pvltos(PreserveVariableLevel pvl)
 }
 bool stob(std::string s)
 {
-	return !stringcasecmp(s,"true");
+	return !stringcasecmp(Var(s).Value,"true");
 }
 PreserveVariableLevel stopvl(std::string s)
 {
@@ -1468,6 +1468,7 @@ int runApp(std::string arg_str, bool redirect_output)
 
 	std::string first_arg;
 	while(arg_str[0] == ' ' || arg_str[0] == '\t') arg_str.erase(arg_str.begin());
+	if(arg_str == "") return 0;
 	if(findu(arg_str," ") != std::string::npos) first_arg = left(arg_str,findu(arg_str," "));
 	else					    first_arg = arg_str;
 
@@ -1549,8 +1550,7 @@ int runApp(std::string arg_str, bool redirect_output)
 
 		if(lcrlybrkt_ctr == rcrlybrkt_ctr) continue;
 
-		if(args[i] == "{" || args[i] == "}" ||
-		   args[i] == "{;" || args[i] == "};")
+		if(args[i] == "{" || args[i] == "}")
 		{
 			i++;
 		}
