@@ -28,11 +28,11 @@ int main(int argc, char** argv)
 
 	bool found_start = false;
 	bool found_end = false;
-	std::string condition;
+	std::string condition, commands_str;
 	std::vector<std::string> commands;
 	for(int i=1; i<argc; i++)
 	{
-		if(!found_start && strcmp(argv[i],"{"))
+		if(!found_start && (strcmp(argv[i],"{") && strcmp(argv[i],"{;")))
 		{
 			condition += std::string(argv[i])+" ";
 		}
@@ -41,35 +41,45 @@ int main(int argc, char** argv)
 			found_start = true;
 			condition.erase(condition.end()-1);
 		}
-		else if(!found_end && strcmp(argv[i],"}"))
-		{
-			std::string command;
-			for(int j=i; j<argc; i++, j++)
-			{
-				command += std::string(argv[j])+" ";
-				if(right(command,command.length()-2) == "; ")
-				{
-					command.erase(command.end()-2);
-					commands.push_back(command);
-					command = "";
-				}
-				else if(!strcmp(argv[j],"}"))
-				{
-					found_end = true;
-					break;
-				}
-			}
-		}
-		else if(!found_end)
-		{
-			found_end = true;
-			break;
-		}
 		else
 		{
+			for(int j=argc-1; j>=i; j--)
+			{
+				if(!found_end)
+				{
+					if(strcmp(argv[j],"}") && strcmp(argv[j],"};")) continue;
+					found_end = true;
+				}
+				commands_str = std::string(argv[j])+" "+commands_str;
+			}
 			break;
 		}
 	}
+
+	fprintf(stdout,"command_str: \"%s\"\n",commands_str.c_str());
+	commands = split(commands_str,';');
+	commands.erase(commands.end()-1);
+	bool nested = false;
+	unsigned nested_level = 0;
+	for(auto& command : commands)
+	{
+		if(left(command,3) == " if")
+		{
+			nested = true;
+			nested_level++;
+		}
+
+		if(command.length() >= 2 && right(command,command.length()-2) == "};")
+			nested_level--;
+
+		if(!nested_level)
+			nested = false;
+
+		if(nested)
+			command += ";";
+	}
+	for(auto& command : commands)
+		fprintf(stdout,"Command: \"%s\"\n",command.c_str());
 
 	if(!found_start)
 	{
@@ -84,10 +94,8 @@ int main(int argc, char** argv)
 
 	if(!stob(getAppOutput(condition).output[0])) return 0;
 
-	for(auto& cmd : commands)
-	{
-		runApp(handleBackslashEscSeqs(cmd),false);
-	}
+	for(auto& command : commands)
+		runApp(handleBackslashEscSeqs(command),false);
 
 	return 0;
 }
