@@ -95,6 +95,10 @@
 #define VAR_COLOR			TEXT_CYAN
 #define WALLET_COLOR			TEXT_MAGENTA
 
+//Special return codes
+#define STATUS_BREAK			100
+#define STATUS_CONTINUE			101
+
 //Internal file/directory paths
 //dir = Directory
 //file = File name
