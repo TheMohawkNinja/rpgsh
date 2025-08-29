@@ -33,6 +33,7 @@ Configuration::Configuration()
 	setting[STARTUP_APPS]	=	"banner,version";
 	setting[PRE_RUN_APPS]	=	"";
 	setting[POST_RUN_APPS]	=	"autorun";
+	setting[VERBOSITY]	=	"3";
 
 	// Create default configuration file if one does not exist
 	if(!std::filesystem::exists(configuration_path.c_str()))
@@ -72,6 +73,11 @@ Configuration::Configuration()
 		fs<<COMMENT<<" Comma-delimited list of programs to run after a command is entered into the prompt.\n";
 		fs<<COMMENT<<" Default: "<<setting[POST_RUN_APPS]<<"\n";
 		fs<<POST_RUN_APPS<<"="<<setting[POST_RUN_APPS]<<"\n";
+		fs<<"\n";
+		fs<<COMMENT<<" Determines which (if any) info/warning/error messages will be printed.\n";
+		fs<<COMMENT<<" 3=info,warning,error, 2=warning,error, 1=error, 0=none\n";
+		fs<<COMMENT<<" Default: "<<setting[VERBOSITY]<<"\n";
+		fs<<VERBOSITY<<"="<<setting[VERBOSITY]<<"\n";
 		fs.close();
 	}
 	std::ifstream fs(configuration_path.c_str());
