@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 
 	while(stob(getAppOutput("eval "+cci.condition).output[0]))
 	{
-		for(auto& command : cci.commands)
+		for(const auto& command : cci.commands)
 		{
 			int status = runApp(handleBackslashEscSeqs(command),false);
 			if(status == STATUS_BREAK) return 0;
