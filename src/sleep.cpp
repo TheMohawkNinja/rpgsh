@@ -7,7 +7,7 @@ int main(int argc, char** argv)
 	if(argc > 2)
 		output(warning,"sleep only expects 0 or 1 arguments, ignoring all other arguments.");
 
-	chkFlagAppDesc(argv,"Pauses for the specified period of seconds.");
+	chkFlagAppDesc(argv,"Pauses for the specified number of seconds.");
 	chkFlagPreserveVariables(argv,none);
 
 	if(chkFlagHelp(argv))
