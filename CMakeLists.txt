@@ -14,6 +14,11 @@ set(bins "autorun;banner;clear;config;copy;del;edit;eval;find;for;help;history;i
 set(SRC_DIR src/)
 set(HEADERS_DIR headers/)
 set(RPGSH_INSTALL_DIR_MACRO "#define RPGSH_INSTALL_DIR		")
+set(ROOT_INSTALL_DIR "$ENV{HOME}/.rpgsh")
+set(CAMPAIGNS_DIR "${ROOT_INSTALL_DIR}/campaigns")
+set(DICELISTS_DIR "${ROOT_INSTALL_DIR}/dice-lists")
+set(SCRIPTS_DIR "${ROOT_INSTALL_DIR}/scripts")
+set(TEMPLATES_DIR "${ROOT_INSTALL_DIR}/templates")
 
 #Insert the dynamically-generated install path into define.h
 file(READ ${HEADERS_DIR}define.h TEXT)
@@ -47,6 +52,17 @@ foreach(bin ${bins})
 					      INSTALL_RPATH "${CMAKE_INSTALL_PREFIX}/lib")
 	list(APPEND prefixed_bins "${prefix}${bin}")
 endforeach()
+
+#Make directories and copy files
+message("\nCreating directories (if they don't already exist")
+file(MAKE_DIRECTORY ${ROOT_INSTALL_DIR}
+		    ${CAMPAIGNS_DIR}
+		    ${DICELISTS_DIR}
+		    ${SCRIPTS_DIR}
+		    ${TEMPLATES_DIR})
+file(INSTALL "dice-lists/" DESTINATION ${DICELISTS_DIR})
+file(INSTALL "scripts/" DESTINATION ${SCRIPTS_DIR})
+file(INSTALL "templates/" DESTINATION ${TEMPLATES_DIR})
 
 #Install
 install(TARGETS ${prefixed_bins} ${libs}
