@@ -1803,6 +1803,16 @@ GetAppOutputInfo getAppOutput(std::string prog)
 }
 int runScript(std::string path)
 {
+	if(path[0] != '/' && left(path,2) != "./" && left(path,3) != "../")
+		path = scripts_dir+path;
+
+	if(!std::filesystem::exists(scripts_dir) ||
+	   std::filesystem::exists(scripts_dir) && !std::filesystem::is_directory(scripts_dir))
+	{
+		output(info,"Scripts directory not found, creating scripts directory at \"%s\".",scripts_dir.c_str());
+		std::filesystem::create_directory(scripts_dir);
+	}
+
 	if(!std::filesystem::exists(path))
 	{
 		output(error,"rpgsh script \"%s\" does not exist.",path.c_str());
