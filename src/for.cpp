@@ -11,7 +11,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	chkFlagAppDesc(argv,"Iterates through the key/value pairs of a set");
+	chkFlagAppDesc(argv,"Iterates through the key/value pairs of a set.");
 	chkFlagPreserveVariables(argv,all);
 
 	if(chkFlagHelp(argv))
