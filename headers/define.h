@@ -118,6 +118,7 @@ extern std::string configuration_path;
 extern std::string campaigns_dir;
 extern std::string templates_dir;
 extern std::string dice_lists_dir;
+extern std::string scripts_dir;
 extern std::string history_path;
 extern std::string prefix;
 extern std::string c_ext;
