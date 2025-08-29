@@ -1,0 +1,55 @@
+#!/usr/local/bin/rpgsh -s
+
+! Author: 0xbd (bd@0xbd.net)
+! This script is designed to walk users through the basics of how to use rpgsh
+
+print -r "%b%<<<\tWelcome to the %cyan%RPG%magenta%sh%/fg% tutorial\!\t>>>\n"
+print -r "This tutorial is designed to walk you through the basics on how to use %b%%cyan%RPG%magenta%sh%/fg%%/b%."
+print -r "As this is simply a basic overview, please reference %b%docs/rpgsh-userguide.pdf%/b% for more detailed information."
+
+print -r "This is the %b%prompt%/b%, and is the main way to interact with %b%%cyan%RPG%magenta%sh%/fg%%/b%."
+print -r "@/.PROMPT"
+
+print -r "\nTo run a program, simply type the program along with any parameters into the prompt and press the %b%Enter%/b% key."
+print -r "For example, if we wanted to roll an 20-sided die, you would enter: \"%b%roll d20%/b%\" into the prompt, which would then output something like:\n"
+roll d20
+
+print -r "\nCharacter attributes, campaign information, and other like data is stored in %b%variables%/b%."
+print -r "Variables in %b%%cyan%RPG%magenta%sh%/fg%%/b% are composed of the following: A %b%scope%/b%, an optional %b%external reference%/b%, an optional %b%type specificer%/b%, and an optional %b%key%/b%.\n"
+
+print -r "%b%scope%/b%:\n\tCan be either '@' (character), '#' (campaign), or '$' (shell). This represents the data source for the requested data."
+
+print -r "%b%external reference%/b%:\n\tAn optional string of text, enclosed in square brackets ('[', ']') that points the data source to a different character or campaign."
+print -r "\te.g. [otherCharacter], [otherCampaign], [otherCampaign/otherCharacter]"
+
+print -r "%b%type specifier%/b%:\n\tCan be either 'v' (Var), 'd' (Dice), 'c' (Currency), or 'w' (Wallet). This represents the data type being requested.\n"
+print -r "\tVar:\t\tRepresents either a number or text. Operations like '+' on Var-type variables are handled accordingly."
+print -r "\tDice:\t\tRepresents one or more dice. Can be set using standard RPG syntax (e.g. 2d8+4)."
+print -r "\tCurrency:\tRepresents a denomination of currency. Can only be explicitly constructed (see documentation)."
+print -r "\tWallet:\t\tRepresents one or more Currency-type variables. Can only be explicitly constructed (see documentation)."
+
+print -r "%b%key%/b%:\n\tA forward-slash-delimited string representing the specific variable in question. The slash-delimiting is such that keys operate in a hierarchical structure analagous to the folders on your operating system."
+
+print -r "\nDue to this hierarchical nature, you can access a whole set of keys at once by suffixing the key with another forward-slash.\n"
+
+print -r "\nFor example, if we print the variable %b%@ \b/HitDice/Current%/b%, we get:"
+@/HitDice/Current
+
+print -r "\nWhereas, if we print %b%@ \b/HitDice/%/b%, we get:"
+@/HitDice/
+
+print -r "\nDon't worry that variable sets are not super easy to read. That format is meant for easy parsing by other programs.\n"
+
+print -r "Let's initialize some variables are perform operations on them to see how this all works in practice.\n"
+print -r "First, we will initialize a variable with a value of 2. We will do this by entering %b%@ \b/MyNumVar = 2%/b%"
+@/MyNumVar = 2
+
+print -r "\nNext, let's modify it by adding 3 to the value. The command we will use is %b%@\b/MyNumVar += 3%/b%"
+@/MyNumVar += 3
+
+print -r "\nNow, let's make a string variable. Since we will be using a space, we will need to make sure to wrap it in quotes."
+print -r "The command we will use is %b%@ \b/MyStrVar = \"Hello World\"%/b%"
+@/MyStrVar = "Hello World"
+
+del @/MyNumVar
+del @/MyStrVar
