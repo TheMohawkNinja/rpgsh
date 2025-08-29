@@ -597,21 +597,18 @@ int main(int argc, char** argv)
 			{
 				case VAR_SIGIL:
 					args[0] = vi.scope.getProperty<Var>(vi.key,vi.property);
-					old_value = vi.scope.getStr<Var>(vi.key);
 					break;
 				case DICE_SIGIL:
 					args[0] = vi.scope.getProperty<Dice>(vi.key,vi.property);
-					old_value = vi.scope.getStr<Dice>(vi.key);
 					break;
 				case CURRENCY_SIGIL:
 					args[0] = vi.scope.getProperty<Currency>(vi.key,vi.property);
-					old_value = vi.scope.getStr<Currency>(vi.key);
 					break;
 				case WALLET_SIGIL:
 					args[0] = vi.scope.getProperty<Wallet>(vi.key,vi.property);
-					old_value = vi.scope.getStr<Wallet>(vi.key);
 					break;
 			}
+			old_value = args[0];
 		}
 		else if(vi.key != "")
 		{
@@ -619,21 +616,18 @@ int main(int argc, char** argv)
 			{
 				case VAR_SIGIL:
 					args[0] = vi.scope.getStr<Var>(vi.key);
-					old_value = vi.scope.getStr<Var>(vi.key);
 					break;
 				case DICE_SIGIL:
 					args[0] = vi.scope.getStr<Dice>(vi.key);
-					old_value = vi.scope.getStr<Dice>(vi.key);
 					break;
 				case CURRENCY_SIGIL:
 					args[0] = vi.scope.getStr<Currency>(vi.key);
-					old_value = vi.scope.getStr<Currency>(vi.key);
 					break;
 				case WALLET_SIGIL:
 					args[0] = vi.scope.getStr<Wallet>(vi.key);
-					old_value = vi.scope.getStr<Wallet>(vi.key);
 					break;
 			}
+			old_value = getAppOutput(std::string(argv[1])).output[0];
 		}
 		else
 		{
@@ -787,7 +781,7 @@ int main(int argc, char** argv)
 			return 0;
 		}
 
-		std::string new_value = getAppOutput(std::string(argv[1])).output[0];
+		std::string new_value = args[0];
 		std::string xref = (vi.xref != "" ? "["+vi.xref+"]" : "");
 		std::string p = vi.property;
 		if(old_value == "")
@@ -819,7 +813,7 @@ int main(int argc, char** argv)
 			return -1;
 		}
 
-		old_value = getAppOutput(vi.variable).output[0];
+		old_value = getSetStr(vi);
 
 		if(!strcasecmp(argv[2],OP_ADD))
 			fprintf(stdout,"%s\n",doAction(&vi, a_set_add, rhs).c_str());
