@@ -63,6 +63,7 @@ int main(int argc, char** argv)
 		{
 			std::string line;
 			std::getline(ifs,line);
+			if(ifs.eof() && line == "") break;
 			if(findu(line,'=') != std::string::npos && left(line,findu(line,'=')) == k)
 			{
 				line = k+"="+v;
@@ -90,6 +91,7 @@ int main(int argc, char** argv)
 		{
 			std::string line;
 			std::getline(ifs,line);
+			if(ifs.eof() && line == "") break;
 			if(findu(line,'=') == std::string::npos ||
 			   (findu(line,'=') != std::string::npos && left(line,findu(line,'=')) != k))
 				data.push_back(line);
