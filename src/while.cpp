@@ -1,5 +1,4 @@
 #include <cstring>
-#include <regex>
 #include "../headers/functions.h"
 #include "../headers/text.h"
 
