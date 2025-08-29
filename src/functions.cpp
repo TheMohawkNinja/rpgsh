@@ -30,11 +30,27 @@ std::string defaultPrompt(Character c)
 
 void output(OutputLevel level, const char* format, ...)
 {
+	Configuration cfg = Configuration();
+	int verbosity;
+	try
+	{
+		verbosity = std::stoi(cfg.setting[VERBOSITY]);
+	}
+	catch(...)
+	{
+		fprintf(stderr,"%s%sUnable to parse output verbosity!%s\n",TEXT_RED,TEXT_BOLD,TEXT_NORMAL);
+		exit(-1);
+	}
+
 	FILE* stream;
 	std::string prefix = "";
 	std::string color;
 	va_list args;
 	va_start(args, format);
+
+	if((verbosity == 2 && level == info) ||
+	   (verbosity == 1 && level != error) ||
+	    verbosity < 1) return;
 
 	switch(level)
 	{
