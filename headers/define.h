@@ -69,6 +69,7 @@
 #define STARTUP_APPS			"startup_apps"
 #define PRE_RUN_APPS			"pre_run_apps"
 #define POST_RUN_APPS			"post_run_apps"
+#define VERBOSITY			"verbosity"
 
 //Universal flags
 #define FLAG_APPDESCRIPTION		"--appdescription"
