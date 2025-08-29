@@ -56,12 +56,7 @@ int main(int argc, char** argv)
 		for(auto& command : cci.commands)
 		{
 			while(command.back() == ' ') command.erase(command.end());
-			if(left(command,2+key.length()) == "$/"+key && command.length() > 2+key.length())
-			{
-				output(error,"Keys are constants and cannot be modified.");
-				continue;
-			}
-			command = std::regex_replace(command,std::regex("\\$/"+key),std::string(1,vi.scope.sigil)+"/"+k);
+			command = std::regex_replace(command,std::regex("\\$/"+key),k);
 			command = std::regex_replace(command,std::regex("\\$/"+value),v);
 			int status = runApp(handleBackslashEscSeqs(command),false);
 			if(status == STATUS_BREAK) return 0;
