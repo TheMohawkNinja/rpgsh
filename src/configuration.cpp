@@ -36,10 +36,10 @@ Configuration::Configuration()
 	setting[VERBOSITY]	=	"3";
 
 	// Create default configuration file if one does not exist
-	if(!std::filesystem::exists(configuration_path.c_str()))
+	if(!std::filesystem::exists(configuration_path))
 	{
-		output(info,"Configuration file not found, creating default at \"%s\".",configuration_path.c_str());
-		std::ofstream fs(configuration_path.c_str());
+		fprintf(stdout,"%s%sConfiguration file not found, creating default at \"%s\".%s\n",TEXT_BOLD,TEXT_CYAN,configuration_path.c_str(),TEXT_NORMAL);
+		std::ofstream fs(configuration_path);
 		fs<<COMMENT<<" Places a newline character before and after command output.\n";
 		fs<<COMMENT<<" Default: "<<setting[PADDING]<<"\n";
 		fs<<PADDING<<"="<<setting[PADDING]<<"\n";
@@ -80,7 +80,7 @@ Configuration::Configuration()
 		fs<<VERBOSITY<<"="<<setting[VERBOSITY]<<"\n";
 		fs.close();
 	}
-	std::ifstream fs(configuration_path.c_str());
+	std::ifstream fs(configuration_path);
 	while(!fs.eof())
 	{
 		std::string data;
