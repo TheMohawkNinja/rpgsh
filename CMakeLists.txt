@@ -54,7 +54,7 @@ foreach(bin ${bins})
 endforeach()
 
 #Make directories and copy files
-message("\nCreating directories (if they don't already exist")
+message("\nCreating and copying importing directories and files")
 file(MAKE_DIRECTORY ${ROOT_INSTALL_DIR}
 		    ${CAMPAIGNS_DIR}
 		    ${DICELISTS_DIR}
