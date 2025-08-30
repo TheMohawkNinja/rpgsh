@@ -18,6 +18,12 @@ void Scope::confirmDefaultCampaign()
 	if(!std::filesystem::exists(campaigns_dir + "default/characters"))
 		std::filesystem::create_directory(campaigns_dir + "default/characters");
 
+	if(!std::filesystem::exists(campaigns_dir + "default/"+variables_file_name))
+	{
+		std::ofstream ofs(campaigns_dir + "default/"+variables_file_name);
+		ofs.close();
+	}
+
 	return;
 }
 
