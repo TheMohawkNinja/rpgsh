@@ -1196,14 +1196,14 @@ void confirmEnvVariablesFile()
 	if(std::filesystem::exists(rpgsh_env_variables_path.c_str())) return;
 
 	output(info,"Environment variables file not found, creating file at \"%s\".",rpgsh_env_variables_path.c_str());
-	std::ofstream ofs(rpgsh_env_variables_path.c_str());
-	ofs.close();
 
 	//Set default values for built-in env variables
 	Configuration cfg = Configuration();
-	Character c = Character(templates_dir + cfg.setting[DEFAULT_GAME].c_str());
-	setEnvVariable(ENV_CURRENT_CHARACTER,c.getName());
-	setEnvVariable(ENV_CURRENT_CAMPAIGN,"default/");
+	Character c = Character(templates_dir + cfg.setting[DEFAULT_GAME]+".char");
+	std::ofstream ofs(rpgsh_env_variables_path);
+	ofs<<ENV_CURRENT_CHARACTER+DS+c.getName()+"\n";
+	ofs<<ENV_CURRENT_CAMPAIGN+DS+"default/\n";
+	ofs.close();
 }
 void confirmShellVariablesFile()
 {
@@ -1807,7 +1807,7 @@ int runScript(std::string path)
 		path = scripts_dir+path;
 
 	if(!std::filesystem::exists(scripts_dir) ||
-	   std::filesystem::exists(scripts_dir) && !std::filesystem::is_directory(scripts_dir))
+	   (std::filesystem::exists(scripts_dir) && !std::filesystem::is_directory(scripts_dir)))
 	{
 		output(info,"Scripts directory not found, creating scripts directory at \"%s\".",scripts_dir.c_str());
 		std::filesystem::create_directory(scripts_dir);
