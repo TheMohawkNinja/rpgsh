@@ -7,7 +7,7 @@ print -r "%b%<<<\tWelcome to the %cyan%RPG%magenta%sh%/fg% tutorial\!\t>>>\n"
 print -r "This tutorial is designed to walk you through the basics on how to use %b%%cyan%RPG%magenta%sh%/fg%%/b%."
 print -r "As this is simply a basic overview, please reference %b%docs/rpgsh-userguide.pdf%/b% for more detailed information."
 
-print -r "This is the %b%prompt%/b%, and is the main way to interact with %b%%cyan%RPG%magenta%sh%/fg%%/b%."
+print -r "\nThis is the %b%prompt%/b%, and is the main way to interact with %b%%cyan%RPG%magenta%sh%/fg%%/b%."
 print -r "@/.PROMPT"
 
 print -r "\nTo run a program, simply type the program along with any parameters into the prompt and press the %b%Enter%/b% key."
@@ -23,33 +23,50 @@ print -r "%b%external reference%/b%:\n\tAn optional string of text, enclosed in 
 print -r "\te.g. [otherCharacter], [otherCampaign], [otherCampaign/otherCharacter]"
 
 print -r "%b%type specifier%/b%:\n\tCan be either 'v' (Var), 'd' (Dice), 'c' (Currency), or 'w' (Wallet). This represents the data type being requested.\n"
-print -r "\tVar:\t\tRepresents either a number or text. Operations like '+' on Var-type variables are handled accordingly."
-print -r "\tDice:\t\tRepresents one or more dice. Can be set using standard RPG syntax (e.g. 2d8+4)."
-print -r "\tCurrency:\tRepresents a denomination of currency. Can only be explicitly constructed (see documentation)."
-print -r "\tWallet:\t\tRepresents one or more Currency-type variables. Can only be explicitly constructed (see documentation)."
+print -r "\t%cyan%Var%/%:\ \ \ \ \ \ Represents either a number or text. Operations like '+' on Var-type variables are handled accordingly."
+print -r "\t%lightblue%Dice%/%:\ \ \ \ \ Represents one or more dice. Can be set using standard RPG syntax (e.g. 2d8+4)."
+print -r "\t%yellow%Currency%/%:\ Represents a denomination of currency. Can only be explicitly constructed (see documentation)."
+print -r "\t%magenta%Wallet%/%:\ \ \ Represents one or more Currency-type variables. Can only be explicitly constructed (see documentation)."
 
 print -r "%b%key%/b%:\n\tA forward-slash-delimited string representing the specific variable in question. The slash-delimiting is such that keys operate in a hierarchical structure analagous to the folders on your operating system."
 
-print -r "\nDue to this hierarchical nature, you can access a whole set of keys at once by suffixing the key with another forward-slash.\n"
-
+print -r "\nDue to this hierarchical nature, you can access a whole set of keys at once by suffixing the key with another forward-slash."
 print -r "\nFor example, if we print the variable %b%@ \b/HitDice/Current%/b%, we get:"
 @/HitDice/Current
 
 print -r "\nWhereas, if we print %b%@ \b/HitDice/%/b%, we get:"
 @/HitDice/
 
-print -r "\nDon't worry that variable sets are not super easy to read. That format is meant for easy parsing by other programs.\n"
+print -r "\nIf we were to omit the key entirely and just enter %b%@ \b/%/b%, that would print all variables in the currently loaded character. We won't do that here to save screen space."
+print -r "Also, don't worry that variable sets are not super easy to read. That format is meant for easy parsing by other programs.\n"
 
 print -r "Let's initialize some variables are perform operations on them to see how this all works in practice.\n"
 print -r "First, we will initialize a variable with a value of 2. We will do this by entering %b%@ \b/MyNumVar = 2%/b%"
 @/MyNumVar = 2
 
-print -r "\nNext, let's modify it by adding 3 to the value. The command we will use is %b%@\b/MyNumVar += 3%/b%"
+print -r "\nNext, let's modify it by adding 3 to the value. The command we will use is %b%@ \b/MyNumVar += 3%/b%"
 @/MyNumVar += 3
 
-print -r "\nNow, let's make a string variable. Since we will be using a space, we will need to make sure to wrap it in quotes."
-print -r "The command we will use is %b%@ \b/MyStrVar = \"Hello World\"%/b%"
-@/MyStrVar = "Hello World"
+print -r "\nNow, let's make a string variable."
+print -r "The command we will use is %b%@ \b/MyStrVar = Hello%/b%"
+@/MyStrVar = Hello
 
+print -r "\nNext, let's add \" world\" to \"Hello\", making sure to wrap the value in quote marks to make sure the space gets added."
+print -r "Therefore, the command we will run is %b%@ \b/MyStrVar += \" World\"%/b%"
+@/MyStrVar += " World"
+
+print -r "\nAs we can see, while two numbers are added together with the %b%+=%/b% operator, two strings are concatenated. As a result, trying to mix the two doesn't work."
+print -r "For example, if we try to add the number 3 to the string \"three\", this happens:"
+eval 3 + three
+
+print -r "\nOperations on other data types are meant to be intuitive. For example, multiplying a Dice-type variable by 2 multiplies the %b%Quantity%/b% by 2."
+@d/MyDice = d4
+@d/MyDice *= 2
+
+print -r "\nThere are many other commands available for use in %b%%cyan%RPG%magenta%sh%/fg%%/b%. You can use the %b%%green%help%/% command to view them all\!"
+help
+
+print -r "\nThis concludes the basic tutorial for %b%%cyan%RPG%magenta%sh%/fg%%/b%. Last thing to do before exiting is to delete the variables we created with the %b%del%/b% command so we don't mess with the currently loaded character more than we have to."
 del @/MyNumVar
 del @/MyStrVar
+del @/MyDice
