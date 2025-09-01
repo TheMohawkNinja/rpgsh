@@ -122,10 +122,12 @@ int prompt()
 		for(unsigned int i=0; i<tmp_buffer.length(); i++)
 			buffer[i]=tmp_buffer[i];
 
+		cfg = Configuration();
 		for(const auto& app : split(cfg.setting[PRE_RUN_APPS],','))
 			if(app.length()) (void)runApp(app,false);
 		padding();
 		(void)runApp(buffer,false);
+		cfg = Configuration();
 		for(const auto& app : split(cfg.setting[POST_RUN_APPS],','))
 			if(app.length()) (void)runApp(app,false);
 		padding();
