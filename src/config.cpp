@@ -21,7 +21,7 @@ int main(int argc, char** argv)
 		fprintf(stdout,"\t%snone%s\t\tPrints current configuration settings and their values.\n",TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\t%ssetting%s\t\tPrints the current value of the configuration setting %ssetting%s.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\t%ssetting%s=%svalue%s\tSets the configuration setting %ssetting%s to the value %svalue%s.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
-		fprintf(stdout,"\t-d %ssetting%s\t\tDeletes the configuration setting %ssetting%s.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t-d %ssetting%s\tDeletes the configuration setting %ssetting%s.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\t%s | %s\tPrint this help text.\n",FLAG_HELPSHORT,FLAG_HELPLONG);
 		return 0;
 	}
