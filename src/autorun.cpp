@@ -21,10 +21,10 @@ void execAutorun(std::string path, std::string scope, bool verbose)
 		getline(ifs,command);
 		if(!command.length() || command[0] == COMMENT) continue;
 		if(findu(command,COMMENT)) command = left(command,findu(command,COMMENT));
-		bool echo = stob(left(command,findu(command,',')-1));
+		bool redirect = !stob(left(command,findu(command,',')-1));
 		if(verbose)
-			output(info,"Running %s autorun command \"%s\"",scope.c_str(),command.c_str());
-		runApp(right(command,findu(command,',')+1),!echo);
+			output(info,"Running %s autorun command \"%s\" with%s output redirection.",scope.c_str(),right(command,findu(command,',')+1).c_str(),(redirect ? "" : "out"));
+		runApp(right(command,findu(command,',')+1),!redirect);
 	}
 	ifs.close();
 }
@@ -32,21 +32,21 @@ void saveAutorun(std::string path, std::string scope)
 {
 	while(true)
 	{
-		std::string command, echo;
+		std::string command, redirect;
 		std::string prompt = "Please enter a command: ";
 		fprintf(stdout,"%s",prompt.c_str());
 		inputHandler(&command,prompt.length());
 		if(!command.length()) continue;
 		do
 		{
-			fprintf(stdout,"Echo output when running command? [Y/n]: ");
-			getline(std::cin,echo);
-		}while(stringcasecmp(echo,"y") && stringcasecmp(echo,"n"));
+			fprintf(stdout,"\nEcho output when running command? [Y/n]: ");
+			getline(std::cin,redirect);
+		}while(stringcasecmp(redirect,"y") && stringcasecmp(redirect,"n"));
 
-		echo = (!stringcasecmp(echo,"n") ? "true," : "false,");
+		redirect = (!stringcasecmp(redirect,"n") ? "false," : "true,");
 		std::ofstream ofs(path,std::ios::app);
-		ofs<<echo+command+"\n";
-		output(info,"Added \"%s%s\" to %s autorun file",echo.c_str(),command.c_str(),scope.c_str());
+		ofs<<redirect+command+"\n";
+		output(info,"Added \"%s%s\" to %s autorun file",redirect.c_str(),command.c_str(),scope.c_str());
 		ofs.close();
 		return;
 	}
