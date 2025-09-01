@@ -503,7 +503,9 @@ void Scope::save()
 		 std::filesystem::rename(datasource.c_str(),(datasource+".bak").c_str());
 
 	//Check for name change with character scopes
-	if(datasource.substr(datasource.length()-5,5) == c_ext || datasource.substr(datasource.length()-9,9) == (c_ext+".bak"))
+	std::string ext = right(datasource,rfindu(datasource,'.'));
+	std::string datasource_dir = left(datasource,rfindu(datasource,'/'));
+	if(ext == c_ext || ext == ".bak")
 	{
 		std::string old_name = right(left(datasource,rfindu(datasource,c_ext)),rfindu(datasource,'/')+1);
 		std::string new_name = getProperty<Var>(getProperty<Var>(std::string(DOT_NAME),"Value"),"Value");
@@ -511,8 +513,18 @@ void Scope::save()
 		{
 			std::filesystem::remove(datasource);
 			std::filesystem::remove(datasource+".bak");
-			datasource = left(datasource,rfindu(datasource,'/')+1) + new_name + c_ext;
+			datasource = datasource_dir+"/"+new_name+c_ext;
 			setEnvVariable(ENV_CURRENT_CHARACTER,new_name);
+
+			//Rename all files related to the character
+			for(const auto& file : getDirectoryListing(datasource_dir))
+			{
+				if(!std::filesystem::is_directory(datasource_dir+"/"+file) && left(file,rfindu(file,'.')) == old_name)
+				{
+					std::filesystem::copy_file(datasource_dir+"/"+file,datasource_dir+"/"+new_name+right(file,rfindu(file,'.')));
+					std::filesystem::remove(datasource_dir+"/"+file);
+				}
+			}
 		}
 	}
 
