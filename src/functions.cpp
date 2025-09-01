@@ -1553,8 +1553,8 @@ int runApp(std::string arg_str, bool redirect_output)
 {
 	//Special return statuses
 	if(arg_str[0] == COMMENT) return 0;
-	else if(left(arg_str,5) == "break") return STATUS_BREAK;
-	else if(left(arg_str,8) == "continue") return STATUS_CONTINUE;
+	else if(left(arg_str,findu(arg_str,' ')) == "break") return STATUS_BREAK;
+	else if(left(arg_str,findu(arg_str,' ')) == "continue") return STATUS_CONTINUE;
 
 	//Snip out inline comment
 	if(findu(arg_str,COMMENT) != std::string::npos)
@@ -1701,24 +1701,25 @@ int runApp(std::string arg_str, bool redirect_output)
 		if(quote_start == std::string::npos ||
 		   (rcrlybrkt && rcrlybrkt < quote_start && isTypeSigil(args[i][rcrlybrkt-1]))) continue;
 
-		std::string from_quote_start = right(args[i],quote_start+1);
+		args[i].erase(args[i].begin()+quote_start);
 		if(quote_end != std::string::npos)//Quotes contained in same arg
 		{
-			args[i] = left(from_quote_start,findu(from_quote_start,'\"'));
+			args[i].erase(args[i].begin()+quote_end-1);
 		}
 		else
 		{
-			args[i] = from_quote_start;
 			i++;
 			while(i < args.size())
 			{
 				quote_end = findu(args[i],'\"');
-				if(quote_end == std::string::npos)
-					args[i-1] += " "+args[i];
-				else
-					args[i-1] += " "+left(args[i],quote_end);
+				long unsigned last_arg_len = args[i-1].length();
+				args[i-1] += " "+args[i];
 				args.erase(args.begin()+i);
-				if(quote_end != std::string::npos) break;
+				if(quote_end != std::string::npos)
+				{
+					args[i-1].erase(args[i-1].begin()+last_arg_len+1+quote_end);
+					break;
+				}
 			}
 		}
 	}
