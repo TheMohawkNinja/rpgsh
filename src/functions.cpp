@@ -1560,6 +1560,19 @@ int runApp(std::string arg_str, bool redirect_output)
 	if(findu(arg_str,COMMENT) != std::string::npos)
 		arg_str = left(arg_str,findu(arg_str,COMMENT));
 
+	std::sregex_iterator end;
+
+	//Handle subshells
+	std::regex subshell_pattern("\\$\\(((?!\\$\\()[^\\)])+?\\)+?");
+	std::sregex_iterator subshell_it(arg_str.begin(),arg_str.end(),subshell_pattern);
+	while(subshell_it != end)
+	{
+		std::regex escaped_subshell_pattern(std::regex_replace(escapeRegexGroupChars(subshell_it->str()),std::regex("\\$"),"\\$"));
+		std::string subshell = right(left(subshell_it->str(),subshell_it->str().length()-1),2);
+		arg_str = std::regex_replace(arg_str,escaped_subshell_pattern,getAppOutput(subshell).output[0],std::regex_constants::format_first_only);
+		subshell_it = std::sregex_iterator(arg_str.begin(),arg_str.end(),subshell_pattern);
+	}
+
 	Configuration cfg = Configuration();
 	Character c = Character();
 	Campaign m = Campaign();
@@ -1586,7 +1599,6 @@ int runApp(std::string arg_str, bool redirect_output)
 	//Check if implicitly running eval
 	std::regex variable_pattern(d_imp_const_pattern_str+"|"+variable_pattern_str);
 	std::sregex_iterator v_str_it(first_arg.begin(),first_arg.end(),variable_pattern);
-	std::sregex_iterator end;
 	if((v_str_it != end && v_str_it->str() == first_arg) || first_arg[0] == '(')
 		arg_str = "eval " + arg_str;
 
