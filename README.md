@@ -17,6 +17,7 @@ Features include:
 - Templates to allow support for new games to be added easily and by the user
 - Automation via scripting and special `autorun` command for keeping up with derived values
 	- `if`, `while`, and `for` commands for more complex scripting
+- Subshells for assigning variables to the output of other commands
 - Unicode support
 - Dice rolling using standard RPG syntax (e.g. 2d8+4) or custom lists
 - Text formatting for $\textsf{{\color{red}c}{\color{blue}o}{\color{green}l}{\color{magenta}o}{\color{yellow}r}{\color{cyan}s}}$, **bold**, *italics*, etc.
