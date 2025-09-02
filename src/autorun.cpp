@@ -32,7 +32,7 @@ void saveAutorun(std::string path, std::string scope)
 {
 	while(true)
 	{
-		std::string command, redirect;
+		std::string command, echo;
 		std::string prompt = "Please enter a command: ";
 		fprintf(stdout,"%s",prompt.c_str());
 		inputHandler(&command,prompt.length());
@@ -40,13 +40,13 @@ void saveAutorun(std::string path, std::string scope)
 		do
 		{
 			fprintf(stdout,"\nEcho output when running command? [Y/n]: ");
-			getline(std::cin,redirect);
-		}while(stringcasecmp(redirect,"y") && stringcasecmp(redirect,"n"));
+			getline(std::cin,echo);
+		}while(stringcasecmp(echo,"y") && stringcasecmp(echo,"n"));
 
-		redirect = (!stringcasecmp(redirect,"n") ? "false," : "true,");
+		echo = (!stringcasecmp(echo,"y") ? "true," : "false,");
 		std::ofstream ofs(path,std::ios::app);
-		ofs<<redirect+command+"\n";
-		output(info,"Added \"%s%s\" to %s autorun file",redirect.c_str(),command.c_str(),scope.c_str());
+		ofs<<echo+command+"\n";
+		output(info,"Added \"%s%s\" to %s autorun file",echo.c_str(),command.c_str(),scope.c_str());
 		ofs.close();
 		return;
 	}
