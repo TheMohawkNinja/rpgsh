@@ -21,10 +21,10 @@ void execAutorun(std::string path, std::string scope, bool verbose)
 		getline(ifs,command);
 		if(!command.length() || command[0] == COMMENT) continue;
 		if(findu(command,COMMENT)) command = left(command,findu(command,COMMENT));
-		bool redirect = !stob(left(command,findu(command,',')-1));
+		bool redirect = !stob(left(command,findu(command,',')));
 		if(verbose)
 			output(info,"Running %s autorun command \"%s\" with%s output redirection.",scope.c_str(),right(command,findu(command,',')+1).c_str(),(redirect ? "" : "out"));
-		runApp(right(command,findu(command,',')+1),!redirect);
+		runApp(right(command,findu(command,',')+1),redirect);
 	}
 	ifs.close();
 }
