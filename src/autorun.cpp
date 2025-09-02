@@ -70,43 +70,43 @@ void printCommands(std::string path, bool print_index, int* cmd_ctr)
 	}
 	ifs.close();
 }
-bool removeCommand(std::string path, int* index, std::string scope)
+bool deleteCommand(std::string path, int* index, std::string scope)
 {
-	bool removingCommand = false;
+	bool foundCommand = false;
 	std::ifstream ifs(path);
 	std::string deletedCommand;
 	std::vector<std::string> commands;
 	while(true)
 	{
-		std::string command;
-		getline(ifs,command);
+		std::string line;
+		getline(ifs,line);
 		if(ifs.eof()) break;
-		if(!command.length()) continue;
+		if(!line.length()) continue;
 		if((*index) != 1)
 		{
-			commands.push_back(command);
+			commands.push_back(line);
 			(*index)--;
 		}
 		else
 		{
-			removingCommand = true;
-			deletedCommand = command;
+			foundCommand = true;
+			deletedCommand = line;
 			break;
 		}
 
 	}
 	ifs.close();
-	if(removingCommand)
+	if(foundCommand)
 	{
 		std::filesystem::remove(path);
 		std::ofstream ofs(path,std::ios::app);
 		for(const auto& command : commands)
 			ofs<<command+"\n";
 		ofs.close();
-		output(info,"Removed \"%s\" from %s autorun file",deletedCommand.c_str(),scope.c_str());
+		output(info,"Deleted \"%s\" from %s autorun file",deletedCommand.c_str(),scope.c_str());
 	}
 
-	return removingCommand;
+	return foundCommand;
 }
 int main(int argc, char** argv)
 {
@@ -126,7 +126,7 @@ int main(int argc, char** argv)
 		fprintf(stdout,"\t-m\t\tCreate autorun command for current campaign.\n");
 		fprintf(stdout,"\t-s\t\tCreate autorun command for shell scope.\n");
 		fprintf(stdout,"\t-l\t\tList currently saved commands in all scopes.\n");
-		fprintf(stdout,"\t-r\t\tRemove one or more commands.\n");
+		fprintf(stdout,"\t-d\t\tDelete a command.\n");
 		fprintf(stdout,"\t-v\t\tSame as %snone%s, but outputs what command is ran from which scope.\n",TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\t%s | %s\tPrint this help text.\n",FLAG_HELPSHORT,FLAG_HELPLONG);
 		return 0;
@@ -174,7 +174,7 @@ int main(int argc, char** argv)
 		printHeader("("+std::string(1,CHARACTER_SIGIL)+") "+c.getName());
 		printCommands(c_path,false,&cmd_ctr);
 	}
-	else if(!strcasecmp(argv[1],"-r"))
+	else if(!strcasecmp(argv[1],"-d"))
 	{
 		int cmd_ctr = 0;
 		std::string m_name = getEnvVariable(ENV_CURRENT_CAMPAIGN);
@@ -201,9 +201,9 @@ int main(int argc, char** argv)
 			catch(...){}
 		}
 
-		if(!removeCommand(s_path,&index,"shell") &&
-		   !removeCommand(m_path,&index,"campaign") &&
-		   !removeCommand(c_path,&index,"character"))
+		if(!deleteCommand(s_path,&index,"shell") &&
+		   !deleteCommand(m_path,&index,"campaign") &&
+		   !deleteCommand(c_path,&index,"character"))
 		{
 			output(error,"No command exists at position %s",index_str.c_str());
 			return -1;
