@@ -1568,8 +1568,12 @@ int runApp(std::string arg_str, bool redirect_output)
 	while(subshell_it != end)
 	{
 		std::regex escaped_subshell_pattern(std::regex_replace(escapeRegexGroupChars(subshell_it->str()),std::regex("\\$"),"\\$"));
-		std::string subshell = right(left(subshell_it->str(),subshell_it->str().length()-1),2);
-		arg_str = std::regex_replace(arg_str,escaped_subshell_pattern,getAppOutput(subshell).output[0],std::regex_constants::format_first_only);
+		std::string subshell_output;
+		for(const auto& line : getAppOutput(right(left(subshell_it->str(),subshell_it->str().length()-1),2)).output)
+			subshell_output += line+"\n";
+		subshell_output = left(subshell_output,subshell_output.length()-2);
+		if(!Var(subshell_output).isInt()) subshell_output = "\""+regex_replace(subshell_output,std::regex("\\n"),"\\n")+"\"";
+		arg_str = std::regex_replace(arg_str,escaped_subshell_pattern,subshell_output,std::regex_constants::format_first_only);
 		subshell_it = std::sregex_iterator(arg_str.begin(),arg_str.end(),subshell_pattern);
 	}
 
