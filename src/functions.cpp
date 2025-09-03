@@ -1768,7 +1768,7 @@ int runApp(std::string arg_str, bool redirect_output)
 	}
 	else
 	{
-			status = posix_spawn(&pid, argv[0], NULL, NULL, &argv[0], environ);
+		status = posix_spawn(&pid, argv[0], NULL, NULL, &argv[0], environ);
 	}
 
 	if(status == 0)
