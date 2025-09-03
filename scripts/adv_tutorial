@@ -1,0 +1,70 @@
+#!/usr/local/bin/rpgsh -s
+
+! Author: 0xbd (bd@0xbd.net)
+! This script is designed to walk users through more advanced functions like command substitution, if, while, and for loops
+
+print -r "%b%<<<     Welcome to the %cyan%RPG%magenta%sh%/fg% Advanced Tutorial\!     >>>\n"
+print -r "%b%%cyan%RPG%magenta%sh%/fg%%/b% allows users to do many different things with variables and variable sets. This includes things like %b%%yellow%command substitution%/%, %b%%green%if%/% statements, %b%%green%while%/% loops, and %b%%green%for%/% loops.\n"
+print -r "Command substitution allows us to inject the output from a command into another command. The most basic example is setting a variable to the output of a command. For example, if we enter %b%@ \b/MyAttackRoll = $ \b(roll 2d8+4 --only-total)%/b%, this will set the variable %b%@ \b/MyAttackRoll%/b% to the output of a %b%roll 2d8+4 --only-total%/b% command. Let's do that now."
+
+@/MyAttackRoll = $(roll 2d8+4 --only-total)
+
+print -r "If you run this script multiple times, you'll see that the value changes because it's the output from a dice roll.\n"
+
+print -r "Now lets talk about conditional statements like %b%%green%if%/%, %b%%green%while%/%, and %b%%green%for%/%."
+print -r "if statements run code when a given condition evaluates to %fg=limegreen%true%/fg%."
+print -r "For example, let's create a variable and initialize it to 2."
+@/test = 2
+print -r "Next, we will create an if statement that will check if our new variable is equal to the number 2 and print out text if this is true. Note that each command between the curly braces must end with a semi-colon, although they do not need to be all on the same line. Only the open curly brace needs to be on the same line as the \"if\". Also note that quotation marks are escaped between the curly braces."
+print -r "This will look like: %b%if @ \b/test == 2 \{ print -r \\\"TRUE\\\"; \}"
+if @/test == 2 { print -r \"TRUE\"; }
+
+print -r "\nif statements only execute their code once. If we want to execute code multiple times, we need a loop. This is where the %b%%green%while%/%, and %b%%green%for%/% commands come in."
+print -r "A while loop will continuously evaluate and execute its' code so long as the condition evaluates to %fg=limegreen%true%/fg%. The while loop will terminate once that condition evaluates to %fg=red%false%/fg%.\n"
+print -r "A while loop follows the exact same syntax as an if statement, just with the \"if\" replaced with \"while\"."
+print -r "Since we will br printing more than just one line at a time, lets lower the verbosity a bit so we don't see a bunch of %b%%cyan%INFO%/% text by running %b%config verbosity=2%/b%."
+config verbosity=2
+print -r "Lets run a while loop that checks if %b%@ \b/test < 10%/%, then prints the Value property of that variable and iterates it by 1. This will look like:"
+print -r "%b%while @ \b/test < 10 \{"
+print -r "%b%\tprint -r \"Test: @ \b/test.Value\";"
+print -r "%b%\t@ \b/test ++;"
+print -r "%b%\}"
+while @/test < 10 {
+	print -r \"Test: @/test.Value\";
+	@/test ++;
+}
+
+print -r "\nThere may be times when we want to skip the rest of a loop, or break out of a loop altogether. This can be accomplished through the %b%%magenta%continue%/% and %b%%magenta%break%/% keywords respectively. Note that these are not commands and as such don't appear when running the %b%%green%help%/% command.\n"
+print -r "Lets run two similar while loops. Each one will check if our test variable is less than 10 and increment on each cycle. The first loop will continue when %b%@ \b/test == 8%/% evaluates to %fg=limegreen%true%/fg%, whereas the second loop will break when that same condition evaluates to %fg=limegreen%true%/fg%. We will reset @ \b/test to 1 before each loop begins.\n"
+@/test = 1
+while @/test < 10 {
+	@/test ++;
+	if @/test == 8 { continue; }
+	print -r \"@/test.Value\";
+}
+print -r "\nNow for the second loop...\n"
+@/test = 1
+while @/test < 10 {
+	@/test ++;
+	if @/test == 8 { break; }
+	print -r \"@/test.Value\";
+}
+print -r "\nNote now the first loop simply skips printing \"8\", whereas the second loop exits altogether when the condition is met.\n"
+print -r "If we want to iterate through a set of data, we can use a for loop. Instead of condition, a for loop requires the user to declare a named value for the %b%key%/b% and %b%value%/b% that will be printed for each pair in the set. For example to write a for loop that iterates through all Dice-type variables in the currently loaded character using %b%k%/b% and %b%v%/b% for the key and value respectively (they don't have to be single characters, I am just doing this for brevity), printing each value as the loop iterates, we would write:"
+print -r "%b%for k,v @ \bd/ \{"
+print -r "%b%\tprint -r \"Key: $ \b/k\";"
+print -r "%b%\tprint -r \"Value: $ \b/v\\n\";"
+print -r "%b%\}"
+for k,v @d/ {
+	print -r \"Key: $/k\";
+	print -r \"Value: $/v\\n\";
+}
+
+print -r "Note that if you wanted to change the data in the set inside the for loop, you would have to start the command with %b%@ \b/$/k%/b% (or whatever the appropriate scope character is).\n"
+print -r "Time to return the verbosity setting to its' default value."
+config verbosity=3
+print -r "\n...and finally delete these unneeded variables."
+del @/MyAttackRoll
+del @/test
+
+print -r "Done"
