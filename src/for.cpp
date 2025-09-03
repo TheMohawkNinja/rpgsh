@@ -32,7 +32,6 @@ int main(int argc, char** argv)
 	ComplexCommandInfo cci = parseComplexCommandString(argc, argv, true);
 
 	std::string key, value, set;
-	VariableInfo vi;
 	if(findu(cci.condition,',') == std::string::npos)
 	{
 		output(error,"Expected \',\'.");
@@ -47,9 +46,9 @@ int main(int argc, char** argv)
 		return -1;
 	}
 	value = left(cci.condition,findu(cci.condition,' '));
-	set = right(cci.condition,value.length()+1);
+	set = right(cci.condition,rfindu(cci.condition,' ')+1);
 
-	vi = parseVariable(set);
+	VariableInfo vi = parseVariable(set);
 	set = getSetStr(vi);
 	if(!looksLikeSet(set))
 	{
