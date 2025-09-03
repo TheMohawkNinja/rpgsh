@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 			fprintf(stdout,"\troll %sdice%s [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 			fprintf(stdout,"\nOPTIONS:\n");
 			fprintf(stdout,"\t-r %sn%s\t\tRepeat the roll %sn%s times. Set to 1 if omitted.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
-			fprintf(stdout,"\t-l\t\tPrints all of the available dice lists.\n");
+			fprintf(stdout,"\t-l\t\tPrints all of the available dice lists in the default folder.\n");
 			fprintf(stdout,"\t-c %sexpr n%s\tCount rolls meeting a criteria defined by a boolean expression %sexpr%s and a number %sn%s.\n\t\t\tExpressions supported: %s, %s, %s, %s, %s, %s\n\t\t\tIf %sexpr%s is omitted, it assumes \'%s\'.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,OP_EQ,OP_LT,OP_GT,OP_LE,OP_GE,OP_NE,TEXT_ITALIC,TEXT_NORMAL,OP_EQ);
 			fprintf(stdout,"\t--only-rolls\tOnly display dice rolls.\n");
 			fprintf(stdout,"\t--only-total\tOnly display total of the roll. When used with a list, only the list item is shown.\n");
@@ -100,7 +100,7 @@ int main(int argc, char** argv)
 		{
 			std::vector<std::string> lists = getDirectoryListing(dice_lists_dir);
 			for(const auto& list : lists)
-				fprintf(stdout,"%s\n",list.c_str());
+				if(!std::filesystem::is_directory(dice_lists_dir+"/"+list)) fprintf(stdout,"%s\n",list.c_str());
 			return 0;
 		}
 		else if(current_arg == "-c")
