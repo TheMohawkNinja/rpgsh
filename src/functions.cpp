@@ -1182,9 +1182,9 @@ std::string escapeSpaces(std::string str)
 
 	return ret;
 }
-std::string escapeRegexGroupChars(std::string str)
+std::string escapeRegexChars(std::string str)
 {
-	std::vector<std::string> patterns = {"\\[","\\]","\\(","\\)","\\{","\\}"};
+	std::vector<std::string> patterns = {"\\[","\\]","\\(","\\)","\\{","\\}","\\$","\\^","\\*","\\-","\\+","\\?"};
 	for(const auto& p : patterns)
 		str = std::regex_replace(str,std::regex(p),p);
 
@@ -1532,7 +1532,7 @@ int replaceVariables(std::string* p_arg_str, PreserveVariableLevel pvl)
 			return -1;
 		}
 		(*p_arg_str) = left((*p_arg_str),match.second-offset)+
-			  std::regex_replace(match.first,std::regex(escapeRegexGroupChars(match.first)),info.output[0])+
+			  std::regex_replace(match.first,std::regex(escapeRegexChars(match.first)),info.output[0])+
 			  right((*p_arg_str),match.second+match.first.length()-offset);
 		offset += match.first.length()-info.output[0].length();
 	}
@@ -1567,7 +1567,7 @@ int runApp(std::string arg_str, bool redirect_output)
 	std::sregex_iterator cmdsub_it(arg_str.begin(),arg_str.end(),cmdsub_pattern);
 	while(cmdsub_it != end)
 	{
-		std::regex escaped_cmdsub_pattern(std::regex_replace(escapeRegexGroupChars(cmdsub_it->str()),std::regex("\\$"),"\\$"));
+		std::regex escaped_cmdsub_pattern(escapeRegexChars(cmdsub_it->str()));
 		std::string cmdsub_output;
 		for(const auto& line : getAppOutput(right(left(cmdsub_it->str(),cmdsub_it->str().length()-1),2)).output)
 			cmdsub_output += line+"\n";
