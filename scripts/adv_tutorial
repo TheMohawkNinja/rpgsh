@@ -22,9 +22,9 @@ if @/test == 2 { print -r \"TRUE\"; }
 print -r "\nif statements only execute their code once. If we want to execute code multiple times, we need a loop. This is where the %b%%green%while%/%, and %b%%green%for%/% commands come in."
 print -r "A while loop will continuously evaluate and execute its' code so long as the condition evaluates to %fg=limegreen%true%/fg%. The while loop will terminate once that condition evaluates to %fg=red%false%/fg%.\n"
 print -r "A while loop follows the exact same syntax as an if statement, just with the \"if\" replaced with \"while\"."
-print -r "Since we will br printing more than just one line at a time, lets lower the verbosity a bit so we don't see a bunch of %b%%cyan%INFO%/% text by running %b%config verbosity=2%/b%."
+print -r "Since we will be printing more than just one line at a time, lets lower the verbosity a bit so we don't see a bunch of %b%%cyan%INFO%/% text by running %b%config verbosity=2%/b%. This won't output anything, because the %b%%cyan%INFO%/% text you would normally see after changing a configuration setting has been blocked from outputting."
 config verbosity=2
-print -r "Lets run a while loop that checks if %b%@ \b/test < 10%/%, then prints the Value property of that variable and iterates it by 1. This will look like:"
+print -r "With the verbosity lowered, let's run a while loop that checks if %b%@ \b/test < 10%/%, then prints the Value property of that variable and iterates it by 1. This will look like:"
 print -r "%b%while @ \b/test < 10 \{"
 print -r "%b%\tprint -r \"Test: @ \b/test.Value\";"
 print -r "%b%\t@ \b/test ++;"
