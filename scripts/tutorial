@@ -3,7 +3,7 @@
 ! Author: 0xbd (bd@0xbd.net)
 ! This script is designed to walk users through the basics of how to use rpgsh
 
-print -r "%b%<<<\tWelcome to the %cyan%RPG%magenta%sh%/fg% tutorial\!\t>>>\n"
+print -r "%b%<<<     Welcome to the %cyan%RPG%magenta%sh%/fg% Tutorial\!     >>>\n"
 print -r "This tutorial is designed to walk you through the basics on how to use %b%%cyan%RPG%magenta%sh%/fg%%/b%."
 print -r "As this is simply a basic overview, please reference %b%docs/rpgsh-userguide.pdf%/b% for more detailed information."
 
