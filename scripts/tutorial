@@ -66,7 +66,7 @@ print -r "\nOperations on other data types are meant to be intuitive. For exampl
 print -r "\nThere are many other commands available for use in %b%%cyan%RPG%magenta%sh%/fg%%/b%. You can use the %b%%green%help%/% command to view them all\!"
 help
 
-print -r "\nThis concludes the basic tutorial for %b%%cyan%RPG%magenta%sh%/fg%%/b%. Last thing to do before exiting is to delete the variables we created with the %b%del%/b% command so we don't mess with the currently loaded character more than we have to."
+print -r "\nThis concludes the basic tutorial for %b%%cyan%RPG%magenta%sh%/fg%%/b%. If you want to learn about %b%%yellow%command substitution%/%, %b%%green%if%/% statements, %b%%green%while%/% loops, and %b%%green%for%/% loops, run the \"adv_tutorial\" script.\n\nLast thing to do before exiting is to delete the variables we created with the %b%del%/b% command so we don't mess with the currently loaded character more than we have to."
 del @/MyNumVar
 del @/MyStrVar
 del @/MyDice
