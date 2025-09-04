@@ -4,9 +4,6 @@
 
 int main(int argc, char** argv)
 {
-	if(argc > 2)
-		output(warning,"script only expects 0 or 1 arguments, ignoring all other arguments.");
-
 	chkFlagAppDesc(argv,"Runs an rpgsh script.");
 	chkFlagPreserveVariables(argv,none);
 
@@ -15,7 +12,7 @@ int main(int argc, char** argv)
 		fprintf(stdout,"USAGE:\n");
 		fprintf(stdout,"\tscript [%sOPTIONS%s]\n",TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\nOPTIONS:\n");
-		fprintf(stdout,"\t%sscript%s\t\tRuns the script %sscript%s.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
+		fprintf(stdout,"\t%sscript%s %sargs%s\t\tRuns the script %sscript%s with the option args %sargs%s.\n",TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL,TEXT_ITALIC,TEXT_NORMAL);
 		fprintf(stdout,"\t-l\t\tPrints all of the available scripts in the default folder.\n");
 		fprintf(stdout,"\t%s | %s\tPrint this help text.\n",FLAG_HELPSHORT,FLAG_HELPLONG);
 		return 0;
@@ -34,5 +31,8 @@ int main(int argc, char** argv)
 		return 0;
 	}
 
-	return runScript(std::string(argv[1]));
+	std::vector<std::string> args;
+	args.push_back(std::to_string(argc-2));
+	for(int i=2; i<argc; i++) args.push_back(std::string(argv[i]));
+	return runScript(std::string(argv[1]),args);
 }
