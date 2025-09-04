@@ -33,7 +33,7 @@ int main(int argc, char** argv)
 	for(const auto& command : cci.commands)
 	{
 		int status = runApp(handleBackslashEscSeqs(command),false);
-		if(status == STATUS_BREAK || status == STATUS_CONTINUE)
+		if(status == STATUS_BREAK || status == STATUS_CONTINUE || status == STATUS_EXIT)
 			return status;
 	}
 
