@@ -646,8 +646,6 @@ int main(int argc, char** argv)
 			args[0] = lparens+std::string(Var(args[0]))+rparens;
 		}
 
-		//if(vi.variable != "") old_value = args[0];
-
 		if(lparen_ctr > rparen_ctr)
 		{
 			output(error,"Missing close parenthesis to match open parenthesis.");
