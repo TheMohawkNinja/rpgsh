@@ -139,7 +139,7 @@ ComplexCommandInfo parseComplexCommandString(int argc, char** argv, bool hasCond
 int replaceVariables(std::string* p_arg_str, PreserveVariableLevel pvl);
 int runApp(std::string arg_str, bool redirect_output);
 GetAppOutputInfo getAppOutput(std::string prog);
-int runScript(std::string path);
+int runScript(std::string path, std::vector<std::string> args);
 
 void chkFlagAppDesc(char** _argv, std::string description);
 void chkFlagPreserveVariables(char** _argv, PreserveVariableLevel pvl=none);
