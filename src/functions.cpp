@@ -1184,7 +1184,7 @@ std::string escapeSpaces(std::string str)
 }
 std::string escapeRegexChars(std::string str)
 {
-	std::vector<std::string> patterns = {"\\[","\\]","\\(","\\)","\\{","\\}","\\$","\\^","\\*","\\-","\\+","\\?"};
+	std::vector<std::string> patterns = {"\\[","\\]","\\(","\\)","\\{","\\}","\\$","\\^","\\*","\\-","\\+","\\?","\\|","\\."};
 	for(const auto& p : patterns)
 		str = std::regex_replace(str,std::regex(p),p);
 
@@ -1555,6 +1555,7 @@ int runApp(std::string arg_str, bool redirect_output)
 	if(arg_str[0] == COMMENT) return 0;
 	else if(left(arg_str,findu(arg_str,' ')) == "break") return STATUS_BREAK;
 	else if(left(arg_str,findu(arg_str,' ')) == "continue") return STATUS_CONTINUE;
+	else if(left(arg_str,findu(arg_str,' ')) == "exit") return STATUS_EXIT;
 
 	//Snip out inline comment
 	if(findu(arg_str,COMMENT) != std::string::npos)
@@ -1563,19 +1564,27 @@ int runApp(std::string arg_str, bool redirect_output)
 	std::sregex_iterator end;
 
 	//Handle command substitution
-	std::regex cmdsub_pattern("\\$\\(((?!\\$\\()[^\\)])+?\\)+?");
-	std::sregex_iterator cmdsub_it(arg_str.begin(),arg_str.end(),cmdsub_pattern);
-	while(cmdsub_it != end)
+	//Skip command substitution in complex args so they get evaluated properly
+	if(findu(arg_str," { ") == std::string::npos)
 	{
-		std::regex escaped_cmdsub_pattern(escapeRegexChars(cmdsub_it->str()));
-		std::string cmdsub_output;
-		for(const auto& line : getAppOutput(right(left(cmdsub_it->str(),cmdsub_it->str().length()-1),2)).output)
-			cmdsub_output += line+"\n";
-		cmdsub_output = left(cmdsub_output,cmdsub_output.length()-2);
-		if(!Var(cmdsub_output).isInt()) cmdsub_output = "\""+regex_replace(cmdsub_output,std::regex("\\n"),"\\n")+"\"";
-		arg_str = std::regex_replace(arg_str,escaped_cmdsub_pattern,cmdsub_output,std::regex_constants::format_first_only);
-		cmdsub_it = std::sregex_iterator(arg_str.begin(),arg_str.end(),cmdsub_pattern);
+		std::regex cmdsub_pattern("\\$\\(((?!\\$\\()[^\\)])+?\\)+?");
+		std::sregex_iterator cmdsub_it(arg_str.begin(),arg_str.end(),cmdsub_pattern);
+		while(cmdsub_it != end)
+		{
+			std::regex escaped_cmdsub_pattern(escapeRegexChars(cmdsub_it->str()));
+			std::string cmdsub_output;
+			for(const auto& line : getAppOutput(right(left(cmdsub_it->str(),cmdsub_it->str().length()-1),2)).output)
+				cmdsub_output += line+"\n";
+			cmdsub_output = left(cmdsub_output,cmdsub_output.length()-2);
+			if(!Var(cmdsub_output).isInt()) cmdsub_output = "\""+regex_replace(cmdsub_output,std::regex("\\n"),"\\n")+"\"";
+			arg_str = std::regex_replace(arg_str,escaped_cmdsub_pattern,cmdsub_output,std::regex_constants::format_first_only);
+			cmdsub_it = std::sregex_iterator(arg_str.begin(),arg_str.end(),cmdsub_pattern);
+		}
 	}
+
+	//Escape colons to prevent issues with variable sets
+	while(findu(arg_str,':') != std::string::npos)
+		arg_str.insert(arg_str.begin()+findu(arg_str,':'),'\\');
 
 	Configuration cfg = Configuration();
 	Character c = Character();
@@ -1818,7 +1827,7 @@ GetAppOutputInfo getAppOutput(std::string prog)
 
 	return info;
 }
-int runScript(std::string path)
+int runScript(std::string path, std::vector<std::string> args)
 {
 	if(path[0] != '/' && left(path,2) != "./" && left(path,3) != "../")
 		path = scripts_dir+path;
@@ -1846,7 +1855,9 @@ int runScript(std::string path)
 			cmd += line;
 			if(countu(cmd,'{') <= countu(cmd,'}'))
 			{
-				runApp(cmd,false);
+				for(int i=0; i<args.size(); i++)
+					cmd = std::regex_replace(cmd,std::regex("\\$"+std::to_string(i)+"(?!\\w)"),args[i]);
+				if(runApp(cmd,false) == STATUS_EXIT) return 0;
 				cmd = "";
 			}
 			else
