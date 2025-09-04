@@ -116,12 +116,6 @@ int prompt()
 			return 1; //Non-zero so we can exit, and positive so user can discriminate between good exits and bad exits
 		}
 
-		//Auto-escape colons so as to not cause issues with variable sets
-		std::regex colon(":");
-		std::string tmp_buffer = std::regex_replace(std::string(buffer),colon,"\\:");
-		for(unsigned int i=0; i<tmp_buffer.length(); i++)
-			buffer[i]=tmp_buffer[i];
-
 		cfg = Configuration();
 		for(const auto& app : split(cfg.setting[PRE_RUN_APPS],','))
 			if(app.length()) (void)runApp(app,false);
@@ -199,7 +193,6 @@ int main(int argc, char** argv)
 	fprintf(stdout,CLEAR_ENTIRE_LINE);//Delete "Generating..." line from start of main()
 
 	//Handle arguments
-	if(argc > 3) output(warning,"rpgsh expects 0, 1, or 2 arguments. Ignoring everything past \"%s\".",argv[2]);
 	if(chkFlagHelp(argv))
 	{
 		fprintf(stdout,"\n");
@@ -232,7 +225,10 @@ int main(int argc, char** argv)
 	//Handle scripts
 	if(argc > 2 && !strcmp(argv[1],"-s"))
 	{
-		return runScript(std::string(argv[2]));
+		std::vector<std::string> args;
+		args.push_back(std::to_string(argc-3));
+		for(int i=3; i<argc; i++) args.push_back(std::string(argv[i]));
+		return runScript(std::string(argv[2]),args);
 	}
 	else if(argv[1] && !strcmp(argv[1],"-s"))
 	{
