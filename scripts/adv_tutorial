@@ -49,8 +49,8 @@ while @/test < 10 {
 	if @/test == 8 { break; }
 	print -r \"@/test.Value\";
 }
-print -r "\nNote now the first loop simply skips printing \"8\", whereas the second loop exits altogether when the condition is met.\n"
-print -r "If we want to iterate through a set of data, we can use a for loop. Instead of condition, a for loop requires the user to declare a named value for the %b%key%/b% and %b%value%/b% that will be printed for each pair in the set. For example to write a for loop that iterates through all Dice-type variables in the currently loaded character using %b%k%/b% and %b%v%/b% for the key and value respectively (they don't have to be single characters, I am just doing this for brevity), printing each value as the loop iterates, we would write:"
+print -r "\nNote now the first loop simply skips printing \"8\", whereas the second loop exits altogether when the condition is met. It should be noted that there is also an \"exit\" keyword which will exit the script entirely. Given that keyword would prematurely exit this tutorial, we will not be demonstrating it."
+print -r "\nIf we want to iterate through a set of data, we can use a for loop. Instead of condition, a for loop requires the user to declare a named value for the %b%key%/b% and %b%value%/b% that will be printed for each pair in the set. For example to write a for loop that iterates through all Dice-type variables in the currently loaded character using %b%k%/b% and %b%v%/b% for the key and value respectively (they don't have to be single characters, I am just doing this for brevity), printing each value as the loop iterates, we would write:"
 print -r "%b%for k,v @ \bd/ \{"
 print -r "%b%\tprint -r \"Key: $ \bk\";"
 print -r "%b%\tprint -r \"Value: $ \bv\\n\";"
@@ -61,6 +61,8 @@ for k,v @d/ {
 }
 
 print -r "Note that if you wanted to change the data in the set inside the for loop, you would have to start the command with %b%@ \b/$/k%/b% (or whatever the appropriate scope character is).\n"
+print -r "\nThe last important thing to learn is about script arguments. Just like with any of the commands in %b%%cyan%RPG%magenta%sh%/fg%%/b%, scripts can be augmented with arguments. Similar to how keys and values in a for loop are written, script args can be referenced as %b%$0%/%, %b%$\1%/%, ..., %b%$%i%n%/%. Note that %b%$\0%/b% returns the total number of args passed to the script, with %b%$\1%/b% through %b%$%i%n%/% representing each of the args passed to the script.\n"
+print -r "Therefore, if we were to run %b%script MyScript test 123 Hello%/b%, $\0 = 3, $\1 = test, $\2 = 123, and $\3 = Hello."
 print -r "\nThis concludes the advanced tutorial. For an example of an actually useful script that one might use in-game, please see the contents of the %b%masseval%/b% script."
 print -r "\nTime to return the verbosity setting to its' default value."
 config verbosity=3
