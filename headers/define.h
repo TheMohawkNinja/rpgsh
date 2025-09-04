@@ -99,6 +99,7 @@
 //Special return codes
 #define STATUS_BREAK			100
 #define STATUS_CONTINUE			101
+#define STATUS_EXIT			102
 
 //Internal file/directory paths
 //dir = Directory
