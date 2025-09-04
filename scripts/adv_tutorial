@@ -52,12 +52,12 @@ while @/test < 10 {
 print -r "\nNote now the first loop simply skips printing \"8\", whereas the second loop exits altogether when the condition is met.\n"
 print -r "If we want to iterate through a set of data, we can use a for loop. Instead of condition, a for loop requires the user to declare a named value for the %b%key%/b% and %b%value%/b% that will be printed for each pair in the set. For example to write a for loop that iterates through all Dice-type variables in the currently loaded character using %b%k%/b% and %b%v%/b% for the key and value respectively (they don't have to be single characters, I am just doing this for brevity), printing each value as the loop iterates, we would write:"
 print -r "%b%for k,v @ \bd/ \{"
-print -r "%b%\tprint -r \"Key: $ \b/k\";"
-print -r "%b%\tprint -r \"Value: $ \b/v\\n\";"
+print -r "%b%\tprint -r \"Key: $ \bk\";"
+print -r "%b%\tprint -r \"Value: $ \bv\\n\";"
 print -r "%b%\}"
 for k,v @d/ {
-	print -r \"Key: $/k\";
-	print -r \"Value: $/v\\n\";
+	print -r \"Key: $k\";
+	print -r \"Value: $v\\n\";
 }
 
 print -r "Note that if you wanted to change the data in the set inside the for loop, you would have to start the command with %b%@ \b/$/k%/b% (or whatever the appropriate scope character is).\n"
