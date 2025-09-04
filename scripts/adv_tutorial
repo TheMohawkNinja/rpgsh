@@ -61,7 +61,8 @@ for k,v @d/ {
 }
 
 print -r "Note that if you wanted to change the data in the set inside the for loop, you would have to start the command with %b%@ \b/$/k%/b% (or whatever the appropriate scope character is).\n"
-print -r "Time to return the verbosity setting to its' default value."
+print -r "\nThis concludes the advanced tutorial. For an example of an actually useful script that one might use in-game, please see the contents of the %b%masseval%/b% script."
+print -r "\nTime to return the verbosity setting to its' default value."
 config verbosity=3
 print -r "\n...and finally delete these unneeded variables."
 del @/MyAttackRoll
