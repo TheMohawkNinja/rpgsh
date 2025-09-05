@@ -1,0 +1,44 @@
+#!/usr/local/bin/rpgsh -s
+
+! Author: 0xbd (bd@0xbd.net)
+! This script will run eval on all the selected units
+
+if $0 == 0 {
+	print -r \"%red%%b%masseval expects at least 1 arg.\";
+	exit;
+}
+
+if $0 == 1 && ($1 == "-?") || ($1 == "--help") {
+	print -r \"USAGE: masseval target_name copy1,copy2,...,copyn key operator operand\";
+	print -r \"\\nEXAMPLE: masseval kobold 1,4,6 HitPoints/Current -= 3\";
+	print -r \"This will effectively run the following commands:\";
+	print -r \"\\t@ \b[kobold1]/HitPoints/Current -= 3\";
+	print -r \"\\t@ \b[kobold4]/HitPoints/Current -= 3\";
+	print -r \"\\t@ \b[kobold6]/HitPoints/Current -= 3\";
+	exit;
+}
+
+if $0 <> 5 {
+	print -r \"%red%%b%Invalid arg count\\! masseval only supports 5 args for normal operation.\";
+	exit;
+}
+
+$/verbosity = $(config verbosity)
+config verbosity=2
+$/targets = $2 + ","
+$/CurrentCharacter = @/Name
+
+while $(exec echo $/targets.Value | grep -o , | wc -c) > 0 {
+	$/target = $(exec echo $/targets.Value | cut -c1);
+	$/targets = $(exec echo $/targets.Value | cut -c3-);
+	load -c $1$/target.value;
+	@/$3 $4 $5;
+	print -r \"@ \b[$1$/target.value] \b/$3 is now @/$3\";
+	del $/target;
+}
+
+del $/targets
+load -c $/CurrentCharacter.Value
+del $/CurrentCharacter
+config verbosity=$/verbosity.Value
+del $/verbosity
