@@ -48,17 +48,12 @@ int main(int argc, char** argv)
 	value = left(cci.condition,findu(cci.condition,' '));
 	set = right(cci.condition,rfindu(cci.condition,' ')+1);
 
-	VariableInfo vi;
+	VariableInfo vi = parseVariable(set);
+	set = getSetStr(vi);
 	if(!looksLikeSet(set))
 	{
-		fprintf(stdout,"%s does not look like a set\n",set.c_str());
-		vi = parseVariable(set);
-		set = getSetStr(vi);
-		if(!looksLikeSet(set))
-		{
-			output(error,"Expected set after value name.");
-			return -1;
-		}
+		output(error,"Expected set after value name.");
+		return -1;
 	}
 
 	for(auto& [k,v] : getSet(set))
